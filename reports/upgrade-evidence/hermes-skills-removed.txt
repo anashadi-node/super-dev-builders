@@ -1,0 +1,145 @@
+# Blok audit 3 skill hub DANGEROUS yang dibuang (approval #9b, 2026-10-04)
+
+Scan: comfyui (official/creative/comfyui/community)  Verdict: DANGEROUS
+  CRITICAL supply_chain   SKILL.md:539                   "curl -s 
+http://127.0.0.1:8188/queue | python -m json.tool"
+  CRITICAL traversal      tests/test_common.py:251       
+"safe_path_join(tmp_path, "/etc/passwd")"
+  CRITICAL obfuscation    scripts/comfyui_setup.sh:117   "VERDICT="$(echo 
+"$HW_JSON" | python3 -c 'import sys,json; pr"
+  CRITICAL obfuscation    scripts/comfyui_setup.sh:118   "FLAG="$(echo 
+"$HW_JSON"   | python3 -c 'import sys,json; pri"
+  CRITICAL supply_chain   scripts/comfyui_setup.sh:238   "curl -fsS 
+"http://127.0.0.1:$PORT/system_stats" | python3 -m"
+  CRITICAL supply_chain   scripts/comfyui_setup.sh:260   "curl -fsS 
+"http://127.0.0.1:$PORT/system_stats" | python3 -m"
+  CRITICAL supply_chain   references/rest-api.md:203     "curl -s 
+"http://127.0.0.1:8188/object_info" | python3 -m jso"
+  MEDIUM   network        SKILL.md:108                   "curl -s 
+http://127.0.0.1:8188/system_stats 2>/dev/null && ec"
+  MEDIUM   network        SKILL.md:152                   "# Local (defaults to 
+http://127.0.0.1:8188)"
+  MEDIUM   network        SKILL.md:406                   "curl -s 
+http://127.0.0.1:8188/system_stats      # health che"
+  MEDIUM   network        SKILL.md:504                   "curl -X POST 
+"http://127.0.0.1:8188/upload/image" \"
+  MEDIUM   network        SKILL.md:539                   "curl -s 
+http://127.0.0.1:8188/queue | python -m json.tool"
+  MEDIUM   network        SKILL.md:540                   "curl -X POST 
+http://127.0.0.1:8188/queue -d '{"clear": true}"
+  MEDIUM   network        SKILL.md:541                   "curl -X POST 
+http://127.0.0.1:8188/interrupt                "
+  MEDIUM   network        SKILL.md:542                   "curl -X POST 
+http://127.0.0.1:8188/free \"
+  MEDIUM   network        SKILL.md:559                   "`curl 
+http://127.0.0.1:8188/system_stats`."
+  MEDIUM   supply_chain   SKILL.md:166                   "# Real-time progress 
+via WebSocket (requires `pip install we"
+  MEDIUM   supply_chain   SKILL.md:380                   "pip install --user 
+comfy-cli"
+  MEDIUM   supply_chain   SKILL.md:420                   "pip install torch 
+torchvision torchaudio --extra-index-url h"
+  MEDIUM   supply_chain   SKILL.md:418                   "git clone 
+https://github.com/comfyanonymous/ComfyUI.git"
+  MEDIUM   network        tests/test_run_workflow.py:180 "assert r.host == 
+"http://127.0.0.1:8188""
+  MEDIUM   network        tests/test_run_workflow.py:200 "assert url == 
+"http://127.0.0.1:8188/prompt""
+  MEDIUM   exfiltration   tests/conftest.py:54           "return 
+os.environ.get("COMFY_CLOUD_API_KEY")"
+  MEDIUM   exfiltration   tests/conftest.py:59           "if 
+os.environ.get("COMFY_CLOUD_API_KEY"):"
+  MEDIUM   network        tests/test_common.py:42        "assert 
+is_cloud_host("http://127.0.0.1:8188") is False"
+  MEDIUM   network        tests/test_common.py:49        "assert 
+is_cloud_host("127.0.0.1:8188") is False"
+  MEDIUM   network        tests/test_common.py:72        "assert 
+resolve_url("http://127.0.0.1:8188", "/prompt") == "h"
+  MEDIUM   network        tests/test_common.py:88        "assert 
+resolve_url("http://127.0.0.1:8188/", "/prompt") == ""
+  MEDIUM   supply_chain   scripts/ws_monitor.py:130      ""install": "pip 
+install websocket-client","
+  MEDIUM   execution      scripts/hardware_check.py:56   "out = subprocess.run("
+  MEDIUM   supply_chain   scripts/comfyui_setup.sh:171   "log "Neither pipx nor 
+uvx found. Falling back to pip install"
+  MEDIUM   supply_chain   scripts/comfyui_setup.sh:173   "if ! pip install 
+--user comfy-cli >>"$LOG_FILE" 2>&1; then"
+  MEDIUM   supply_chain   scripts/comfyui_setup.sh:175   "log "pip install 
+--user failed. Retrying with --break-system"
+  MEDIUM   supply_chain   scripts/comfyui_setup.sh:176   "pip install --user 
+--break-system-packages comfy-cli >>"$LOG"
+  MEDIUM   execution      scripts/auto_fix_deps.py:54    "proc = 
+subprocess.run(cmd, capture_output=True, text=True, e"
+  MEDIUM   supply_chain   scripts/auto_fix_deps.py:129   ""reason": "comfy-cli 
+not on PATH; install with `pip install "
+  MEDIUM   supply_chain   scripts/health_check.py:42     ""hint": "Install with:
+pipx install comfy-cli (or `pip insta"
+  MEDIUM   network        scripts/_common.py:43          "DEFAULT_LOCAL_HOST = 
+"http://127.0.0.1:8188""
+  MEDIUM   supply_chain   scripts/_common.py:463         ""Install with: pip 
+install requests""
+  MEDIUM   supply_chain   references/official-cli.md:13  "pip install --user 
+comfy-cli      # fallback"
+  MEDIUM   network        references/rest-api.md:11      "| Base URL | 
+`http://127.0.0.1:8188` | `https://cloud.comfy."
+  MEDIUM   network        references/rest-api.md:55      "curl -X POST 
+"http://127.0.0.1:8188/prompt" \"
+  MEDIUM   network        references/rest-api.md:103     "curl -s 
+"http://127.0.0.1:8188/history"          # all"
+  MEDIUM   network        references/rest-api.md:104     "curl -s 
+"http://127.0.0.1:8188/history/{id}"     # one promp"
+  MEDIUM   network        references/rest-api.md:129     "curl -s 
+"http://127.0.0.1:8188/view?filename=ComfyUI_00001_."
+  MEDIUM   network        references/rest-api.md:147     "wscat -c 
+"ws://127.0.0.1:8188/ws?clientId=MY-UUID""
+  MEDIUM   network        references/rest-api.md:187     "curl -X POST 
+"http://127.0.0.1:8188/upload/image" \"
+  MEDIUM   network        references/rest-api.md:192     "curl -X POST 
+"http://127.0.0.1:8188/upload/mask" \"
+  MEDIUM   network        references/rest-api.md:203     "curl -s 
+"http://127.0.0.1:8188/object_info" | python3 -m jso"
+  MEDIUM   network        references/rest-api.md:206     "curl -s 
+"http://127.0.0.1:8188/object_info/KSampler""
+  MEDIUM   network        references/rest-api.md:209     "curl -s 
+"http://127.0.0.1:8188/models/checkpoints""
+  MEDIUM   network        references/rest-api.md:210     "curl -s 
+"http://127.0.0.1:8188/models/loras""
+  MEDIUM   network        references/rest-api.md:221     "curl -s 
+"http://127.0.0.1:8188/queue""
+  MEDIUM   network        references/rest-api.md:224     "curl -X POST 
+"http://127.0.0.1:8188/queue" \"
+  MEDIUM   network        references/rest-api.md:229     "curl -X POST 
+"http://127.0.0.1:8188/queue" \"
+  MEDIUM   network        references/rest-api.md:234     "curl -X POST 
+"http://127.0.0.1:8188/interrupt""
+  MEDIUM   network        references/rest-api.md:241     "curl -s 
+"http://127.0.0.1:8188/system_stats""
+  MEDIUM   network        references/rest-api.md:244     "curl -X POST 
+"http://127.0.0.1:8188/free" \"
+  MEDIUM   network        references/rest-api.md:256     "curl -X POST 
+"http://127.0.0.1:8188/manager/queue/install" \"
+  MEDIUM   network        references/rest-api.md:261     "curl -s 
+"http://127.0.0.1:8188/manager/queue/status""
+  MEDIUM   network        references/rest-api.md:264     "curl -X POST 
+"http://127.0.0.1:8188/manager/queue/install_mo"
+
+Decision: BLOCKED — Blocked (community source + dangerous verdict, 61 findings).
+--force does not override a dangerous verdict.
+
+Scan: huggingface-hub (official/mlops/huggingface-hub/community)  Verdict: 
+DANGEROUS
+  CRITICAL supply_chain   SKILL.md:18                    "*   **Installation:** 
+`curl -LsSf https://hf.co/cli/install."
+
+Decision: BLOCKED — Blocked (community source + dangerous verdict, 1 findings). 
+--force does not override a dangerous verdict.
+
+Scan: reddit-reading (official/social-media/reddit-reading/community)  Verdict: 
+DANGEROUS
+  CRITICAL exfiltration   SKILL.md:39                    "two values in 
+`~/.hermes/.env`:"
+  MEDIUM   exfiltration   scripts/reddit.py:91           "cid, secret = 
+os.environ.get("REDDIT_CLIENT_ID"), os.environ"
+
+Decision: BLOCKED — Blocked (community source + dangerous verdict, 2 findings). 
+--force does not override a dangerous verdict.

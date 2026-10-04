@@ -60,6 +60,15 @@ Ringkasan nyata (diparsing dari `reports/upgrade-evidence/hermes-skills-audit.tx
   (mis. `ascii-art`, `touchdesigner-mcp`) -> **BLOCKED != malware**; tetap wajib review manual, dan `--force` dilarang.
 - **Terbuka (belum diputuskan Owner)**: `comfyui` (DANGEROUS), `huggingface-hub` (DANGEROUS), `reddit-reading` (DANGEROUS)
   masih terpasang di instalasi Hermes — di luar scope approval #4/#9.
+- **Tindakan lanjutan (approval #9b, 2026-10-04)**: `comfyui` (7 CRITICAL/54 MEDIUM),
+  `huggingface-hub` (1 CRITICAL), `reddit-reading` (1 CRITICAL exfiltration) **dibuang** — semua via
+  `hermes skills uninstall --yes`, dengan backup tar `gzip -t` OK lebih dulu.
+  Verifikasi per skill: terdaftar di `hermes skills list` = **0**, direktori hilang.
+  **Audit ulang**: 14 skill hub -> **7 CAUTION/BLOCKED + 7 SAFE/ALLOWED, 0 DANGEROUS**
+  (`reports/upgrade-evidence/hermes-skills-audit-after.txt`).
+  Blok temuan lengkap: `reports/upgrade-evidence/hermes-skills-removed.txt`.
+  Dicek dulu: tidak ada referensi di `~/.hermes/cron/`, `config.yaml`, maupun `plugins/`.
+  Denylist: `registry/hub_skills_denylist.yaml` (mencegah reinstall tanpa approval).
 
 ## 4. Supply-chain venv Hermes (`hermes security audit`, OSV.dev)
 - Hasil: **71 advisory / 136 komponen**, termasuk CRITICAL `PyJWT==2.13.0` (GHSA-ffc3-869f-jxw9, fixed 2.14.0)
@@ -83,7 +92,8 @@ Ringkasan nyata (diparsing dari `reports/upgrade-evidence/hermes-skills-audit.tx
 |---|---|---|---|
 | Skill/MCP pihak ketiga (belum dipasang) | HIGH bila dipasang | pipeline §6 + approval + pin | terbuka (by design) |
 | Skill hub `inference-sh-cli` DANGEROUS | HIGH | **ditutup**: dibuang + backup + verifikasi audit ulang | SELESAI |
-| Skill hub `comfyui`/`huggingface-hub`/`reddit-reading` DANGEROUS | HIGH | terdeteksi guard; keputusan Owner belum diambil | terbuka |
+| Skill hub `comfyui`/`huggingface-hub`/`reddit-reading` DANGEROUS | HIGH | **ditutup**: dibuang 2026-10-04 (approval #9b), backup + audit ulang 0 DANGEROUS | SELESAI |
+| 7 skill hub CAUTION masih terpasang (`ascii-art`, `touchdesigner-mcp`, `evaluating-llms-harness`, `weights-and-biases`, `llama-cpp`, `serving-llms-vllm`, `hyperframes`) | MEDIUM | BLOCKED oleh guard; belum dipakai untuk target eksternal | dipantau |
 | Repo tanpa manifest dependency/IaC -> scan trivy tidak bermakna | LOW | catat sebagai keterbatasan; ulangi saat manifest ada | diakui |
 | Advisory venv Hermes | HIGH | dilaporkan; upgrade menunggu approval | terbuka |
 | SkillSpector coverage rendah | MEDIUM | review manual + guard native + lint internal | diakui |

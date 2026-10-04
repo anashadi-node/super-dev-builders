@@ -1,0 +1,60 @@
+# Denylist skill hub Hermes — hasil `hermes skills audit` (Skills Guard native).
+# Alasan pembuatan: verdict DANGEROUS + policy "tidak ada skill pihak ketiga diaktifkan tanpa review".
+# JANGAN hapus entri tanpa approval Owner (lihat reports/human-approval-required.md).
+version: 1.0.0
+updated: 2026-10-04
+policy: "install/reinstall skill yang ada di daftar ini = butuh approval Owner + review manual temuan"
+source_of_truth: reports/upgrade-evidence/hermes-skills-removed.txt
+
+removed:
+  - name: inference-sh-cli
+    category: devops
+    upstream: community
+    verdict: DANGEROUS
+    findings: 5
+    critical_examples:
+      - "SKILL.md:40 supply_chain: curl -fsSL https://cli.inference.sh | sh"
+      - "references/cli-reference.md:78 destructive: infsh completion bash > /etc/bash_completion.d/infsh"
+    action: "hermes skills uninstall --yes (approval #9, 2026-10-04)"
+    backup: "~/backups/sdb-upgrade-20261004_071800/quarantine/inference-sh-cli-20261004_082750.tar.gz"
+  - name: comfyui
+    category: creative
+    upstream: community
+    verdict: DANGEROUS
+    findings: 61
+    critical_examples:
+      - "SKILL.md:539 supply_chain: curl … | sh"
+      - "scripts/comfyui_setup.sh:117-118 obfuscation: VERDICT=$(echo …)"
+      - "scripts/comfyui_setup.sh:238,260 supply_chain: curl -fsS …"
+      - "tests/test_common.py:251 traversal"
+    action: "hermes skills uninstall --yes (approval #9b, 2026-10-04)"
+    backup: "~/backups/sdb-upgrade-20261004_071800/quarantine/comfyui-20261004_083346.tar.gz"
+  - name: huggingface-hub
+    category: mlops
+    upstream: community
+    verdict: DANGEROUS
+    findings: 1
+    critical_examples:
+      - "SKILL.md:18 supply_chain: blok instalasi (pip) tanpa verifikasi checksum"
+    action: "hermes skills uninstall --yes (approval #9b, 2026-10-04)"
+    backup: "~/backups/sdb-upgrade-20261004_071800/quarantine/huggingface-hub-20261004_083346.tar.gz"
+  - name: reddit-reading
+    category: social-media
+    upstream: community
+    verdict: DANGEROUS
+    findings: 2
+    critical_examples:
+      - "SKILL.md:39 exfiltration: dua nilai dibaca/dikirim tanpa konteks jelas (kandidat false positive, tetap dipatuhi guard)"
+    action: "hermes skills uninstall --yes (approval #9b, 2026-10-04)"
+    backup: "~/backups/sdb-upgrade-20261004_071800/quarantine/reddit-reading-20261004_083346.tar.gz"
+
+restore_procedure:
+  - "Cari identifier resmi: `hermes skills search <name>` atau `hermes skills browse`"
+  - "Install: `hermes skills install <identifier> --yes` (DILARANG --force)"
+  - "Jaring pengaman offline: extract tar di ~/backups/.../quarantine/ ke ~/.hermes/skills/<category>/<name>/"
+  - "Setelah restore: jalankan `hermes skills audit` + review manual temuan; catat di reports/"
+
+# Status audit setelah pembersihan (2026-10-04): 14 skill hub tersisa -> 7 CAUTION/BLOCKED + 7 SAFE/ALLOWED, 0 DANGEROUS.
+# CAUTION yang masih terpasang (bukan bagian approval #9b): ascii-art, touchdesigner-mcp, evaluating-llms-harness,
+# weights-and-biases, llama-cpp, serving-llms-vllm, hyperframes -> review manual bila dipakai untuk target eksternal.
+# SAFE (7, ALLOWED): excalidraw, pretext, sketch, openhue, rss-feeds, kanban-video-orchestrator, ai-presenter-video.

@@ -14,7 +14,7 @@ Semua item di bawah **tidak dieksekusi** sampai Owner setuju. Status upgrade saa
 | 7 | Pasang 21 skill ke profil `default` | LOW-MED | +~402 token per turn | `/usr/bin/python3 scripts/install_skills.py --main` |
 | 8 | Rename direktori profil `cc-*` -> `sdb-*` (opsional) | MEDIUM | memengaruhi state.db/riwayat sesi | prosedur `docs/ROLLBACK_PLAN.md` §2 |
 | 9 | ~~**Temuan**: skill hub `inference-sh-cli` DANGEROUS (5 CRITICAL)~~ **SELESAI 2026-10-04** | HIGH | — | Dibuang via `hermes skills uninstall --yes`; backup `~/backups/sdb-upgrade-20261004_071800/quarantine/`; verifikasi list=0 + audit bersih |
-| 9b | **BARU**: skill hub DANGEROUS lain masih terpasang — `comfyui` (61 temuan), `huggingface-hub`, `reddit-reading` | HIGH | supply-chain; keputusan removal milik Owner | `hermes skills uninstall --yes comfyui huggingface-hub reddit-reading` bila tidak dipakai |
+| 9b | ~~**Temuan**: skill hub DANGEROUS lain — `comfyui` (61 temuan), `huggingface-hub`, `reddit-reading`~~ **SELESAI 2026-10-04** | HIGH | — | Dibuang via `hermes skills uninstall --yes`; backup 3 tar di `~/backups/.../quarantine/`; audit ulang: 0 DANGEROUS; denylist `registry/hub_skills_denylist.yaml` |
 | 10 | **Temuan**: 71 advisory OSV di venv Hermes (1 CRITICAL PyJWT) | HIGH | upgrade Hermes berisiko | rencanakan upgrade + backup + rollback; jangan otomatis |
 | 11 | Deploy produksi / migration / secret-IAM | HIGH-CRITICAL | blueprint §10A | prosedur manusia + bukti rollback |
 | 12 | Target reconstruction pertama | MED-HIGH | Gate #0 wajib otorisasi | isi `evidence/<slug>/authorization.yaml` -> `gate_check.py` |

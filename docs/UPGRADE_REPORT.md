@@ -36,7 +36,7 @@ repo V1 tetap utuh di `/home/anashadi/copy-cloning-super-dev-builders`, backup t
 | Charter | `agents/*.yaml` (machine-readable, permission eksplisit, alias profil) |
 | Test suite | 21 test pytest — SEMUA PASS |
 | Gate self-test | PASS / FAIL / BLOCKED terbukti (exit 0/1/2) |
-| Skill scan | SkillSpector v2.12.0: 20 bersih, 1 LOW (false positive ditriase); Skills Guard native: 4 DANGEROUS/7 CAUTION/7 SAFE dari 18 skill hub, 11 BLOCKED |
+| Skill scan | SkillSpector v2.12.0: 20 bersih, 1 LOW (false positive ditriase); Skills Guard native: 4 DANGEROUS/7 CAUTION/7 SAFE dari 18 skill hub, 11 BLOCKED -> setelah approval #9/#9b: **14 hub skill, 0 DANGEROUS** |
 | Tool deterministik | ruff 0.16.10 + semgrep 1.179.0 + trivy 0.75.0 terpasang (pin + checksum); scan repo: ruff 35->0, semgrep 0/344 rule, trivy 0 (tanpa manifest) |
 | Pemasangan skill | 36 operasi ke 7 profil divisi |
 
@@ -106,6 +106,6 @@ Artefak bukti: `reports/upgrade-evidence/`.
 ## 8. Next steps
 1. ~~Pasang Semgrep/Trivy/ruff~~ **SELESAI** (2026-10-04, approval #4).
 2. ~~Buang skill hub DANGEROUS `inference-sh-cli`~~ **SELESAI** (2026-10-04, approval #9; backup + verifikasi).
-3. Putuskan skill hub DANGEROUS lain: `comfyui`, `huggingface-hub`, `reddit-reading`.
+3. ~~Putuskan/buang skill hub DANGEROUS lain: `comfyui`, `huggingface-hub`, `reddit-reading`~~ **SELESAI** (approval #9b, 2026-10-04; audit ulang 0 DANGEROUS, denylist dibuat).
 4. Pilih target pertama (milik sendiri/open-source) -> Gate #0 -> capture Mode A -> rebuild -> fidelity.
 5. CodeQL saat milestone; Syft bila SBOM diminta.

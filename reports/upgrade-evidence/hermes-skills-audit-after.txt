@@ -1,0 +1,165 @@
+
+Auditing 14 skill(s)...
+
+Scan: ascii-art (official/creative/ascii-art/community)  Verdict: CAUTION
+  HIGH     privilege_escalation SKILL.md:92                    "sudo apt install
+cowsay -y    # Debian/Ubuntu"
+  HIGH     privilege_escalation SKILL.md:136                   "sudo apt install
+boxes -y    # Debian/Ubuntu"
+  HIGH     privilege_escalation SKILL.md:171                   "sudo apt install
+toilet toilet-fonts -y    # Debian/Ubuntu"
+  HIGH     privilege_escalation SKILL.md:202                   "sudo snap 
+install ascii-image-converter"
+  HIGH     privilege_escalation SKILL.md:219                   "sudo apt install
+jp2a -y"
+  MEDIUM   supply_chain   SKILL.md:27                    "pip install pyfiglet 
+--break-system-packages -q"
+
+Decision: BLOCKED — Blocked (community source + caution verdict, 6 findings). 
+Use --force to override.
+
+Scan: excalidraw (official/creative/excalidraw/community)  Verdict: SAFE
+  MEDIUM   supply_chain   SKILL.md:57                    "This uploads to 
+excalidraw.com (no account needed) and print"
+  MEDIUM   supply_chain   scripts/upload.py:32           "print("Install it 
+with: pip install cryptography")"
+
+Decision: ALLOWED — Allowed (community source, safe verdict)
+
+Scan: pretext (official/creative/pretext/community)  Verdict: SAFE
+Decision: ALLOWED — Allowed (community source, safe verdict)
+
+Scan: sketch (official/creative/sketch/community)  Verdict: SAFE
+Decision: ALLOWED — Allowed (community source, safe verdict)
+
+Scan: touchdesigner-mcp (official/creative/touchdesigner-mcp/community)  
+Verdict: CAUTION
+  HIGH     privilege_escalation references/external-data.md:303 "4. **Serial 
+port permissions on macOS** — TD needs Full Disk"
+  LOW      persistence    references/troubleshooting.md:140 
+"`$HERMES_HOME/config.yaml` (defaults to `~/.hermes/config.ya"
+
+Decision: BLOCKED — Blocked (community source + caution verdict, 2 findings). 
+Use --force to override.
+
+Scan: evaluating-llms-harness 
+(official/mlops/evaluation/evaluating-llms-harness/community)  Verdict: CAUTION
+  HIGH     execution      SKILL.md:206                   
+"os.system(f"./eval_checkpoint.sh checkpoints step-{step}")"
+  HIGH     execution      SKILL.md:223                   "os.system(f"lm_eval 
+--model hf --model_args pretrained={chec"
+  MEDIUM   supply_chain   SKILL.md:27                    "pip install lm-eval"
+  MEDIUM   supply_chain   SKILL.md:353                   "pip install vllm"
+
+Decision: BLOCKED — Blocked (community source + caution verdict, 4 findings). 
+Use --force to override.
+
+Scan: weights-and-biases 
+(official/mlops/evaluation/weights-and-biases/community)  Verdict: CAUTION
+  HIGH     exfiltration   SKILL.md:551                   
+"os.environ["WANDB_MODE"] = "offline""
+  MEDIUM   supply_chain   SKILL.md:34                    "pip install wandb"
+
+Decision: BLOCKED — Blocked (community source + caution verdict, 2 findings). 
+Use --force to override.
+
+Scan: llama-cpp (official/mlops/inference/llama-cpp/community)  Verdict: CAUTION
+  HIGH     privilege_escalation references/troubleshooting.md:22 "sudo apt 
+install nvidia-cuda-toolkit"
+  HIGH     exfiltration   references/advanced-usage.md:470 
+"os.environ["CUDA_VISIBLE_DEVICES"] = "0,1""
+  MEDIUM   supply_chain   SKILL.md:110                   "`pip install 
+llama-cpp-python` (CUDA: `CMAKE_ARGS="-DGGML_CU"
+  MEDIUM   supply_chain   SKILL.md:69                    "git clone 
+https://github.com/ggml-org/llama.cpp"
+  MEDIUM   supply_chain   references/server.md:82        "RUN git clone 
+https://github.com/ggerganov/llama.cpp"
+  MEDIUM   supply_chain   references/troubleshooting.md:37 "pip install cmake 
+scikit-build-core"
+  MEDIUM   supply_chain   references/troubleshooting.md:40 
+"CMAKE_ARGS="-DGGML_CUDA=on" pip install llama-cpp-python --f"
+  MEDIUM   supply_chain   references/troubleshooting.md:43 
+"CMAKE_ARGS="-DGGML_METAL=on" pip install llama-cpp-python --"
+  MEDIUM   supply_chain   references/troubleshooting.md:55 
+"CUDACXX=/usr/local/cuda/bin/nvcc CMAKE_ARGS="-DGGML_CUDA=on""
+  MEDIUM   supply_chain   references/troubleshooting.md:367 
+"CMAKE_ARGS="-DGGML_METAL=on" pip install llama-cpp-python --"
+  MEDIUM   execution      references/advanced-usage.md:165 "result = 
+subprocess.run("
+
+Decision: BLOCKED — Blocked (community source + caution verdict, 11 findings). 
+Use --force to override.
+
+Scan: serving-llms-vllm (official/mlops/inference/serving-llms-vllm/community)  
+Verdict: CAUTION
+  HIGH     privilege_escalation references/troubleshooting.md:222 "sudo ufw 
+allow 8000"
+  MEDIUM   supply_chain   SKILL.md:27                    "pip install vllm"
+  MEDIUM   supply_chain   SKILL.md:104                   "pip install locust"
+  MEDIUM   supply_chain   references/optimization.md:164 "pip install locust"
+  MEDIUM   supply_chain   references/troubleshooting.md:193 "pip install 
+flash-attn --no-build-isolation"
+  MEDIUM   supply_chain   references/server-deployment.md:18 "RUN pip install 
+vllm"
+  MEDIUM   supply_chain   references/quantization.md:204 "pip install autoawq"
+  MEDIUM   supply_chain   references/quantization.md:213 "pip install auto-gptq"
+
+Decision: BLOCKED — Blocked (community source + caution verdict, 8 findings). 
+Use --force to override.
+
+Scan: openhue (official/smart-home/openhue/community)  Verdict: SAFE
+Decision: ALLOWED — Allowed (community source, safe verdict)
+
+Scan: rss-feeds (official/research/rss-feeds/community)  Verdict: SAFE
+Decision: ALLOWED — Allowed (community source, safe verdict)
+
+Scan: hyperframes (official/creative/hyperframes/community)  Verdict: CAUTION
+  HIGH     privilege_escalation scripts/setup.sh:48            "Linux*)   echo "
+sudo apt-get install -y ffmpeg   # Debian"
+  HIGH     privilege_escalation scripts/setup.sh:49            "echo "   sudo 
+dnf install -y ffmpeg       # Fedora/RHEL";;"
+  HIGH     privilege_escalation scripts/setup.sh:82            "echo "   Try: 
+sudo npm install -g hyperframes@latest""
+  HIGH     privilege_escalation scripts/setup.sh:97            "echo "   Try 
+'npm install -g hyperframes@latest' or 'sudo np"
+  HIGH     privilege_escalation references/troubleshooting.md:61 "| Ubuntu / 
+Debian | `sudo apt-get install -y ffmpeg`    |"
+  HIGH     privilege_escalation references/troubleshooting.md:62 "| Fedora / 
+RHEL   | `sudo dnf install -y ffmpeg`        |"
+  HIGH     privilege_escalation references/troubleshooting.md:63 "| Arch        
+| `sudo pacman -S ffmpeg`             |"
+  MEDIUM   supply_chain   SKILL.md:65                    "2. Installs the 
+`hyperframes` CLI globally (`npm install -g "
+  MEDIUM   supply_chain   scripts/setup.sh:80            "if ! npm install -g 
+"hyperframes@latest" >/dev/null 2>&1; th"
+  MEDIUM   supply_chain   scripts/setup.sh:81            "red "✗ npm install -g 
+hyperframes@latest failed.""
+  MEDIUM   supply_chain   scripts/setup.sh:82            "echo "   Try: sudo npm
+install -g hyperframes@latest""
+  MEDIUM   supply_chain   scripts/setup.sh:97            "echo "   Try 'npm 
+install -g hyperframes@latest' or 'sudo np"
+  MEDIUM   supply_chain   references/troubleshooting.md:20 "npm install -g 
+hyperframes@latest"
+  MEDIUM   supply_chain   references/cli.md:3            "Everything runs 
+through `npx hyperframes` (or the globally-i"
+
+Decision: BLOCKED — Blocked (community source + caution verdict, 14 findings). 
+Use --force to override.
+
+Scan: kanban-video-orchestrator 
+(official/creative/kanban-video-orchestrator/community)  Verdict: SAFE
+  MEDIUM   execution      scripts/monitor.py:37          "out = subprocess.run("
+  MEDIUM   execution      scripts/monitor.py:46          "out = subprocess.run("
+  MEDIUM   execution      scripts/monitor.py:70          "out = subprocess.run("
+  MEDIUM   supply_chain   references/kanban-setup.md:120 "installs). If absent: 
+`pip install pyyaml`."
+
+Decision: ALLOWED — Allowed (community source, safe verdict)
+
+Scan: ai-presenter-video (official/creative/ai-presenter-video/community)  
+Verdict: SAFE
+  MEDIUM   execution      scripts/preflight.py:15        "result = 
+subprocess.run("
+
+Decision: ALLOWED — Allowed (community source, safe verdict)
+

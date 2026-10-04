@@ -62,7 +62,7 @@
 ### 3.3 Dua skill baru hasil riset
 
 **A. `local-llm-serving`** — menggantikan `serving-llms-vllm`, `inference-sh-cli`, dan menutup jalur model `llama-cpp`.
-- Binari dibangun dari source pada **tag `v0.5.0` (commit `7fe450e`)**, statis (`-DBUILD_SHARED_LIBS=OFF`), tanpa `sudo`, tanpa `curl | sh`.
+- Binari dibangun dari source pada **tag `v0.5.0` (commit `7fe450e`)**, `-DBUILD_SHARED_LIBS=OFF` → lib pihak ketiga (llama/ggml) ter-static, sementara glibc/libssl/libgomp tetap dinamis dari host (**bukan** "fully static"); tanpa `sudo`, tanpa `curl | sh`.
 - API kompatibel OpenAI: `/health`, `/v1/models`, `/v1/chat/completions`.
 - Model: `qwen2.5-0.5b-instruct-q4_k_m.gguf` — **sha256 `74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db`**, 491.400.032 byte, terverifikasi sebelum dipakai.
 - Kenapa **melebihi**: skill lama memerlukan runtime vLLM yang **tidak dapat dipakai sama sekali** di host tanpa GPU; jalur ini **terbukti melayani** (batching paralel terukur) dan tidak bergantung SaaS pihak ketiga.

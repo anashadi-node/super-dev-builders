@@ -43,6 +43,8 @@ cmake -B src/build -S src -DCMAKE_BUILD_TYPE=Release -DLLAMA_CURL=OFF \
       -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DGGML_NATIVE=ON
 cmake --build src/build --target llama-server -j"$(nproc)"
 install -m 0755 src/build/bin/llama-server ~/bin/llama-server
+# Catatan: -DBUILD_SHARED_LIBS=OFF membuat lib pihak ketiga (llama/ggml) ter-static,
+# tetapi glibc/libssl/libgomp tetap dinamis dari host -> catat apa adanya, jangan klaim "fully static".
 
 # 2) model terverifikasi (skill model-hub-provenance)
 /usr/bin/python3 skills/model-hub-provenance/scripts/fetch_gguf.py

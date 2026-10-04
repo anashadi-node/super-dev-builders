@@ -89,7 +89,7 @@ present:
     version_pin: "0.5.0-dev (build 1, commit 7fe450e)"
     path: /home/anashadi/bin/llama-server
     role: local_llm_serving_openai_compatible
-    install_method: "bangun dari source, tanpa sudo: git clone --depth 1 --branch v0.5.0 ggml-org/llama.cpp + cmake -DBUILD_SHARED_LIBS=OFF -DGGML_NATIVE=ON -DLLAMA_CURL=OFF (binari statis 18 MB)"
+    install_method: "bangun dari source, tanpa sudo: git clone --depth 1 --branch v0.5.0 ggml-org/llama.cpp + cmake -DBUILD_SHARED_LIBS=OFF -DGGML_NATIVE=ON -DLLAMA_CURL=OFF (lib llama/ggml ter-static, 18 MB; glibc/libssl/libgomp tetap dinamis dari host)"
     evidence: reports/upgrade-evidence/local-llm-serving-bench.json
     policy: "bind 127.0.0.1 saja; tanpa sudo; tanpa curl|sh; model wajib sha256 terverifikasi (skill model-hub-provenance)"
     replaces: serving-llms-vllm, inference-sh-cli, llama-cpp

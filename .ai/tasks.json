@@ -1,0 +1,65 @@
+{
+  "project": "super-dev-builders-ecosystem",
+  "version": "2.2.0",
+  "upgraded_from": "copy-cloning-super-dev-builders@0.1.0",
+  "date": "2026-10-04",
+  "tasks": [
+    {
+      "id": "inventory-before",
+      "title": "Inventory project lama + host capability + registry sumber",
+      "status": "done"
+    },
+    {
+      "id": "backup-rollback",
+      "title": "Backup legacy + profil config + rollback plan",
+      "status": "done"
+    },
+    {
+      "id": "repo-structure",
+      "title": "Repo baru super-dev-builders + git init",
+      "status": "done"
+    },
+    {
+      "id": "docs-core",
+      "title": "Docs inti: architecture, divisions, workflow/gates, permission, model routing",
+      "status": "done"
+    },
+    {
+      "id": "docs-policy",
+      "title": "Docs policy: evidence taxonomy, supply-chain, token, technology, reconstruction, rollback",
+      "status": "done"
+    },
+    {
+      "id": "registry",
+      "title": "Skill registry + tool registry dengan sumber & revisi terpin",
+      "status": "done"
+    },
+    {
+      "id": "custom-skills-21",
+      "title": "21 custom skill ekosistem (kecil, references/, scripts/)",
+      "status": "done"
+    },
+    {
+      "id": "profiles-7",
+      "title": "Upgrade 7 profil divisi: SOUL.md, profile.yaml, skill pasang",
+      "status": "done"
+    },
+    {
+      "id": "scripts-tests",
+      "title": "Scripts deterministik + test suite pytest",
+      "status": "done"
+    },
+    {
+      "id": "verify",
+      "title": "Verifikasi: doctor, pytest, skill audit, security audit, gate self-test",
+      "status": "done"
+    },
+    {
+      "id": "reports",
+      "title": "Laporan: upgrade, security, token estimate, human-approval list",
+      "status": "done"
+    }
+  ],
+  "status": "upgrade-complete",
+  "completed_at": "2026-10-04"
+}

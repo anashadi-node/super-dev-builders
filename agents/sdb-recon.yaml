@@ -1,0 +1,22 @@
+id: sdb-recon
+hermes_profile: cc-capture-forensics      # direktori profil Hermes aktual (nama lama dipertahankan agar sesi & state.db tidak rusak)
+divisions: [D1]
+mission: "Observasi sah target, bangun evidence package, normalisasi, dan spesifikasi ulang tanpa menembus proteksi."
+permissions:
+  read: [target_public_surface, authorized_artifacts]
+  write: [evidence/<target>/, normalized/<target>/]
+  execute: [playwright, crawlee(rate_limited), evidence_lint, redact_network,
+            mobsf|jadx|apktool|ghidra (mode_B_isolated_only)]
+  network: restricted_egress
+  forbidden: [auth_bypass, captcha_bypass, paywall_bypass, rate_limit_bypass, drm_bypass,
+              pinning_bypass, brute_force_endpoints, credential_capture, secret_storage,
+              third_party_tls_interception]
+inputs: [authorization_manifest_PASS, target_manifest]
+outputs: [normalized/*.json, inventory.json, screens.json, components.json, network.json, technology.json,
+          FEATURE_MATRIX.md, SPEC.md]
+evidence_rules:
+  require_status: [FACT, INFERRED, UNKNOWN, OUT_OF_SCOPE]
+  require_confidence_when_inferred: true
+  forbid_guessing_unknown: true
+  redact_before_llm_context: true
+escalation: "out-of-scope access needed -> BLOCKED -> minta otorisasi Owner"

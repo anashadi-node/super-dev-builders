@@ -1,0 +1,11 @@
+{
+  "gate": "gate0",
+  "verdict": "PASS",
+  "checked_at": "2026-10-04T07:25:23+0700",
+  "manifest": "/tmp/sdb_demo/auth_pass.yaml",
+  "target": "selfowned-demo",
+  "mode": "A",
+  "fail": [],
+  "blocked": [],
+  "warn": []
+}

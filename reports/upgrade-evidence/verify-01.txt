@@ -1,0 +1,46 @@
+### doctor.py
+doctor — 2026-10-04T07:25:02+0700 | YAML backend: PyYAML
+  [OK  ] git          /usr/bin/git git version 2.43.0
+  [OK  ] python3      /home/anashadi/.hermes/tools/python-3.14.7+20260901-linux-x64/bin/python3 Python 3.14.7
+  [OK  ] node         /home/anashadi/.hermes/tools/node-26.7.0-linux-x64/bin/node v26.7.0
+  [OK  ] npm          /home/anashadi/.hermes/tools/node-26.7.0-linux-x64/bin/npm 11.19.0
+  [OK  ] docker       /usr/bin/docker Docker version 29.8.1, build 4a63305
+  [OK  ] jq           /usr/bin/jq jq-1.7
+  [OK  ] playwright   /home/anashadi/.local/bin/playwright Traceback (most recent call last):
+  [OK  ] pytest       /home/anashadi/.local/bin/pytest pytest 9.1.1
+  [OK  ] uv           /home/anashadi/.hermes/bin/uv uv 0.12.5 (x86_64-unknown-linux-gnu)
+  [-   ] gh            
+  [-   ] semgrep       
+  [-   ] trivy         
+  [-   ] syft          
+  [-   ] ruff          
+  profil divisi:
+    MISS sdb-orchestrator (soul=False)
+    MISS sdb-recon (soul=False)
+    MISS sdb-architect (soul=False)
+    MISS sdb-builder (soul=False)
+    MISS sdb-reviewer (soul=False)
+    MISS sdb-security (soul=False)
+    MISS sdb-devops (soul=False)
+    OK  cc-orchestrator (soul=True)
+    OK  cc-capture-forensics (soul=True)
+    OK  cc-architect (soul=True)
+    OK  cc-builder (soul=True)
+    OK  cc-reviewer-qa (soul=True)
+    OK  cc-security-governor (soul=True)
+    OK  cc-devops-docs (soul=True)
+  kapabilitas wajib tersedia
+
+### registry_lint.py
+registry_lint: PASS
+  custom skills: 21 | profiles: 7 | keep_local: 26
+
+### inventory before (legacy)
+inventory: reports/inventory_before.json
+  custom skills: 21 | repo files: 91
+  profiles: 23 | tools present: 10/19
+
+### inventory after
+inventory: reports/inventory_after.json
+  custom skills: 21 | repo files: 92
+  profiles: 23 | tools present: 10/19

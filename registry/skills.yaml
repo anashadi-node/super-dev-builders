@@ -1,0 +1,305 @@
+# Skill Registry — Super Dev Builders Ecosystem V2.2
+# Status: KEEP | UPDATE | REPLACE | ADD | REMOVE | QUARANTINE | PENDING_APPROVAL
+# Aturan: tidak ada skill pihak ketiga yang diaktifkan tanpa pipeline supply-chain + approval manusia.
+version: 2.2.0
+updated: 2026-10-04
+pipeline_required: [source_trust_check, pin_revision, hermes_native_scan, manual_source_review, sandbox_test, allowlist_tools, human_approval]
+
+# ---------- A. Custom skills ekosistem (dibuat di repo ini, sumber tunggal: skills/) ----------
+custom:
+  - id: reconstruction-scope-gate
+    status: ADD
+    divisions: [D0, D1, D8]
+    profiles: [sdb-orchestrator, sdb-recon, sdb-security]
+    path: skills/reconstruction-scope-gate
+    scripts: [scripts/scope_gate_check.py]
+  - id: target-inventory
+    status: ADD
+    divisions: [D1, D3]
+    profiles: [sdb-recon, sdb-architect]
+    path: skills/target-inventory
+  - id: ui-ux-state-mapper
+    status: ADD
+    divisions: [D1]
+    profiles: [sdb-recon]
+    path: skills/ui-ux-state-mapper
+  - id: observed-network-contract
+    status: ADD
+    divisions: [D1]
+    profiles: [sdb-recon]
+    path: skills/observed-network-contract
+    scripts: [scripts/redact_network.py]
+  - id: technology-profiler
+    status: ADD
+    divisions: [D1, D3]
+    profiles: [sdb-recon]
+    path: skills/technology-profiler
+  - id: evidence-normalizer
+    status: ADD
+    divisions: [D1]
+    profiles: [sdb-recon]
+    path: skills/evidence-normalizer
+    scripts: [scripts/evidence_lint.py]
+  - id: reconstruction-spec
+    status: ADD
+    divisions: [D1, D3]
+    profiles: [sdb-recon, sdb-architect]
+    path: skills/reconstruction-spec
+  - id: reconstruction-fidelity
+    status: ADD
+    divisions: [D1, D6, D7]
+    profiles: [sdb-recon, sdb-reviewer]
+    path: skills/reconstruction-fidelity
+    scripts: [scripts/fidelity_report.py]
+  - id: architecture-decision-record
+    status: ADD
+    divisions: [D3]
+    profiles: [sdb-architect]
+    path: skills/architecture-decision-record
+  - id: technology-selection
+    status: ADD
+    divisions: [D3]
+    profiles: [sdb-architect]
+    path: skills/technology-selection
+  - id: api-contract
+    status: ADD
+    divisions: [D5, D3, D7]
+    profiles: [sdb-builder, sdb-architect, sdb-reviewer]
+    path: skills/api-contract
+  - id: database-migration-safety
+    status: ADD
+    divisions: [D5, D8, D10]
+    profiles: [sdb-builder, sdb-security, sdb-devops]
+    path: skills/database-migration-safety
+  - id: authz-authn-review
+    status: ADD
+    divisions: [D5, D8]
+    profiles: [sdb-builder, sdb-security]
+    path: skills/authz-authn-review
+  - id: accessibility-audit
+    status: ADD
+    divisions: [D4, D7]
+    profiles: [sdb-builder, sdb-reviewer]
+    path: skills/accessibility-audit
+  - id: test-pyramid-and-risk
+    status: ADD
+    divisions: [D7, D5]
+    profiles: [sdb-reviewer, sdb-builder]
+    path: skills/test-pyramid-and-risk
+  - id: architecture-compliance-audit
+    status: ADD
+    divisions: [D9]
+    profiles: [sdb-security]
+    path: skills/architecture-compliance-audit
+  - id: engineering-release-audit
+    status: ADD
+    divisions: [D9, D10]
+    profiles: [sdb-security, sdb-devops]
+    path: skills/engineering-release-audit
+    scripts: [scripts/release_check.py]
+  - id: ci-cd-release-gate
+    status: ADD
+    divisions: [D10, D8]
+    profiles: [sdb-devops, sdb-security]
+    path: skills/ci-cd-release-gate
+  - id: rollback-and-recovery
+    status: ADD
+    divisions: [D10]
+    profiles: [sdb-devops]
+    path: skills/rollback-and-recovery
+  - id: architecture-docs
+    status: ADD
+    divisions: [D11, D3]
+    profiles: [sdb-devops, sdb-architect]
+    path: skills/architecture-docs
+  - id: release-handover-docs
+    status: ADD
+    divisions: [D11, D10]
+    profiles: [sdb-devops]
+    path: skills/release-handover-docs
+
+# ---------- B. Sumber pihak ketiga (terverifikasi metadata 2026-10-04, revisi terpin) ----------
+# status PENDING_APPROVAL = sumber diverifikasi + revisi dipin, BELUM dipasang (menunggu approval manusia).
+third_party:
+  - repo: obra/superpowers
+    url: https://github.com/obra/superpowers
+    license: MIT
+    pinned_commit: 8ca22dba9a94f28898bbce59f2537ff4d87c747d
+    pinned_date: 2026-09-27
+    status: PENDING_APPROVAL
+    gate_note: "Blueprint V2.1: instalasi plugin dapat diblokir Skills Guard sebagai dangerous verdict pada beberapa versi Hermes. DILARANG bypass. Prioritaskan port manual metodologi (brainstorming, writing-plans, TDD, systematic-debugging, verification-before-completion) menjadi custom skill kecil."
+    adopt: [methodology_only]
+  - repo: trailofbits/skills
+    url: https://github.com/trailofbits/skills
+    license: CC-BY-SA-4.0
+    pinned_commit: 82fe8226252622fa807643bdca1710901198553a
+    pinned_date: 2026-10-02
+    status: PENDING_APPROVAL
+    adopt: [audit-context-building, differential-review, semgrep, codeql, variant-analysis, modern-python]
+  - repo: getsentry/skills
+    url: https://github.com/getsentry/skills
+    license: Apache-2.0
+    pinned_commit: d18b7aa8ba878354e5c348310230e652f7690f9c
+    pinned_date: 2026-10-02
+    status: PENDING_APPROVAL
+    adopt: [skill-scanner, security-review, agents-md, code-simplifier]
+    gate_note: "Secondary methodology. Gate pertama tetap Hermes native scanner."
+  - repo: getsentry/sentry-for-ai
+    url: https://github.com/getsentry/sentry-for-ai
+    license: MIT
+    pinned_commit: d8fd106782e609625704f5348b25c43b2f5dbeff
+    pinned_date: 2026-10-02
+    status: OPTIONAL
+    adopt: [observability_integration]
+    gate_note: "Repo lama getsentry/sentry-agent-skills SUDAH ARCHIVED — pakai sentry-for-ai."
+  - repo: anthropics/skills
+    url: https://github.com/anthropics/skills
+    license: none_declared
+    pinned_commit: 8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4
+    pinned_date: 2026-10-03
+    status: PENDING_APPROVAL
+    adopt: [frontend-design, webapp-testing, mcp-builder]
+    gate_note: "Repo tidak mendeklarasikan license SPDX — wajib konfirmasi lisensi sebelum adopsi."
+  - repo: github/github-mcp-server
+    url: https://github.com/github/github-mcp-server
+    license: MIT
+    pinned_commit: 71ef8266e48110974b13aef50b4df6ff9914ff68
+    pinned_date: 2026-10-03
+    status: PENDING_APPROVAL
+    adopt: [mcp_repository_integration]
+    gate_note: "Wajib token permission minimum + allowlist tool."
+  - repo: upstash/context7
+    url: https://github.com/upstash/context7
+    license: MIT
+    pinned_commit: bfa02ea67b5707fe0e0a673faa49d0f50b28c80b
+    pinned_date: 2026-10-03
+    status: PENDING_APPROVAL
+    adopt: [mcp_docs_retrieval]
+  - repo: microsoft/playwright
+    url: https://github.com/microsoft/playwright
+    license: Apache-2.0
+    pinned_commit: 7ad3fba1aad9471c7e46d67a11b0e710a5d77ea8
+    pinned_date: 2026-10-03
+    status: IN_USE
+    adopt: [capture_engine_primary]
+    gate_note: "CLI Playwright sudah tersedia di host; python module belum — lihat registry/tools.yaml."
+  - repo: apify/crawlee
+    url: https://github.com/apify/crawlee
+    license: Apache-2.0
+    pinned_commit: a97a31133e7ff6eed1ad1279ac9d1d92d2e5b738
+    pinned_date: 2026-10-03
+    status: PENDING_APPROVAL
+    adopt: [secondary_crawler]
+    gate_note: "Anti-bot evasion/proxy rotation dilarang oleh policy ekosistem."
+  - repo: dequelabs/axe-core
+    url: https://github.com/dequelabs/axe-core
+    license: MPL-2.0
+    pinned_commit: f59642eddf14c93ae3c9c31d69bcd611229bedb4
+    pinned_date: 2026-10-02
+    status: PENDING_APPROVAL
+    adopt: [accessibility_evidence]
+  - repo: GoogleChrome/lighthouse
+    url: https://github.com/GoogleChrome/lighthouse
+    license: Apache-2.0
+    pinned_commit: db0f40a444a53c6edacc120eb917beceabc00401
+    pinned_date: 2026-10-03
+    status: PENDING_APPROVAL
+    adopt: [performance_evidence]
+  - repo: MobSF/Mobile-Security-Framework-MobSF
+    url: https://github.com/MobSF/Mobile-Security-Framework-MobSF
+    license: GPL-3.0
+    pinned_commit: 7a4785fb3b55949231dd2b5d7df82ccba02a114f
+    pinned_date: 2026-09-30
+    status: QUARANTINE
+    adopt: [mode_b_only]
+    gate_note: "GPL-3.0 + berat. Mode B saja, terisolasi, artefak berizin."
+  - repo: skylot/jadx
+    url: https://github.com/skylot/jadx
+    license: Apache-2.0
+    pinned_commit: 4e2b8d54cae5db9db1831d21c48bfc007f7a68b0
+    pinned_date: 2026-10-03
+    status: QUARANTINE
+    adopt: [mode_b_only]
+  - repo: iBotPeaches/Apktool
+    url: https://github.com/iBotPeaches/Apktool
+    license: Apache-2.0
+    pinned_commit: 52d1cbd62ba4fb1872b1923642b4f92bb3cd7969
+    pinned_date: 2026-09-28
+    status: QUARANTINE
+    adopt: [mode_b_only]
+  - repo: NationalSecurityAgency/ghidra
+    url: https://github.com/NationalSecurityAgency/ghidra
+    license: Apache-2.0
+    pinned_commit: a462673d2f1543d153c61d10bcd6c68f85555194
+    pinned_date: 2026-09-30
+    status: QUARANTINE
+    adopt: [mode_b_only_heavy]
+    gate_note: "Berat + security advisories wajib dicek sebelum penggunaan."
+  - repo: garris/BackstopJS
+    url: https://github.com/garris/BackstopJS
+    license: MIT
+    pinned_commit: a11d3657788bbffebd7a2b2eb5212006696afbff
+    pinned_date: 2026-09-08
+    status: DEFER
+    adopt: [visual_regression_optional]
+    gate_note: "Mencari maintainer baru; prioritaskan Playwright-native screenshot assertion."
+
+# ---------- C. Skill Hermes yang sudah ada & dipakai ulang (KEEP) ----------
+keep_local:
+  - id: plan
+    path: software-development/plan
+  - id: simplify-code
+    path: software-development/simplify-code
+  - id: dogfood
+    path: software-development/dogfood
+  - id: spike
+    path: software-development/spike
+  - id: karpathy-guidelines
+  - id: i-have-adhd
+  - id: caveman
+  - id: ponytail
+  - id: token-optimizer
+  - id: riset-penelitian
+  - id: advanced-root-cause-analysis
+  - id: bottleneck-analysis
+  - id: structured-problem-solving
+  - id: hermes-agent
+  - id: hermes-agent-skill-authoring
+  - id: web-reconstruction
+  - id: mobile-reconstruction
+  - id: windows-reconstruction
+  - id: browser-forensics-api
+  - id: visual-regression-verifier
+  - id: release-quality-gate
+  - id: security-static-review
+  - id: dependency-sbom-audit
+  - id: test-generator
+  - id: architecture-doc-generator
+  - id: codebase-map
+
+# ---------- D. Official optional skills yang direkomendasikan blueprint ----------
+official_optional:
+  - id: ast-grep
+    status: NOT_PRESENT
+    action: "cari via `hermes skills browse --source official` bila dibutuhkan (structural search/rewrite)"
+  - id: grill-me
+    status: NOT_PRESENT
+    action: "official optional; evaluasi sebelum adopsi"
+  - id: rest-graphql-debug
+    status: NOT_PRESENT
+    action: "official optional; relevan untuk debugging API"
+  - id: code-wiki
+    status: NOT_PRESENT
+    action: "official optional; relevan untuk dokumentasi kode"
+  - id: subagent-driven-development
+    status: NOT_PRESENT
+    action: "official optional; jangan default (token lebih tinggi)"
+
+# ---------- E. V1 legacy yang dimigrasi ----------
+legacy:
+  - id: copy-cloning-super-dev-builders
+    status: REPLACE
+    replaced_by: "docs/DIVISIONS.md + docs/RECONSTRUCTION_POLICY.md + 21 custom skill"
+  - id: super-development-suite
+    status: KEEP
+    note: "router authorized cloning/QA/review/reconstruction — tetap dipakai sebagai pintu masuk"

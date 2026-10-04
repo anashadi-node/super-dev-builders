@@ -1,0 +1,13 @@
+{
+  "gate": "gate0",
+  "verdict": "BLOCKED",
+  "checked_at": "2026-10-04T07:25:24+0700",
+  "manifest": "/tmp/sdb_demo/auth_modeb.yaml",
+  "target": "selfowned-demo",
+  "mode": "B",
+  "fail": [],
+  "blocked": [
+    "mode B wajib authorization_type=written_permission"
+  ],
+  "warn": []
+}

@@ -1,0 +1,20 @@
+# Release Gate (tahap 12)
+id: release_gate
+runner: scripts/release_check.py
+rule: "Tidak ada PASS tanpa artifact baru. LLM statement bukan evidence."
+max_artifact_age_hours: 24
+required_artifacts:
+  requirement: [requirements.md]
+  build: [logs/build-*.log]
+  tests: [logs/tests-*.log]
+  review: [reports/review-*.md]
+  security: [reports/security-gate.md]
+  audit: [reports/assurance-audit.md]
+  docs: [docs/README-*, reports/handover-*.md]
+risk_class_controls:
+  LOW: {human_approval: false}
+  MEDIUM: {human_approval: true, branch_required: true}
+  HIGH: {human_approval: true, isolation_required: true, independent_security: true}
+  CRITICAL: {autonomous_execution: false, procedure: human_controlled, rollback_evidence_required: true}
+outcomes: [PASS, FAIL, BLOCKED]
+on_fail: perbaiki; dilarang menandai PASS manual

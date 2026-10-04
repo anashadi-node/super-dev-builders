@@ -1,0 +1,98 @@
+# Tool Registry — deterministic evidence tools
+# Aturan: pin versi, verifikasi checksum untuk binary, install user-local (tanpa sudo) bila memungkinkan.
+version: 2.2.0
+updated: 2026-10-04
+host_checked: 2026-10-04
+
+present:
+  - id: git
+    path: /usr/bin/git
+    role: version_control_evidence
+  - id: node
+    path: /home/anashadi/.hermes/tools/node-26.7.0-linux-x64/bin/node
+    version_pin: "26.7.0"
+    role: frontend_tooling
+  - id: npm
+    version_pin: "11.19.0"
+    role: frontend_tooling
+  - id: docker
+    path: /usr/bin/docker
+    role: whole_process_isolation
+    note: "JANGAN beri akses socket Docker ke pekerjaan untrusted"
+  - id: uv
+    path: /home/anashadi/.hermes/bin/uv
+    role: python_tool_isolation
+  - id: pytest
+    path: /home/anashadi/.local/bin/pytest
+    role: test_runner
+  - id: playwright_cli
+    path: /home/anashadi/.local/bin/playwright
+    role: capture_engine_primary
+    note: "CLI ada; python module `playwright` tidak ada di interpreter default -> pakai venv khusus bila perlu"
+  - id: jq
+    path: /usr/bin/jq
+    role: json_evidence_processing
+
+pending_approval:
+  - id: semgrep
+    role: fast_sast
+    priority: A
+    install: "uv tool install semgrep==<pin>"
+    verify: "semgrep --version && semgrep --test"
+    policy: "frequent fast scan; output SARIF; read-only"
+    reason_pending: "tool pihak ketiga -> butuh approval manusia (blueprint §6)"
+  - id: trivy
+    role: dependency_container_iac_secret_scan
+    priority: A
+    install: "unduh binary rilis resmi aquasecurity/trivy + verifikasi checksum SHA256"
+    verify: "trivy --version && trivy fs --scanners vuln,secret,misconfig ."
+    reason_pending: "butuh approval manusia"
+  - id: syft
+    role: sbom_spdx_cyclonedx
+    priority: B
+    install: "binary rilis resmi anchore/syft + checksum"
+    reason_pending: "butuh approval manusia; hanya bila SBOM diminta"
+  - id: ruff
+    role: python_lint_format
+    priority: A
+    install: "uv tool install ruff==<pin>"
+    reason_pending: "butuh approval manusia"
+  - id: codeql
+    role: deep_interprocedural_sast
+    priority: A_but_heavy
+    install: "unduh CodeQL CLI resmi (ratusan MB) + query pack"
+    policy: "hanya milestone/release atau area berisiko tinggi; PC terbatas -> bukan siklus harian"
+    reason_pending: "berat + butuh approval manusia"
+  - id: gh
+    role: github_ci_pr_release_visibility
+    priority: B
+    install: "binari resmi GitHub CLI atau apt"
+    reason_pending: "butuh approval manusia; kredensial scope minimum"
+
+quarantine:
+  - id: mobsf
+    role: mobile_static_dynamic_analysis
+    mode: B_only
+    install: "docker (terisolasi)"
+    reason: "GPL-3.0 + berat; hanya artefak yang diotorisasi"
+  - id: jadx
+    role: android_decompiler
+    mode: B_only
+  - id: apktool
+    role: android_resource_decode
+    mode: B_only
+  - id: ghidra
+    role: native_disassembly
+    mode: B_only_heavy
+    note: "cek security advisory versi sebelum pakai"
+
+deferred:
+  - id: backstopjs
+    role: visual_regression
+    reason: "maintenance tidak stabil; prioritaskan Playwright screenshot assertion"
+  - id: frida
+    role: dynamic_instrumentation
+    reason: "TIDAK dipakai untuk target pihak ketiga; hanya milik sendiri dengan otorisasi (hindari instrumentasi pihak ketiga)"
+  - id: mitmproxy
+    role: tls_interception
+    reason: "hanya Mode B pada environment yang diotorisasi; dilarang mematahkan TLS pihak ketiga"

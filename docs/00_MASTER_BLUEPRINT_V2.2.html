@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hermes AI Software Engineering Company — Super Dev Builders Ecosystem — Master Blueprint V2.2</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--ink:#172033;--muted:#647084;--line:#dfe5ef;--blue:#2755d9;--blue2:#eaf0ff;--green:#087957;--green2:#eaf8f2;--amber:#a26400;--amber2:#fff5df;--red:#b42318;--red2:#fff0ee;--navy:#101a3b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif;line-height:1.62}
+main{max-width:1180px;margin:auto;padding:34px 22px 70px}.hero{background:linear-gradient(135deg,#101a3b,#2755d9);color:#fff;border-radius:25px;padding:42px}
+h1{font-size:2.35rem;line-height:1.08;margin:.15em 0}.hero p{max-width:930px;color:#e8edff}.tag{display:inline-block;border:1px solid #ffffff45;background:#ffffff17;border-radius:999px;padding:5px 10px;margin:3px;font-size:.84rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px;margin-top:20px;box-shadow:0 5px 20px #15203b0a}
+h2{font-size:1.55rem;margin-top:0}h3{margin:25px 0 8px}h4{margin-bottom:6px}.lead{font-size:1.08rem}.small{font-size:.9rem;color:var(--muted)}
+.callout{border-left:5px solid var(--blue);background:var(--blue2);padding:16px 18px;border-radius:10px;margin:14px 0}.good{border-left-color:var(--green);background:var(--green2)}.warn{border-left-color:#d79000;background:var(--amber2)}.danger{border-left-color:var(--red);background:var(--red2)}
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:.94rem}th,td{border-bottom:1px solid var(--line);padding:11px 9px;text-align:left;vertical-align:top}th{background:#f0f3f8}
+pre{white-space:pre-wrap;background:#101827;color:#e7ebf3;padding:19px;border-radius:13px;overflow:auto;line-height:1.48}
+code{background:#eef2f7;border-radius:5px;padding:2px 5px}a{color:var(--blue);word-break:break-word}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:13px}.mini{border:1px solid var(--line);border-radius:14px;padding:16px}.rank{font-weight:800;color:var(--green)}
+hr{border:0;border-top:1px solid var(--line);margin:25px 0}.toc a{text-decoration:none}.badge{font-size:.78rem;font-weight:700;padding:3px 7px;border-radius:6px;background:#edf2ff;color:#254fc0}
+footer{font-size:.87rem;color:var(--muted);margin-top:30px}
+</style></head>
+<body><main>
+<section class="hero">
+<div><span class="tag">Hermes Desktop / Hermes Agent</span><span class="tag">Enterprise SDLC</span><span class="tag">Security First</span><span class="tag">Low Token</span><span class="tag">Low Concurrency</span></div>
+<h1>AI Software Engineering Company<br>Super Dev Builders Ecosystem — Master Blueprint V2.2</h1>
+<p><b>Super Dev Builders Ecosystem</b> adalah software-engineering ecosystem berbasis Hermes yang mampu merancang, membangun, menguji, mengaudit, mengamankan, mendokumentasikan dan men-deploy website, web app, Android/iOS, Windows/macOS, backend/API, database, AI/agent integration dan platform enterprise. V2.2 menambahkan kemampuan resmi <b>Authorized Reverse Engineering & Reconstruction</b>: observasi, pemetaan, spesifikasi ulang, dan pembangunan ulang sistem berdasarkan target yang dapat dianalisis secara sah.</p>
+<p><b>Prinsip utama:</b> jangan memasang puluhan agent yang terus aktif. Pisahkan divisi kritis, gunakan skills on-demand, deterministic tools untuk fakta yang dapat diuji, progressive disclosure untuk menghemat token, dan human approval pada operasi berisiko.</p>
+</section>
+
+<section class="card">
+<h2>0. Independent Re-Audit — perubahan material dari V2</h2>
+<div class="callout warn"><b>Status:</b> V2 dinilai memiliki fondasi arsitektur yang baik, tetapi tidak “sempurna” dan dua rekomendasi operasional perlu dikoreksi. V2.1 ini menggantikan V2 sebagai acuan implementasi.</div>
+<table>
+<tr><th>Temuan audit</th><th>Koreksi V2.1</th></tr>
+<tr><td>Superpowers memang mendokumentasikan Hermes, tetapi ada laporan aktual instalasi plugin Hermes v0.20.4 diblokir security scanner sebagai <code>dangerous verdict</code>.</td><td><b>Jangan jadikan plugin Superpowers instalasi otomatis/default.</b> Gunakan sebagai methodology/reference atau hanya install setelah scanner PASS pada versi Hermes/Superpowers aktual dan source/plugin/hooks direview.</td></tr>
+<tr><td>Repo <code>getsentry/sentry-agent-skills</code> sudah archived/superseded.</td><td>Observability integration diarahkan ke <b>getsentry/sentry-for-ai</b>. Repo <code>getsentry/skills</code> tetap dapat menjadi referensi untuk code-review/skill-scanner/agents-md.</td></tr>
+<tr><td>Terminal sandbox bukan containment penuh terhadap seluruh agent process.</td><td>Untuk web/untrusted repo/MCP/plugin/input eksternal, gunakan <b>whole-process isolation</b> (Hermes Docker/Compose atau supported whole-process sandbox). Terminal backend saja tidak cukup.</td></tr>
+<tr><td>Hermes sekarang mempunyai built-in Skills Guard / <code>hermes skills audit</code>.</td><td>Jadikan <b>Hermes native skill scanner sebagai gate pertama</b>; Sentry skill-scanner hanya defense-in-depth/manual second opinion.</td></tr>
+<tr><td>V2 terlalu cepat menyebut banyak external skills “Prioritas A”.</td><td>Trust hierarchy baru: <b>Hermes builtin/official → verified upstream vendor/security org → custom audited → community</b>. External skill tidak otomatis production-approved.</td></tr>
+</table>
+</section>
+
+<section class="card toc"><h2>Daftar isi</h2>
+<p><a href="#principles">1. Prinsip desain</a> · <a href="#org">2. Struktur organisasi</a> · <a href="#stack">3. Technology governance</a> · <a href="#reconstruction">4. Reverse Engineering & Reconstruction</a> · <a href="#skills">5. Skill matrix per divisi</a> · <a href="#security">5. Security supply-chain</a> · <a href="#workflow">6. Workflow & gates</a> · <a href="#token">7. Token/resource policy</a> · <a href="#install">8. Prioritas instalasi</a> · <a href="#upgrade">9. Instruksi upgrade Hermes</a> · <a href="#sources">10. Referensi</a></p></section>
+
+<section class="card" id="principles"><h2>1. Prinsip desain yang dipakai</h2>
+<p>Hermes sendiri menggunakan skill sebagai dokumen pengetahuan <i>on-demand</i> dengan progressive disclosure dan kompatibel dengan standar Agent Skills. Skill lokal berada di <code>~/.hermes/skills/</code>; Hermes juga mempunyai skill management dan dukungan MCP. Karena itu arsitektur terbaik adalah <b>agent/division sedikit, skills banyak tetapi hanya dimuat ketika dibutuhkan</b>.</p>
+<div class="grid">
+<div class="mini"><b>Agent = tanggung jawab</b><br>Dipisah bila perlu independence, permission boundary, atau konteks kerja berbeda.</div>
+<div class="mini"><b>Skill = SOP/keahlian</b><br>Prosedur reusable yang dimuat hanya ketika relevan.</div>
+<div class="mini"><b>Tool = bukti deterministik</b><br>Compiler, test runner, linter, scanner, Git, Playwright, Semgrep, CodeQL, Trivy.</div>
+<div class="mini"><b>Gate = keputusan</b><br>PASS/FAIL yang berbasis evidence, bukan “feeling” LLM.</div>
+</div>
+<div class="callout good"><b>Rule:</b> jangan membuat agent baru jika masalah dapat diselesaikan dengan skill atau tool pada agent/divisi yang sudah ada.</div>
+<div class="callout danger"><b>Security boundary rule:</b> approval prompts, output redaction, skill scanners dan tool allowlists adalah defense-in-depth, <u>bukan containment absolut</u>. Untuk untrusted content gunakan OS-level/whole-process isolation. Jalankan agent non-root, mount hanya workspace yang diperlukan, minimalkan network egress dan jangan expose host secrets.</div>
+</section>
+
+<section class="card" id="org"><h2>2. Struktur organisasi final</h2>
+<pre>                         HUMAN OWNER
+                              │
+                     MASTER ORCHESTRATOR
+                              │
+        ┌─────────────────────┼──────────────────────┐
+        ▼                     ▼                      ▼
+ NEW PROJECT         EXISTING/AUTHORIZED TARGET    GOVERNANCE
+        │                     │
+        │                     ▼
+        │            REVERSE ENGINEERING &
+        │             RECONSTRUCTION DIVISION
+        │                     │
+        └──────────────┬──────┘
+                       ▼
+                    RESEARCH
+                       │
+                       ▼
+                  ARCHITECTURE
+                       │
+                  ENGINEERING
+                                                  │
+                                     ┌────────────┴────────────┐
+                                     ▼                         ▼
+                                  FRONTEND                  BACKEND
+                                                             │
+                                              ┌──────────────┼──────────────┐
+                                              ▼              ▼              ▼
+                                          Core/API        Data/DB      Identity &
+                                                                        Integration
+
+────────────────────── INDEPENDENT ASSURANCE ─────────────────────────
+
+         CODE REVIEW → QA/TEST → SECURITY → CODE AUDIT/ASSURANCE
+                                                │
+                                                ▼
+                                           RELEASE GATE
+                                                │
+                                                ▼
+                                             DEVOPS
+                                                │
+                                                ▼
+                                            PRODUCTION
+                                                │
+                                      DOCUMENTATION / HANDOVER</pre>
+<p>Documentation dapat bekerja sepanjang lifecycle; posisinya di bawah hanya menunjukkan final handover. Code Audit/Engineering Assurance bersifat independen dan mengaudit keseluruhan codebase, architecture compliance, maintainability, technical debt, test evidence, dependency health dan hasil security tooling.</p>
+</section>
+
+<section class="card" id="stack"><h2>3. Technology & Programming Language Governance</h2>
+<p>Architect memilih stack; developer tidak bebas mengganti framework hanya karena model lebih familiar dengannya.</p>
+<table>
+<tr><th>Tier</th><th>Teknologi</th><th>Penggunaan</th></tr>
+<tr><td><b>Core</b></td><td>TypeScript, JavaScript, Python, SQL, HTML/CSS, Bash</td><td>Web, backend, API, AI/automation, database, scripting.</td></tr>
+<tr><td><b>Platform</b></td><td>Kotlin, Swift, Dart/Flutter, C#/.NET</td><td>Android native, Apple native, cross-platform mobile, Windows.</td></tr>
+<tr><td><b>Specialized</b></td><td>Go, Rust, Java, C/C++, PowerShell</td><td>High performance, systems, enterprise JVM, native/system integration.</td></tr>
+</table>
+<p><b>Default stack:</b> Web = TypeScript + React/Next.js; backend = TypeScript/Node.js dengan Python untuk AI/automation; database = PostgreSQL/SQLite; mobile = Flutter sebagai default cross-platform; desktop = Tauri atau Electron sesuai requirement; DevOps = Docker + Bash/YAML, Terraform bila perlu.</p>
+<div class="callout warn">Native Kotlin/Swift/C# dipilih bila requirement platform, hardware/API OS, performance, security, atau UX membenarkannya. Jangan memakai native hanya untuk terlihat “enterprise”.</div>
+</section>
+
+<section class="card" id="reconstruction">
+<h2>4. Reverse Engineering & Reconstruction Division</h2>
+<p>Divisi ini memberi Super Dev Builders dua jalur produksi: <b>Build From Specification</b> dan <b>Authorized Reconstruction From Existing Target</b>. Tujuannya bukan membobol proteksi, tetapi memperoleh observasi seteliti mungkin dari surface yang sah, membangun evidence package, lalu merekonstruksi behavior/UX/functionality tanpa mengarang komponen yang tidak diketahui.</p>
+
+<div class="callout danger"><b>Hard boundary:</b> divisi ini tidak boleh bypass authentication/authorization, CAPTCHA/anti-bot/access controls, paywall, rate limit, DRM/licensing, code-signing, certificate pinning, secret/credential controls, atau mengeksploitasi vulnerability untuk memperoleh akses. Tidak boleh mengambil private source/data/API yang tidak diotorisasi. Jika target membutuhkan akses lebih dalam, Owner harus menyediakan source/binary/test account/staging environment/credentials dan scope authorization secara eksplisit.</div>
+
+<h3>4.1 Dua mode resmi</h3>
+<table>
+<tr><th>Mode</th><th>Input</th><th>Boleh</th><th>Tidak boleh</th></tr>
+<tr><td><b>A — External Reconstruction</b></td><td>URL publik / aplikasi yang dapat diamati secara sah.</td><td>Public crawl, browser automation, DOM/layout/assets, screenshots, responsive states, public network behavior, public API contract, technology signals, accessibility/performance, user-flow observation.</td><td>Bypass login/access control/anti-bot, credential theft, private endpoint discovery by exploitation, source-code theft.</td></tr>
+<tr><td><b>B — Owner-Authorized Deep Reconstruction</b></td><td>Source/repository, APK/IPA/EXE/binary, test account, staging, API docs, DB schema atau environment yang Owner berwenang audit.</td><td>Static/dynamic analysis, package/dependency analysis, runtime/network observation, source architecture, authorized API/schema, binary inspection, configuration and CI/CD review sesuai scope.</td><td>Keluar dari target/scope; menyerang third-party dependency/service; mengambil data nyata yang tidak diperlukan.</td></tr>
+</table>
+
+<h3>4.2 Workflow</h3>
+<pre>AUTHORIZATION & SCOPE GATE
+        ↓
+TARGET INVENTORY
+        ↓
+SAFE DISCOVERY / CRAWL
+        ↓
+UI + UX + NAVIGATION + STATE MAP
+        ↓
+OBSERVED NETWORK / API / DATA CONTRACT
+        ↓
+TECHNOLOGY + ASSET + DEPENDENCY PROFILE
+        ↓
+AUTHORIZED STATIC/DYNAMIC ANALYSIS (Mode B only)
+        ↓
+EVIDENCE NORMALIZATION
+        ↓
+FACT / INFERRED / UNKNOWN CLASSIFICATION
+        ↓
+FEATURE MATRIX + RECONSTRUCTION PRD
+        ↓
+ARCHITECTURE & IMPLEMENTATION PLAN
+        ↓
+FRONTEND / BACKEND REBUILD
+        ↓
+VISUAL + FUNCTIONAL + ACCESSIBILITY + PERFORMANCE DIFF
+        ↓
+QA → SECURITY → ENGINEERING ASSURANCE
+        ↓
+RECONSTRUCTION FIDELITY REPORT</pre>
+
+<h3>4.3 Core skills dan tools</h3>
+<table>
+<tr><th>Tier</th><th>Skill/Tool</th><th>Mode</th><th>Fungsi dan policy</th></tr>
+<tr><td>A</td><td><b>Custom: reconstruction-scope-gate</b></td><td>A/B</td><td>Mencatat target, owner/authorization basis, allowed surfaces, prohibited actions, test accounts, data handling, time/scope. Tidak ada deep scan sebelum gate PASS.</td></tr>
+<tr><td>A</td><td><b>Microsoft Playwright</b><br><a href="https://github.com/microsoft/playwright">official</a></td><td>A/B</td><td>Browser automation lintas Chromium/Firefox/WebKit; navigation, screenshots, DOM/state, forms, responsive viewports, trace dan repeatable behavioral tests. Primary browser observation engine.</td></tr>
+<tr><td>A</td><td><b>Custom: target-inventory</b></td><td>A/B</td><td>Mencatat routes/pages/screens, entry points, roles yang sah, assets, states, forms, feature areas, target versions.</td></tr>
+<tr><td>A</td><td><b>Custom: ui-ux-state-mapper</b></td><td>A/B</td><td>Membuat screen/page map, navigation graph, component inventory, state transitions, empty/loading/error/success states, responsive behavior dan design tokens yang dapat diobservasi.</td></tr>
+<tr><td>A</td><td><b>Custom: observed-network-contract</b></td><td>A/B</td><td>Merekam request/response yang memang terjadi selama authorized interaction; menyusun endpoint/method/schema/status/error map. Dilarang brute-force atau mencari endpoint dengan exploit.</td></tr>
+<tr><td>A</td><td><b>Lighthouse</b><br><a href="https://github.com/GoogleChrome/lighthouse">official</a></td><td>A/B</td><td>Evidence untuk performance, best-practice, accessibility dan web-quality characteristics; bukan reverse-engineering backend.</td></tr>
+<tr><td>A</td><td><b>axe-core</b><br><a href="https://github.com/dequelabs/axe-core">official</a></td><td>A/B</td><td>Automated accessibility evidence. Hasil incomplete wajib manual review; automated checks tidak dianggap coverage 100%.</td></tr>
+<tr><td>B</td><td><b>Crawlee</b><br><a href="https://github.com/apify/crawlee">official</a></td><td>A/B</td><td>Structured crawling dan asset/page inventory untuk target yang mengizinkan crawling. <b>Anti-bot evasion/proxy rotation tidak boleh dipakai untuk menghindari pembatas target.</b> Hormati scope, robots/policy yang relevan dan rate limit.</td></tr>
+<tr><td>B</td><td><b>Custom: technology-profiler</b></td><td>A/B</td><td>Menggabungkan headers, public assets, script/module names, DOM/runtime evidence untuk menginfer stack. Output selalu confidence-scored; fingerprint bukan bukti source architecture.</td></tr>
+<tr><td>B</td><td><b>BackstopJS / Playwright screenshot diff</b><br><a href="https://github.com/garris/BackstopJS">BackstopJS</a></td><td>A/B</td><td>Visual regression/fidelity comparison. BackstopJS saat audit mencari maintainer baru, jadi Playwright-native screenshot assertions dapat diprioritaskan untuk longevity.</td></tr>
+<tr><td>A</td><td><b>Custom: evidence-normalizer</b></td><td>A/B</td><td>Semua temuan diberi provenance, timestamp, target/version, evidence pointer dan confidence.</td></tr>
+<tr><td>A</td><td><b>Custom: reconstruction-spec</b></td><td>A/B</td><td>Mengubah evidence menjadi Feature Matrix, UX spec, observable API contract, PRD dan technical reconstruction specification.</td></tr>
+<tr><td>A</td><td><b>Custom: reconstruction-fidelity</b></td><td>A/B</td><td>Mengukur hasil baru terhadap evidence target: visual, navigation, interaction, responsive, feature, accessibility dan performance fidelity.</td></tr>
+</table>
+
+<h3>4.4 Owner-Authorized Mobile / Desktop Deep Analysis</h3>
+<table>
+<tr><th>Tier</th><th>Tool</th><th>Target</th><th>Fungsi aman</th></tr>
+<tr><td>A (Mode B only)</td><td><b>MobSF</b> — <a href="https://github.com/MobSF/Mobile-Security-Framework-MobSF">official</a></td><td>Android/iOS/Windows mobile packages/source</td><td>Static/dynamic security and privacy analysis, manifest/permissions, binary/source indicators, runtime/network evidence. Jalankan terisolasi pada artifact yang Owner berwenang analisis.</td></tr>
+<tr><td>B (Mode B only)</td><td><b>JADX</b> — <a href="https://github.com/skylot/jadx">official</a></td><td>APK/DEX/AAB/JAR</td><td>Decompiler untuk memahami structure/logic dari artifact yang diotorisasi. JADX sendiri memperingatkan dekompilasi tidak selalu 100%; hasil = evidence, bukan source asli.</td></tr>
+<tr><td>B (Mode B only)</td><td><b>Apktool</b> — <a href="https://github.com/iBotPeaches/Apktool">official</a></td><td>Android APK</td><td>Decode resources/manifest/smali dan project-like structure. Upstream secara eksplisit menyatakan bukan untuk piracy/non-legal use.</td></tr>
+<tr><td>C (Mode B only)</td><td><b>Ghidra</b> — <a href="https://github.com/NationalSecurityAgency/ghidra">official</a></td><td>Compiled Windows/macOS/Linux/native binaries</td><td>Disassembly/decompilation/graphing/scripting untuk owned/authorized binaries. Berat; gunakan hanya jika source tidak tersedia dan kebutuhan benar-benar ada. Periksa security advisories versi Ghidra sebelum penggunaan.</td></tr>
+</table>
+
+<h3>4.5 Network observation policy</h3>
+<p>Browser DevTools/Playwright trace adalah pilihan pertama. Proxy/interception tooling hanya digunakan di <b>Mode B</b> pada aplikasi/environment yang Owner otorisasi dan tidak untuk mematahkan TLS/certificate controls pihak ketiga. Jangan menyimpan authorization headers, cookies, tokens atau PII ke artifact reconstruction; lakukan redaction sebelum evidence masuk ke context LLM.</p>
+
+<h3>4.6 Evidence taxonomy — anti-halusinasi</h3>
+<table>
+<tr><th>Status</th><th>Makna</th><th>Aturan</th></tr>
+<tr><td><b>FACT / OBSERVED</b></td><td>Didukung screenshot, DOM, trace, file, source atau runtime evidence.</td><td>Boleh menjadi requirement fidelity.</td></tr>
+<tr><td><b>INFERRED</b></td><td>Kesimpulan teknis dari beberapa evidence tetapi tidak terlihat langsung.</td><td>Wajib confidence 0–100% + alasan.</td></tr>
+<tr><td><b>UNKNOWN</b></td><td>Tidak dapat ditentukan dari scope/evidence.</td><td>Dilarang diisi dengan tebakan; Architect mendesain implementasi baru yang sesuai requirement.</td></tr>
+<tr><td><b>OUT OF SCOPE</b></td><td>Memerlukan akses/tindakan yang tidak diotorisasi.</td><td>Stop dan minta authorization/artifact dari Owner bila memang diperlukan.</td></tr>
+</table>
+
+<h3>4.7 Reconstruction Fidelity Score</h3>
+<p>Jangan menghasilkan satu angka palsu. Laporkan skor per dimensi beserta coverage:</p>
+<table>
+<tr><th>Dimensi</th><th>Evidence</th></tr>
+<tr><td>Visual Fidelity</td><td>Screenshot diff pada viewport yang ditentukan.</td></tr>
+<tr><td>Navigation Fidelity</td><td>Route/screen graph dan tested journeys.</td></tr>
+<tr><td>Interaction Fidelity</td><td>Forms, dialogs, states, keyboard/mouse/touch behavior.</td></tr>
+<tr><td>Responsive Fidelity</td><td>Breakpoint/device matrix.</td></tr>
+<tr><td>Functional Coverage</td><td>Feature matrix: observed / reproduced / intentionally changed / unknown.</td></tr>
+<tr><td>Accessibility</td><td>axe + manual checks untuk area yang automation tidak dapat memastikan.</td></tr>
+<tr><td>Performance</td><td>Lighthouse/runtime measurements dengan environment dicatat.</td></tr>
+<tr><td>API Contract Fidelity</td><td>Observed/authorized contract tests; internal implementation tidak perlu identik.</td></tr>
+</table>
+<div class="callout good"><b>Design principle:</b> Super Dev Builders harus menyalin <i>observable requirements and behavior</i>, bukan memaksa menyalin internal implementation. Untuk reconstruction legal/maintainable, hasil baru sebaiknya clean implementation berdasarkan specification/evidence, kecuali Owner memang memberikan source code yang boleh dimodifikasi.</div>
+</section>
+
+<section class="card" id="skills"><h2>5. Skill Matrix — pilihan terbaik per divisi</h2>
+<p><span class="rank">Prioritas A</span> = sangat direkomendasikan. <b>B</b> = install/use bila relevan. <b>C</b> = optional/specialized. “Skill” di bawah dapat berupa Agent Skill yang benar-benar di-load Hermes atau workflow/tool yang dibungkus menjadi Hermes skill tipis.</p>
+
+<h3>4.1 Master Orchestrator / Product & Planning</h3>
+<table>
+<tr><th>Prioritas</th><th>Skill</th><th>Sumber</th><th>Fungsi</th></tr>
+<tr><td>A</td><td><b>Superpowers: brainstorming</b></td><td><a href="https://github.com/obra/superpowers">obra/superpowers</a></td><td>Memaksa discovery dan design sebelum coding; mengurangi salah requirement.</td></tr>
+<tr><td>A</td><td><b>Superpowers: writing-plans</b></td><td><a href="https://github.com/obra/superpowers">obra/superpowers</a></td><td>Mengubah design menjadi task implementasi kecil dengan file dan verification steps.</td></tr>
+<tr><td>A</td><td><b>ask-questions-if-underspecified</b></td><td><a href="https://github.com/trailofbits/skills">Trail of Bits Skills</a></td><td>Mencegah Hermes menebak requirement yang tidak lengkap.</td></tr>
+<tr><td>B</td><td><b>executing-plans</b></td><td><a href="https://github.com/obra/superpowers">Superpowers</a></td><td>Eksekusi plan inline; lebih hemat daripada subagent-per-task untuk proyek kecil/menengah.</td></tr>
+<tr><td>C</td><td><b>subagent-driven-development</b></td><td><a href="https://github.com/obra/superpowers/blob/main/skills/subagent-driven-development/SKILL.md">Superpowers</a></td><td>Untuk pekerjaan besar/independen; fresh context + review. Jangan default karena token lebih tinggi.</td></tr>
+</table>
+
+<h3>4.2 Research Division</h3>
+<p>Research harus memakai web/docs retrieval dan menyimpan hasil sebagai artifact pendek. Jangan menjadikan browsing sebagai percakapan panjang antar-agent.</p>
+<table>
+<tr><th>Prioritas</th><th>Skill/Tool</th><th>Fungsi</th></tr>
+<tr><td>A</td><td><b>Hermes research/web capabilities</b></td><td>Official documentation, standards, library/API verification.</td></tr>
+<tr><td>A</td><td><b>Context7 MCP</b> — <a href="https://github.com/upstash/context7">link</a></td><td>Mengambil dokumentasi library/framework terkini secara terarah sehingga developer tidak mengandalkan API yang sudah usang.</td></tr>
+<tr><td>B</td><td><b>GitHub MCP official</b> — <a href="https://github.com/github/github-mcp-server">link</a></td><td>Read repository, issues, PR, workflow dan code context. Gunakan token/permission minimum.</td></tr>
+</table>
+
+<h3>4.3 Architecture Division</h3>
+<table>
+<tr><th>Prioritas</th><th>Skill</th><th>Fungsi</th></tr>
+<tr><td>A</td><td><b>Custom: architecture-decision-record</b></td><td>Hermes membuat ADR: context → options → trade-offs → decision → consequences. Skill custom karena architecture harus mengikuti governance proyek Anda.</td></tr>
+<tr><td>A</td><td><b>Custom: technology-selection</b></td><td>Menerapkan Technology Governance Matrix di dokumen ini; mencegah framework drift.</td></tr>
+<tr><td>A</td><td><b>audit-context-building</b> — <a href="https://github.com/trailofbits/skills/blob/main/plugins/audit-context-building/skills/audit-context-building/SKILL.md">Trail of Bits</a></td><td>Memahami codebase, asumsi, guarantee dan dependency sebelum architecture review/audit.</td></tr>
+<tr><td>B</td><td><b>Anthropic mcp-builder</b> — <a href="https://github.com/anthropics/skills/blob/main/skills%2Fmcp-builder%2FSKILL.md">link</a></td><td>Jika sistem membutuhkan MCP server/integration; panduan Python/TypeScript MCP.</td></tr>
+</table>
+
+<h3>4.4 Frontend Engineering Division</h3>
+<table>
+<tr><th>Prioritas</th><th>Skill/Tool</th><th>Fungsi</th></tr>
+<tr><td>A</td><td><b>frontend-design</b> — <a href="https://github.com/anthropics/skills/blob/main/skills%2Ffrontend-design%2FSKILL.md">Anthropic</a></td><td>Arah visual/UI yang intentional; hindari UI generik/template.</td></tr>
+<tr><td>A</td><td><b>test-driven-development</b> — <a href="https://github.com/obra/superpowers/blob/main/skills/test-driven-development/SKILL.md">Superpowers</a></td><td>RED → GREEN → REFACTOR untuk component/feature yang testable.</td></tr>
+<tr><td>A</td><td><b>webapp-testing</b> — <a href="https://github.com/anthropics/skills/blob/main/skills%2Fwebapp-testing%2FSKILL.md">Anthropic</a></td><td>Playwright-based UI verification, browser logs, screenshot evidence.</td></tr>
+<tr><td>A</td><td><b>systematic-debugging</b> — <a href="https://github.com/obra/superpowers/blob/main/skills/systematic-debugging/SKILL.md">Superpowers</a></td><td>Root-cause-first untuk bug, build failure, integration dan performance issue.</td></tr>
+<tr><td>B</td><td><b>Custom: accessibility-audit</b></td><td>WCAG/semantic HTML/keyboard/focus/ARIA checks; dibungkus dengan axe/Playwright bila tersedia.</td></tr>
+<tr><td>B</td><td><b>Platform adapters</b></td><td>Flutter/Dart, Kotlin/Android, Swift/Apple, C#/.NET/Tauri sebagai skill on-demand, bukan agent permanen.</td></tr>
+</table>
+
+<h3>4.5 Backend Engineering Division</h3>
+<p>Backend dibagi secara logis menjadi Core/API, Data/DB, dan Identity/Integration; hanya specialist yang relevan yang aktif.</p>
+<table>
+<tr><th>Sub-area</th><th>Skill terbaik</th><th>Fungsi</th></tr>
+<tr><td>Core/API</td><td><b>TDD + systematic-debugging + verification-before-completion</b> — <a href="https://github.com/obra/superpowers">Superpowers</a></td><td>Business logic/API dibangun dengan test dan bukti, bukan trial-and-error.</td></tr>
+<tr><td>Core/API</td><td><b>Custom: api-contract</b></td><td>OpenAPI/schema-first, error contract, idempotency, pagination, validation, versioning.</td></tr>
+<tr><td>Data/DB</td><td><b>Custom: database-migration-safety</b></td><td>Schema migration, backward compatibility, transaction, index, rollback, backup gate.</td></tr>
+<tr><td>Identity</td><td><b>Custom: authz-authn-review</b></td><td>OAuth/OIDC/session/token/RBAC/ABAC; requirement dan implementation checklist.</td></tr>
+<tr><td>Integration</td><td><b>Anthropic mcp-builder</b></td><td>MCP integration bila dibutuhkan.</td></tr>
+<tr><td>Python</td><td><b>modern-python</b> — <a href="https://github.com/trailofbits/claude-code-config">Trail of Bits config/skills guidance</a></td><td>Modern Python workflow dengan uv, Ruff, pytest dan tooling terstruktur.</td></tr>
+</table>
+
+<h3>4.6 Code Review Division</h3>
+<table>
+<tr><th>Prioritas</th><th>Skill</th><th>Fungsi</th></tr>
+<tr><td>A</td><td><b>requesting-code-review</b> — <a href="https://github.com/obra/superpowers/blob/main/skills/requesting-code-review/SKILL.md">link</a></td><td>Review terhadap requirement/plan dan Git range; reviewer mendapat context terpilih, bukan seluruh chat.</td></tr>
+<tr><td>A</td><td><b>receiving-code-review</b> — <a href="https://github.com/obra/superpowers/blob/main/skills/receiving-code-review/SKILL.md">link</a></td><td>Mencegah developer mengikuti feedback reviewer secara buta; verifikasi teknis dahulu.</td></tr>
+<tr><td>A</td><td><b>Sentry code-review</b> — <a href="https://github.com/getsentry/skills">getsentry/skills</a></td><td>Second methodology untuk quality review; gunakan sebagai referensi/customization, bukan menjalankan reviewer tanpa batas.</td></tr>
+<tr><td>B</td><td><b>code-simplifier</b> — <a href="https://github.com/getsentry/skills/blob/main/skills/code-simplifier/SKILL.md">link</a></td><td>Clarity/maintainability refactor tanpa mengubah behavior; wajib setelah tests tersedia.</td></tr>
+</table>
+
+<h3>4.7 QA / Test Division</h3>
+<table>
+<tr><th>Prioritas</th><th>Skill/Tool</th><th>Fungsi</th></tr>
+<tr><td>A</td><td><b>TDD</b></td><td>Unit/component behavior.</td></tr>
+<tr><td>A</td><td><b>Anthropic webapp-testing + Playwright</b></td><td>E2E/browser UI.</td></tr>
+<tr><td>A</td><td><b>verification-before-completion</b> — <a href="https://github.com/obra/superpowers/blob/main/skills/verification-before-completion/SKILL.md">link</a></td><td>Hermes dilarang mengatakan “selesai/lulus” tanpa fresh command output.</td></tr>
+<tr><td>A</td><td><b>systematic-debugging</b></td><td>Root cause untuk test failure.</td></tr>
+<tr><td>B</td><td><b>Custom: test-pyramid-and-risk</b></td><td>Memilih unit/integration/contract/E2E/performance sesuai risk, bukan E2E untuk semuanya.</td></tr>
+</table>
+
+<h3>4.8 Security Division</h3>
+<table>
+<tr><th>Prioritas</th><th>Skill/Tool</th><th>Fungsi</th></tr>
+<tr><td>A</td><td><b>security-review</b> — <a href="https://github.com/getsentry/skills/blob/main/skills/security-review/SKILL.md">Sentry</a></td><td>Security code review berbasis exploitability dan confidence; menelusuri data flow sebelum melaporkan.</td></tr>
+<tr><td>A</td><td><b>Semgrep skill</b> — <a href="https://github.com/trailofbits/skills/blob/main/plugins/static-analysis/skills/semgrep/SKILL.md">Trail of Bits</a></td><td>Fast SAST/pattern/taint scan; dapat dibuat read-only dan output SARIF.</td></tr>
+<tr><td>A</td><td><b>CodeQL skill</b> — <a href="https://github.com/trailofbits/skills/blob/main/plugins/static-analysis/skills/codeql/SKILL.md">Trail of Bits</a></td><td>Deep interprocedural data-flow/taint analysis untuk banyak bahasa.</td></tr>
+<tr><td>A</td><td><b>Trivy</b> — <a href="https://github.com/aquasecurity/trivy">Aqua Security</a></td><td>Dependency/container/IaC/secret vulnerability scanning. Gunakan official distribution.</td></tr>
+<tr><td>B</td><td><b>variant-analysis</b> — <a href="https://github.com/trailofbits/skills/blob/main/plugins/variant-analysis/skills/variant-analysis/SKILL.md">Trail of Bits</a></td><td>Setelah satu bug/vulnerability ditemukan, mencari seluruh variasi root cause di codebase.</td></tr>
+<tr><td>B</td><td><b>Syft</b> — <a href="https://github.com/anchore/syft">Anchore</a></td><td>Membuat SBOM SPDX/CycloneDX. Catatan: tetap pin/update versi karena scanner sendiri juga mempunyai advisory.</td></tr>
+</table>
+<div class="callout danger"><b>Security rule:</b> LLM security review tidak boleh menjadi satu-satunya gate. Minimal kombinasikan review + deterministic SAST/dependency/secret scan + tests. Security agent tidak boleh mempunyai hak deploy production.</div>
+
+<h3>4.9 Code Audit & Engineering Assurance Division</h3>
+<p>Ini pemilik audit keseluruhan pengkodean sistem.</p>
+<table>
+<tr><th>Prioritas</th><th>Skill/Tool</th><th>Fungsi</th></tr>
+<tr><td>A</td><td><b>audit-context-building</b></td><td>Membangun pemahaman codebase sebelum verdict.</td></tr>
+<tr><td>A</td><td><b>differential-review</b> — <a href="https://github.com/trailofbits/skills/blob/main/plugins/differential-review/README.md">Trail of Bits</a></td><td>Audit perubahan + blast radius + test coverage + risk; cocok untuk release audit.</td></tr>
+<tr><td>A</td><td><b>CodeQL + Semgrep + SARIF parsing</b> — <a href="https://github.com/trailofbits/skills/tree/main/plugins/static-analysis">Trail of Bits Static Analysis</a></td><td>Evidence machine-readable dan agregasi finding.</td></tr>
+<tr><td>A</td><td><b>Custom: architecture-compliance-audit</b></td><td>Membandingkan ADR/architecture spec dengan repository aktual; menemukan architecture drift.</td></tr>
+<tr><td>A</td><td><b>Custom: engineering-release-audit</b></td><td>Final gate: requirements, tests, review, security, dependencies, migrations, rollback, docs.</td></tr>
+<tr><td>B</td><td><b>code-simplifier</b></td><td>Dipakai setelah finding maintainability dikonfirmasi dan regression tests ada.</td></tr>
+</table>
+
+<h3>4.10 DevOps / Release / Reliability Division</h3>
+<table>
+<tr><th>Prioritas</th><th>Skill/Tool</th><th>Fungsi</th></tr>
+<tr><td>A</td><td><b>Custom: ci-cd-release-gate</b></td><td>Build → test → scan → artifact → staging → approval → production; semua gate memiliki exit criteria.</td></tr>
+<tr><td>A</td><td><b>Docker + project-native CI</b></td><td>Reproducible build dan deployment. Jangan beri agent unrestricted Docker socket pada untrusted code.</td></tr>
+<tr><td>A</td><td><b>Trivy</b></td><td>Image/IaC/dependency scanning sebelum release.</td></tr>
+<tr><td>B</td><td><b>Sentry for AI</b> — <a href="https://github.com/getsentry/sentry-for-ai">getsentry/sentry-for-ai</a></td><td>Current official source untuk Sentry agent integration: error monitoring, tracing, logs, metrics, profiling dan AI/LLM monitoring. Repo lama <code>sentry-agent-skills</code> sudah archived.</td></tr>
+<tr><td>B</td><td><b>GitHub MCP official</b></td><td>CI workflow/PR/release visibility bila repository berada di GitHub.</td></tr>
+<tr><td>B</td><td><b>Custom: rollback-and-recovery</b></td><td>Rollback, DB compatibility, backup/restore verification, health checks.</td></tr>
+</table>
+
+<h3>4.11 Documentation Division</h3>
+<table>
+<tr><th>Prioritas</th><th>Skill</th><th>Fungsi</th></tr>
+<tr><td>A</td><td><b>agents-md</b> — <a href="https://github.com/getsentry/skills/blob/main/skills/agents-md/SKILL.md">Sentry</a></td><td>Membuat AGENTS.md/agent instruction yang pendek, factual dan reference-backed; sangat baik untuk menghemat context.</td></tr>
+<tr><td>A</td><td><b>Custom: architecture-docs</b></td><td>ADR, C4-like context/container/component, API/data-flow, deployment topology.</td></tr>
+<tr><td>A</td><td><b>Custom: release-handover-docs</b></td><td>README, setup, runbook, environment, backup, rollback, known limitations, changelog.</td></tr>
+<tr><td>B</td><td><b>Anthropic Agent Skills examples</b> — <a href="https://github.com/anthropics/skills">link</a></td><td>Referensi format skill dan progressive disclosure; jangan menyalin skill yang tidak relevan.</td></tr>
+</table>
+
+<h3>4.12 Skill Governance / Skill Supply-Chain</h3>
+<table>
+<tr><th>Prioritas</th><th>Skill</th><th>Fungsi</th></tr>
+<tr><td>A</td><td><b>Hermes Skills Guard / hermes skills audit</b> — <a href="https://github.com/NousResearch/hermes-agent/blob/main/website/docs/user-guide/features/skills.md">Hermes official</a></td><td>Gate pertama untuk semua hub-installed skills: data exfiltration, prompt injection, destructive commands dan supply-chain signals. Jangan gunakan <code>--force</code> untuk melewati verdict berbahaya.</td></tr><tr><td>B</td><td><b>skill-scanner</b> — <a href="https://github.com/getsentry/skills/blob/main/skills/skill-scanner/SKILL.md">Sentry</a></td><td>Second opinion/manual static scan untuk prompt injection, scripts, permission, secrets dan supply-chain risk; tidak menggantikan Hermes native guard atau manual source review.</td></tr>
+<tr><td>A</td><td><b>Hermes skill authoring</b> — <a href="https://github.com/NousResearch/hermes-agent/blob/main/website/docs/user-guide/skills/bundled/software-development/software-development-hermes-agent-skill-authoring.md">official Hermes</a></td><td>Format dan lifecycle skill native Hermes.</td></tr>
+<tr><td>A</td><td><b>Superpowers writing-skills</b> — <a href="https://github.com/obra/superpowers/blob/main/skills/writing-skills/SKILL.md">link</a></td><td>TDD untuk skill: test baseline → skill → retest; sangat cocok untuk custom skills proyek.</td></tr>
+</table>
+</section>
+
+<section class="card" id="security"><h2>6. Kebijakan keamanan skills & MCP</h2>
+<p>Tidak ada skill pihak ketiga yang dapat dijamin “100% aman” hanya karena populer atau open-source. Karena skill dapat menginstruksikan agent menjalankan shell/script, membaca file, atau mengubah konfigurasi, ia adalah bagian dari software supply chain.</p>
+<pre>NEW SKILL / MCP
+      │
+      ▼
+SOURCE TRUST CHECK
+official/vendor > established security org > community
+      │
+      ▼
+PIN VERSION / COMMIT
+      │
+      ▼
+STATIC READ + SKILL-SCANNER
+      │
+      ▼
+CHECK scripts / hooks / network / permissions / secrets
+      │
+      ▼
+TEST IN SANDBOX / DISPOSABLE REPO
+      │
+      ▼
+ALLOWLIST MINIMUM TOOLS
+      │
+      ▼
+APPROVE → INSTALL
+      │
+      ▼
+PERIODIC RE-AUDIT ON UPDATE</pre>
+<p>Hermes mendokumentasikan defense-in-depth: dangerous-command approval, file-write controls, MCP credential filtering, context-file prompt-injection scanning, cross-session isolation, secret redaction dan sandboxing. Namun Hermes juga menegaskan bahwa <b>OS-level isolation adalah security boundary yang sebenarnya terhadap adversarial LLM</b>. Terminal-backend sandbox mengurung shell/file operations, tetapi tidak otomatis mengurung seluruh plugin/hook/MCP/agent-process path.</p>
+<div class="callout danger"><b>Production/untrusted-input baseline:</b> gunakan whole-process wrapping (mis. official Hermes Docker/Compose atau supported whole-process sandbox), non-root user, workspace-only mounts, restricted egress, no Docker socket, no host SSH/AWS/Kubernetes credential mounts, dan credential injection minimum. Default local backend hanya untuk trusted development.</div>
+<div class="callout danger"><b>Dilarang auto-approve:</b> destructive shell, production deploy, database destructive migration, secret/credential change, IAM change, publish/release, payment/financial action, deletion, atau MCP baru yang meminta broad filesystem/network access.</div>
+<p><b>MCP policy:</b> gunakan official/vendor MCP bila tersedia; expose hanya tool yang diperlukan dengan include/allowlist; filesystem hanya pada workspace allowlist; production database default read-only; credential scope minimum. Hermes memfilter environment stdio MCP, tetapi credential yang secara eksplisit dikonfigurasi tetap dapat dibaca MCP tersebut—karena itu treat MCP server sebagai trusted code dan audit source/version-nya.</p>
+</section>
+
+<section class="card" id="workflow"><h2>7. Workflow operasional final</h2>
+<pre>01 USER OBJECTIVE
+       ↓
+01A IF EXISTING TARGET:
+    AUTHORIZATION/SCOPE GATE
+       ↓
+    REVERSE ENGINEERING & RECONSTRUCTION
+    evidence package → FACT / INFERRED / UNKNOWN
+       ↓
+02 ORCHESTRATOR + brainstorming / clarification
+       ↓
+03 RESEARCH (hanya bila perlu)
+       ↓
+04 ARCHITECTURE + ADR + stack decision
+       ↓
+05 HUMAN DESIGN/ARCHITECTURE APPROVAL (major project)
+       ↓
+06 IMPLEMENTATION PLAN
+       ↓
+07 FRONTEND and/or BACKEND
+       │   TDD + targeted context + deterministic tools
+       ↓
+08 CODE REVIEW
+       ↓
+09 QA / INTEGRATION / E2E
+       ↓
+10 SECURITY
+   Semgrep / CodeQL / dependency / secret / config
+       ↓
+11 CODE AUDIT & ENGINEERING ASSURANCE
+   architecture drift + whole-system release audit
+       ↓
+12 RELEASE GATE
+       ↓
+13 HUMAN APPROVAL for production/high-risk action
+       ↓
+14 DEVOPS DEPLOY
+       ↓
+15 OBSERVABILITY / SMOKE TEST / ROLLBACK READINESS
+       ↓
+16 DOCUMENTATION + HANDOVER</pre>
+<h3>Release gate minimum</h3>
+<table>
+<tr><th>Gate</th><th>Harus ada evidence</th></tr>
+<tr><td>Requirement</td><td>Acceptance criteria terpetakan.</td></tr>
+<tr><td>Build</td><td>Fresh successful build output.</td></tr>
+<tr><td>Tests</td><td>Unit/integration/E2E sesuai risk; no unexplained failures.</td></tr>
+<tr><td>Review</td><td>Critical/high code-review issue closed atau explicitly accepted manusia.</td></tr>
+<tr><td>Security</td><td>Static/dependency/secret scans + triage.</td></tr>
+<tr><td>Audit</td><td>Architecture compliance & release audit PASS.</td></tr>
+<tr><td>Operations</td><td>Rollback/backup/health check tersedia sesuai kelas sistem.</td></tr>
+<tr><td>Docs</td><td>Setup/runbook/release notes aktual.</td></tr>
+</table>
+</section>
+
+<section class="card" id="token"><h2>8. Token & PC Resource Policy</h2>
+<ol>
+<li><b>Sequential by default.</b> Maksimum 1–2 specialist aktif; parallel hanya untuk task independen yang benar-benar menghemat waktu.</li>
+<li><b>Progressive disclosure.</b> System prompt hanya memuat nama/deskripsi skill; full SKILL.md/reference dimuat saat triggered.</li>
+<li><b>Artifact handoff.</b> Requirement, ADR, plan, diff, test/SARIF report; jangan forward seluruh transcript.</li>
+<li><b>Diff-first review.</b> Reviewer menerima requirement + Git diff + file terkait.</li>
+<li><b>Tool before model.</b> Compiler/linter/test/scanner menjawab fakta deterministik.</li>
+<li><b>Bounded loops.</b> Maksimum 2–3 repair cycles, lalu eskalasi; cegah infinite token loop.</li>
+<li><b>Cheap model for routine.</b> Routing/docs/simple transforms; strong model untuk architecture, complex debugging, security triage dan final audit.</li>
+<li><b>No duplicate skill families.</b> Pilih satu primary methodology; skill kedua hanya sebagai specialist.</li>
+</ol>
+<div class="callout good"><b>Rekomendasi audited:</b> jadikan workflow Hermes-native sebagai control plane; gunakan konsep Superpowers sebagai methodology hanya setelah compatibility/security gate. Tambahkan external skills secara selektif: Anthropic untuk frontend/web testing/MCP, Trail of Bits untuk audit/security, Sentry untuk secondary code/skill review dan observability bila relevan. Jangan install satu repository penuh jika hanya satu skill yang diperlukan.</div>
+</section>
+
+<section class="card" id="install"><h2>9. Prioritas instalasi — jangan install semuanya sekaligus</h2>
+<h3>Phase 1 — Foundation (Audited)</h3>
+<p><b>Mulai dari Hermes builtin/official skills dan Plan Mode.</b> Gunakan <code>hermes skills browse --source official</code>, <code>hermes skills inspect ...</code>, dan <code>hermes skills audit</code>. Prioritaskan official software-development skills yang benar-benar dibutuhkan seperti <b>ast-grep</b>, <b>grill-me</b>, <b>rest-graphql-debug</b>, <b>code-wiki</b>, dan <b>subagent-driven-development</b> bila tersedia pada versi Anda.</p>
+<p><b>Superpowers:</b> methodology-nya tetap sangat baik sebagai referensi (brainstorming, plan, TDD, debugging, review, verification), dan upstream mendokumentasikan <code>hermes plugins install obra/superpowers --enable</code>. Namun audit V2.1 menemukan laporan aktual bahwa instalasi pada Hermes v0.20.4 dapat diblokir Skills Guard sebagai <code>dangerous verdict</code>. Karena plugin memiliki surface lebih besar daripada SKILL.md biasa (hooks/scripts/plugin code), <b>jangan bypass scanner dan jangan menjadikannya mandatory install sampai kombinasi versi Anda PASS</b>. Jika gagal, port/adapt hanya workflow yang dibutuhkan menjadi custom Hermes skills yang kecil dan diaudit.</p>
+<h3>Phase 2 — Assurance</h3>
+<p>Adopsi/audit Trail of Bits: <b>audit-context-building, differential-review, Semgrep, CodeQL, SARIF, variant-analysis</b>. Untuk PC terbatas, Semgrep menjadi frequent fast scan; CodeQL dipakai pada milestone/release atau area berisiko tinggi karena lebih berat.</p>
+<h3>Phase 3 — UI & Integration</h3>
+<p>Anthropic: <b>frontend-design, webapp-testing, mcp-builder</b>. Karena ini dibuat untuk ekosistem Agent Skills, lakukan compatibility test di Hermes sebelum production use.</p>
+<h3>Phase 4 — Governance</h3>
+<p>Sentry <code>getsentry/skills</code>: <b>skill-scanner, security-review, agents-md, code-simplifier</b> dapat dipakai sebagai secondary methodology. <b>Primary quarantine gate tetap Hermes Skills Guard / hermes skills audit</b>, ditambah manual source review.</p>
+<h3>Phase 5 — Deterministic Security Tools</h3>
+<p>Semgrep, CodeQL, Trivy; Syft bila membutuhkan SBOM. Pin versi dan update terkontrol. Jangan menambah scanner hanya karena tersedia—overlap menghasilkan noise dan maintenance.</p>
+</section>
+
+<section class="card" id="upgrade"><h2>10. Instruksi yang dapat langsung diberikan kepada Hermes</h2>
+<div class="callout"><b>Tujuan Hermes:</b> gunakan dokumen ini sebagai target architecture. Audit project sebelumnya terlebih dahulu; jangan overwrite/menghapus konfigurasi atau skill yang masih diperlukan. Buat migration plan, backup, dan diff sebelum perubahan.</div>
+<pre>UPGRADE DIRECTIVE
+
+1. Inventory project saat ini:
+   - agents/divisions
+   - skills/plugins/MCP
+   - permissions
+   - models
+   - project memory
+   - build/test/security tooling
+   - Git/CI/CD
+   - duplicated or obsolete capabilities
+
+2. Gap-analysis terhadap Super Dev Builders Ecosystem V2.2 ini.
+
+3. Jangan langsung install semua skill.
+   Klasifikasikan:
+   KEEP / UPDATE / REPLACE / ADD / REMOVE / QUARANTINE.
+
+4. Terapkan organization:
+   Orchestrator
+   Reverse Engineering & Reconstruction (authorized target path)
+   Research
+   Architecture
+   Frontend
+   Backend (Core/API, Data/DB, Identity/Integration)
+   Code Review
+   QA/Test
+   Security
+   Code Audit & Engineering Assurance
+   DevOps
+   Documentation
+
+5. Agent/division harus lazy/on-demand.
+   Jangan spawn seluruh division bersamaan.
+
+6. Gunakan Hermes-native workflow sebagai baseline. Adopsi Superpowers methodology/plugin hanya jika Hermes Skills Guard PASS, plugin/hooks/scripts telah direview, dan compatibility test PASS. Jangan bypass dangerous verdict.
+
+7. Semua third-party skill:
+   source verification → pinned revision → Hermes Skills Guard/audit → manual source+script+hook review
+   → sandbox test → minimum permission → approval.
+
+8. Buat custom skills hanya untuk policy yang spesifik:
+   reconstruction-scope-gate
+   target-inventory
+   ui-ux-state-mapper
+   observed-network-contract
+   technology-profiler
+   evidence-normalizer
+   reconstruction-spec
+   reconstruction-fidelity
+   architecture-decision-record
+   technology-selection
+   api-contract
+   database-migration-safety
+   authz-authn-review
+   accessibility-audit
+   test-pyramid-and-risk
+   architecture-compliance-audit
+   engineering-release-audit
+   ci-cd-release-gate
+   rollback-and-recovery
+   architecture-docs
+   release-handover-docs
+
+9. Custom skill wajib kecil:
+   SKILL.md = routing/procedure penting.
+   Detail besar → references/.
+   Deterministic operation → scripts/.
+   Test skill sebelum dianggap production-ready.
+
+10. Permission:
+   default deny/minimum privilege.
+   Security/Auditor = read/scan/report; no production deploy.
+   DevOps = deployment tools, tetapi production/high-risk requires human approval.
+   Developers = project workspace only; no unrelated home/secret access.
+
+11. Reverse Engineering & Reconstruction:
+    - default = External Reconstruction only.
+    - deep mobile/desktop/binary analysis requires explicit Owner-Authorized Mode B.
+    - never bypass access controls/anti-bot/DRM/auth/certificate controls.
+    - redact cookies/tokens/credentials/PII before LLM context.
+    - every finding = FACT / INFERRED(confidence) / UNKNOWN / OUT OF SCOPE.
+    - prefer Playwright-first evidence; heavy tools lazy/on-demand.
+    - Ghidra/MobSF/JADX/Apktool run isolated and only on authorized artifacts.
+
+12. Release tidak boleh PASS hanya dari LLM statement.
+    Wajib fresh build/test/scan evidence.
+
+13. Hasil upgrade:
+    - architecture diagram
+    - inventory before/after
+    - skill registry + source + pinned version/commit
+    - permission matrix
+    - model-routing matrix
+    - workflow/gates
+    - rollback plan
+    - security audit report
+    - token/resource estimate
+    - list perubahan yang memerlukan human approval.</pre>
+</section>
+
+<section class="card"><h2>10A. Risk classification & acceptance</h2>
+<table>
+<tr><th>Kelas</th><th>Contoh</th><th>Policy</th></tr>
+<tr><td>LOW</td><td>Docs, formatting, read-only research</td><td>Normal Hermes controls.</td></tr>
+<tr><td>MEDIUM</td><td>Code edits di disposable/dev workspace</td><td>Git branch + tests + approval controls.</td></tr>
+<tr><td>HIGH</td><td>Auth, payments, secrets, migrations, CI/CD, infra/IAM</td><td>Whole-process isolation, independent security/audit, human approval.</td></tr>
+<tr><td>CRITICAL</td><td>Production destructive actions, credential rotation, irreversible data operations</td><td>No autonomous execution; explicit human-controlled procedure and rollback/recovery evidence.</td></tr>
+</table>
+<p><b>Acceptance principle:</b> “secure” bukan berarti zero-risk. Release berarti residual risk telah diketahui, evidence gates lulus, dan risk owner manusia menerima risiko yang tersisa.</p>
+</section>
+
+<section class="card"><h2>11. Rekomendasi final</h2>
+<p class="lead"><b>Super Dev Builders Ecosystem</b> bukan “sebanyak mungkin skills”, melainkan <b>curated skills + specialized divisions + authorized reconstruction + strong gates + deterministic verification</b>.</p>
+<p>Reverse Engineering & Reconstruction menjadi capability resmi, tetapi dipisahkan dari Security/Pentest. Tujuan utamanya adalah <b>understand → specify → rebuild → compare</b>, bukan defeat controls. External target memakai Playwright-first safe observation; MobSF/JADX/Apktool/Ghidra hanya lazy-loaded untuk owner-authorized deep analysis.</p>
+<p><b>Core methodology:</b> Hermes-native workflow/Plan Mode + curated Superpowers methodology (plugin hanya jika security scan PASS). <b>UI/testing/MCP:</b> audited Anthropic Agent Skills. <b>Security & deep audit:</b> audited Trail of Bits skills + deterministic scanners. <b>Skill supply-chain/code quality:</b> Hermes Skills Guard first, Sentry skills second. <b>Observability:</b> current <code>getsentry/sentry-for-ai</code> bila Sentry dipilih. <b>Repository integration:</b> official GitHub MCP dengan minimal tool exposure. <b>Current library docs:</b> Context7 bila dibutuhkan dan telah diaudit. <b>Runtime security:</b> whole-process isolation + least privilege untuk untrusted/production workloads.</p>
+<p>Code Audit & Engineering Assurance menjadi otoritas final teknis sebelum release gate, tetapi tidak menggantikan QA atau Security. Ia menggabungkan evidence dari seluruh divisi dan memeriksa kesehatan engineering secara sistemik.</p>
+</section>
+
+<section class="card" id="sources"><h2>12. Referensi primer yang diteliti</h2>
+<ul>
+<li>Hermes Agent Skills System — <a href="https://github.com/NousResearch/hermes-agent/blob/main/website/docs/user-guide/features/skills.md">official</a></li>
+<li>Hermes Security Model — <a href="https://github.com/NousResearch/hermes-agent/blob/main/website/docs/user-guide/security.md">official</a></li>
+<li>Hermes Optional Skills Catalog — <a href="https://github.com/NousResearch/hermes-agent/blob/main/website/docs/reference/optional-skills-catalog.md">official</a></li>
+<li>Superpowers — <a href="https://github.com/obra/superpowers">official repository</a></li>
+<li>Anthropic Agent Skills — <a href="https://github.com/anthropics/skills">official repository</a></li>
+<li>Trail of Bits Skills — <a href="https://github.com/trailofbits/skills">official repository</a></li>
+<li>Sentry Skills — <a href="https://github.com/getsentry/skills">official repository</a></li>
+<li>Sentry for AI — <a href="https://github.com/getsentry/sentry-for-ai">current official repository</a></li>
+<li>GitHub MCP Server — <a href="https://github.com/github/github-mcp-server">official repository</a></li>
+<li>Model Context Protocol reference servers — <a href="https://github.com/modelcontextprotocol/servers">official repository</a></li>
+<li>Context7 — <a href="https://github.com/upstash/context7">repository</a></li>
+<li>Microsoft Playwright — <a href="https://github.com/microsoft/playwright">official repository</a></li>
+<li>Apify Crawlee — <a href="https://github.com/apify/crawlee">official repository</a></li>
+<li>Deque axe-core — <a href="https://github.com/dequelabs/axe-core">official repository</a></li>
+<li>Google Lighthouse — <a href="https://github.com/GoogleChrome/lighthouse">official repository</a></li>
+<li>MobSF — <a href="https://github.com/MobSF/Mobile-Security-Framework-MobSF">official repository</a></li>
+<li>JADX — <a href="https://github.com/skylot/jadx">official repository</a></li>
+<li>Apktool — <a href="https://github.com/iBotPeaches/Apktool">official repository</a></li>
+<li>Ghidra — <a href="https://github.com/NationalSecurityAgency/ghidra">official repository</a></li>
+<li>BackstopJS — <a href="https://github.com/garris/BackstopJS">repository; maintenance status must be checked before adoption</a></li>
+<li>NIST SSDF SP 800-218 — <a href="https://csrc.nist.gov/pubs/sp/800/218/final">NIST</a></li>
+<li>OWASP SAMM — <a href="https://owasp.org/projects/samm">OWASP</a></li>
+<li>Aqua Trivy — <a href="https://github.com/aquasecurity/trivy">official repository</a></li>
+<li>Anchore Syft — <a href="https://github.com/anchore/syft">official repository</a></li>
+</ul>
+<p class="small"><b>Kejujuran/limitasi:</b> dokumen ini tidak mengklaim setiap skill pihak ketiga aman secara absolut atau native-Hermes tanpa adaptasi. Superpowers upstream mendokumentasikan instalasi Hermes, tetapi kompatibilitas/security verdict dapat berubah antar-versi dan saat audit terdapat laporan instalasi yang diblokir. Hermes mengikuti Agent Skills/progressive disclosure dan memiliki native Skills Guard. Skill Anthropic, Trail of Bits dan Sentry harus diuji kompatibilitas dan keamanan pada versi Hermes Anda sebelum diaktifkan. Tool/repository dapat berubah setelah tanggal riset; pin revision dan audit update. NIST SSDF 1.1 adalah final; SSDF 1.2 yang ditemukan dalam riset masih Initial Public Draft, sehingga baseline normative di dokumen ini tetap 1.1.</p>
+</section>
+
+<footer>Hermes AI Software Engineering Company — Super Dev Builders Ecosystem V2.2 · Reverse Engineering & Reconstruction Edition, 2026-10-04 · Designed for controlled resource usage, low token overhead, secure SDLC, and practical migration from an existing Hermes project.</footer>
+</main></body></html>

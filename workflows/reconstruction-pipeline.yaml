@@ -1,0 +1,45 @@
+# Reconstruction pipeline (aktif hanya bila ada target existing)
+id: reconstruction-pipeline
+owner: D1
+preconditions:
+  - gate0 == PASS
+  - mode == A atau (mode == B dan written_permission terverifikasi)
+steps:
+  - id: target-inventory
+    skill: target-inventory
+    output: normalized/<target>/inventory.json
+    evidence_required: [routes, entry_points, roles_allowed, forms, feature_areas]
+  - id: safe-discovery
+    skill: ui-ux-state-mapper
+    tools: [playwright]
+    output: normalized/<target>/screens.json, normalized/<target>/components.json
+    constraints: [rate_limited, robots_respected, no_anti_bot_evasion]
+  - id: network-contract
+    skill: observed-network-contract
+    tools: [playwright_trace]
+    output: normalized/<target>/network.json
+    constraints: [redact_before_store, no_bruteforce, no_tls_interception_third_party]
+  - id: technology-profile
+    skill: technology-profiler
+    output: normalized/<target>/technology.json
+    rule: "semua inferensi wajib confidence 0-100"
+  - id: deep-analysis
+    skill: target-inventory
+    mode: B_only
+    tools: [mobsf, jadx, apktool, ghidra]
+    applies_when: "artefak berizin tersedia dan analisis mendalam memang dibutuhkan"
+  - id: normalize
+    skill: evidence-normalizer
+    output: normalized/<target>/*.json (dengan status/confidence/provenance)
+    gate: evidence_lint
+  - id: spec
+    skill: reconstruction-spec
+    output: reconstruction/<target>/SPEC.md + FEATURE_MATRIX.md
+  - id: rebuild
+    owner: D4/D5
+    output: reconstruction/<target>/
+  - id: fidelity
+    skill: reconstruction-fidelity
+    output: verification/<target>/fidelity.md
+    dimensions: [visual, navigation, interaction, responsive, functional, accessibility, performance, api_contract]
+terminal_gates: [D7 QA, D8 Security, D9 Assurance, RELEASE_GATE]

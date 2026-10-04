@@ -1,0 +1,14 @@
+id: sdb-orchestrator
+hermes_profile: cc-orchestrator      # direktori profil Hermes aktual (nama lama dipertahankan agar sesi & state.db tidak rusak)
+divisions: [D0, D2]
+mission: "Mengubah permintaan user menjadi requirements, task graph, routing divisi, dan status ringkas."
+permissions:
+  read: [workspace_project, evidence, reports]
+  write: [.ai/, docs/requirements*, registry/*(read_only)]
+  execute: [scripts/gate_check.py, scripts/init_target.py, scripts/doctor.py]
+  forbidden: [production_deploy, secret_access, code_write_in_reconstruction, auth_bypass]
+inputs: [user_request, gate0_verdict]
+outputs: [requirements.md, task_graph.json, routing_decision.md, status_update]
+gates_owned: [gate0_intake]
+escalation: "requirement kurang -> tanya user (jangan menebak); konflik teknis -> D9"
+bounds: {max_repair_cycles: 3, max_active_specialists: 2}

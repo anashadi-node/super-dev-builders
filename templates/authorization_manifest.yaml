@@ -1,0 +1,46 @@
+# Authentication/Authorization Manifest — Gate #0
+# Copy ke evidence/<target>/authorization.yaml lalu isi. gate_check.py akan memvalidasi berkas ini.
+schema_version: 2.2
+target_name: ""                 # slug lowercase
+mode: A                         # A = external reconstruction | B = owner-authorized deep
+owner_or_authorizer: ""
+authorization_type: ""          # owned | open_source | staging | written_permission
+license_or_permission_ref: ""   # URL lisensi / nomor izin / referensi dokumen
+allowed_targets:
+  urls: []
+  repos: []
+  apps: []
+  apk_ipa_binaries: []          # wajib dikosongkan bila mode A
+allowed_accounts:               # hanya akun test yang diberikan pemilik
+  - purpose: test_only
+    handle: ""
+network_capture_allowed: false
+deep_analysis_allowed: false    # hanya boleh true bila mode B + written_permission
+forbidden_data:
+  - credentials
+  - session_tokens
+  - cookies
+  - payment_data
+  - private_user_data
+forbidden_actions:
+  - auth_bypass
+  - captcha_or_anti_bot_bypass
+  - paywall_bypass
+  - rate_limit_bypass
+  - drm_or_licensing_bypass
+  - certificate_pinning_bypass
+  - private_endpoint_bruteforce
+  - hidden_backend_source_extraction
+out_of_scope: []
+retention:
+  raw_evidence_days: 30
+  redact_before_prompt: true
+sandbox:
+  whole_process_isolation: true
+  non_root: true
+  workspace_only_mounts: true
+  network_egress: restricted
+  docker_socket: false
+  host_credentials_mounted: false
+approved_by: ""                 # nama manusia
+approved_at: ""                 # ISO-8601

@@ -1,0 +1,213 @@
+{
+  "captured_at": "2026-10-04T07:25:03+0700",
+  "repo": "/home/anashadi/super-dev-builders/.",
+  "repo_files": 92,
+  "custom_skills": 21,
+  "profiles": {
+    ".deleted": {
+      "skills": 0,
+      "soul_md": false,
+      "memories": 0
+    },
+    "alpaca": {
+      "skills": 115,
+      "soul_md": true,
+      "memories": 2,
+      "description": "Profile ekosistem Anantara Sakti: alpaca"
+    },
+    "anantara-sakti": {
+      "skills": 114,
+      "soul_md": true,
+      "memories": 2,
+      "description": "Manajer Pusat Ekosistem Anantara Sakti — koordinasi 8 divisi, briefing, pemandangan besar"
+    },
+    "astronacci": {
+      "skills": 115,
+      "soul_md": true,
+      "memories": 2,
+      "description": "Profile ekosistem Anantara Sakti: astronacci"
+    },
+    "auditor": {
+      "skills": 119,
+      "soul_md": true,
+      "memories": 3,
+      "description": "Auditor internal ekosistem Anantara Sakti - scan kelemahan & kekurangan semua divisi"
+    },
+    "cc-architect": {
+      "skills": 94,
+      "soul_md": true,
+      "memories": 0,
+      "description": "<unreadable>"
+    },
+    "cc-builder": {
+      "skills": 93,
+      "soul_md": true,
+      "memories": 0,
+      "description": "<unreadable>"
+    },
+    "cc-capture-forensics": {
+      "skills": 96,
+      "soul_md": true,
+      "memories": 0,
+      "description": "<unreadable>"
+    },
+    "cc-devops-docs": {
+      "skills": 94,
+      "soul_md": true,
+      "memories": 0,
+      "description": "<unreadable>"
+    },
+    "cc-orchestrator": {
+      "skills": 89,
+      "soul_md": true,
+      "memories": 0,
+      "description": "<unreadable>"
+    },
+    "cc-reviewer-qa": {
+      "skills": 92,
+      "soul_md": true,
+      "memories": 0,
+      "description": "<unreadable>"
+    },
+    "cc-security-governor": {
+      "skills": 94,
+      "soul_md": true,
+      "memories": 0,
+      "description": "<unreadable>"
+    },
+    "cex-binance": {
+      "skills": 115,
+      "soul_md": true,
+      "memories": 2,
+      "description": "Profile ekosistem Anantara Sakti: cex-binance"
+    },
+    "hl-harvest": {
+      "skills": 115,
+      "soul_md": true,
+      "memories": 2,
+      "description": "Profile ekosistem Anantara Sakti: hl-harvest"
+    },
+    "intelijen": {
+      "skills": 114,
+      "soul_md": true,
+      "memories": 2,
+      "description": "Profile ekosistem Anantara Sakti: intelijen"
+    },
+    "keamanan": {
+      "skills": 119,
+      "soul_md": true,
+      "memories": 3,
+      "description": "Penjaga Safety-Keamanan-Privasi ekosistem Anantara Sakti - anti malware/virus/bug/leak"
+    },
+    "lokal": {
+      "skills": 136,
+      "soul_md": true,
+      "memories": 2,
+      "description": "Profil LLM Lokal (config-only, SOUL identik)"
+    },
+    "pregain": {
+      "skills": 115,
+      "soul_md": true,
+      "memories": 2,
+      "description": "Profile ekosistem Anantara Sakti: pregain"
+    },
+    "riset": {
+      "skills": 117,
+      "soul_md": true,
+      "memories": 2,
+      "description": "Profile ekosistem Anantara Sakti: riset"
+    },
+    "robinhood": {
+      "skills": 115,
+      "soul_md": true,
+      "memories": 2,
+      "description": "Profile ekosistem Anantara Sakti: robinhood"
+    },
+    "sodex": {
+      "skills": 116,
+      "soul_md": true,
+      "memories": 2,
+      "description": "Profile ekosistem Anantara Sakti: sodex"
+    },
+    "sodex-cex-monitor": {
+      "skills": 71,
+      "soul_md": true,
+      "memories": 0,
+      "description": "Monitoring & Improving Agent khusus Divisi SoDEX + CEX-Binance — 24/7 otonom, terstruktur, berkelanjutan. Health check, performance tracking, macro policy verif"
+    },
+    "villa-agency": {
+      "skills": 133,
+      "soul_md": true,
+      "memories": 2,
+      "description": "Divisi Project Villa Management & Agency — ekosistem AI agentic reservation, villa management, dan owner settlement (Bali + Yogyakarta)."
+    }
+  },
+  "tools": {
+    "git": true,
+    "node": true,
+    "npm": true,
+    "python3": true,
+    "docker": true,
+    "jq": true,
+    "playwright": true,
+    "pytest": true,
+    "uv": true,
+    "semgrep": false,
+    "codeql": false,
+    "trivy": false,
+    "syft": false,
+    "ruff": false,
+    "gh": false,
+    "adb": true,
+    "nmap": false,
+    "jadx": false,
+    "apktool": false
+  },
+  "cron": {
+    "present": true,
+    "jobs": 4
+  },
+  "config": {
+    "present": true,
+    "parsed": true,
+    "top_level_keys": [
+      "_config_version",
+      "agent",
+      "auxiliary",
+      "browser",
+      "code_execution",
+      "compression",
+      "context_file_max_chars",
+      "custom_providers",
+      "database",
+      "delegation",
+      "display",
+      "fallback_providers",
+      "gateway",
+      "group_sessions_per_user",
+      "image_gen",
+      "kanban",
+      "known_builtin_toolsets",
+      "known_plugin_toolsets",
+      "memory",
+      "moa",
+      "model",
+      "onboarding",
+      "platform_toolsets",
+      "prompt_caching",
+      "providers",
+      "runtime",
+      "session_reset",
+      "skills",
+      "streaming",
+      "stt",
+      "telemetry",
+      "terminal",
+      "tool_loop_guardrails",
+      "tts",
+      "updates",
+      "web"
+    ]
+  },
+  "plugins": []
+}

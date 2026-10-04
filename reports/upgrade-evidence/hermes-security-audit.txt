@@ -1,0 +1,210 @@
+Found 71 known vulnerability finding(s) across 136 component(s):
+
+[venv]
+  CRITICAL  PyJWT==2.13.0  GHSA-ffc3-869f-jxw9
+           PyJWT: Asymmetric-PEM detection bypass: whitespace/line-ending-mutated public keys skip the HS/as...
+           fixed in: 2.14.0
+  HIGH      hermes-agent==0.0.0  GHSA-4pqm-j46f-795x
+           Hermes Agent contains a DNS rebinding vulnerability in WebSocket endpoints that allows remote att...
+           fixed in: 0.16.0
+  HIGH      httpcore2==2.7.0  GHSA-7mj9-2mp8-4m2p
+           HTTPX2: Secure WebSocket traffic sent without TLS through SOCKS proxies
+           fixed in: 2.10.0
+  HIGH      httpx2==2.7.0  GHSA-7mj9-2mp8-4m2p
+           HTTPX2: Secure WebSocket traffic sent without TLS through SOCKS proxies
+           fixed in: 2.10.0
+  HIGH      httpx2==2.7.0  GHSA-8xx6-hgc6-gc2m
+           HTTPX2: Streaming response decompression does not bound peak memory (decompression amplification)
+           fixed in: 2.12.0
+  HIGH      PyJWT==2.13.0  GHSA-9j54-fg26-wv3r
+           PyJWT: PyJWK accepts empty HMAC keys, bypassing PyJWT's empty-key validation
+           fixed in: 2.14.0
+  HIGH      PyJWT==2.13.0  GHSA-9v7f-9g4p-ffgj
+           PyJWT: PyJWKClient follows redirects when fetching JWKS
+           fixed in: 2.14.0
+  HIGH      PyJWT==2.13.0  GHSA-p4g4-x82p-q773
+           PyJWT: Public keys in DER form are accepted as HMAC secrets, bypassing the CVE-2022-29217 guard
+           fixed in: 2.14.0
+  HIGH      PyJWT==2.13.0  GHSA-r6x4-923q-g947
+           PyJWT BOM Bypass
+           fixed in: 2.14.0
+  HIGH      PyJWT==2.13.0  GHSA-w2cx-738m-mc7w
+           PyJWT accepts public JWK containers as HMAC secrets
+           fixed in: 2.14.0
+  HIGH      tornado==6.5.8  GHSA-c2m8-h5v5-343r
+           Tornado: StaticFileHandler follows symlinks outside static root (path traversal)
+           fixed in: 6.5.9
+  HIGH      tornado==6.5.8  GHSA-chx6-46f5-w4vp
+           tornado: CurlAsyncHTTPClient enforces no response-size limit — decompression bomb drives unbounde...
+           fixed in: 6.5.9
+  HIGH      urllib3==2.7.0  GHSA-8988-9cw3-xx77
+           urllib3: HTTPS proxy TLS configuration may be ignored or overridden
+           fixed in: 2.8.0
+  HIGH      urllib3==2.7.0  GHSA-vxq7-64xx-v4gw
+           urllib3: HTTPResponse.stream()/read_chunked() buffers an unbounded chunk-size line into memory
+           fixed in: 2.8.0
+  MODERATE  hermes-agent==0.0.0  GHSA-238w-f66p-w349
+           hermes-agent has an Injection issue
+           fixed in: 0.15.0
+  MODERATE  hermes-agent==0.0.0  GHSA-99f9-j8r3-p853
+           Hermes Agent creates response_store.db and webhook_subscriptions.json with world-readable permiss...
+           fixed in: 0.16.0
+  MODERATE  hermes-agent==0.0.0  GHSA-pgp4-xr4j-h5cg
+           hermes-agent has an Injection issue
+           fixed in: 0.15.0
+  MODERATE  hermes-agent==0.0.0  GHSA-pmqc-57g8-c22c
+           hermes-agent has an Uncontrolled Resource Consumption issue
+  MODERATE  hermes-agent==0.0.0  GHSA-wm96-9gfh-vvgq
+           hermes-agent has a sandbox issue
+           fixed in: 0.11.0
+  MODERATE  hermes-agent==0.0.0  GHSA-xq8w-9jvx-gm3v
+           hermes-agent has an Injection issue
+  MODERATE  httpx2==2.7.0  GHSA-f2fp-rgf2-35cp
+           HTTPX2: Quadratic SSE line buffering can cause CPU denial of service
+           fixed in: 2.10.0
+  MODERATE  httpx2==2.7.0  GHSA-h4x7-gw46-3wm6
+           HTTPX2: Multipart part header injection via unvalidated file Content-Type and custom headers
+           fixed in: 2.11.0
+  MODERATE  httpx2==2.7.0  GHSA-pf96-p4fj-6566
+           HTTPX2: Conflicting Content-Length and Transfer-Encoding headers can be auto-generated
+           fixed in: 2.11.0
+  MODERATE  oauthlib==3.3.1  GHSA-hj66-6f7g-4r5v
+           Oauthlib : Unsafe JSONP callback injection in RevocationEndpoint allows arbitrary JavaScript resp...
+           fixed in: 4.0.0
+  MODERATE  oauthlib==3.3.1  GHSA-xpv3-w29h-x7cv
+           Oauthlib: Timing Attack Vulnerability in PKCE code_verifier Comparison (CWE-208)
+           fixed in: 4.0.0
+  MODERATE  PyJWT==2.13.0  GHSA-2gx3-rcp4-g85q
+           PyJWT: PyJWKClient still amplifies unauthenticated JWKS fetches on unknown kid values (incomplete...
+           fixed in: 2.14.0
+  MODERATE  PyJWT==2.13.0  GHSA-42vr-xj54-vc7v
+           PyJWT: Unauthenticated RecursionError DoS in pre-verification payload parse (PyJWKClient.get_sign...
+           fixed in: 2.15.0
+  MODERATE  PyJWT==2.13.0  GHSA-8wjv-2p76-3863
+           PyJWT: Uncaught RecursionError in jwt.decode() on deeply nested token header
+           fixed in: 2.14.0
+  MODERATE  PyJWT==2.13.0  GHSA-gvp8-978c-rx2q
+           PyJWT.decode() reintroduces options-dict mutation, enabling silent claim-verification bypass on d...
+  MODERATE  PyJWT==2.13.0  GHSA-hxm8-2xgr-2p9m
+           PyJWT: Non-canonical signature segments enable raw-token revocation bypass
+           fixed in: 2.14.0
+  MODERATE  PyJWT==2.13.0  GHSA-jwrc-g2q2-pq5p
+           PyJWT: ReDoS vulnerability when calling the `is_pem_format` function.
+           fixed in: 2.14.0
+  MODERATE  PyJWT==2.13.0  GHSA-w6j9-cwv2-h6wq
+           PyJWT: Malformed RSA JWK aborts parsing of an entire JWK Set
+           fixed in: 2.14.0
+  MODERATE  tornado==6.5.8  GHSA-3hv7-mjh2-fv65
+           Tornado: Unbounded query-string argument count allows event-loop-stalling DoS
+           fixed in: 6.5.9
+  MODERATE  urllib3==2.7.0  GHSA-gh4c-6fx4-qh6g
+           urllib3: Chunked Deflate streaming can enter an infinite loop
+           fixed in: 2.8.0
+  LOW       hermes-agent==0.0.0  GHSA-33qv-c5qm-799v
+           hermes-agent has an Injection issue
+           fixed in: 0.15.0
+  LOW       hermes-agent==0.0.0  GHSA-cv5c-mh6j-wvp9
+           hermes-agent has an Incorrect Comparison
+           fixed in: 0.15.0
+  LOW       hermes-agent==0.0.0  GHSA-mv8x-fg99-32mf
+           hermes-agent has an Injection issue
+           fixed in: 0.18.0
+  UNKNOWN   hermes-agent==0.0.0  PYSEC-2026-2509
+           hermes-agent has an Injection issue
+           fixed in: 0.15.0
+  UNKNOWN   hermes-agent==0.0.0  PYSEC-2026-2510
+           Hermes Agent contains a DNS rebinding vulnerability in WebSocket endpoints that allows remote att...
+           fixed in: 0.16.0
+  UNKNOWN   hermes-agent==0.0.0  PYSEC-2026-2511
+           Hermes Agent creates response_store.db and webhook_subscriptions.json with world-readable permiss...
+           fixed in: 0.16.0
+  UNKNOWN   hermes-agent==0.0.0  PYSEC-2026-2512
+           hermes-agent has an Incorrect Comparison
+           fixed in: 0.15.0
+  UNKNOWN   hermes-agent==0.0.0  PYSEC-2026-2513
+           hermes-agent has an Injection issue
+           fixed in: 0.18.0
+  UNKNOWN   hermes-agent==0.0.0  PYSEC-2026-2514
+           hermes-agent has an Injection issue
+           fixed in: 0.15.0
+  UNKNOWN   hermes-agent==0.0.0  PYSEC-2026-2515
+           hermes-agent has a sandbox issue
+           fixed in: 0.11.0
+  UNKNOWN   hermes-agent==0.0.0  PYSEC-2026-3575
+           hermes-agent has an Injection issue
+           fixed in: 0.15.0
+  UNKNOWN   hermes-agent==0.0.0  PYSEC-2026-3576
+           hermes-agent has an Uncontrolled Resource Consumption issue
+  UNKNOWN   hermes-agent==0.0.0  PYSEC-2026-3577
+           hermes-agent has an Injection issue
+  UNKNOWN   httpcore2==2.7.0  PYSEC-2026-3844
+           HTTPX2: Secure WebSocket traffic sent without TLS through SOCKS proxies
+           fixed in: 2.10.0
+  UNKNOWN   httpx2==2.7.0  PYSEC-2026-3845
+           HTTPX2: Secure WebSocket traffic sent without TLS through SOCKS proxies
+           fixed in: 2.10.0
+  UNKNOWN   httpx2==2.7.0  PYSEC-2026-3846
+           HTTPX2: Streaming response decompression does not bound peak memory (decompression amplification)
+           fixed in: 2.12.0
+  UNKNOWN   httpx2==2.7.0  PYSEC-2026-3847
+           HTTPX2: Quadratic SSE line buffering can cause CPU denial of service
+           fixed in: 2.10.0
+  UNKNOWN   httpx2==2.7.0  PYSEC-2026-3848
+           HTTPX2: Multipart part header injection via unvalidated file Content-Type and custom headers
+           fixed in: 2.11.0
+  UNKNOWN   httpx2==2.7.0  PYSEC-2026-3849
+           HTTPX2: Conflicting Content-Length and Transfer-Encoding headers can be auto-generated
+           fixed in: 2.11.0
+  UNKNOWN   oauthlib==3.3.1  PYSEC-2026-4113
+           Oauthlib : Unsafe JSONP callback injection in RevocationEndpoint allows arbitrary JavaScript resp...
+           fixed in: 4.0.0
+  UNKNOWN   oauthlib==3.3.1  PYSEC-2026-4114
+           Oauthlib: Timing Attack Vulnerability in PKCE code_verifier Comparison (CWE-208)
+           fixed in: 4.0.0
+  UNKNOWN   PyJWT==2.13.0  PYSEC-2026-4140
+           PyJWT: PyJWKClient still amplifies unauthenticated JWKS fetches on unknown kid values (incomplete...
+           fixed in: 2.14.0
+  UNKNOWN   PyJWT==2.13.0  PYSEC-2026-4141
+           PyJWT: Unauthenticated RecursionError DoS in pre-verification payload parse (PyJWKClient.get_sign...
+           fixed in: 2.15.0
+  UNKNOWN   PyJWT==2.13.0  PYSEC-2026-4142
+           PyJWT: Uncaught RecursionError in jwt.decode() on deeply nested token header
+           fixed in: 2.14.0
+  UNKNOWN   PyJWT==2.13.0  PYSEC-2026-4143
+           PyJWT: PyJWK accepts empty HMAC keys, bypassing PyJWT's empty-key validation
+           fixed in: 2.14.0
+  UNKNOWN   PyJWT==2.13.0  PYSEC-2026-4144
+           PyJWT: PyJWKClient follows redirects when fetching JWKS
+           fixed in: 2.14.0
+  UNKNOWN   PyJWT==2.13.0  PYSEC-2026-4145
+           PyJWT: Asymmetric-PEM detection bypass: whitespace/line-ending-mutated public keys skip the HS/as...
+           fixed in: 2.14.0
+  UNKNOWN   PyJWT==2.13.0  PYSEC-2026-4146
+           PyJWT.decode() reintroduces options-dict mutation, enabling silent claim-verification bypass on d...
+  UNKNOWN   PyJWT==2.13.0  PYSEC-2026-4147
+           PyJWT: Non-canonical signature segments enable raw-token revocation bypass
+           fixed in: 2.14.0
+  UNKNOWN   PyJWT==2.13.0  PYSEC-2026-4148
+           PyJWT: ReDoS vulnerability when calling the `is_pem_format` function.
+           fixed in: 2.14.0
+  UNKNOWN   PyJWT==2.13.0  PYSEC-2026-4149
+           PyJWT: Public keys in DER form are accepted as HMAC secrets, bypassing the CVE-2022-29217 guard
+           fixed in: 2.14.0
+  UNKNOWN   PyJWT==2.13.0  PYSEC-2026-4150
+           PyJWT BOM Bypass
+           fixed in: 2.14.0
+  UNKNOWN   PyJWT==2.13.0  PYSEC-2026-4151
+           PyJWT accepts public JWK containers as HMAC secrets
+           fixed in: 2.14.0
+  UNKNOWN   PyJWT==2.13.0  PYSEC-2026-4152
+           PyJWT: Malformed RSA JWK aborts parsing of an entire JWK Set
+           fixed in: 2.14.0
+  UNKNOWN   urllib3==2.7.0  PYSEC-2026-4175
+           urllib3: HTTPS proxy TLS configuration may be ignored or overridden
+           fixed in: 2.8.0
+  UNKNOWN   urllib3==2.7.0  PYSEC-2026-4176
+           urllib3: Chunked Deflate streaming can enter an infinite loop
+           fixed in: 2.8.0
+  UNKNOWN   urllib3==2.7.0  PYSEC-2026-4177
+           urllib3: HTTPResponse.stream()/read_chunked() buffers an unbounded chunk-size line into memory
+           fixed in: 2.8.0

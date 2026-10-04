@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+*.env
+!*.env.template
+evidence/**/raw/
+normalized/**/*.local.json
+reports/**/*.local.md
+*.log
+.DS_Store
+sandboxes/
+.node_modules/
+node_modules/
+.pytest_cache/

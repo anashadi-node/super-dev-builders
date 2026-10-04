@@ -1,0 +1,23 @@
+target:
+  name: ""
+  platform: web | pwa | android | ios | windows | macos | backend | api | mixed
+  entrypoints: []
+  roles_allowed: []
+  breakpoints:
+    - {name: mobile, width: 390, height: 844}
+    - {name: tablet, width: 768, height: 1024}
+    - {name: desktop, width: 1440, height: 900}
+  states_required: [empty, loading, error, success]
+success_metrics:
+  visual: "screenshot diff per viewport; catat deviasi eksplisit"
+  navigation: "route/screen graph + journey yang diuji"
+  interaction: "form/dialog/keyboard/touch checklist"
+  functional_coverage: "feature matrix: observed / reproduced / intentionally_changed / unknown"
+  accessibility: "axe-core + manual review area inconclusive"
+  performance: "lighthouse/runtime + catatan environment"
+  api_contract: "contract test observed/authorized"
+  coverage_target: 0.0   # faksi area target yang benar-benar diperiksa
+classification_rules:
+  require_status_field: true          # FACT | INFERRED | UNKNOWN | OUT_OF_SCOPE
+  require_confidence_when_inferred: true
+  forbid_guessing_unknown: true

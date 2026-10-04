@@ -1,0 +1,22 @@
+# Gate #0 — Authorization & Scope Gate (tahap 01A)
+id: gate0
+stage: "01A"
+owner: D0            # dijalankan sebelum routing; verdict mengikat seluruh ekosistem
+runner: scripts/gate_check.py
+requires:
+  - evidence/<target>/authorization.yaml
+pass_criteria:
+  - target_name terisi (slug valid)
+  - authorization_type in [owned, open_source, staging, written_permission]
+  - license_or_permission_ref terisi bila written_permission
+  - allowed_targets minimal satu (urls|repos|apps|apk_ipa_binaries)
+  - mode B => deep_analysis_allowed true DAN authorization_type == written_permission
+  - mode A => apk_ipa_binaries kosong dan deep_analysis_allowed false
+  - retention.redact_before_prompt == true
+  - sandbox: whole_process_isolation true, non_root true, docker_socket false, host_credentials_mounted false
+  - approved_by dan approved_at terisi
+  - forbidden_actions memuat seluruh larangan inti (auth bypass, captcha, paywall, rate limit, drm, pinning, brute-force, backend extraction)
+outcomes: [PASS, FAIL, BLOCKED]
+on_fail: berhenti; lapor bagian yang gagal; jangan capture/analisis apa pun
+on_blocked: minta otorisasi/artefak/keputusan manusia
+evidence_output: reports/<target>/gate0-verdict.json

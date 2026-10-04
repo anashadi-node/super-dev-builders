@@ -38,7 +38,10 @@ Parity dinaikkan, bukan diturunkan: vLLM **tidak dapat dipakai sama sekali** di 
 ## Alur baku
 ```bash
 # 1) bangun server (sekali, ~3-6 menit di 16 core; tanpa sudo)
-git clone --depth 1 --branch <TAG> https://github.com/ggml-org/llama.cpp src
+git clone --depth 1 --branch v0.5.0 https://github.com/ggml-org/llama.cpp src
+# Tag v0.5.0 = commit 7fe450e19305b828c199d602c23a8337aaa1f03b (catat SHA penuh saat build).
+# Catatan: build default menghasilkan lib .so terpisah (butuh libllama.so dkk di samping binari).
+# Pakai -DBUILD_SHARED_LIBS=OFF agar binari mandiri (yang dipakai di host ini).
 cmake -B src/build -S src -DCMAKE_BUILD_TYPE=Release -DLLAMA_CURL=OFF \
       -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DGGML_NATIVE=ON
 cmake --build src/build --target llama-server -j"$(nproc)"

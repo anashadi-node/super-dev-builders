@@ -86,7 +86,9 @@ present:
     approved_at: 2026-10-04
   # --- ditambahkan 2026-10-04 (riset pengganti mandat Owner: kapabilitas > skill yang dihapus) ---
   - id: llama_cpp_server
-    version_pin: "0.5.0-dev (build 1, commit 7fe450e)"
+    version_pin: "0.5.0-dev (build 1)"
+    pinned_commit: 7fe450e19305b828c199d602c23a8337aaa1f03b  # tag v0.5.0; SHA penuh (bukan short) agar bisa diverifikasi ulang
+    pinned_tag: v0.5.0
     path: /home/anashadi/bin/llama-server
     role: local_llm_serving_openai_compatible
     install_method: "bangun dari source, tanpa sudo: git clone --depth 1 --branch v0.5.0 ggml-org/llama.cpp + cmake -DBUILD_SHARED_LIBS=OFF -DGGML_NATIVE=ON -DLLAMA_CURL=OFF (lib llama/ggml ter-static, 18 MB; glibc/libssl/libgomp tetap dinamis dari host)"

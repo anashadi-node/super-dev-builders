@@ -95,7 +95,7 @@ hermes security audit (OSV, venv Hermes)       -> 71 advisory / 136 komponen (di
 Artefak bukti: `reports/upgrade-evidence/`.
 
 ## 7. Known limitations (jujur)
-1. ~~Belum ada target reconstruction pertama~~ **SELESAI 2026-10-04**: pipeline diuji end-to-end pada target `sdb-local-demo` (milik sendiri, Mode A) — Gate #0 PASS/BLOCKED/FAIL, capture nyata, redaksi, normalisasi, evidence lint PASS, fidelity 8 dimensi, release gate PASS. Lihat `docs/PIPELINE_E2E_EVIDENCE.md`.
+1. ~~Belum ada target reconstruction pertama~~ **SELESAI 2026-10-04**: pipeline diuji end-to-end pada target `sdb-local-demo` (milik sendiri, Mode A) — Gate #0 PASS/BLOCKED/FAIL, capture nyata, redaksi, normalisasi, evidence lint PASS, fidelity 9 dimensi, release gate PASS. **2026-10-04 (target kedua, OPEN-SOURCE)**: pipeline diuji lagi pada `startbootstrap-agency` (MIT, commit ter-pin) — Gate #0 PASS, rebuild clean-room, fidelity 9 dimensi bercoverage, CodeQL JS + semgrep + trivy + SBOM, release gate PASS. Lihat `docs/PIPELINE_E2E_EVIDENCE.md` §5.
 2. Semgrep/Trivy/ruff (approval #4) + Syft/CodeQL/Playwright (approval #2) sudah terpasang, semuanya pin + checksum. Hasil trivy saat ini
    **nihil karena tidak ada manifest dependency/IaC** di repo -> bukan bukti bebas kerentanan.
 3. SkillSpector coverage **parsial (23.81%)** — bukan jaminan bebas temuan.

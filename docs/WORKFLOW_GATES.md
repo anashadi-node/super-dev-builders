@@ -99,7 +99,7 @@ Aturan pemakaian:
 | Redaksi | `scripts/redact_network.py` | header sensitif `x-demo-session` → REDACTED, mentah disimpan `.raw` |
 | Normalisasi | `scripts/normalize_capture.py` → `normalized/<target>/*.json` | 5 berkas, 27 record |
 | Evidence lint | `scripts/evidence_lint.py` | **PASS** (menangkap 1 bug normalizer sebelum lolos) |
-| Fidelity | `scripts/fidelity_compare.py` + `fidelity_report.py` | 8 dimensi terukur + coverage + gambar diff |
+| Fidelity | `scripts/fidelity_compare.py` + `fidelity_report.py` | 9 dimensi terukur + coverage + gambar diff (dimensi yang tak bisa diobservasi ditandai `NOT_OBSERVED`, bukan dikarang) |
 | Release gate | `scripts/release_check.py --project runs/sdb-local-demo` | **FAIL** saat artefak kosong → **PASS** setelah 7 artefak ada (umur < 24 jam) |
 
 Detail: `docs/PIPELINE_E2E_EVIDENCE.md`, artefak `reports/sdb-local-demo/`, `verification/sdb-local-demo/`.

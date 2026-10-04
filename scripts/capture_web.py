@@ -84,8 +84,15 @@ def main(argv=None) -> int:
                     el = page.query_selector(args.click)
                     if el:
                         net_len = len(net)
+                        dom_before = len(dom)
+                        aria_before = el.get_attribute("aria-expanded")
                         el.click()
                         page.wait_for_timeout(args.settle_ms * 2)
+                        # efek generik: perubahan DOM + dialog/log yang benar-benar terlihat
+                        dom_after = len(page.content())
+                        visible_dialogs = page.evaluate("""() => [...document.querySelectorAll('[role=dialog],dialog')]
+                            .filter(e => { const r = e.getBoundingClientRect();
+                                           return r.width > 0 && r.height > 0 && getComputedStyle(e).display !== 'none'; }).length""")
                         status_txt = page.eval_on_selector("#status", "e => e.textContent") if page.query_selector("#status") else None
                         api = [e for e in net[net_len:] if e["phase"] == "response" and "/api/" in e["url"]]
                         bodies = []
@@ -95,7 +102,11 @@ def main(argv=None) -> int:
                                                "body": page.request.get(a["url"]).json()})
                             except Exception as exc:  # noqa: BLE001
                                 bodies.append({"url": a["url"], "status": a["status"], "error": str(exc)})
-                        interaction = {"selector": args.click, "status_text": status_txt, "api_calls": bodies}
+                        interaction = {"selector": args.click, "status_text": status_txt, "api_calls": bodies,
+                                       "aria_expanded_before": aria_before, "effect": {"dom_len_before": dom_before, "dom_len_after": dom_after,
+                                                  "dom_delta": dom_after - dom_before,
+                                                  "visible_dialogs": visible_dialogs,
+                                                  "aria_expanded_after": page.eval_on_selector(args.click, "e => e.getAttribute('aria-expanded')") if page.query_selector(args.click) else None}}
                 except Exception as exc:  # noqa: BLE001
                     interaction = {"selector": args.click, "error": str(exc)}
             result["pages"].append({"path": pth, "url": url, "http_status": resp.status if resp else None,

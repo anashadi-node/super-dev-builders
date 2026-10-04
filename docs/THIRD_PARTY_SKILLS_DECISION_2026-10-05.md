@@ -190,12 +190,39 @@ Implikasi metodologis yang saya terapkan: verdict hub adalah **hasil scan pada s
 
 Polanya: pemotongan terjadi pada skill berisi banyak berkas, tetapi **ambangnya tidak konsisten** (3, 9, dan 32 hilang) sehingga sebabnya **tidak saya klaim**. Yang dapat dipertanggungjawabkan: setiap kekurangan dideteksi dan dilengkapi dari commit pin yang sama, lalu dibuktikan byte-identik.
 
-**Sebaran ke profil divisi**: `cc-security-governor` 6 · `cc-reviewer-qa` 2 · `cc-architect` 2 · `cc-devops-docs` 1 · `cc-builder` 0 (menunggu `modern-python`).
+### 5.4 Tinjauan manual dua skill yang diblokir (dari commit pin, tanpa kuota API)
 
-**Yang TIDAK dipasang dan alasannya (jujur)**:
-- `variant-analysis` — hub: `BLOCKED (caution, 11 findings)`. Tidak dibypass. Catatan kami: pemindai deterministik hanya menemukan pola rule semgrep → **kandidat false positive**, layak ditinjau manusia, bukan dipaksa.
-- `modern-python`, `post-patch-validation` — gagal unduh: kuota GitHub API anonim (60/jam) habis. Dijadwalkan ulang otomatis setelah reset.
-- `mutation-testing`, `property-based-testing` — tidak diadopsi (butuh dependensi baru; prinsip minimal).
+Kuota GitHub API anonim habis lagi saat percobaan verdict ulang, jadi daftar temuan hub untuk keduanya **belum bisa saya ambil**. Yang bisa saya lakukan — dan sudah dilakukan — adalah meninjau **isinya** di commit pin dengan dua alat mandiri (pemindai pola deterministik + SkillSpector statis `--recursive`).
+
+**`post-patch-validation`** — pemindai kami: 92/CRITICAL, 6 temuan (cakupan 80%). Setelah tiap temuan dibaca pada baris aslinya:
+
+| Temuan | Baris nyata | Vonis |
+|---|---|---|
+| `Data Exfiltration → Env Variable Harvesting` (H) | `env = {k: v for k, v in os.environ.items() if k in BASE_ENV_KEYS}` | **terbalik**: ini **whitelist env** (scrubbing) — tindakan anti-kebocoran, bukan kebocoran |
+| `Privilege Escalation → Credential Access` ×2 (H) | validasi nama variabel dengan `ENV_RE.fullmatch` + `reject_shell_string(...)` + `require_safe_cwd(...)` + batas `timeout_seconds` 1–3600 | **terbalik**: ini pengerasan input (menolak shell string, cwd divalidasi) |
+| `Dangerous Code Execution → subprocess` ×3 (M) | `run_git()` menjalankan `git worktree`, dan menjalankan test suite proyek | memang inti fungsi alat ini (menjalankan tes untuk memvalidasi patch) |
+| `MCP Least Privilege` (H) | tanpa `file`/snippet yang bisa ditindak | tak actionable |
+
+Pemeriksaan jaringan: **tidak ada** `requests`/`urllib`/`socket` sama sekali (satu-satunya kemunculan "http" adalah URL `$schema` JSON Schema). Angka: 2.032 baris Python, 14 berkas.
+
+**`modern-python`** — pemindai kami: 82/CRITICAL, 10 temuan (cakupan 92.9%). Isi sebenarnya:
+
+| Temuan | Baris nyata | Vonis |
+|---|---|---|
+| `Tool Misuse → Chaining Abuse` ×2 (H) + `Supply Chain → External Script Fetching` ×2 (L) | `curl -LsSf https://astral.sh/uv/install.sh \| sh` (uv-commands.md:11, security-setup.md:19) dan `cargo install prek` | **nyata**: baris installer yang MEMANG dilarang di host ini → wajib caveat host-policy |
+| `Tool Misuse → Tool Parameter Abuse` (H, 3× pada baris yang SAMA: prek.md:200) | `uv tool install prek`, `pip uninstall pre-commit` | satu isu, terhitung tiga kali (duplikasi) → dokumentasi instalasi |
+| `Data Exfiltration → External Transmission` (M) | contoh tutorial PEP 723: `requests.get("https://api.example.com/data")` | contoh kode di dokumentasi |
+| `MCP Rug Pull` ×3 (M) | tanpa snippet | tak actionable |
+
+**Koreksi klaim saya sebelumnya**: saya pernah menulis pemindai kami menemukan "2 baris `curl|sh` + 0 pola lain" untuk `modern-python`. Itu **tidak lengkap** — pemindai berbeda menemukan kelas tambahan (contoh tutorial, kelas MCP tanpa snippet). Yang saya klaim sekarang hanya: `curl|sh` ×2 terbukti ada dan terlarang di host ini.
+
+**Rekomendasi (belum diputuskan)**: TAHAN keduanya sampai daftar temuan hub bisa dibaca. Untuk `post-patch-validation`, bukti baris-per-baris justru menunjukkan pola **pengerasan**; untuk `modern-python`, satu-satunya risiko nyata adalah baris installer yang bisa dilarang eksplisit. Verdict hub untuk keduanya perlu diambil ulang pada ruleset baru (seperti `variant-analysis` yang berbalik SAFE) sebelum ada keputusan.
+
+**Status akhir pemasangan (jujur)**:
+- **TERPASANG (7)**: semgrep, codeql, sarif-parsing, differential-review, variant-analysis, fp-check, audit-context-building — semuanya lengkap & byte-identik commit pin, tersebar ke profil divisi.
+- **DITAHAN (2)**: `modern-python`, `post-patch-validation` — hub memblokir; daftar temuan hub belum bisa dibaca (kuota API habis saat verdict ulang). Tinjauan manual isi tersedia di §5.4.
+- **TIDAK DIADOPSI**: `mutation-testing`, `property-based-testing` (butuh dependensi baru; prinsip minimal).
+- **DIBLOKIR/DITOLAK di tingkat sumber**: `anthropics/skills` (lisensi), `obra/superpowers` (acuan), `getsentry/skills` (cakupan).
 
 ---
 
@@ -203,7 +230,7 @@ Polanya: pemotongan terjadi pada skill berisi banyak berkas, tetapi **ambangnya 
 
 1. `semgrep` workflow menjalankan `rm -rf` **ter-guard** pada `$OUTPUT_DIR` sendiri → selalu set `OUTDIR` eksplisit.
 2. `modern-python/references/` memuat baris `curl -LsSf … | sh` (dokumentasi installer upstream). **DILARANG dijalankan di host ini** — pakai `uv` (`~/.hermes/bin/uv`) atau `cargo` yang sudah terpasang.
-3. `variant-analysis` (bila kelak disetujui manusia) memuat aturan semgrep berisi pola `eval(...)`; itu **rule**, bukan kode yang dieksekusi — jangan dianggap temuan keamanan.
+3. `variant-analysis` memuat aturan semgrep berisi pola `eval(...)`; itu **rule**, bukan kode yang dieksekusi — jangan dianggap temuan keamanan.
 4. Skill pihak ketiga dipisahkan dari skill MIT kami; pembaruan hub bisa menimpa direktori skill → jalankan `sync_third_party_skills.py --check` untuk memeriksa deviasi.
 
 ---
@@ -214,10 +241,10 @@ Polanya: pemotongan terjadi pada skill berisi banyak berkas, tetapi **ambangnya 
 cd ~/super-dev-builders
 python3 scripts/sync_third_party_skills.py --check          # bandingkan isi terpasang vs commit pin (sha256)
 python3 scripts/third_party_scan.py semgrep codeql sarif-parsing \
-        differential-review fp-check audit-context-building  # kelas pola terlarang
+        differential-review variant-analysis fp-check audit-context-building  # kelas pola terlarang
 python3 scripts/registry_lint.py                            # status registry valid
 python3 scripts/evidence_lint.py reports/upgrade-evidence    # kontrak bukti
-python3 -m pytest tests -q                                   # 49 tes
+python3 -m pytest tests -q                                   # 56 tes
 ```
 
 `--check` keluar `rc=1` **hanya** bila ada berkas terpasang yang **berbeda** dari pin (indikasi isi diubah pihak lain) — berkas yang belum lengkap hanya dilaporkan sebagai `PERLU-SINKRON`, supaya sinyal keamanan tidak tenggelam oleh kondisi operasional.
@@ -227,8 +254,8 @@ python3 -m pytest tests -q                                   # 49 tes
 ## 8. Keterbatasan yang tidak saya klaim
 
 - **Tidak ada pemeriksaan semantik oleh LLM** untuk skill ini: `claude` CLI rusak di host, `codex` menolak direktori tak-terpercaya. Yang ada: pemindai statistik hub + pemindai statis SkillSpector + pemindai deterministik kami + pemeriksaan baris demi baris. Ini **lebih lemah** dari penilaian LLM dan disebut apa adanya.
-- Sebab hub memotong `codeql` **tidak diketahui** (tidak diklaim).
-- Detil 11 temuan yang memblokir `variant-analysis` belum terdokumentasi (perlu kuota API; job terjadwal mengambilnya).
+- Sebab hub memotong sebagian berkas **tidak diketahui** (tidak diklaim) — pola terukurnya ada di §5.3.
+- Daftar temuan hub untuk `variant-analysis` (11), `modern-python` (90), `post-patch-validation` (12) **belum bisa diambil** (kuota GitHub API anonim habis). Untuk `variant-analysis`, verdict-nya sudah berbalik SAFE sehingga temuan itu tidak lagi eksis; untuk dua lainnya, tinjauan manual isi sudah dilakukan (§5.4) tetapi daftar resmi hub masih tertunda.
 - `agents-md` (Sentry) masih gap terbuka; MCP belum ditinjau karena belum dibutuhkan.
 
 ---

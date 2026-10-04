@@ -5,7 +5,7 @@
  "pin": "82fe8226252622fa807643bdca1710901198553a",
  "license": "CC-BY-SA-4.0",
  "mode": "check",
- "captured_at": "2026-10-05T06:39:26+0700",
+ "captured_at": "2026-10-05T06:42:49+0700",
  "redaction_status": "clean",
  "status": "OBSERVED",
  "skills": [
@@ -149,27 +149,14 @@
    "license": "CC-BY-SA-4.0",
    "installed_dir": "/home/anashadi/.hermes/skills/variant-analysis",
    "copied": [],
-   "deviations": [
-    "belum sinkron: 9 berkas hilang (jalankan --fix)"
-   ],
-   "ok": false,
+   "deviations": [],
+   "ok": true,
    "upstream_files": 18,
-   "installed_files_before": 9,
-   "missing": [
-    "resources/codeql/java.ql",
-    "resources/codeql/javascript.ql",
-    "resources/codeql/python.ql",
-    "resources/semgrep/cpp.yaml",
-    "resources/semgrep/go.yaml",
-    "resources/semgrep/java.yaml",
-    "resources/semgrep/javascript.yaml",
-    "resources/semgrep/python.yaml",
-    "resources/variant-report-template.md"
-   ],
+   "installed_files_before": 18,
+   "missing": [],
    "differing": [],
    "extra_files": [],
-   "patched_files": [],
-   "pending_sync": true
+   "patched_files": []
   }
  ]
 }

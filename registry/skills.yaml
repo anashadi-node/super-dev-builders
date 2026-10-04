@@ -218,9 +218,9 @@ third_party:
     audit_status: "hermes skills audit 2026-10-05: semgrep SAFE/ALLOWED · sarif-parsing ALLOWED · differential-review ALLOWED · fp-check SAFE/ALLOWED · variant-analysis SAFE/ALLOWED (verdict berbalik dari BLOCKED) · audit-context-building BLOCKED->ALLOWED setelah 2 ZWSP dihapus · codeql BLOCKED/CAUTION (25 findings) = DISIMPAN atas keputusan Owner dengan pengecualian terdokumentasi"
     blocked:
       - skill: modern-python
-        reason: "Hub menolak: 'BLOCKED — dangerous verdict, 90 findings'. TIDAK dibypass. Pemindai deterministik kami hanya menemukan 2 baris dokumentasi 'curl … | sh' + 0 pola lain -> selisih jauh BELUM dijelaskan; Owner minta peninjauan manual rincian temuan sebelum keputusan."
+        reason: "Hub: 'BLOCKED — dangerous verdict, 90 findings' (verdict ulang gagal: kuota GitHub API habis). TIDAK dibypass. Tinjauan manual isi dari commit pin (2 alat mandiri): 92.9% cakupan, 10 temuan -> 2 terbukti NYATA (baris 'curl -LsSf https://astral.sh/uv/install.sh | sh' di uv-commands.md:11 & security-setup.md:19 = DILARANG di host ini; kita sudah punya uv+cargo), sisanya dokumentasi instalasi/duplikat (1 baris dihitung 3x), contoh tutorial PEP 723 (requests.get ke api.example.com), dan kelas MCP tanpa snippet. DITAHAN sampai daftar resmi hub bisa dibaca."
       - skill: post-patch-validation
-        reason: "Hub menolak: 'BLOCKED — caution verdict, 12 findings'. TIDAK dibypass; verdict ulang sedang diambil untuk memastikan bukan cache/ruleset basi (seperti kasus variant-analysis)."
+        reason: "Hub: 'BLOCKED — caution verdict, 12 findings' (verdict ulang gagal: kuota habis). TIDAK dibypass. Tinjauan manual isi (2.032 baris Python, 80% cakupan, 6 temuan): temuan HIGH-nya TERBALIK — 'Env Variable Harvesting' sebenarnya WHITELIST env (env = {k:v for k,v in os.environ.items() if k in BASE_ENV_KEYS}), 'Credential Access' sebenarnya validasi input (ENV_RE.fullmatch, reject_shell_string, require_safe_cwd, timeout 1-3600); 3 temuan subprocess = inti fungsi (menjalankan git worktree + test suite proyek); NOL kode jaringan. DITAHAN sampai daftar resmi hub bisa dibaca; bukti saat ini justru menunjukkan pola pengerasan."
     resolved_decisions:
       - question: "Simpan atau hapus `codeql` (audit hub BLOCKED/CAUTION, 25 findings)?"
         owner_answer: "SIMPAN dengan pengecualian terdokumentasi (2026-10-05)"

@@ -1,0 +1,2345 @@
+{
+ "multi_skill": true,
+ "skill_count": 2,
+ "max_risk_score": 92,
+ "risk_severity": "CRITICAL",
+ "execution_successful": true,
+ "risk_recommendation": "DO_NOT_INSTALL",
+ "analysis_completeness": {
+  "is_complete": false,
+  "execution_successful": true,
+  "status": "partial",
+  "coverage_percent": 0.0,
+  "fully_inspected_files": 0,
+  "partially_inspected_files": 2,
+  "entirely_uninspected_files": 0,
+  "total_files": 2,
+  "limitations": [],
+  "scope": "recursive_skills"
+ },
+ "skills_scanned": 2,
+ "skills_omitted": 0,
+ "skills_output_omitted": 0,
+ "public_finding_records": 18,
+ "report_characters": 74883,
+ "transitive_finding_count": 0,
+ "transitive_sources": [],
+ "skills": [
+  {
+   "name": "modern-python",
+   "path": "modern-python",
+   "risk_score": 82,
+   "risk_severity": "CRITICAL",
+   "finding_count": 10,
+   "execution_successful": true,
+   "transitive_finding_count": 0,
+   "transitive_sources": [],
+   "skill": {
+    "name": "modern-python",
+    "source": "/home/anashadi/.hermes/cache/scratch/tob-scan-stage2/modern-python",
+    "scanned_at": "2026-10-04T23:41:50.213189+00:00"
+   },
+   "risk_assessment": {
+    "score": 82,
+    "severity": "CRITICAL",
+    "recommendation": "DO_NOT_INSTALL",
+    "max_issue_severity": "HIGH"
+   },
+   "components": [
+    {
+     "path": "SKILL.md",
+     "type": "markdown",
+     "lines": 333,
+     "executable": false,
+     "size_bytes": 10015,
+     "source_url": null,
+     "source_identity": null,
+     "source_digest": null
+    },
+    {
+     "path": "agents/openai.yaml",
+     "type": "yaml",
+     "lines": 6,
+     "executable": false,
+     "size_bytes": 226,
+     "source_url": null,
+     "source_identity": null,
+     "source_digest": null
+    },
+    {
+     "path": "assets/trail-of-bits-mark.svg",
+     "type": "other",
+     "lines": 1,
+     "executable": true,
+     "size_bytes": 3084,
+     "source_url": null,
+     "source_identity": null,
+     "source_digest": null
+    },
+    {
+     "path": "references/dependabot.md",
+     "type": "markdown",
+     "lines": 43,
+     "executable": false,
+     "size_bytes": 1800,
+     "source_url": null,
+     "source_identity": null,
+     "source_digest": null
+    },
+    {
+     "path": "references/migration-checklist.md",
+     "type": "markdown",
+     "lines": 141,
+     "executable": false,
+     "size_bytes": 3071,
+     "source_url": null,
+     "source_identity": null,
+     "source_digest": null
+    },
+    {
+     "path": "references/pep723-scripts.md",
+     "type": "markdown",
+     "lines": 259,
+     "executable": false,
+     "size_bytes": 5134,
+     "source_url": null,
+     "source_identity": null,
+     "source_digest": null
+    },
+    {
+     "path": "references/prek.md",
+     "type": "markdown",
+     "lines": 211,
+     "executable": false,
+     "size_bytes": 5951,
+     "source_url": null,
+     "source_identity": null,
+     "source_digest": null
+    },
+    {
+     "path": "references/pyproject.md",
+     "type": "markdown",
+     "lines": 254,
+     "executable": false,
+     "size_bytes": 5694,
+     "source_url": null,
+     "source_identity": null,
+     "source_digest": null
+    },
+    {
+     "path": "references/ruff-config.md",
+     "type": "markdown",
+     "lines": 240,
+     "executable": false,
+     "size_bytes": 5476,
+     "source_url": null,
+     "source_identity": null,
+     "source_digest": null
+    },
+    {
+     "path": "references/security-setup.md",
+     "type": "markdown",
+     "lines": 255,
+     "executable": false,
+     "size_bytes": 6504,
+     "source_url": null,
+     "source_identity": null,
+     "source_digest": null
+    },
+    {
+     "path": "references/testing.md",
+     "type": "markdown",
+     "lines": 284,
+     "executable": false,
+     "size_bytes": 5214,
+     "source_url": null,
+     "source_identity": null,
+     "source_digest": null
+    },
+    {
+     "path": "references/uv-commands.md",
+     "type": "markdown",
+     "lines": 200,
+     "executable": false,
+     "size_bytes": 4653,
+     "source_url": null,
+     "source_identity": null,
+     "source_digest": null
+    },
+    {
+     "path": "templates/dependabot.yml",
+     "type": "yaml",
+     "lines": 36,
+     "executable": false,
+     "size_bytes": 958,
+     "source_url": null,
+     "source_identity": null,
+     "source_digest": null
+    },
+    {
+     "path": "templates/pre-commit-config.yaml",
+     "type": "yaml",
+     "lines": 66,
+     "executable": false,
+     "size_bytes": 2259,
+     "source_url": null,
+     "source_identity": null,
+     "source_digest": null
+    }
+   ],
+   "structured_summaries": [],
+   "issues": [
+    {
+     "id": "TM1",
+     "finding_id": "finding-379e1f9d6162469ab0a87d9cdd17cccf",
+     "category": "Tool Misuse",
+     "pattern": "Tool Parameter Abuse",
+     "severity": "HIGH",
+     "confidence": 0.9,
+     "location": {
+      "file": "references/prek.md",
+      "start_line": 200,
+      "end_line": null,
+      "start_column": 39
+     },
+     "finding": "rm -rf ~",
+     "explanation": "Tool parameters are crafted to achieve unintended or unsafe behavior. Parameter abuse can bypass intended safety checks (e.g. shell=True, --force, dangerous glob patterns).",
+     "remediation": "Validate all tool parameters against an allowlist. Reject dangerous parameter values (shell=True, --force, -rf /) and use safe defaults.",
+     "code_snippet": "1. Install prek: `uv tool install prek`\n2. Remove pre-commit: `pip uninstall pre-commit` or `uv tool uninstall pre-commit`\n3. Re-install hooks: `prek install`\n4. (Optional) Clean old environments: `rm -rf ~/.cache/pre-commit`\n\nYour existing `.pre-commit-config.yaml` works unchanged.\n",
+     "intent": null,
+     "tags": [
+      "Tool Misuse"
+     ],
+     "evidence": {},
+     "match_fingerprint": "26e22f4cfd2aa77cd384519bed5efdd6f6dba6aab2e61d67ae29c1cbcadc466e",
+     "occurrences": [
+      {
+       "file": "references/prek.md",
+       "start_line": 200,
+       "end_line": null,
+       "start_column": 39
+      }
+     ]
+    },
+    {
+     "id": "TM1",
+     "finding_id": "finding-e32601b183144e80a86cb1efaf5abc5f",
+     "category": "Tool Misuse",
+     "pattern": "Tool Parameter Abuse",
+     "severity": "HIGH",
+     "confidence": 0.9,
+     "location": {
+      "file": "references/prek.md",
+      "start_line": 200,
+      "end_line": null,
+      "start_column": 39
+     },
+     "finding": "rm -rf ~/.cache/pre-commit",
+     "explanation": "Tool parameters are crafted to achieve unintended or unsafe behavior. Parameter abuse can bypass intended safety checks (e.g. shell=True, --force, dangerous glob patterns).",
+     "remediation": "Validate all tool parameters against an allowlist. Reject dangerous parameter values (shell=True, --force, -rf /) and use safe defaults.",
+     "code_snippet": "1. Install prek: `uv tool install prek`\n2. Remove pre-commit: `pip uninstall pre-commit` or `uv tool uninstall pre-commit`\n3. Re-install hooks: `prek install`\n4. (Optional) Clean old environments: `rm -rf ~/.cache/pre-commit`\n\nYour existing `.pre-commit-config.yaml` works unchanged.\n",
+     "intent": null,
+     "tags": [
+      "Tool Misuse"
+     ],
+     "evidence": {},
+     "match_fingerprint": "5086dde5dd85ef3dfbd3d4cfbeaee258b090e16c4230179252047e7243908047",
+     "occurrences": [
+      {
+       "file": "references/prek.md",
+       "start_line": 200,
+       "end_line": null,
+       "start_column": 39
+      }
+     ]
+    },
+    {
+     "id": "TM1",
+     "finding_id": "finding-92b09b0426c146d0ab17c6ed825a222b",
+     "category": "Tool Misuse",
+     "pattern": "Tool Parameter Abuse",
+     "severity": "HIGH",
+     "confidence": 0.85,
+     "location": {
+      "file": "references/prek.md",
+      "start_line": 200,
+      "end_line": null,
+      "start_column": 39
+     },
+     "finding": "rm -rf ~/.cache/pre-commit`",
+     "explanation": "Tool parameters are crafted to achieve unintended or unsafe behavior. Parameter abuse can bypass intended safety checks (e.g. shell=True, --force, dangerous glob patterns).",
+     "remediation": "Validate all tool parameters against an allowlist. Reject dangerous parameter values (shell=True, --force, -rf /) and use safe defaults.",
+     "code_snippet": "1. Install prek: `uv tool install prek`\n2. Remove pre-commit: `pip uninstall pre-commit` or `uv tool uninstall pre-commit`\n3. Re-install hooks: `prek install`\n4. (Optional) Clean old environments: `rm -rf ~/.cache/pre-commit`\n\nYour existing `.pre-commit-config.yaml` works unchanged.\n",
+     "intent": null,
+     "tags": [
+      "Tool Misuse"
+     ],
+     "evidence": {},
+     "match_fingerprint": "f2210b4aef089507c85ca29e36aee839994f620fe582c0dcc48cfb52724c3976",
+     "occurrences": [
+      {
+       "file": "references/prek.md",
+       "start_line": 200,
+       "end_line": null,
+       "start_column": 39
+      }
+     ]
+    },
+    {
+     "id": "TM2",
+     "finding_id": "finding-72e3870d39604f15bebd2bea6aa06203",
+     "category": "Tool Misuse",
+     "pattern": "Chaining Abuse",
+     "severity": "HIGH",
+     "confidence": 0.7,
+     "location": {
+      "file": "references/security-setup.md",
+      "start_line": 19,
+      "end_line": null,
+      "start_column": 110
+     },
+     "finding": "| sh",
+     "explanation": "Tool calls are chained to bypass individual safety checks or escalate capabilities beyond what any single tool call would allow.",
+     "remediation": "Limit tool chaining depth and validate the output of each tool before passing it to the next. Require explicit user approval for multi-step chains.",
+     "code_snippet": "cargo install prek\n\n# Standalone installer\ncurl --proto '=https' --tlsv1.2 -LsSf https://github.com/j178/prek/releases/latest/download/prek-installer.sh | sh\n```\n\n### Security tools",
+     "intent": null,
+     "tags": [
+      "Tool Misuse"
+     ],
+     "evidence": {},
+     "match_fingerprint": "1d8c5f437ab35a4780c77ab29ff51a050f9e7ead84a13d55decf93cd3c70c577",
+     "occurrences": [
+      {
+       "file": "references/security-setup.md",
+       "start_line": 19,
+       "end_line": null,
+       "start_column": 110
+      }
+     ]
+    },
+    {
+     "id": "TM2",
+     "finding_id": "finding-72e3870d39604f15bebd2bea6aa06203",
+     "category": "Tool Misuse",
+     "pattern": "Chaining Abuse",
+     "severity": "HIGH",
+     "confidence": 0.7,
+     "location": {
+      "file": "references/uv-commands.md",
+      "start_line": 11,
+      "end_line": null,
+      "start_column": 43
+     },
+     "finding": "| sh",
+     "explanation": "Tool calls are chained to bypass individual safety checks or escalate capabilities beyond what any single tool call would allow.",
+     "remediation": "Limit tool chaining depth and validate the output of each tool before passing it to the next. Require explicit user approval for multi-step chains.",
+     "code_snippet": "cargo install prek\n\n# Standalone installer\ncurl --proto '=https' --tlsv1.2 -LsSf https://github.com/j178/prek/releases/latest/download/prek-installer.sh | sh\n```\n\n### Security tools",
+     "intent": null,
+     "tags": [
+      "Tool Misuse"
+     ],
+     "evidence": {},
+     "match_fingerprint": "1d8c5f437ab35a4780c77ab29ff51a050f9e7ead84a13d55decf93cd3c70c577",
+     "occurrences": [
+      {
+       "file": "references/uv-commands.md",
+       "start_line": 11,
+       "end_line": null,
+       "start_column": 43
+      }
+     ]
+    },
+    {
+     "id": "RP1",
+     "finding_id": "finding-044206f835504c98945ca79fefd28f21",
+     "category": "MCP Rug Pull",
+     "pattern": null,
+     "severity": "MEDIUM",
+     "confidence": 0.65,
+     "location": {
+      "file": "SKILL.md",
+      "start_line": 112,
+      "end_line": null
+     },
+     "finding": null,
+     "explanation": "uvx/uv tool run commands without ==version create a rug-pull risk.",
+     "remediation": "Pin the version: uvx package-name==1.2.3",
+     "code_snippet": null,
+     "intent": null,
+     "tags": [
+      "ASI16"
+     ],
+     "evidence": {},
+     "match_fingerprint": "44bc5524ad8b66e84c4e7a9336f01452563fbc10c44b73bc27207f2aebea0279",
+     "occurrences": [
+      {
+       "file": "SKILL.md",
+       "start_line": 112,
+       "end_line": null
+      }
+     ]
+    },
+    {
+     "id": "E1",
+     "finding_id": "finding-8a818831caab4fef9a7caa4efa1bfe05",
+     "category": "Data Exfiltration",
+     "pattern": "External Transmission",
+     "severity": "MEDIUM",
+     "confidence": 0.5,
+     "location": {
+      "file": "references/pep723-scripts.md",
+      "start_line": 35,
+      "end_line": null,
+      "start_column": 25
+     },
+     "finding": "https://api.example.com/",
+     "explanation": "Data is being sent to an external URL. This could be legitimate telemetry or data exfiltration. Manual review is recommended.",
+     "remediation": "Verify the destination URL is trusted and necessary. Remove or replace with documented APIs. Ensure no secrets, tokens, or PII are transmitted.",
+     "code_snippet": "import requests\nfrom rich import print\n\nresponse = requests.get(\"https://api.example.com/data\")\nprint(response.json())\n```\n",
+     "intent": null,
+     "tags": [
+      "Data Exfiltration"
+     ],
+     "evidence": {},
+     "match_fingerprint": "88f1946300c8ae45d5ea7e81f2b6d4309a13082e928b6f7d1215d273945a1431",
+     "occurrences": [
+      {
+       "file": "references/pep723-scripts.md",
+       "start_line": 35,
+       "end_line": null,
+       "start_column": 25
+      }
+     ]
+    },
+    {
+     "id": "RP1",
+     "finding_id": "finding-36486ef7bb5a48c8ad4ac148bb9d1724",
+     "category": "MCP Rug Pull",
+     "pattern": null,
+     "severity": "MEDIUM",
+     "confidence": 0.65,
+     "location": {
+      "file": "references/uv-commands.md",
+      "start_line": 80,
+      "end_line": null
+     },
+     "finding": null,
+     "explanation": "uvx/uv tool run commands without ==version create a rug-pull risk.",
+     "remediation": "Pin the version: uvx package-name==1.2.3",
+     "code_snippet": null,
+     "intent": null,
+     "tags": [
+      "ASI16"
+     ],
+     "evidence": {},
+     "match_fingerprint": "d75172620f1d890e697a33dc9c832a7f92937bedec181ad88461179a0741828a",
+     "occurrences": [
+      {
+       "file": "references/uv-commands.md",
+       "start_line": 80,
+       "end_line": null
+      }
+     ]
+    },
+    {
+     "id": "RP1",
+     "finding_id": "finding-e3986b31896a460aa1e72b1b40edbf3e",
+     "category": "MCP Rug Pull",
+     "pattern": null,
+     "severity": "MEDIUM",
+     "confidence": 0.65,
+     "location": {
+      "file": "references/uv-commands.md",
+      "start_line": 81,
+      "end_line": null
+     },
+     "finding": null,
+     "explanation": "uvx/uv tool run commands without ==version create a rug-pull risk.",
+     "remediation": "Pin the version: uvx package-name==1.2.3",
+     "code_snippet": null,
+     "intent": null,
+     "tags": [
+      "ASI16"
+     ],
+     "evidence": {},
+     "match_fingerprint": "6553c9b54d89a7ae1d0034061936878a7ec303754dfefb125a9310753849cd8c",
+     "occurrences": [
+      {
+       "file": "references/uv-commands.md",
+       "start_line": 81,
+       "end_line": null
+      }
+     ]
+    },
+    {
+     "id": "SC2",
+     "finding_id": "finding-eadc4f321af94fd385f1b89b83eec685",
+     "category": "Supply Chain",
+     "pattern": "External Script Fetching",
+     "severity": "LOW",
+     "confidence": 0.15,
+     "location": {
+      "file": "references/security-setup.md",
+      "start_line": 19,
+      "end_line": null,
+      "start_column": 0
+     },
+     "finding": "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/j178/prek/releases/latest/download/prek-installer.sh | sh",
+     "explanation": "Remote code is downloaded and executed. This bypasses code review and could introduce malicious code.",
+     "remediation": "Avoid downloading and executing remote scripts. Use trusted packages from PyPI/npm. If remote fetch is required, verify checksums and use HTTPS.",
+     "code_snippet": "cargo install prek\n\n# Standalone installer\ncurl --proto '=https' --tlsv1.2 -LsSf https://github.com/j178/prek/releases/latest/download/prek-installer.sh | sh\n```\n\n### Security tools",
+     "intent": null,
+     "tags": [
+      "Supply Chain"
+     ],
+     "evidence": {},
+     "match_fingerprint": "e64e0667f14416882e9728e41d823758b21f94d4afede338b893aa3fa1ef4dfe",
+     "occurrences": [
+      {
+       "file": "references/security-setup.md",
+       "start_line": 19,
+       "end_line": null,
+       "start_column": 0
+      }
+     ]
+    },
+    {
+     "id": "SC2",
+     "finding_id": "finding-a025e2c620b348b6b24371bdf5ccec2b",
+     "category": "Supply Chain",
+     "pattern": "External Script Fetching",
+     "severity": "LOW",
+     "confidence": 0.15,
+     "location": {
+      "file": "references/uv-commands.md",
+      "start_line": 11,
+      "end_line": null,
+      "start_column": 0
+     },
+     "finding": "curl -LsSf https://astral.sh/uv/install.sh | sh",
+     "explanation": "Remote code is downloaded and executed. This bypasses code review and could introduce malicious code.",
+     "remediation": "Avoid downloading and executing remote scripts. Use trusted packages from PyPI/npm. If remote fetch is required, verify checksums and use HTTPS.",
+     "code_snippet": "\n```bash\n# macOS/Linux\ncurl -LsSf https://astral.sh/uv/install.sh | sh\n\n# Windows\npowershell -ExecutionPolicy ByPass -c \"irm https://astral.sh/uv/install.ps1 | iex\"",
+     "intent": null,
+     "tags": [
+      "Supply Chain"
+     ],
+     "evidence": {},
+     "match_fingerprint": "5fd8b8523ba79a27734ebf6d819dd3afafc6b9f34042d0028fa9671115b66391",
+     "occurrences": [
+      {
+       "file": "references/uv-commands.md",
+       "start_line": 11,
+       "end_line": null,
+       "start_column": 0
+      }
+     ]
+    }
+   ],
+   "suppressed_count": 0,
+   "suppressed": [],
+   "metadata": {
+    "has_executable_scripts": true,
+    "skillspector_version": "2.12.0",
+    "llm_requested": false,
+    "llm_available": false,
+    "meta_analysis_applied": false,
+    "inference_usage": [],
+    "llm_provenance": {
+     "schema_version": 1,
+     "provider": {
+      "configured_adapter": "nv_build",
+      "resolved_adapter": "nv_build",
+      "effective_adapter": "not_applicable",
+      "effective_adapters": [],
+      "service": "unknown",
+      "routing": {
+       "deployment_override": null,
+       "deployment_source": "not_applicable",
+       "api_version": null,
+       "api_version_source": "not_applicable"
+      }
+     },
+     "analyzers": [
+      {
+       "analyzer_id": "mcp_tool_poisoning",
+       "model": "z-ai/glm-5.2",
+       "model_source": "resolved_configuration",
+       "analyzer_revision": {
+        "value": "2.12.0",
+        "source": "skillspector_package",
+        "source_revision": {
+         "value": "unknown",
+         "source": "unknown"
+        }
+       }
+      },
+      {
+       "analyzer_id": "semantic_developer_intent",
+       "model": "z-ai/glm-5.2",
+       "model_source": "resolved_configuration",
+       "analyzer_revision": {
+        "value": "2.12.0",
+        "source": "skillspector_package",
+        "source_revision": {
+         "value": "unknown",
+         "source": "unknown"
+        }
+       }
+      },
+      {
+       "analyzer_id": "semantic_quality_policy",
+       "model": "z-ai/glm-5.2",
+       "model_source": "resolved_configuration",
+       "analyzer_revision": {
+        "value": "2.12.0",
+        "source": "skillspector_package",
+        "source_revision": {
+         "value": "unknown",
+         "source": "unknown"
+        }
+       }
+      },
+      {
+       "analyzer_id": "semantic_security_discovery",
+       "model": "z-ai/glm-5.2",
+       "model_source": "resolved_configuration",
+       "analyzer_revision": {
+        "value": "2.12.0",
+        "source": "skillspector_package",
+        "source_revision": {
+         "value": "unknown",
+         "source": "unknown"
+        }
+       }
+      },
+      {
+       "analyzer_id": "meta_analyzer",
+       "model": "z-ai/glm-5.2",
+       "model_source": "resolved_configuration",
+       "analyzer_revision": {
+        "value": "2.12.0",
+        "source": "skillspector_package",
+        "source_revision": {
+         "value": "unknown",
+         "source": "unknown"
+        }
+       }
+      }
+     ],
+     "sampling": {
+      "temperature": {
+       "requested": null,
+       "source": "provider_default",
+       "forwarded_to_client": null,
+       "adapter_support": true,
+       "provider_support": "unknown"
+      },
+      "seed": {
+       "requested": null,
+       "source": "unset",
+       "forwarded_to_client": null,
+       "adapter_support": true,
+       "provider_support": "unknown"
+      },
+      "reasoning_effort": {
+       "requested": null,
+       "source": "provider_default",
+       "forwarded_to_client": null,
+       "adapter_support": true,
+       "provider_support": "unknown"
+      }
+     },
+     "determinism": {
+      "classification": "not_applicable",
+      "control_status": "not_applied",
+      "provider_guarantee": false,
+      "reason": "LLM analysis was not executed for this scan."
+     }
+    },
+    "filtering_mode": "heuristic"
+   },
+   "analysis_completeness": {
+    "total_components": 14,
+    "scanned_components": 13,
+    "coverage_percent": 92.9,
+    "is_complete": false,
+    "status": "partial",
+    "execution_successful": true,
+    "fully_inspected_files": 13,
+    "partially_inspected_files": 1,
+    "entirely_uninspected_files": 0,
+    "ledger_exceptions": [
+     {
+      "outcome": "partial",
+      "phase": "static",
+      "reason_code": "obfuscated_instruction_text",
+      "message": "Obfuscated instruction text could not be fully evaluated by the deterministic layer.",
+      "path": "SKILL.md",
+      "start_line": null,
+      "end_line": null,
+      "fatal": false,
+      "analyzers": [
+       "static_patterns_agent_snooping",
+       "static_patterns_anti_refusal",
+       "static_patterns_deserialization",
+       "static_patterns_excessive_agency",
+       "static_patterns_harmful_content",
+       "static_patterns_memory_poisoning",
+       "static_patterns_privilege_escalation",
+       "static_patterns_prompt_injection",
+       "static_patterns_rogue_agent",
+       "static_patterns_ssrf",
+       "static_patterns_supply_chain",
+       "static_patterns_system_prompt_leakage",
+       "static_patterns_tool_misuse"
+      ]
+     },
+     {
+      "outcome": "partial",
+      "phase": "reference_resolution",
+      "reason_code": "reference_missing",
+      "message": "A local path-like reference does not match any bundled artifact, such as a file the skill writes at runtime.",
+      "path": "SKILL.md",
+      "start_line": 13,
+      "end_line": 13,
+      "fatal": false
+     },
+     {
+      "outcome": "partial",
+      "phase": "reference_resolution",
+      "reason_code": "reference_missing",
+      "message": "A local path-like reference does not match any bundled artifact, such as a file the skill writes at runtime.",
+      "path": "SKILL.md",
+      "start_line": 101,
+      "end_line": 101,
+      "fatal": false
+     },
+     {
+      "outcome": "partial",
+      "phase": "reference_resolution",
+      "reason_code": "reference_missing",
+      "message": "A local path-like reference does not match any bundled artifact, such as a file the skill writes at runtime.",
+      "path": "SKILL.md",
+      "start_line": 141,
+      "end_line": 141,
+      "fatal": false
+     },
+     {
+      "outcome": "partial",
+      "phase": "reference_resolution",
+      "reason_code": "reference_missing",
+      "message": "A local path-like reference does not match any bundled artifact, such as a file the skill writes at runtime.",
+      "path": "SKILL.md",
+      "start_line": 166,
+      "end_line": 166,
+      "fatal": false
+     },
+     {
+      "outcome": "partial",
+      "phase": "reference_resolution",
+      "reason_code": "reference_missing",
+      "message": "A local path-like reference does not match any bundled artifact, such as a file the skill writes at runtime.",
+      "path": "SKILL.md",
+      "start_line": 233,
+      "end_line": 233,
+      "fatal": false
+     },
+     {
+      "outcome": "partial",
+      "phase": "reference_resolution",
+      "reason_code": "reference_missing",
+      "message": "A local path-like reference does not match any bundled artifact, such as a file the skill writes at runtime.",
+      "path": "SKILL.md",
+      "start_line": 235,
+      "end_line": 235,
+      "fatal": false
+     },
+     {
+      "outcome": "partial",
+      "phase": "reference_resolution",
+      "reason_code": "reference_missing",
+      "message": "A local path-like reference does not match any bundled artifact, such as a file the skill writes at runtime.",
+      "path": "SKILL.md",
+      "start_line": 243,
+      "end_line": 243,
+      "fatal": false
+     },
+     {
+      "outcome": "partial",
+      "phase": "reference_resolution",
+      "reason_code": "reference_missing",
+      "message": "A local path-like reference does not match any bundled artifact, such as a file the skill writes at runtime.",
+      "path": "SKILL.md",
+      "start_line": 257,
+      "end_line": 257,
+      "fatal": false
+     },
+     {
+      "outcome": "partial",
+      "phase": "reference_resolution",
+      "reason_code": "reference_missing",
+      "message": "A local path-like reference does not match any bundled artifact, such as a file the skill writes at runtime.",
+      "path": "SKILL.md",
+      "start_line": 296,
+      "end_line": 296,
+      "fatal": false
+     },
+     {
+      "outcome": "partial",
+      "phase": "reference_resolution",
+      "reason_code": "reference_missing",
+      "message": "A local path-like reference does not match any bundled artifact, such as a file the skill writes at runtime.",
+      "path": "SKILL.md",
+      "start_line": 320,
+      "end_line": 320,
+      "fatal": false
+     }
+    ],
+    "scope_exclusions": [],
+    "analyzer_statuses": [
+     {
+      "analyzer_id": "artifact_integrity",
+      "status": "completed",
+      "planned_work": 14,
+      "completed": 14,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "behavioral_ast",
+      "status": "not_applicable",
+      "planned_work": 0,
+      "completed": 0,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0,
+      "reason_code": "no_applicable_files",
+      "message": "No files matched this analyzer's applicability contract."
+     },
+     {
+      "analyzer_id": "behavioral_taint_tracking",
+      "status": "not_applicable",
+      "planned_work": 0,
+      "completed": 0,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0,
+      "reason_code": "no_applicable_files",
+      "message": "No files matched this analyzer's applicability contract."
+     },
+     {
+      "analyzer_id": "bundled_execution_surface",
+      "status": "not_applicable",
+      "planned_work": 0,
+      "completed": 0,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0,
+      "reason_code": "no_applicable_files",
+      "message": "No files matched this analyzer's applicability contract."
+     },
+     {
+      "analyzer_id": "mcp_least_privilege",
+      "status": "completed",
+      "planned_work": 2,
+      "completed": 2,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "mcp_rug_pull",
+      "status": "completed",
+      "planned_work": 14,
+      "completed": 14,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "mcp_tool_poisoning",
+      "status": "completed",
+      "planned_work": 1,
+      "completed": 1,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "meta_analyzer",
+      "status": "disabled",
+      "planned_work": 0,
+      "completed": 0,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0,
+      "reason_code": "disabled_by_configuration",
+      "message": "Analyzer was disabled by the requested configuration."
+     },
+     {
+      "analyzer_id": "semantic_developer_intent",
+      "status": "disabled",
+      "planned_work": 0,
+      "completed": 0,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0,
+      "reason_code": "disabled_by_configuration",
+      "message": "Analyzer was disabled by the requested configuration."
+     },
+     {
+      "analyzer_id": "semantic_quality_policy",
+      "status": "disabled",
+      "planned_work": 0,
+      "completed": 0,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0,
+      "reason_code": "disabled_by_configuration",
+      "message": "Analyzer was disabled by the requested configuration."
+     },
+     {
+      "analyzer_id": "semantic_security_discovery",
+      "status": "disabled",
+      "planned_work": 0,
+      "completed": 0,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0,
+      "reason_code": "disabled_by_configuration",
+      "message": "Analyzer was disabled by the requested configuration."
+     },
+     {
+      "analyzer_id": "static_patterns_agent_snooping",
+      "status": "degraded",
+      "planned_work": 14,
+      "completed": 13,
+      "partial": 1,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_anti_refusal",
+      "status": "degraded",
+      "planned_work": 14,
+      "completed": 13,
+      "partial": 1,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_data_exfiltration",
+      "status": "completed",
+      "planned_work": 14,
+      "completed": 14,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_deserialization",
+      "status": "degraded",
+      "planned_work": 14,
+      "completed": 13,
+      "partial": 1,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_excessive_agency",
+      "status": "degraded",
+      "planned_work": 14,
+      "completed": 13,
+      "partial": 1,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_harmful_content",
+      "status": "degraded",
+      "planned_work": 14,
+      "completed": 13,
+      "partial": 1,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_memory_poisoning",
+      "status": "degraded",
+      "planned_work": 14,
+      "completed": 13,
+      "partial": 1,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_output_handling",
+      "status": "completed",
+      "planned_work": 14,
+      "completed": 14,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_privilege_escalation",
+      "status": "degraded",
+      "planned_work": 14,
+      "completed": 13,
+      "partial": 1,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_prompt_injection",
+      "status": "degraded",
+      "planned_work": 14,
+      "completed": 13,
+      "partial": 1,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_rogue_agent",
+      "status": "degraded",
+      "planned_work": 14,
+      "completed": 13,
+      "partial": 1,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_ssrf",
+      "status": "degraded",
+      "planned_work": 14,
+      "completed": 13,
+      "partial": 1,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_supply_chain",
+      "status": "degraded",
+      "planned_work": 14,
+      "completed": 13,
+      "partial": 1,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_system_prompt_leakage",
+      "status": "degraded",
+      "planned_work": 14,
+      "completed": 13,
+      "partial": 1,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_tool_misuse",
+      "status": "degraded",
+      "planned_work": 14,
+      "completed": 13,
+      "partial": 1,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_yara",
+      "status": "completed",
+      "planned_work": 14,
+      "completed": 14,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     }
+    ],
+    "references": [
+     {
+      "source_path": "SKILL.md",
+      "line": 8,
+      "column": 96,
+      "evidence": "Guide for modern Python tooling and best practices, based on [trailofbits/cookiecutter-python](https://github.com/trailofbits/cookiecutter-python).",
+      "target_path": null,
+      "status": "rejected",
+      "disposition": "out_of_scope",
+      "reference_kind": "markdown_link"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 13,
+      "column": 15,
+      "evidence": "- Setting up `pyproject.toml` configuration",
+      "target_path": null,
+      "status": "missing",
+      "disposition": "partial",
+      "reference_kind": "quoted_or_code"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 50,
+      "column": 37,
+      "evidence": "│ └─ Use PEP 723 inline metadata (./references/pep723-scripts.md)",
+      "target_path": "references/pep723-scripts.md",
+      "status": "resolved",
+      "disposition": "analyzed",
+      "reference_kind": "plain_path"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 70,
+      "column": 40,
+      "evidence": "| **prek** | Pre-commit hooks ([setup](./references/prek.md)) | pre-commit (faster, Rust-native) |",
+      "target_path": "references/prek.md",
+      "status": "resolved",
+      "disposition": "analyzed",
+      "reference_kind": "markdown_link"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 83,
+      "column": 25,
+      "evidence": "See [security-setup.md](./references/security-setup.md) for configuration and usage.",
+      "target_path": "references/security-setup.md",
+      "status": "resolved",
+      "disposition": "analyzed",
+      "reference_kind": "markdown_link"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 101,
+      "column": 15,
+      "evidence": "uv run python src/myproject/main.py",
+      "target_path": null,
+      "status": "missing",
+      "disposition": "partial",
+      "reference_kind": "plain_path"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 135,
+      "column": 20,
+      "evidence": "See [pyproject.md](./references/pyproject.md) for complete configuration reference.",
+      "target_path": "references/pyproject.md",
+      "status": "resolved",
+      "disposition": "analyzed",
+      "reference_kind": "markdown_link"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 141,
+      "column": 12,
+      "evidence": "version = \"0.1.0\"",
+      "target_path": null,
+      "status": "missing",
+      "disposition": "partial",
+      "reference_kind": "quoted_or_code"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 166,
+      "column": 19,
+      "evidence": "python-version = \"3.11\"",
+      "target_path": null,
+      "status": "missing",
+      "disposition": "partial",
+      "reference_kind": "quoted_or_code"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 213,
+      "column": 89,
+      "evidence": "**For standalone scripts**: Convert to PEP 723 inline metadata (see [pep723-scripts.md](./references/pep723-scripts.md))",
+      "target_path": "references/pep723-scripts.md",
+      "status": "resolved",
+      "disposition": "analyzed",
+      "reference_kind": "markdown_link"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 233,
+      "column": 12,
+      "evidence": "1. Delete `requirements.txt`, `requirements-dev.txt`",
+      "target_path": null,
+      "status": "missing",
+      "disposition": "partial",
+      "reference_kind": "quoted_or_code"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 233,
+      "column": 32,
+      "evidence": "1. Delete `requirements.txt`, `requirements-dev.txt`",
+      "target_path": null,
+      "status": "missing",
+      "disposition": "partial",
+      "reference_kind": "quoted_or_code"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 235,
+      "column": 9,
+      "evidence": "3. Add `uv.lock` to version control",
+      "target_path": null,
+      "status": "missing",
+      "disposition": "partial",
+      "reference_kind": "quoted_or_code"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 243,
+      "column": 12,
+      "evidence": "5. Delete `setup.py`, `setup.cfg`, `MANIFEST.in`",
+      "target_path": null,
+      "status": "missing",
+      "disposition": "partial",
+      "reference_kind": "quoted_or_code"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 243,
+      "column": 24,
+      "evidence": "5. Delete `setup.py`, `setup.cfg`, `MANIFEST.in`",
+      "target_path": null,
+      "status": "missing",
+      "disposition": "partial",
+      "reference_kind": "quoted_or_code"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 243,
+      "column": 37,
+      "evidence": "5. Delete `setup.py`, `setup.cfg`, `MANIFEST.in`",
+      "target_path": null,
+      "status": "missing",
+      "disposition": "partial",
+      "reference_kind": "quoted_or_code"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 250,
+      "column": 49,
+      "evidence": "4. Add ruff configuration (see [ruff-config.md](./references/ruff-config.md))",
+      "target_path": "references/ruff-config.md",
+      "status": "resolved",
+      "disposition": "analyzed",
+      "reference_kind": "markdown_link"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 257,
+      "column": 12,
+      "evidence": "2. Delete `mypy.ini`, `pyrightconfig.json`, or `[tool.mypy]`/`[tool.pyright]` sections",
+      "target_path": null,
+      "status": "missing",
+      "disposition": "partial",
+      "reference_kind": "quoted_or_code"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 257,
+      "column": 24,
+      "evidence": "2. Delete `mypy.ini`, `pyrightconfig.json`, or `[tool.mypy]`/`[tool.pyright]` sections",
+      "target_path": null,
+      "status": "missing",
+      "disposition": "partial",
+      "reference_kind": "quoted_or_code"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 296,
+      "column": 54,
+      "evidence": "- `uv add`: Package is a project dependency (goes in pyproject.toml/uv.lock)",
+      "target_path": null,
+      "status": "missing",
+      "disposition": "partial",
+      "reference_kind": "plain_path"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 299,
+      "column": 22,
+      "evidence": "See [uv-commands.md](./references/uv-commands.md) for complete reference.",
+      "target_path": "references/uv-commands.md",
+      "status": "resolved",
+      "disposition": "analyzed",
+      "reference_kind": "markdown_link"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 320,
+      "column": 12,
+      "evidence": "- [ ] Add `uv.lock` to version control",
+      "target_path": null,
+      "status": "missing",
+      "disposition": "partial",
+      "reference_kind": "quoted_or_code"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 325,
+      "column": 28,
+      "evidence": "- [migration-checklist.md](./references/migration-checklist.md) - Step-by-step migration cleanup",
+      "target_path": "references/migration-checklist.md",
+      "status": "resolved",
+      "disposition": "analyzed",
+      "reference_kind": "markdown_link"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 326,
+      "column": 18,
+      "evidence": "- [pyproject.md](./references/pyproject.md) - Complete pyproject.toml reference",
+      "target_path": "references/pyproject.md",
+      "status": "resolved",
+      "disposition": "analyzed",
+      "reference_kind": "markdown_link"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 327,
+      "column": 20,
+      "evidence": "- [uv-commands.md](./references/uv-commands.md) - uv command reference",
+      "target_path": "references/uv-commands.md",
+      "status": "resolved",
+      "disposition": "analyzed",
+      "reference_kind": "markdown_link"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 328,
+      "column": 20,
+      "evidence": "- [ruff-config.md](./references/ruff-config.md) - Ruff linting/formatting configuration",
+      "target_path": "references/ruff-config.md",
+      "status": "resolved",
+      "disposition": "analyzed",
+      "reference_kind": "markdown_link"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 329,
+      "column": 16,
+      "evidence": "- [testing.md](./references/testing.md) - pytest and coverage setup",
+      "target_path": "references/testing.md",
+      "status": "resolved",
+      "disposition": "analyzed",
+      "reference_kind": "markdown_link"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 330,
+      "column": 23,
+      "evidence": "- [pep723-scripts.md](./references/pep723-scripts.md) - PEP 723 inline script metadata",
+      "target_path": "references/pep723-scripts.md",
+      "status": "resolved",
+      "disposition": "analyzed",
+      "reference_kind": "markdown_link"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 331,
+      "column": 13,
+      "evidence": "- [prek.md](./references/prek.md) - Fast pre-commit hooks with prek",
+      "target_path": "references/prek.md",
+      "status": "resolved",
+      "disposition": "analyzed",
+      "reference_kind": "markdown_link"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 332,
+      "column": 23,
+      "evidence": "- [security-setup.md](./references/security-setup.md) - Security hooks and dependency scanning",
+      "target_path": "references/security-setup.md",
+      "status": "resolved",
+      "disposition": "analyzed",
+      "reference_kind": "markdown_link"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 333,
+      "column": 19,
+      "evidence": "- [dependabot.md](./references/dependabot.md) - Automated dependency updates",
+      "target_path": "references/dependabot.md",
+      "status": "resolved",
+      "disposition": "analyzed",
+      "reference_kind": "markdown_link"
+     }
+    ],
+    "limitations": [
+     "Analyzer static_patterns_agent_snooping status: degraded.",
+     "Analyzer static_patterns_anti_refusal status: degraded.",
+     "Analyzer static_patterns_deserialization status: degraded.",
+     "Analyzer static_patterns_excessive_agency status: degraded.",
+     "Analyzer static_patterns_harmful_content status: degraded.",
+     "Analyzer static_patterns_memory_poisoning status: degraded.",
+     "Analyzer static_patterns_privilege_escalation status: degraded.",
+     "Analyzer static_patterns_prompt_injection status: degraded.",
+     "Analyzer static_patterns_rogue_agent status: degraded.",
+     "Analyzer static_patterns_ssrf status: degraded.",
+     "Analyzer static_patterns_supply_chain status: degraded.",
+     "Analyzer static_patterns_system_prompt_leakage status: degraded.",
+     "Analyzer static_patterns_tool_misuse status: degraded."
+    ],
+    "findings_before_filtering": 11,
+    "findings_after_filtering": 11
+   }
+  },
+  {
+   "name": "post-patch-validation",
+   "path": "post-patch-validation",
+   "risk_score": 92,
+   "risk_severity": "CRITICAL",
+   "finding_count": 6,
+   "execution_successful": true,
+   "transitive_finding_count": 0,
+   "transitive_sources": [],
+   "skill": {
+    "name": "post-patch-validation",
+    "source": "/home/anashadi/.hermes/cache/scratch/tob-scan-stage2/post-patch-validation",
+    "scanned_at": "2026-10-04T23:41:59.781700+00:00"
+   },
+   "risk_assessment": {
+    "score": 92,
+    "severity": "CRITICAL",
+    "recommendation": "DO_NOT_INSTALL",
+    "max_issue_severity": "HIGH"
+   },
+   "components": [
+    {
+     "path": "SKILL.md",
+     "type": "markdown",
+     "lines": 261,
+     "executable": false,
+     "size_bytes": 15336,
+     "source_url": null,
+     "source_identity": null,
+     "source_digest": null
+    },
+    {
+     "path": "agents/openai.yaml",
+     "type": "yaml",
+     "lines": 4,
+     "executable": false,
+     "size_bytes": 244,
+     "source_url": null,
+     "source_identity": null,
+     "source_digest": null
+    },
+    {
+     "path": "references/evidence-model.md",
+     "type": "markdown",
+     "lines": 221,
+     "executable": false,
+     "size_bytes": 12305,
+     "source_url": null,
+     "source_identity": null,
+     "source_digest": null
+    },
+    {
+     "path": "scripts/post_patch_validation.py",
+     "type": "python",
+     "lines": 2032,
+     "executable": true,
+     "size_bytes": 78163,
+     "source_url": null,
+     "source_identity": null,
+     "source_digest": null
+    },
+    {
+     "path": "scripts/pyproject.toml",
+     "type": "toml",
+     "lines": 6,
+     "executable": false,
+     "size_bytes": 116,
+     "source_url": null,
+     "source_identity": null,
+     "source_digest": null
+    }
+   ],
+   "structured_summaries": [],
+   "issues": [
+    {
+     "id": "LP1",
+     "finding_id": "finding-6e76429317be4f4e99139a2bf00aae11",
+     "category": "MCP Least Privilege",
+     "pattern": null,
+     "severity": "HIGH",
+     "confidence": 0.75,
+     "location": {
+      "file": "scripts/post_patch_validation.py",
+      "start_line": 1,
+      "end_line": null
+     },
+     "finding": null,
+     "explanation": "The skill uses 'env' capability that is not listed in its permissions. This may indicate deceptive intent or missing permission declarations.",
+     "remediation": "Add a tool that covers the 'env' capability to the 'allowed-tools' frontmatter field in SKILL.md, or remove the code that requires it.",
+     "code_snippet": null,
+     "intent": null,
+     "tags": [
+      "ASI02"
+     ],
+     "evidence": {},
+     "match_fingerprint": null,
+     "occurrences": [
+      {
+       "file": "scripts/post_patch_validation.py",
+       "start_line": 1,
+       "end_line": null
+      }
+     ]
+    },
+    {
+     "id": "E2",
+     "finding_id": "finding-fec458053d8e45b78dfab71917ae7a7c",
+     "category": "Data Exfiltration",
+     "pattern": "Env Variable Harvesting",
+     "severity": "HIGH",
+     "confidence": 0.7,
+     "location": {
+      "file": "scripts/post_patch_validation.py",
+      "start_line": 265,
+      "end_line": 265,
+      "start_column": 40
+     },
+     "finding": "os.environ.items()",
+     "explanation": "Code enumerates, copies, or searches environment variables for secrets. Bulk environment access can collect credentials unrelated to the skill's stated purpose.",
+     "remediation": "Read only explicitly required environment variables by name. Avoid enumerating or copying the full environment, and never log or transmit credentials to untrusted destinations.",
+     "code_snippet": "\n\ndef stable_env(extra: Mapping[str, str] | None = None) -> dict[str, str]:\n    env = {key: value for key, value in os.environ.items() if key in BASE_ENV_KEYS}\n    if extra:\n        env.update(extra)\n    env.update(FIXED_ENV)",
+     "intent": null,
+     "tags": [
+      "Data Exfiltration"
+     ],
+     "evidence": {},
+     "match_fingerprint": "21b29b57b89a5a3233f697b487f442cbfa19ad73da80ad74d8531f3d6c0dc384",
+     "occurrences": [
+      {
+       "file": "scripts/post_patch_validation.py",
+       "start_line": 265,
+       "end_line": 265,
+       "start_column": 40
+      }
+     ]
+    },
+    {
+     "id": "PE3",
+     "finding_id": "finding-479136b1f7854c8fbb52ae870bef02f9",
+     "category": "Privilege Escalation",
+     "pattern": "Credential Access",
+     "severity": "HIGH",
+     "confidence": 0.6,
+     "location": {
+      "file": "scripts/post_patch_validation.py",
+      "start_line": 515,
+      "end_line": null,
+      "start_column": 32
+     },
+     "finding": ".env ",
+     "explanation": "Code accesses credential files (SSH keys, AWS credentials, etc.). This could indicate credential theft attempts.",
+     "remediation": "Remove references to credential paths. Use environment variables or secrets managers. For docs, use placeholder paths (e.g., /path/to/config). Never load .env or token files in production code paths.",
+     "code_snippet": "        raise PlanError(f\"{path}.timeout_seconds must be an integer from 1 to 3600\")\n    env = raw.get(\"env\", {})\n    if not isinstance(env, dict):\n        raise PlanError(f\"{path}.env must be a string map\")\n    normalized_env: dict[str, str] = {}\n    for key, value in env.items():\n        if not isinstance(key, str) or not ENV_RE.fullmatch(key):",
+     "intent": null,
+     "tags": [
+      "Privilege Escalation"
+     ],
+     "evidence": {},
+     "match_fingerprint": "66ef81c27c03406fd9935e5fc86fc4126d7150c15b8d076fdc528d05cea7c7bf",
+     "occurrences": [
+      {
+       "file": "scripts/post_patch_validation.py",
+       "start_line": 515,
+       "end_line": null,
+       "start_column": 32
+      }
+     ]
+    },
+    {
+     "id": "PE3",
+     "finding_id": "finding-479136b1f7854c8fbb52ae870bef02f9",
+     "category": "Privilege Escalation",
+     "pattern": "Credential Access",
+     "severity": "HIGH",
+     "confidence": 0.6,
+     "location": {
+      "file": "scripts/post_patch_validation.py",
+      "start_line": 519,
+      "end_line": null,
+      "start_column": 36
+     },
+     "finding": ".env ",
+     "explanation": "Code accesses credential files (SSH keys, AWS credentials, etc.). This could indicate credential theft attempts.",
+     "remediation": "Remove references to credential paths. Use environment variables or secrets managers. For docs, use placeholder paths (e.g., /path/to/config). Never load .env or token files in production code paths.",
+     "code_snippet": "        raise PlanError(f\"{path}.timeout_seconds must be an integer from 1 to 3600\")\n    env = raw.get(\"env\", {})\n    if not isinstance(env, dict):\n        raise PlanError(f\"{path}.env must be a string map\")\n    normalized_env: dict[str, str] = {}\n    for key, value in env.items():\n        if not isinstance(key, str) or not ENV_RE.fullmatch(key):",
+     "intent": null,
+     "tags": [
+      "Privilege Escalation"
+     ],
+     "evidence": {},
+     "match_fingerprint": "66ef81c27c03406fd9935e5fc86fc4126d7150c15b8d076fdc528d05cea7c7bf",
+     "occurrences": [
+      {
+       "file": "scripts/post_patch_validation.py",
+       "start_line": 519,
+       "end_line": null,
+       "start_column": 36
+      }
+     ]
+    },
+    {
+     "id": "AST4",
+     "finding_id": "finding-cd9dbba3ab324058b2b613b51e79f03c",
+     "category": "Dangerous Code Execution",
+     "pattern": "subprocess module call",
+     "severity": "MEDIUM",
+     "confidence": 0.7,
+     "location": {
+      "file": "scripts/post_patch_validation.py",
+      "start_line": 275,
+      "end_line": 281,
+      "start_column": 17,
+      "end_column": 9
+     },
+     "finding": "subprocess.run(\n            command,\n            cwd=repo,\n            env=stable_env(),\n            capture_output=True,\n            check=False,\n        )",
+     "explanation": "subprocess module calls execute external commands. Without careful input validation, this enables command injection.",
+     "remediation": "Use subprocess.run() with shell=False and an explicit argument list. Validate all inputs and avoid passing user-controlled data to commands.",
+     "code_snippet": "def run_git(repo: Path, *args: str) -> bytes:\n    command = [*GIT_PREFIX, *args]\n    try:\n        result = subprocess.run(\n            command,\n            cwd=repo,\n            env=stable_env(),",
+     "intent": null,
+     "tags": [
+      "Dangerous Code Execution"
+     ],
+     "evidence": {},
+     "match_fingerprint": "5c5421b5d0a7b76e5c7af97acd8b9d68602e92458bcc368d8f932d8b429642a8",
+     "occurrences": [
+      {
+       "file": "scripts/post_patch_validation.py",
+       "start_line": 275,
+       "end_line": 281,
+       "start_column": 17,
+       "end_column": 9
+      }
+     ]
+    },
+    {
+     "id": "AST4",
+     "finding_id": "finding-5ce9279159b74a2ea5771c6b000787d2",
+     "category": "Dangerous Code Execution",
+     "pattern": "subprocess module call",
+     "severity": "MEDIUM",
+     "confidence": 0.7,
+     "location": {
+      "file": "scripts/post_patch_validation.py",
+      "start_line": 1076,
+      "end_line": 1084,
+      "start_column": 30,
+      "end_column": 21
+     },
+     "finding": "subprocess.Popen(\n                        argv,\n                        cwd=cwd,\n                        env=process_env,\n                        stdin=subprocess.DEVNULL,\n                        stdo",
+     "explanation": "subprocess module calls execute external commands. Without careful input validation, this enables command injection.",
+     "remediation": "Use subprocess.run() with shell=False and an explicit argument list. Validate all inputs and avoid passing user-controlled data to commands.",
+     "code_snippet": "                tempfile.TemporaryFile(dir=runtime_scratch) as stderr_buffer,\n            ):\n                try:\n                    process = subprocess.Popen(\n                        argv,\n                        cwd=cwd,\n                        env=process_env,",
+     "intent": null,
+     "tags": [
+      "Dangerous Code Execution"
+     ],
+     "evidence": {},
+     "match_fingerprint": "3cda8f4ec9495357db042b25f03bf296b832f9d2111121355d0f034aafb7dc2a",
+     "occurrences": [
+      {
+       "file": "scripts/post_patch_validation.py",
+       "start_line": 1076,
+       "end_line": 1084,
+       "start_column": 30,
+       "end_column": 21
+      }
+     ]
+    },
+    {
+     "id": "AST4",
+     "finding_id": "finding-5a18cf8456f141ab91469a97c84104da",
+     "category": "Dangerous Code Execution",
+     "pattern": "subprocess module call",
+     "severity": "MEDIUM",
+     "confidence": 0.7,
+     "location": {
+      "file": "scripts/post_patch_validation.py",
+      "start_line": 1643,
+      "end_line": 1649,
+      "start_column": 17,
+      "end_column": 9
+     },
+     "finding": "subprocess.run(\n            [*GIT_PREFIX, \"worktree\", \"remove\", \"--force\", str(path)],\n            cwd=repo,\n            env=stable_env(),\n            capture_output=True,\n            check=False,\n   ",
+     "explanation": "subprocess module calls execute external commands. Without careful input validation, this enables command injection.",
+     "remediation": "Use subprocess.run() with shell=False and an explicit argument list. Validate all inputs and avoid passing user-controlled data to commands.",
+     "code_snippet": "    with suppress(PlanError):\n        run_git(repo, \"worktree\", \"unlock\", str(path))\n    try:\n        result = subprocess.run(\n            [*GIT_PREFIX, \"worktree\", \"remove\", \"--force\", str(path)],\n            cwd=repo,\n            env=stable_env(),",
+     "intent": null,
+     "tags": [
+      "Dangerous Code Execution"
+     ],
+     "evidence": {},
+     "match_fingerprint": "effc60a73440e96081a99492193c71947af94e39e6e75bd711ef3e2a255bc399",
+     "occurrences": [
+      {
+       "file": "scripts/post_patch_validation.py",
+       "start_line": 1643,
+       "end_line": 1649,
+       "start_column": 17,
+       "end_column": 9
+      }
+     ]
+    }
+   ],
+   "suppressed_count": 0,
+   "suppressed": [],
+   "metadata": {
+    "has_executable_scripts": true,
+    "skillspector_version": "2.12.0",
+    "llm_requested": false,
+    "llm_available": false,
+    "meta_analysis_applied": false,
+    "inference_usage": [],
+    "llm_provenance": {
+     "schema_version": 1,
+     "provider": {
+      "configured_adapter": "nv_build",
+      "resolved_adapter": "nv_build",
+      "effective_adapter": "not_applicable",
+      "effective_adapters": [],
+      "service": "unknown",
+      "routing": {
+       "deployment_override": null,
+       "deployment_source": "not_applicable",
+       "api_version": null,
+       "api_version_source": "not_applicable"
+      }
+     },
+     "analyzers": [
+      {
+       "analyzer_id": "mcp_tool_poisoning",
+       "model": "z-ai/glm-5.2",
+       "model_source": "resolved_configuration",
+       "analyzer_revision": {
+        "value": "2.12.0",
+        "source": "skillspector_package",
+        "source_revision": {
+         "value": "unknown",
+         "source": "unknown"
+        }
+       }
+      },
+      {
+       "analyzer_id": "semantic_developer_intent",
+       "model": "z-ai/glm-5.2",
+       "model_source": "resolved_configuration",
+       "analyzer_revision": {
+        "value": "2.12.0",
+        "source": "skillspector_package",
+        "source_revision": {
+         "value": "unknown",
+         "source": "unknown"
+        }
+       }
+      },
+      {
+       "analyzer_id": "semantic_quality_policy",
+       "model": "z-ai/glm-5.2",
+       "model_source": "resolved_configuration",
+       "analyzer_revision": {
+        "value": "2.12.0",
+        "source": "skillspector_package",
+        "source_revision": {
+         "value": "unknown",
+         "source": "unknown"
+        }
+       }
+      },
+      {
+       "analyzer_id": "semantic_security_discovery",
+       "model": "z-ai/glm-5.2",
+       "model_source": "resolved_configuration",
+       "analyzer_revision": {
+        "value": "2.12.0",
+        "source": "skillspector_package",
+        "source_revision": {
+         "value": "unknown",
+         "source": "unknown"
+        }
+       }
+      },
+      {
+       "analyzer_id": "meta_analyzer",
+       "model": "z-ai/glm-5.2",
+       "model_source": "resolved_configuration",
+       "analyzer_revision": {
+        "value": "2.12.0",
+        "source": "skillspector_package",
+        "source_revision": {
+         "value": "unknown",
+         "source": "unknown"
+        }
+       }
+      }
+     ],
+     "sampling": {
+      "temperature": {
+       "requested": null,
+       "source": "provider_default",
+       "forwarded_to_client": null,
+       "adapter_support": true,
+       "provider_support": "unknown"
+      },
+      "seed": {
+       "requested": null,
+       "source": "unset",
+       "forwarded_to_client": null,
+       "adapter_support": true,
+       "provider_support": "unknown"
+      },
+      "reasoning_effort": {
+       "requested": null,
+       "source": "provider_default",
+       "forwarded_to_client": null,
+       "adapter_support": true,
+       "provider_support": "unknown"
+      }
+     },
+     "determinism": {
+      "classification": "not_applicable",
+      "control_status": "not_applied",
+      "provider_guarantee": false,
+      "reason": "LLM analysis was not executed for this scan."
+     }
+    },
+    "filtering_mode": "heuristic"
+   },
+   "analysis_completeness": {
+    "total_components": 5,
+    "scanned_components": 4,
+    "coverage_percent": 80.0,
+    "is_complete": false,
+    "status": "partial",
+    "execution_successful": true,
+    "fully_inspected_files": 4,
+    "partially_inspected_files": 1,
+    "entirely_uninspected_files": 0,
+    "ledger_exceptions": [
+     {
+      "outcome": "partial",
+      "phase": "reference_resolution",
+      "reason_code": "reference_missing",
+      "message": "A local path-like reference does not match any bundled artifact, such as a file the skill writes at runtime.",
+      "path": "SKILL.md",
+      "start_line": 49,
+      "end_line": 49,
+      "fatal": false
+     },
+     {
+      "outcome": "partial",
+      "phase": "reference_resolution",
+      "reason_code": "reference_missing",
+      "message": "A local path-like reference does not match any bundled artifact, such as a file the skill writes at runtime.",
+      "path": "SKILL.md",
+      "start_line": 68,
+      "end_line": 68,
+      "fatal": false
+     },
+     {
+      "outcome": "partial",
+      "phase": "reference_resolution",
+      "reason_code": "reference_missing",
+      "message": "A local path-like reference does not match any bundled artifact, such as a file the skill writes at runtime.",
+      "path": "SKILL.md",
+      "start_line": 75,
+      "end_line": 75,
+      "fatal": false
+     },
+     {
+      "outcome": "partial",
+      "phase": "reference_resolution",
+      "reason_code": "reference_missing",
+      "message": "A local path-like reference does not match any bundled artifact, such as a file the skill writes at runtime.",
+      "path": "SKILL.md",
+      "start_line": 79,
+      "end_line": 79,
+      "fatal": false
+     },
+     {
+      "outcome": "partial",
+      "phase": "reference_resolution",
+      "reason_code": "reference_missing",
+      "message": "A local path-like reference does not match any bundled artifact, such as a file the skill writes at runtime.",
+      "path": "SKILL.md",
+      "start_line": 140,
+      "end_line": 140,
+      "fatal": false
+     },
+     {
+      "outcome": "partial",
+      "phase": "reference_resolution",
+      "reason_code": "reference_missing",
+      "message": "A local path-like reference does not match any bundled artifact, such as a file the skill writes at runtime.",
+      "path": "SKILL.md",
+      "start_line": 145,
+      "end_line": 145,
+      "fatal": false
+     },
+     {
+      "outcome": "partial",
+      "phase": "reference_resolution",
+      "reason_code": "reference_missing",
+      "message": "A local path-like reference does not match any bundled artifact, such as a file the skill writes at runtime.",
+      "path": "SKILL.md",
+      "start_line": 163,
+      "end_line": 163,
+      "fatal": false
+     },
+     {
+      "outcome": "partial",
+      "phase": "reference_resolution",
+      "reason_code": "reference_missing",
+      "message": "A local path-like reference does not match any bundled artifact, such as a file the skill writes at runtime.",
+      "path": "SKILL.md",
+      "start_line": 210,
+      "end_line": 210,
+      "fatal": false
+     },
+     {
+      "outcome": "partial",
+      "phase": "static",
+      "reason_code": "static_parse_limit",
+      "message": "A security-relevant expression exceeded a bounded static parser's span limit.",
+      "path": "scripts/post_patch_validation.py",
+      "start_line": null,
+      "end_line": null,
+      "fatal": false,
+      "analyzers": [
+       "static_patterns_tool_misuse"
+      ]
+     }
+    ],
+    "scope_exclusions": [],
+    "analyzer_statuses": [
+     {
+      "analyzer_id": "artifact_integrity",
+      "status": "completed",
+      "planned_work": 5,
+      "completed": 5,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "behavioral_ast",
+      "status": "completed",
+      "planned_work": 1,
+      "completed": 1,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "behavioral_taint_tracking",
+      "status": "completed",
+      "planned_work": 1,
+      "completed": 1,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "bundled_execution_surface",
+      "status": "not_applicable",
+      "planned_work": 0,
+      "completed": 0,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0,
+      "reason_code": "no_applicable_files",
+      "message": "No files matched this analyzer's applicability contract."
+     },
+     {
+      "analyzer_id": "mcp_least_privilege",
+      "status": "completed",
+      "planned_work": 2,
+      "completed": 2,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "mcp_rug_pull",
+      "status": "completed",
+      "planned_work": 5,
+      "completed": 5,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "mcp_tool_poisoning",
+      "status": "completed",
+      "planned_work": 1,
+      "completed": 1,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "meta_analyzer",
+      "status": "disabled",
+      "planned_work": 0,
+      "completed": 0,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0,
+      "reason_code": "disabled_by_configuration",
+      "message": "Analyzer was disabled by the requested configuration."
+     },
+     {
+      "analyzer_id": "semantic_developer_intent",
+      "status": "disabled",
+      "planned_work": 0,
+      "completed": 0,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0,
+      "reason_code": "disabled_by_configuration",
+      "message": "Analyzer was disabled by the requested configuration."
+     },
+     {
+      "analyzer_id": "semantic_quality_policy",
+      "status": "disabled",
+      "planned_work": 0,
+      "completed": 0,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0,
+      "reason_code": "disabled_by_configuration",
+      "message": "Analyzer was disabled by the requested configuration."
+     },
+     {
+      "analyzer_id": "semantic_security_discovery",
+      "status": "disabled",
+      "planned_work": 0,
+      "completed": 0,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0,
+      "reason_code": "disabled_by_configuration",
+      "message": "Analyzer was disabled by the requested configuration."
+     },
+     {
+      "analyzer_id": "static_patterns_agent_snooping",
+      "status": "completed",
+      "planned_work": 5,
+      "completed": 5,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_anti_refusal",
+      "status": "completed",
+      "planned_work": 5,
+      "completed": 5,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_data_exfiltration",
+      "status": "completed",
+      "planned_work": 5,
+      "completed": 5,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_deserialization",
+      "status": "completed",
+      "planned_work": 5,
+      "completed": 5,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_excessive_agency",
+      "status": "completed",
+      "planned_work": 5,
+      "completed": 5,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_harmful_content",
+      "status": "completed",
+      "planned_work": 5,
+      "completed": 5,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_memory_poisoning",
+      "status": "completed",
+      "planned_work": 5,
+      "completed": 5,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_output_handling",
+      "status": "completed",
+      "planned_work": 5,
+      "completed": 5,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_privilege_escalation",
+      "status": "completed",
+      "planned_work": 5,
+      "completed": 5,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_prompt_injection",
+      "status": "completed",
+      "planned_work": 5,
+      "completed": 5,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_rogue_agent",
+      "status": "completed",
+      "planned_work": 5,
+      "completed": 5,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_ssrf",
+      "status": "completed",
+      "planned_work": 5,
+      "completed": 5,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_supply_chain",
+      "status": "completed",
+      "planned_work": 5,
+      "completed": 5,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_system_prompt_leakage",
+      "status": "completed",
+      "planned_work": 5,
+      "completed": 5,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_patterns_tool_misuse",
+      "status": "degraded",
+      "planned_work": 5,
+      "completed": 4,
+      "partial": 1,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     },
+     {
+      "analyzer_id": "static_yara",
+      "status": "completed",
+      "planned_work": 5,
+      "completed": 5,
+      "partial": 0,
+      "skipped": 0,
+      "failed": 0,
+      "unaccounted": 0
+     }
+    ],
+    "references": [
+     {
+      "source_path": "SKILL.md",
+      "line": 49,
+      "column": 15,
+      "evidence": "--output post-patch-validation/plan.json",
+      "target_path": null,
+      "status": "missing",
+      "disposition": "partial",
+      "reference_kind": "plain_path"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 68,
+      "column": 13,
+      "evidence": "--plan post-patch-validation/plan.json",
+      "target_path": null,
+      "status": "missing",
+      "disposition": "partial",
+      "reference_kind": "plain_path"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 75,
+      "column": 13,
+      "evidence": "--plan post-patch-validation/plan.json \\",
+      "target_path": null,
+      "status": "missing",
+      "disposition": "partial",
+      "reference_kind": "plain_path"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 79,
+      "column": 12,
+      "evidence": "6. Report `result.json`, `report.md`, the evidence level, and the complete `assessment`.",
+      "target_path": null,
+      "status": "missing",
+      "disposition": "partial",
+      "reference_kind": "quoted_or_code"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 79,
+      "column": 27,
+      "evidence": "6. Report `result.json`, `report.md`, the evidence level, and the complete `assessment`.",
+      "target_path": null,
+      "status": "missing",
+      "disposition": "partial",
+      "reference_kind": "quoted_or_code"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 140,
+      "column": 10,
+      "evidence": "--plan post-patch-validation/plan.json \\",
+      "target_path": null,
+      "status": "missing",
+      "disposition": "partial",
+      "reference_kind": "plain_path"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 145,
+      "column": 45,
+      "evidence": "Forwarded names and values are recorded in `result.json`. A requested variable that is unset is an",
+      "target_path": null,
+      "status": "missing",
+      "disposition": "partial",
+      "reference_kind": "quoted_or_code"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 163,
+      "column": 32,
+      "evidence": "Use a dedicated directory for `plan.json`: its sibling files and directories are copied into each",
+      "target_path": null,
+      "status": "missing",
+      "disposition": "partial",
+      "reference_kind": "quoted_or_code"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 183,
+      "column": 26,
+      "evidence": "Read [evidence-model.md](references/evidence-model.md) when designing coverage, selecting",
+      "target_path": "references/evidence-model.md",
+      "status": "resolved",
+      "disposition": "analyzed",
+      "reference_kind": "markdown_link"
+     },
+     {
+      "source_path": "SKILL.md",
+      "line": 210,
+      "column": 2,
+      "evidence": "`result.json` schema 2.0 contains an `assessment` with `status`, `findings`, `gaps`, and",
+      "target_path": null,
+      "status": "missing",
+      "disposition": "partial",
+      "reference_kind": "quoted_or_code"
+     }
+    ],
+    "limitations": [
+     "Analyzer static_patterns_tool_misuse status: degraded."
+    ],
+    "findings_before_filtering": 7,
+    "findings_after_filtering": 7
+   }
+  }
+ ],
+ "provenance": "skillspector/trivy/syft/semgrep: keluaran mentah; blok kontrak ditambahkan oleh scripts/annotate_evidence.py",
+ "captured_at": "2026-10-05T06:43:07+0700",
+ "redaction_status": "clean",
+ "status": "OBSERVED"
+}

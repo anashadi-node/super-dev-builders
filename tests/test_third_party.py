@@ -10,6 +10,7 @@ Tiga hal yang dijaga di sini:
 from __future__ import annotations
 
 import importlib.util
+import json
 import os
 import sys
 
@@ -136,6 +137,27 @@ def test_sync_accepts_registered_patch_but_not_unregistered_diff(tmp_path, monke
     r2 = sync.sync_skill("s", "x/skills/s", str(clone), fix=False)
     assert r2["patched_files"] == []
     assert any("a.md" in d for d in r2["deviations"])
+
+
+def test_annotate_evidence_adds_missing_without_touching_content(tmp_path):
+    """Anotasi kontrak hanya MENAMBAH kunci hilang; isi hasil alat tidak boleh diubah.
+
+    Kejadian nyata: dua artefak ter-commit tanpa `status` karena ditambal manual.
+    """
+    annotate = load("annotate_evidence")
+    payload = {"risk_assessment": {"score": 100}, "issues": [{"category": "x"}],
+               "provenance": "sudah ada — jangan ditimpa"}
+    f = tmp_path / "artefak.json"
+    f.write_text(json.dumps(payload))
+
+    assert annotate.annotate(str(f), "skillspector").startswith("TAMBAH")
+    out = json.load(open(f))
+    assert out["provenance"] == "sudah ada — jangan ditimpa"   # tidak ditimpa
+    assert out["risk_assessment"] == {"score": 100}            # isi alat utuh
+    assert out["issues"] == [{"category": "x"}]
+    assert {"captured_at", "redaction_status", "status"} <= set(out)
+
+    assert annotate.annotate(str(f), "skillspector").startswith("OK")  # idempoten
 
 
 def test_registry_records_four_third_party_decisions():

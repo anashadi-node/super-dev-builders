@@ -16,6 +16,7 @@ RUFF_PIN="${RUFF_PIN:-0.16.10}"
 SEMGREP_PIN="${SEMGREP_PIN:-1.179.0}"
 TRIVY_VERSION="${TRIVY_VERSION:-0.75.0}"
 SYFT_VERSION="${SYFT_VERSION:-1.54.0}"
+CODEQL_VERSION="${CODEQL_VERSION:-2.27.1}"
 BIN_DIR="${BIN_DIR:-$HOME/.local/bin}"
 
 DRY_RUN=1
@@ -28,18 +29,18 @@ for arg in "$@"; do
     --check) DRY_RUN=1; WANT=(check) ;;
     --install) DRY_RUN=0 ;;
     --yes) APPROVED=1 ;;
-    ruff|semgrep|trivy|syft) WANT+=("$arg") ;;
+    ruff|semgrep|trivy|syft|codeql) WANT+=("$arg") ;;
     *) echo "argumen tidak dikenal: $arg" >&2; exit 2 ;;
   esac
 done
 
 echo "== Bootstrap tools (pin versi) =="
-echo "ruff=$RUFF_PIN semgrep=$SEMGREP_PIN trivy=$TRIVY_VERSION syft=$SYFT_VERSION"
+echo "ruff=$RUFF_PIN semgrep=$SEMGREP_PIN trivy=$TRIVY_VERSION syft=$SYFT_VERSION codeql=$CODEQL_VERSION"
 echo "target bin: $BIN_DIR"
 echo
 
 status() {
-  for t in ruff semgrep trivy syft; do
+  for t in ruff semgrep trivy syft codeql; do
     if command -v "$t" >/dev/null 2>&1; then
       printf '  OK   %-8s %s (%s)\n' "$t" "$(command -v "$t")" "$("$t" --version 2>&1 | head -1)"
     else
@@ -90,6 +91,27 @@ install_gh_binary() {
   fi
 }
 
+# --- arsip ZIP GitHub (CodeQL): unduh -> verifikasi SHA256 -> unzip ke ~/.local/share ---
+install_gh_zip() {
+  local owner="$1" repo="$2" tag="$3" asset="$4" checksums="$5" binname="$6"
+  local base="https://github.com/$owner/$repo/releases/download/$tag"
+  local dest="$HOME/.local/share/$binname-$tag"
+  local tmp; tmp="$(mktemp -d)"
+  echo "+ unduh $base/$asset (~400 MB)"
+  echo "+ verifikasi SHA256 dari $checksums"
+  echo "+ unzip -> $dest ; symlink $BIN_DIR/$binname"
+  if [ "$DRY_RUN" -eq 0 ]; then
+    curl -fL --retry 3 -o "$tmp/$asset" "$base/$asset"
+    curl -fsSL -o "$tmp/$checksums" "$base/$checksums"
+    ( cd "$tmp" && grep " $asset\$" "$checksums" | sha256sum -c - )
+    mkdir -p "$dest"
+    unzip -q -o "$tmp/$asset" -d "$dest"
+    ln -sfn "$dest/$binname/$binname" "$BIN_DIR/$binname"
+    rm -rf "$tmp"
+    echo "  terpasang: $BIN_DIR/$binname -> $dest/$binname/$binname"
+  fi
+}
+
 for t in "${WANT[@]}"; do
   case "$t" in
     ruff)    install_pypi_tool ruff "$RUFF_PIN" ;;
@@ -97,6 +119,12 @@ for t in "${WANT[@]}"; do
     trivy)
       install_gh_binary aquasecurity trivy "v$TRIVY_VERSION" \
         "trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz" "trivy_${TRIVY_VERSION}_checksums.txt" trivy trivy
+      ;;
+    codeql)
+      # CATATAN LISENSI: CodeQL CLI hanya boleh dipakai pada codebase berlisensi OSI-approved atau riset akademik;
+      # dilarang untuk CI/CD / proses rekayasa perangkat lunak normal. Lihat docs/TECHNOLOGY_GOVERNANCE.md.
+      install_gh_zip github codeql-cli-binaries "v$CODEQL_VERSION" \
+        codeql-linux64.zip codeql-linux64.zip.checksum.txt codeql
       ;;
     syft)
       install_gh_binary anchore syft "v$SYFT_VERSION" \

@@ -1,0 +1,9 @@
+{
+  "checked_at": "2026-10-04T08:54:53+0700",
+  "path": "normalized/sdb-local-demo",
+  "files_checked": 5,
+  "records": 27,
+  "errors": [],
+  "warnings": [],
+  "verdict": "PASS"
+}

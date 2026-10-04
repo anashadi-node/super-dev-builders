@@ -95,8 +95,8 @@ hermes security audit (OSV, venv Hermes)       -> 71 advisory / 136 komponen (di
 Artefak bukti: `reports/upgrade-evidence/`.
 
 ## 7. Known limitations (jujur)
-1. Belum ada target reconstruction pertama — pipeline belum diuji end-to-end pada target nyata.
-2. Semgrep/Trivy/ruff sudah terpasang (approval #4). CodeQL/Syft belum (menunggu approval). Hasil trivy saat ini
+1. ~~Belum ada target reconstruction pertama~~ **SELESAI 2026-10-04**: pipeline diuji end-to-end pada target `sdb-local-demo` (milik sendiri, Mode A) — Gate #0 PASS/BLOCKED/FAIL, capture nyata, redaksi, normalisasi, evidence lint PASS, fidelity 8 dimensi, release gate PASS. Lihat `docs/PIPELINE_E2E_EVIDENCE.md`.
+2. Semgrep/Trivy/ruff (approval #4) + Syft/CodeQL/Playwright (approval #2) sudah terpasang, semuanya pin + checksum. Hasil trivy saat ini
    **nihil karena tidak ada manifest dependency/IaC** di repo -> bukan bukti bebas kerentanan.
 3. SkillSpector coverage **parsial (23.81%)** — bukan jaminan bebas temuan.
 4. 21 skill baru diuji struktural + lint + scan, belum diuji lewat pemakaian nyata.
@@ -108,4 +108,5 @@ Artefak bukti: `reports/upgrade-evidence/`.
 2. ~~Buang skill hub DANGEROUS `inference-sh-cli`~~ **SELESAI** (2026-10-04, approval #9; backup + verifikasi).
 3. ~~Putuskan/buang skill hub DANGEROUS lain: `comfyui`, `huggingface-hub`, `reddit-reading`~~ **SELESAI** (approval #9b, 2026-10-04; audit ulang 0 DANGEROUS, denylist dibuat).
 4. Pilih target pertama (milik sendiri/open-source) -> Gate #0 -> capture Mode A -> rebuild -> fidelity.
-5. CodeQL saat milestone; Syft bila SBOM diminta.
+5. CodeQL dipakai ketat sesuai lisensi (hanya OSI-approved/akademik; bukan internal/CI). Syft bila SBOM diminta.
+6. **Belum diuji**: target eksternal (web publik / APK / desktop), analisis mendalam Mode B, CodeQL pada kode internal (dilarang lisensi).

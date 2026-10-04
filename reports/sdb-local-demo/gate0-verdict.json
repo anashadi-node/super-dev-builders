@@ -1,0 +1,11 @@
+{
+  "gate": "gate0",
+  "verdict": "PASS",
+  "checked_at": "2026-10-04T08:53:53+0700",
+  "manifest": "/home/anashadi/super-dev-builders/evidence/sdb-local-demo/authorization.yaml",
+  "target": "sdb-local-demo",
+  "mode": "A",
+  "fail": [],
+  "blocked": [],
+  "warn": []
+}

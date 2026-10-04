@@ -9,7 +9,7 @@ Semua item di bawah **tidak dieksekusi** sampai Owner setuju. Status upgrade saa
 | 2 | Plugin Superpowers | HIGH | §0: pernah diblokir Skills Guard (dangerous) | hanya setelah PASS; kalau gagal -> port manual |
 | 3 | MCP server (GitHub MCP, Context7) | HIGH | akses network/fs luas + kredensial | konfigurasi + allowlist tool + token scope minimum |
 | 4 | ~~Pasang `ruff`, `semgrep`, `trivy`~~ **SELESAI 2026-10-04** | MEDIUM | — | ruff 0.16.10 + semgrep 1.179.0 (uv tool) + trivy 0.75.0 (rilis resmi, SHA256 OK). Bukti: `reports/upgrade-evidence/`, `registry/tools.yaml` |
-| 5 | Pasang `codeql` (berat), `syft`, `gh` | MEDIUM | ukuran/berat + kredensial | saat dibutuhkan; pin versi + checksum |
+| 5 | ~~Pasang `codeql`, `syft`, `gh`~~ **SELESAI 2026-10-04** | MEDIUM | — | Syft 1.54.0 + CodeQL 2.27.1 dipasang dengan checksum OK; `gh` belum (tetap pending). Bukti: `reports/upgrade-evidence/codeql-and-sbom-summary.md` |
 | 6 | Tool Mode B: `mobsf`, `jadx`, `apktool`, `ghidra` | HIGH | analisis mendalam artefak; MobSF GPL-3.0 | hanya artefak berizin tertulis, terisolasi |
 | 7 | Pasang 21 skill ke profil `default` | LOW-MED | +~402 token per turn | `/usr/bin/python3 scripts/install_skills.py --main` |
 | 8 | Rename direktori profil `cc-*` -> `sdb-*` (opsional) | MEDIUM | memengaruhi state.db/riwayat sesi | prosedur `docs/ROLLBACK_PLAN.md` §2 |
@@ -17,7 +17,7 @@ Semua item di bawah **tidak dieksekusi** sampai Owner setuju. Status upgrade saa
 | 9b | ~~**Temuan**: skill hub DANGEROUS lain — `comfyui` (61 temuan), `huggingface-hub`, `reddit-reading`~~ **SELESAI 2026-10-04** | HIGH | — | Dibuang via `hermes skills uninstall --yes`; backup 3 tar di `~/backups/.../quarantine/`; audit ulang: 0 DANGEROUS; denylist `registry/hub_skills_denylist.yaml` |
 | 10 | **Temuan**: 71 advisory OSV di venv Hermes (1 CRITICAL PyJWT) | HIGH | upgrade Hermes berisiko | rencanakan upgrade + backup + rollback; jangan otomatis |
 | 11 | Deploy produksi / migration / secret-IAM | HIGH-CRITICAL | blueprint §10A | prosedur manusia + bukti rollback |
-| 12 | Target reconstruction pertama | MED-HIGH | Gate #0 wajib otorisasi | isi `evidence/<slug>/authorization.yaml` -> `gate_check.py` |
+| 12 | ~~Target reconstruction pertama~~ **SELESAI 2026-10-04** | MED-HIGH | — | Target `sdb-local-demo` (milik sendiri, Mode A): Gate #0 PASS, capture/redaksi/lint/fidelity/release gate semua terbukti. Lihat `docs/PIPELINE_E2E_EVIDENCE.md` |
 
 ## Cara memberi approval
 ```text

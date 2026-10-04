@@ -4,7 +4,7 @@
 version: 2.2.0
 updated: 2026-10-04
 host_checked: 2026-10-04
-tools_installed: "ruff 0.16.10, semgrep 1.179.0, trivy 0.75.0 (approval item #4, 2026-10-04)"
+tools_installed: "ruff 0.16.10, semgrep 1.179.0, trivy 0.75.0 (approval #4), syft 1.54.0, codeql 2.27.1, playwright 1.63.0 (approval #2, 2026-10-04)"
 
 present:
   - id: git
@@ -30,8 +30,13 @@ present:
     role: test_runner
   - id: playwright_cli
     path: /home/anashadi/.local/bin/playwright
+    version_pin: "1.63.0"
     role: capture_engine_primary
-    note: "CLI ada; python module `playwright` tidak ada di interpreter default -> pakai venv khusus bila perlu"
+    install_method: "uv tool install --force playwright==1.63.0 + playwright install chromium"
+    note: "CLI lama rusak (module hilang) -> dipulihkan 2026-10-04; browser chromium-1243 di ~/.cache/ms-playwright"
+    evidence: evidence/sdb-local-demo/capture/ (screenshot+DOM+network nyata)
+    approved_by: mas anas
+    approved_at: 2026-10-04
   - id: jq
     path: /usr/bin/jq
     role: json_evidence_processing
@@ -61,19 +66,27 @@ present:
     evidence: reports/upgrade-evidence/trivy-fs.json
     approved_by: mas anas
     approved_at: 2026-10-04
+  # --- dipasang 2026-10-04 setelah approval manusia (item #2) ---
+  - id: syft
+    version_pin: "1.54.0"
+    path: /home/anashadi/.local/bin/syft
+    role: sbom_spdx_cyclonedx
+    install_method: "GH release v1.54.0 tar.gz + verifikasi SHA256 (checksum OK)"
+    evidence: reports/upgrade-evidence/sbom-oss-click-spdx.json (102 paket) + codeql-and-sbom-summary.md
+    approved_by: mas anas
+    approved_at: 2026-10-04
+  - id: codeql
+    version_pin: "2.27.1"
+    path: /home/anashadi/.local/bin/codeql
+    role: deep_interprocedural_sast
+    install_method: "GH release codeql-linux64.zip + verifikasi SHA256 (checksum OK)"
+    evidence: reports/upgrade-evidence/codeql-oss-click.sarif + codeql-and-sbom-summary.md
+    policy: "LISENSI: hanya codebase OSI-approved atau riset akademik; DILARANG untuk kode proprietary internal & DILARANG di CI/CD"
+    approved_by: mas anas
+    approved_at: 2026-10-04
 
 pending_approval:
-  - id: syft
-    role: sbom_spdx_cyclonedx
-    priority: B
-    install: "bash scripts/bootstrap_tools.sh --install syft --yes"
-    reason_pending: "hanya bila SBOM diminta"
-  - id: codeql
-    role: deep_interprocedural_sast
-    priority: A_but_heavy
-    install: "unduh CodeQL CLI resmi (ratusan MB) + query pack"
-    policy: "hanya milestone/release atau area berisiko tinggi; PC terbatas -> bukan siklus harian"
-    reason_pending: "berat + butuh approval manusia"
+  # catatan: syft & codeql sudah dipasang (lihat `present`)
   - id: gh
     role: github_ci_pr_release_visibility
     priority: B

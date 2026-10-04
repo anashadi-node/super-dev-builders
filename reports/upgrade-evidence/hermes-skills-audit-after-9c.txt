@@ -1,0 +1,40 @@
+
+Auditing 7 skill(s)...
+
+Scan: excalidraw (official/creative/excalidraw/community)  Verdict: SAFE
+  MEDIUM   supply_chain   SKILL.md:57                    "This uploads to 
+excalidraw.com (no account needed) and print"
+  MEDIUM   supply_chain   scripts/upload.py:32           "print("Install it 
+with: pip install cryptography")"
+
+Decision: ALLOWED — Allowed (community source, safe verdict)
+
+Scan: pretext (official/creative/pretext/community)  Verdict: SAFE
+Decision: ALLOWED — Allowed (community source, safe verdict)
+
+Scan: sketch (official/creative/sketch/community)  Verdict: SAFE
+Decision: ALLOWED — Allowed (community source, safe verdict)
+
+Scan: openhue (official/smart-home/openhue/community)  Verdict: SAFE
+Decision: ALLOWED — Allowed (community source, safe verdict)
+
+Scan: rss-feeds (official/research/rss-feeds/community)  Verdict: SAFE
+Decision: ALLOWED — Allowed (community source, safe verdict)
+
+Scan: kanban-video-orchestrator 
+(official/creative/kanban-video-orchestrator/community)  Verdict: SAFE
+  MEDIUM   execution      scripts/monitor.py:37          "out = subprocess.run("
+  MEDIUM   execution      scripts/monitor.py:46          "out = subprocess.run("
+  MEDIUM   execution      scripts/monitor.py:70          "out = subprocess.run("
+  MEDIUM   supply_chain   references/kanban-setup.md:120 "installs). If absent: 
+`pip install pyyaml`."
+
+Decision: ALLOWED — Allowed (community source, safe verdict)
+
+Scan: ai-presenter-video (official/creative/ai-presenter-video/community)  
+Verdict: SAFE
+  MEDIUM   execution      scripts/preflight.py:15        "result = 
+subprocess.run("
+
+Decision: ALLOWED — Allowed (community source, safe verdict)
+

@@ -81,7 +81,25 @@ trivy fs --scanners vuln,misconfig,secret --format json -o reports/upgrade-evide
 ```
 
 Aturan pemakaian:
-- Semgrep/ruff = scan cepat harian (murah); CodeQL hanya milestone/release (berat).
+- Semgrep/ruff/trivy = scan cepat harian (murah, bebas dipakai internal).
+- **CodeQL = milestone/release SAJA, dan hanya untuk codebase OSI-approved atau riset akademik** (batas lisensi GitHub).
+  Dilarang untuk kode proprietary internal dan dilarang di CI/CD; alternatif internal = Semgrep + ruff + trivy + syft.
+- `syft` untuk SBOM; `codeql` untuk temuan interprosedural mendalam (mis. `clear-text-logging-sensitive-data`, `overly-permissive-file`).
 - Trivy hanya bermakna bila repo punya manifest (`package.json`, `requirements.txt`) atau IaC/Dockerfile;
   "0 temuan" pada repo tanpa manifest berarti "tidak ada yang diperiksa".
 - Semua temuan masuk `reports/` sebagai artefak; temuan critical/high memblokir rilis.
+
+## Pipeline reconstruction — hasil uji end-to-end (2026-10-04, target `sdb-local-demo` milik sendiri)
+
+| Tahap | Perintah | Hasil nyata |
+|---|---|---|
+| Gate #0 | `scripts/gate_check.py --target sdb-local-demo` | **PASS** (exit 0) |
+| Gate #0 negatif | manifest tanpa approval manusia / `authorization_type` tak sah | **BLOCKED** (exit 2) / **FAIL** (exit 1) |
+| Capture | `scripts/capture_web.py` (Playwright) | 2 halaman, 6 request, screenshot+DOM+network+klik |
+| Redaksi | `scripts/redact_network.py` | header sensitif `x-demo-session` → REDACTED, mentah disimpan `.raw` |
+| Normalisasi | `scripts/normalize_capture.py` → `normalized/<target>/*.json` | 5 berkas, 27 record |
+| Evidence lint | `scripts/evidence_lint.py` | **PASS** (menangkap 1 bug normalizer sebelum lolos) |
+| Fidelity | `scripts/fidelity_compare.py` + `fidelity_report.py` | 8 dimensi terukur + coverage + gambar diff |
+| Release gate | `scripts/release_check.py --project runs/sdb-local-demo` | **FAIL** saat artefak kosong → **PASS** setelah 7 artefak ada (umur < 24 jam) |
+
+Detail: `docs/PIPELINE_E2E_EVIDENCE.md`, artefak `reports/sdb-local-demo/`, `verification/sdb-local-demo/`.

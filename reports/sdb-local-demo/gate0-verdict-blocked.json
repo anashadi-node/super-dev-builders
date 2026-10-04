@@ -1,0 +1,14 @@
+{
+  "gate": "gate0",
+  "verdict": "BLOCKED",
+  "checked_at": "2026-10-04T08:53:53+0700",
+  "manifest": "/tmp/sdb-e2e-blocked.yaml",
+  "target": "sdb-local-demo",
+  "mode": "A",
+  "fail": [],
+  "blocked": [
+    "approved_by kosong — butuh orang yang mengesahkan (keputusan manusia)",
+    "approved_at kosong — butuh timestamp persetujuan"
+  ],
+  "warn": []
+}

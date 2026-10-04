@@ -1,0 +1,60 @@
+{
+  "gate": "release",
+  "verdict": "FAIL",
+  "checked_at": "2026-10-04T08:55:38+0700",
+  "project": "/home/anashadi/super-dev-builders",
+  "max_age_hours": 24.0,
+  "satisfied": [],
+  "failures": [
+    {
+      "gate": "requirement",
+      "reason": "artefak tidak ditemukan",
+      "patterns": [
+        "requirements.md"
+      ]
+    },
+    {
+      "gate": "build",
+      "reason": "artefak tidak ditemukan",
+      "patterns": [
+        "logs/build-*.log"
+      ]
+    },
+    {
+      "gate": "tests",
+      "reason": "artefak tidak ditemukan",
+      "patterns": [
+        "logs/tests-*.log"
+      ]
+    },
+    {
+      "gate": "review",
+      "reason": "artefak tidak ditemukan",
+      "patterns": [
+        "reports/review-*.md"
+      ]
+    },
+    {
+      "gate": "security",
+      "reason": "artefak tidak ditemukan",
+      "patterns": [
+        "reports/security-gate.md"
+      ]
+    },
+    {
+      "gate": "audit",
+      "reason": "artefak tidak ditemukan",
+      "patterns": [
+        "reports/assurance-audit.md"
+      ]
+    },
+    {
+      "gate": "docs",
+      "reason": "artefak tidak ditemukan",
+      "patterns": [
+        "docs/README-*",
+        "reports/handover-*.md"
+      ]
+    }
+  ]
+}

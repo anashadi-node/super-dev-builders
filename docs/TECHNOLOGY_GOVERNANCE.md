@@ -28,12 +28,12 @@ Sumber: blueprint §3. Architect memilih stack; developer **tidak** bebas mengga
 | Kebutuhan | Tool | Status di host |
 |---|---|---|
 | Test runner | pytest (Python), Playwright Test (web) | pytest ada; Playwright CLI ada |
-| Lint/format Python | Ruff | belum terpasang (pending approval) |
-| SAST cepat | Semgrep | belum terpasang (pending approval) |
-| SAST mendalam | CodeQL | belum terpasang (berat; milestone/release) |
-| Dependency/container/IaC | Trivy | belum terpasang (pending approval) |
-| SBOM | Syft | belum terpasang (pending approval) |
-| Browser observasi | Playwright | ada |
+| Lint/format Python | Ruff | **terpasang 0.16.10** (approval #4) |
+| SAST cepat | Semgrep | **terpasang 1.179.0** (approval #4) |
+| SAST mendalam | CodeQL | **terpasang 2.27.1** (approval #2) — ⚠️ LISENSI: hanya codebase OSI-approved/riset akademik, **dilarang** untuk kode proprietary internal & CI/CD |
+| Dependency/container/IaC | Trivy | **terpasang 0.75.0** (approval #4) |
+| SBOM | Syft | **terpasang 1.54.0** (approval #2); "No packages discovered" bila tanpa manifest ≠ bebas kerentanan |
+| Browser observasi | Playwright | **terpasang 1.63.0** + Chromium (approval #2); capture engine nyata (`scripts/capture_web.py`) |
 | Accessibility | axe-core | belum (npm local) |
 | Performance | Lighthouse | belum (npm local) |
 | Git/GitHub | git / gh CLI | git ada; `gh` belum terpasang |

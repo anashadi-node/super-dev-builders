@@ -1,16 +1,22 @@
-__pycache__/
-*.pyc
-.venv/
-venv/
+# Secrets — JANGAN pernah masuk git
 .env
 *.env
-!*.env.template
-evidence/**/raw/
-normalized/**/*.local.json
-reports/**/*.local.md
-*.log
-.DS_Store
-sandboxes/
-.node_modules/
-node_modules/
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.pyc
 .pytest_cache/
+.venv/
+
+# Artefak lingkungan sementara (uv run --with)
+uv.lock
+
+# Evidence MENTAH sebelum redaksi (wajib diredaksi dulu)
+evidence/**/*.raw
+*.har
+
+# Data besar / hasil sementara
+data/raw/
+*.log.tmp

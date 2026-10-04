@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SDB Demo — Beranda</title><link rel="stylesheet" href="/styles.css"></head>
+<body>
+<header><nav aria-label="utama"><a href="/index.html">Beranda</a> <a href="/about.html">Tentang</a></nav></header>
+<h1 data-testid="h1">SDB Demo</h1>
+<button id="btn-load" data-testid="load">Muat status</button>
+<div id="status" role="status">belum dimuat</div>
+<form id="f" action="/submit" method="post"><label for="q">Kata kunci</label><input id="q" name="q"><button type="submit">Kirim</button></form>
+<script src="/app.js"></script>
+</body></html>

@@ -218,12 +218,57 @@ def test_registry_lint_passes_on_repo():
     assert registry.main() == 0, "registry + frontmatter skill harus konsisten"
 
 
-def test_registry_has_21_custom_skills():
+def test_registry_matches_skill_directories():
+    """Registry harus mencerminkan direktori skills/ (invariant, bukan angka mati)."""
     reg = common.load_yaml(os.path.join(REPO, "registry", "skills.yaml"))
-    assert len(reg["custom"]) == 21
+    on_disk = {d for d in os.listdir(os.path.join(REPO, "skills"))
+               if os.path.isfile(os.path.join(REPO, "skills", d, "SKILL.md"))}
+    ids = {item["id"] for item in reg["custom"]}
+    assert ids == on_disk, f"selisih registry vs disk: {ids ^ on_disk}"
+    assert len(reg["custom"]) >= 21, "jumlah skill tidak boleh menyusut tanpa alasan tercatat"
     for item in reg["custom"]:
         assert os.path.exists(os.path.join(REPO, "skills", item["id"], "SKILL.md")), item["id"]
         assert item["profiles"], f"{item['id']} tanpa profil"
+
+
+# ------------------------------------------------------------- pipeline E2E (capture/normalize/fidelity)
+def _load(name, rel):
+    import importlib.util as ilu
+    spec = ilu.spec_from_file_location(name, os.path.join(REPO, rel))
+    mod = ilu.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def test_capture_web_menolak_url_di_luar_scope(tmp_path):
+    """Gate #0 ditegakkan di dalam capture: URL di luar allowed_targets -> exit 2, tanpa buka browser."""
+    tgt = tmp_path / "evidence" / "t1"
+    tgt.mkdir(parents=True)
+    (tgt / "authorization.yaml").write_text(
+        "target_name: t1\nallowed_targets:\n  urls: [\"http://127.0.0.1:8100\"]\n", encoding="utf-8")
+    cap = _load("cap", "scripts/capture_web.py")
+    cap.repo_path = lambda *parts: os.path.join(str(tmp_path), *parts)   # sandbox manifest
+    rc = cap.main(["--target", "t1", "--url", "https://pihak-lain.example/x", "--out", str(tmp_path / "o")])
+    assert rc == 2
+
+
+def test_fidelity_compare_butuh_input(tmp_path, capsys):
+    mod = _load("fd", "scripts/fidelity_compare.py")
+    assert mod.main(["--target", "x", "--original", str(tmp_path / "a"), "--rebuilt", str(tmp_path / "b")]) == 2
+
+
+def test_normalize_butuh_artefak_capture(tmp_path):
+    mod = _load("nz", "scripts/normalize_capture.py")
+    assert mod.main(["--target", "x", "--capture", str(tmp_path / "kosong")]) == 2
+
+
+def test_fidelity_report_menolak_tanpa_coverage(tmp_path):
+    mod = _load("fr2", "scripts/fidelity_report.py")
+    js = tmp_path / "fidelity.json"
+    common.write_json(str(js), [{"dimension": "visual", "status": "ok"}])
+    assert mod.main(["--target", "x", "--json", str(js), "--out", str(tmp_path / "r.md")]) == 0
+    body = (tmp_path / "r.md").read_text(encoding="utf-8")
+    assert "NOT_MEASURED" in body  # dimensi lain wajib eksplisit belum diukur
 
 
 # ------------------------------------------------------------- misc scripts

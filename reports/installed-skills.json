@@ -1,5 +1,5 @@
 {
-  "at": "2026-10-04T07:24:57+0700",
+  "at": "2026-10-04T08:46:46+0700",
   "uninstall": false,
   "operations": [
     {
@@ -7,6 +7,12 @@
       "skill": "reconstruction-scope-gate",
       "profile": "cc-orchestrator",
       "path": "/home/anashadi/.hermes/profiles/cc-orchestrator/skills/super-dev-builders/reconstruction-scope-gate"
+    },
+    {
+      "action": "install",
+      "skill": "public-feed-reader",
+      "profile": "cc-orchestrator",
+      "path": "/home/anashadi/.hermes/profiles/cc-orchestrator/skills/super-dev-builders/public-feed-reader"
     },
     {
       "action": "install",
@@ -91,6 +97,24 @@
       "skill": "ci-cd-release-gate",
       "profile": "cc-security-governor",
       "path": "/home/anashadi/.hermes/profiles/cc-security-governor/skills/super-dev-builders/ci-cd-release-gate"
+    },
+    {
+      "action": "install",
+      "skill": "model-hub-provenance",
+      "profile": "cc-security-governor",
+      "path": "/home/anashadi/.hermes/profiles/cc-security-governor/skills/super-dev-builders/model-hub-provenance"
+    },
+    {
+      "action": "install",
+      "skill": "local-experiment-tracking",
+      "profile": "cc-security-governor",
+      "path": "/home/anashadi/.hermes/profiles/cc-security-governor/skills/super-dev-builders/local-experiment-tracking"
+    },
+    {
+      "action": "install",
+      "skill": "privilege-free-tooling",
+      "profile": "cc-security-governor",
+      "path": "/home/anashadi/.hermes/profiles/cc-security-governor/skills/super-dev-builders/privilege-free-tooling"
     },
     {
       "action": "install",
@@ -184,6 +208,42 @@
     },
     {
       "action": "install",
+      "skill": "local-media-generation",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/local-media-generation"
+    },
+    {
+      "action": "install",
+      "skill": "model-hub-provenance",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/model-hub-provenance"
+    },
+    {
+      "action": "install",
+      "skill": "public-feed-reader",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/public-feed-reader"
+    },
+    {
+      "action": "install",
+      "skill": "html-to-video-render",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/html-to-video-render"
+    },
+    {
+      "action": "install",
+      "skill": "local-experiment-tracking",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/local-experiment-tracking"
+    },
+    {
+      "action": "install",
+      "skill": "privilege-free-tooling",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/privilege-free-tooling"
+    },
+    {
+      "action": "install",
       "skill": "database-migration-safety",
       "profile": "cc-devops-docs",
       "path": "/home/anashadi/.hermes/profiles/cc-devops-docs/skills/super-dev-builders/database-migration-safety"
@@ -217,6 +277,24 @@
       "skill": "release-handover-docs",
       "profile": "cc-devops-docs",
       "path": "/home/anashadi/.hermes/profiles/cc-devops-docs/skills/super-dev-builders/release-handover-docs"
+    },
+    {
+      "action": "install",
+      "skill": "local-media-generation",
+      "profile": "cc-devops-docs",
+      "path": "/home/anashadi/.hermes/profiles/cc-devops-docs/skills/super-dev-builders/local-media-generation"
+    },
+    {
+      "action": "install",
+      "skill": "html-to-video-render",
+      "profile": "cc-devops-docs",
+      "path": "/home/anashadi/.hermes/profiles/cc-devops-docs/skills/super-dev-builders/html-to-video-render"
+    },
+    {
+      "action": "install",
+      "skill": "privilege-free-tooling",
+      "profile": "cc-devops-docs",
+      "path": "/home/anashadi/.hermes/profiles/cc-devops-docs/skills/super-dev-builders/privilege-free-tooling"
     }
   ],
   "missing_profiles": []

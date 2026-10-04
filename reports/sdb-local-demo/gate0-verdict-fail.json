@@ -1,0 +1,13 @@
+{
+  "gate": "gate0",
+  "verdict": "FAIL",
+  "checked_at": "2026-10-04T08:53:53+0700",
+  "manifest": "/tmp/sdb-e2e-fail.yaml",
+  "target": "sdb-local-demo",
+  "mode": "A",
+  "fail": [
+    "authorization_type tidak valid: 'none' (pilih: ['open_source', 'owned', 'staging', 'written_permission'])"
+  ],
+  "blocked": [],
+  "warn": []
+}

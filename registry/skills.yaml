@@ -120,6 +120,42 @@ custom:
 
 # ---------- B. Sumber pihak ketiga (terverifikasi metadata 2026-10-04, revisi terpin) ----------
 # status PENDING_APPROVAL = sumber diverifikasi + revisi dipin, BELUM dipasang (menunggu approval manusia).
+  - id: local-media-generation
+    status: ADD
+    divisions: [D4, D5]
+    profiles: [sdb-builder, sdb-devops]
+    path: skills/local-media-generation
+    replaces: comfyui
+  - id: model-hub-provenance
+    status: ADD
+    divisions: [D4, D5, D8]
+    profiles: [sdb-builder, sdb-security]
+    path: skills/model-hub-provenance
+    replaces: huggingface-hub
+  - id: public-feed-reader
+    status: ADD
+    divisions: [D2, D5]
+    profiles: [sdb-orchestrator, sdb-builder]
+    path: skills/public-feed-reader
+    replaces: reddit-reading
+  - id: html-to-video-render
+    status: ADD
+    divisions: [D4, D5]
+    profiles: [sdb-builder, sdb-devops]
+    path: skills/html-to-video-render
+    replaces: hyperframes
+  - id: local-experiment-tracking
+    status: ADD
+    divisions: [D9, D5]
+    profiles: [sdb-builder, sdb-security]
+    path: skills/local-experiment-tracking
+    replaces: weights-and-biases
+  - id: privilege-free-tooling
+    status: ADD
+    divisions: [D4, D8, D10]
+    profiles: [sdb-builder, sdb-security, sdb-devops]
+    path: skills/privilege-free-tooling
+    replaces: ascii-art, llama-cpp, serving-llms-vllm, evaluating-llms-harness
 third_party:
   - repo: obra/superpowers
     url: https://github.com/obra/superpowers

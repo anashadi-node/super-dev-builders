@@ -99,6 +99,19 @@ Artinya angka itu **artefak run rusak**, bukan temuan. Yang menyelamatkan: harne
 
 ### 4.4 Scan ketiga: 6 skill terpasang (`skillspector --no-llm`, statis)
 
+Catatan metodologis: run pertama men-scan direktori sebagai **satu unit** (tool memperingatkan *"Found 6 skills in this directory. Use --recursive to scan each independently"*, terlihat dari `skill.name = "unknown"`). Celah itu diperbaiki: run ulang dengan `--recursive` memberi **skor per-skill** (semua `execution_successful = true`):
+
+| Skill | Skor | Severity | Isu | Cakupan |
+|---|---|---|---|---|
+| semgrep | 100 | CRITICAL | 24 | 66.7% partial |
+| codeql | 100 | CRITICAL | 18 | 73.5% partial |
+| sarif-parsing | 100 | CRITICAL | 11 | 75.0% partial |
+| audit-context-building | 47 | MEDIUM | 3 | 83.3% partial |
+| fp-check | 13 | LOW | 4 | 100% (partial) |
+| differential-review | 7 | **LOW** | 1 | **100% complete** |
+
+Pola yang terlihat: tiga skor CRITICAL adalah **tiga skill yang punya script/workflow shell** (semgrep 24 isu, codeql 18, sarif-parsing 11) — konsisten dengan kelas yang sudah dibedah di bawah, bukan dengan perilaku jahat. Yang isinya murni metodologi/teks (differential-review, fp-check) justru **LOW**.
+
 Angka mentah: `coverage_percent = 79.5` (status `partial` — mode LLM tidak tersedia), **35 temuan** (26 MEDIUM, 9 HIGH), agregat `risk_score = 100 / CRITICAL / DO_NOT_INSTALL`.
 
 Tanpa membaca isinya, angka itu akan menyesatkan. Setelah tiap temuan HIGH dibaca pada baris aslinya:

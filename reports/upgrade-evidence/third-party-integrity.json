@@ -4,8 +4,8 @@
  "upstream": "trailofbits/skills",
  "pin": "82fe8226252622fa807643bdca1710901198553a",
  "license": "CC-BY-SA-4.0",
- "mode": "fix",
- "captured_at": "2026-10-05T06:31:35+0700",
+ "mode": "check",
+ "captured_at": "2026-10-05T06:39:26+0700",
  "redaction_status": "clean",
  "status": "OBSERVED",
  "skills": [
@@ -32,10 +32,6 @@
      "pin_sha256": "029532945776fb0fcbc866f19cd6114fe4152cd3dea1c0f44b266ec13a2cc6e8",
      "our_sha256": "351a0b6d61454e09fcd3ae39a4201771e0745687d8b9a2a857e2a74e28caeeb3"
     }
-   ],
-   "profiles": [
-    "cc-security-governor",
-    "cc-architect"
    ]
   },
   {
@@ -52,10 +48,7 @@
    "missing": [],
    "differing": [],
    "extra_files": [],
-   "patched_files": [],
-   "profiles": [
-    "cc-security-governor"
-   ]
+   "patched_files": []
   },
   {
    "skill": "differential-review",
@@ -71,12 +64,7 @@
    "missing": [],
    "differing": [],
    "extra_files": [],
-   "patched_files": [],
-   "profiles": [
-    "cc-security-governor",
-    "cc-architect",
-    "cc-reviewer-qa"
-   ]
+   "patched_files": []
   },
   {
    "skill": "fp-check",
@@ -92,11 +80,7 @@
    "missing": [],
    "differing": [],
    "extra_files": [],
-   "patched_files": [],
-   "profiles": [
-    "cc-security-governor",
-    "cc-reviewer-qa"
-   ]
+   "patched_files": []
   },
   {
    "skill": "modern-python",
@@ -140,10 +124,7 @@
    "missing": [],
    "differing": [],
    "extra_files": [],
-   "patched_files": [],
-   "profiles": [
-    "cc-security-governor"
-   ]
+   "patched_files": []
   },
   {
    "skill": "semgrep",
@@ -159,11 +140,7 @@
    "missing": [],
    "differing": [],
    "extra_files": [],
-   "patched_files": [],
-   "profiles": [
-    "cc-security-governor",
-    "cc-devops-docs"
-   ]
+   "patched_files": []
   },
   {
    "skill": "variant-analysis",
@@ -173,11 +150,26 @@
    "installed_dir": "/home/anashadi/.hermes/skills/variant-analysis",
    "copied": [],
    "deviations": [
-    "belum terpasang di profil default"
+    "belum sinkron: 9 berkas hilang (jalankan --fix)"
    ],
    "ok": false,
-   "missing_install": true,
-   "upstream_files": 18
+   "upstream_files": 18,
+   "installed_files_before": 9,
+   "missing": [
+    "resources/codeql/java.ql",
+    "resources/codeql/javascript.ql",
+    "resources/codeql/python.ql",
+    "resources/semgrep/cpp.yaml",
+    "resources/semgrep/go.yaml",
+    "resources/semgrep/java.yaml",
+    "resources/semgrep/javascript.yaml",
+    "resources/semgrep/python.yaml",
+    "resources/variant-report-template.md"
+   ],
+   "differing": [],
+   "extra_files": [],
+   "patched_files": [],
+   "pending_sync": true
   }
  ]
 }

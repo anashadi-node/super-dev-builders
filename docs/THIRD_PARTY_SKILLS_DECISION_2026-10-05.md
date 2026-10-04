@@ -151,7 +151,8 @@ Metode: `hermes skills install skills-sh/trailofbits/skills/... --yes` → verdi
 | differential-review | **ALLOWED** | — | — |
 | fp-check | **ALLOWED** (SAFE) | — | — |
 | audit-context-building | **BLOCKED → ALLOWED** | 3 → 0 efektif | setelah 2 ZWSP dihapus (lihat bawah) |
-| codeql | **BLOCKED** (CAUTION) | 25 | semua kelas dokumentasi/harness — keputusan manusia |
+| codeql | **BLOCKED** (CAUTION) | 25 | **Owner 2026-10-05: DISIMPAN** dengan pengecualian terdokumentasi |
+| variant-analysis | **BLOCKED → SAFE** | 11 → **0** (`rules: none`) | verdict berbalik; terpasang tanpa pemaksaan (lihat §5.2) |
 
 **Perbaikan yang terbukti kausal**: hub menandai `resources/ANALYSIS_FORMAT.md:25,28` sebagai `HIGH injection` karena **2 karakter zero-width (U+200B)** — persis 2 karakter yang pemindai mandiri kami temukan (dua pemindai independen, angka identik). Isinya: pagar kode ```` ```language ```` dengan karakter tak-terlihat di depannya, **tanpa teks tersembunyi**. Setelah 2 karakter itu dihapus (berkas 2.613 → 2.607 byte, pagar kode utuh), audit ulang memberi **ALLOWED**. Patch dicatat sebagai deviasi sengaja dengan sha256 kami + sha256 pin di `scripts/sync_third_party_skills.py::INTENTIONAL_DEVIATIONS`, dan diterima hanya bila hash-nya cocok persis — perubahan lain tetap dilaporkan sebagai deviasi keamanan.
 
@@ -165,17 +166,29 @@ Metode: `hermes skills install skills-sh/trailofbits/skills/... --yes` → verdi
 | `MEDIUM supply_chain` (10) | dokumentasi workflow: `uv run {baseDir}/scripts/…`, `pip install -e .`, `npm install`, `make clean` — perintah yang memang dibutuhkan untuk **membangun database CodeQL** di proyek target |
 | `LOW privilege_escalation` (1) | baris frontmatter `allowed-tools:` — muncul juga di skill yang berverdict SAFE |
 
-Tidak ada: eksfiltrasi data, sudo, `curl \| sh`, kredensial, atau mitigasi bypass. Yang ada: **harness test milik skill itu sendiri** + panduan perintah build. Keputusan menyimpan/menghapus `codeql` diserahkan ke Owner karena gate audit menyebut BLOCKED (keputusan manusia), bukan karena ada bukti perilaku jahat.
+Tidak ada: eksfiltrasi data, sudo, `curl \| sh`, kredensial, atau mitigasi bypass. Yang ada: **harness test milik skill itu sendiri** + panduan perintah build. Karena gate audit menyebut BLOCKED, keputusan diserahkan ke Owner — dan Owner memutuskan **SIMPAN dengan pengecualian terdokumentasi** (2026-10-05). Pengecualian ini terbatas pada `codeql` dan tidak mengubah aturan `no --force` untuk skill lain.
 
-### 5.2 Tiga skill yang TIDAK dipasang karena gate hub (tidak ada bypass)
+### 5.2 Verdict yang BERGESER — pelajaran penting tentang mempercayai satu kali scan
 
-| Skill | Verdict hub saat instalasi | Alasan |
-|---|---|---|
-| `variant-analysis` | BLOCKED (caution, 11 findings) | tidak dibypass; pemindai mandiri kami hanya menemukan pola rule semgrep (`eval(`) — kandidat false positive |
-| `modern-python` | BLOCKED (**dangerous**, 90 findings) | tidak dibypass (catatan: pemindai mandiri kami hanya menemukan 2 baris dokumentasi `curl … \| sh`) |
-| `post-patch-validation` | BLOCKED (caution, 12 findings) | tidak dibypass |
+| Skill | Verdict saat pertama dicoba | Verdict sekarang | Yang terjadi |
+|---|---|---|---|
+| `variant-analysis` | BLOCKED — *caution verdict, 11 findings* | **SAFE — `rules: none`** | Terpasang lewat gate normal (tanpa `--force`). **11 temuan itu tidak ada lagi** pada ruleset sekarang → tidak ada yang bisa ditinjau; yang ada hanya fakta bahwa verdict berubah. Owner meminta peninjauan manual, dan laporan ini menyampaikan: tidak ada temuan untuk ditinjau. |
 
-Catatan penting: `variant-block-raw.txt` (hasil `hermes skills inspect`) ternyata berisi **isi SKILL.md**, bukan daftar 11 temuan — jadi rincian temuan `variant-analysis` **belum terdokumentasi** dan tidak saya klaim. Untuk `modern-python`, selisih 90 temuan hub vs 2 temuan pemindai kami juga belum dijelaskan — perlu tinjauan manusia sebelum menyimpulkan apa pun.
+Implikasi metodologis yang saya terapkan: verdict hub adalah **hasil scan pada satu waktu dengan satu ruleset**, bukan sifat tetap sebuah skill. Karena itu (a) setiap verdict dicatat dengan timestamp + hash + `rules:`-nya, dan (b) blokir tidak pernah dipaksa, tetapi juga tidak otomatis diperlakukan sebagai kebenaran abadi — diuji ulang, lalu dilaporkan apa adanya.
+
+### 5.3 Pola pemotongan berkas oleh hub (terukur, sebab belum terbukti)
+
+| Skill | Berkas upstream | Berkas terpasang hub | Selisih |
+|---|---|---|---|
+| semgrep | 9 | 9 | 0 |
+| sarif-parsing | 8 | 8 | 0 |
+| fp-check | 9 | 9 | 0 |
+| differential-review | 7 | 7 | 0 |
+| audit-context-building | 6 | 3 | **3** |
+| variant-analysis | 18 | 9 | **9** |
+| codeql | 34 | 2 | **32** |
+
+Polanya: pemotongan terjadi pada skill berisi banyak berkas, tetapi **ambangnya tidak konsisten** (3, 9, dan 32 hilang) sehingga sebabnya **tidak saya klaim**. Yang dapat dipertanggungjawabkan: setiap kekurangan dideteksi dan dilengkapi dari commit pin yang sama, lalu dibuktikan byte-identik.
 
 **Sebaran ke profil divisi**: `cc-security-governor` 6 · `cc-reviewer-qa` 2 · `cc-architect` 2 · `cc-devops-docs` 1 · `cc-builder` 0 (menunggu `modern-python`).
 

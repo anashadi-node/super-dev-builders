@@ -218,6 +218,16 @@ def test_registry_lint_passes_on_repo():
     assert registry.main() == 0, "registry + frontmatter skill harus konsisten"
 
 
+def test_evidence_dir_satisfies_contract():
+    """Setiap artefak bukti WAJIB punya blok kontrak (provenance/captured_at/...).
+
+    Tanpa tes ini, `evidence_lint` hanya gate manual — dan gate manual pernah
+    terlewat saat commit. Fakta ini (bukan niat baik) yang menutup celahnya.
+    """
+    ev = os.path.join(REPO, "reports", "upgrade-evidence")
+    assert lint.main([ev]) == 0, "artefak bukti melanggar kontrak docs/EVIDENCE_SCHEMA.md"
+
+
 def test_registry_matches_skill_directories():
     """Registry harus mencerminkan direktori skills/ (invariant, bukan angka mati)."""
     reg = common.load_yaml(os.path.join(REPO, "registry", "skills.yaml"))

@@ -1,18 +1,22 @@
 {
-  "gate": "gate0",
-  "verdict": "FAIL",
-  "checked_at": "2026-10-04T07:25:23+0700",
-  "manifest": "templates/authorization_manifest.yaml",
-  "target": "",
-  "mode": "A",
-  "fail": [
-    "target_name kosong",
-    "authorization_type tidak valid: '' (pilih: ['open_source', 'owned', 'staging', 'written_permission'])",
-    "allowed_targets kosong (minimal satu url/repo/app)"
-  ],
-  "blocked": [
-    "approved_by kosong — butuh orang yang mengesahkan (keputusan manusia)",
-    "approved_at kosong — butuh timestamp persetujuan"
-  ],
-  "warn": []
+ "gate": "gate0",
+ "verdict": "FAIL",
+ "checked_at": "2026-10-04T07:25:23+0700",
+ "manifest": "templates/authorization_manifest.yaml",
+ "target": "",
+ "mode": "A",
+ "fail": [
+  "target_name kosong",
+  "authorization_type tidak valid: '' (pilih: ['open_source', 'owned', 'staging', 'written_permission'])",
+  "allowed_targets kosong (minimal satu url/repo/app)"
+ ],
+ "blocked": [
+  "approved_by kosong — butuh orang yang mengesahkan (keputusan manusia)",
+  "approved_at kosong — butuh timestamp persetujuan"
+ ],
+ "warn": [],
+ "provenance": "demo gate0 mode FAIL (uji fail-closed) — sesi 2026-10-04",
+ "captured_at": "2026-10-04 (sesi asal)",
+ "redaction_status": "clean",
+ "status": "OBSERVED"
 }

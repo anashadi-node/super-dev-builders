@@ -1,1 +1,198 @@
-{"spdxVersion":"SPDX-2.3","dataLicense":"CC0-1.0","SPDXID":"SPDXRef-DOCUMENT","name":"/home/anashadi/sdb-targets/oss-sb-agency-b2d5d5c","documentNamespace":"https://anchore.com/syft/dir/home/anashadi/sdb-targets/oss-sb-agency-b2d5d5c-c4af21b2-bea6-4703-a31d-46e0486bf09b","creationInfo":{"licenseListVersion":"3.29","creators":["Organization: Anchore, Inc","Tool: syft-1.54.0"],"created":"2026-10-04T08:12:05Z"},"packages":[{"name":"@popperjs/core","SPDXID":"SPDXRef-Package-npm--popperjs-core-a574ad7e7bd13657","versionInfo":"2.11.6","supplier":"NOASSERTION","downloadLocation":"https://registry.npmjs.org/@popperjs/core/-/core-2.11.6.tgz","filesAnalyzed":false,"sourceInfo":"acquired package info from installed node module manifest file: /package-lock.json","licenseConcluded":"NOASSERTION","licenseDeclared":"NOASSERTION","copyrightText":"NOASSERTION","externalRefs":[{"referenceCategory":"SECURITY","referenceType":"cpe23Type","referenceLocator":"cpe:2.3:a:\\@popperjs\\/core:\\@popperjs\\/core:2.11.6:*:*:*:*:*:*:*"},{"referenceCategory":"PACKAGE-MANAGER","referenceType":"purl","referenceLocator":"pkg:npm/%40popperjs/core@2.11.6"}]},{"name":"bootstrap","SPDXID":"SPDXRef-Package-npm-bootstrap-903c7daa692c4b87","versionInfo":"5.2.3","supplier":"NOASSERTION","downloadLocation":"https://registry.npmjs.org/bootstrap/-/bootstrap-5.2.3.tgz","filesAnalyzed":false,"sourceInfo":"acquired package info from installed node module manifest file: /package-lock.json","licenseConcluded":"NOASSERTION","licenseDeclared":"NOASSERTION","copyrightText":"NOASSERTION","externalRefs":[{"referenceCategory":"SECURITY","referenceType":"cpe23Type","referenceLocator":"cpe:2.3:a:bootstrap:bootstrap:5.2.3:*:*:*:*:*:*:*"},{"referenceCategory":"PACKAGE-MANAGER","referenceType":"purl","referenceLocator":"pkg:npm/bootstrap@5.2.3"}]},{"name":"startbootstrap-agency","SPDXID":"SPDXRef-Package-npm-startbootstrap-agency-20a718a9af0d2a40","versionInfo":"7.0.12","supplier":"NOASSERTION","downloadLocation":"NOASSERTION","filesAnalyzed":false,"sourceInfo":"acquired package info from installed node module manifest file: /package-lock.json","licenseConcluded":"NOASSERTION","licenseDeclared":"MIT","copyrightText":"NOASSERTION","externalRefs":[{"referenceCategory":"SECURITY","referenceType":"cpe23Type","referenceLocator":"cpe:2.3:a:startbootstrap-agency:startbootstrap-agency:7.0.12:*:*:*:*:*:*:*"},{"referenceCategory":"SECURITY","referenceType":"cpe23Type","referenceLocator":"cpe:2.3:a:startbootstrap-agency:startbootstrap_agency:7.0.12:*:*:*:*:*:*:*"},{"referenceCategory":"SECURITY","referenceType":"cpe23Type","referenceLocator":"cpe:2.3:a:startbootstrap_agency:startbootstrap-agency:7.0.12:*:*:*:*:*:*:*"},{"referenceCategory":"SECURITY","referenceType":"cpe23Type","referenceLocator":"cpe:2.3:a:startbootstrap_agency:startbootstrap_agency:7.0.12:*:*:*:*:*:*:*"},{"referenceCategory":"SECURITY","referenceType":"cpe23Type","referenceLocator":"cpe:2.3:a:startbootstrap:startbootstrap-agency:7.0.12:*:*:*:*:*:*:*"},{"referenceCategory":"SECURITY","referenceType":"cpe23Type","referenceLocator":"cpe:2.3:a:startbootstrap:startbootstrap_agency:7.0.12:*:*:*:*:*:*:*"},{"referenceCategory":"PACKAGE-MANAGER","referenceType":"purl","referenceLocator":"pkg:npm/startbootstrap-agency@7.0.12"}]},{"name":"/home/anashadi/sdb-targets/oss-sb-agency-b2d5d5c","SPDXID":"SPDXRef-DocumentRoot-Directory--home-anashadi-sdb-targets-oss-sb-agency-b2d5d5c","supplier":"NOASSERTION","downloadLocation":"NOASSERTION","filesAnalyzed":false,"licenseConcluded":"NOASSERTION","licenseDeclared":"NOASSERTION","copyrightText":"NOASSERTION","primaryPackagePurpose":"FILE"}],"files":[{"fileName":"package-lock.json","SPDXID":"SPDXRef-File-package-lock.json-fd71c2238fc07657","fileTypes":["APPLICATION"],"checksums":[{"algorithm":"SHA1","checksumValue":"da8d73970cbdd618ea9a79d4d643a816fe40b962"},{"algorithm":"SHA256","checksumValue":"b263ad12f5725861d9173db022129c946359e20bd8f4560f7f9c8109ec92065a"}],"licenseConcluded":"NOASSERTION","licenseInfoInFiles":["NOASSERTION"],"copyrightText":"NOASSERTION"}],"relationships":[{"spdxElementId":"SPDXRef-Package-npm-bootstrap-903c7daa692c4b87","relatedSpdxElement":"SPDXRef-Package-npm-startbootstrap-agency-20a718a9af0d2a40","relationshipType":"DEPENDENCY_OF"},{"spdxElementId":"SPDXRef-Package-npm-startbootstrap-agency-20a718a9af0d2a40","relatedSpdxElement":"SPDXRef-File-package-lock.json-fd71c2238fc07657","relationshipType":"OTHER","comment":"evident-by: indicates the package's existence is evident by the given file"},{"spdxElementId":"SPDXRef-Package-npm-bootstrap-903c7daa692c4b87","relatedSpdxElement":"SPDXRef-File-package-lock.json-fd71c2238fc07657","relationshipType":"OTHER","comment":"evident-by: indicates the package's existence is evident by the given file"},{"spdxElementId":"SPDXRef-Package-npm--popperjs-core-a574ad7e7bd13657","relatedSpdxElement":"SPDXRef-File-package-lock.json-fd71c2238fc07657","relationshipType":"OTHER","comment":"evident-by: indicates the package's existence is evident by the given file"},{"spdxElementId":"SPDXRef-DocumentRoot-Directory--home-anashadi-sdb-targets-oss-sb-agency-b2d5d5c","relatedSpdxElement":"SPDXRef-Package-npm--popperjs-core-a574ad7e7bd13657","relationshipType":"CONTAINS"},{"spdxElementId":"SPDXRef-DocumentRoot-Directory--home-anashadi-sdb-targets-oss-sb-agency-b2d5d5c","relatedSpdxElement":"SPDXRef-Package-npm-bootstrap-903c7daa692c4b87","relationshipType":"CONTAINS"},{"spdxElementId":"SPDXRef-DocumentRoot-Directory--home-anashadi-sdb-targets-oss-sb-agency-b2d5d5c","relatedSpdxElement":"SPDXRef-Package-npm-startbootstrap-agency-20a718a9af0d2a40","relationshipType":"CONTAINS"},{"spdxElementId":"SPDXRef-DOCUMENT","relatedSpdxElement":"SPDXRef-DocumentRoot-Directory--home-anashadi-sdb-targets-oss-sb-agency-b2d5d5c","relationshipType":"DESCRIBES"}]}
+{
+ "spdxVersion": "SPDX-2.3",
+ "dataLicense": "CC0-1.0",
+ "SPDXID": "SPDXRef-DOCUMENT",
+ "name": "/home/anashadi/sdb-targets/oss-sb-agency-b2d5d5c",
+ "documentNamespace": "https://anchore.com/syft/dir/home/anashadi/sdb-targets/oss-sb-agency-b2d5d5c-c4af21b2-bea6-4703-a31d-46e0486bf09b",
+ "creationInfo": {
+  "licenseListVersion": "3.29",
+  "creators": [
+   "Organization: Anchore, Inc",
+   "Tool: syft-1.54.0"
+  ],
+  "created": "2026-10-04T08:12:05Z"
+ },
+ "packages": [
+  {
+   "name": "@popperjs/core",
+   "SPDXID": "SPDXRef-Package-npm--popperjs-core-a574ad7e7bd13657",
+   "versionInfo": "2.11.6",
+   "supplier": "NOASSERTION",
+   "downloadLocation": "https://registry.npmjs.org/@popperjs/core/-/core-2.11.6.tgz",
+   "filesAnalyzed": false,
+   "sourceInfo": "acquired package info from installed node module manifest file: /package-lock.json",
+   "licenseConcluded": "NOASSERTION",
+   "licenseDeclared": "NOASSERTION",
+   "copyrightText": "NOASSERTION",
+   "externalRefs": [
+    {
+     "referenceCategory": "SECURITY",
+     "referenceType": "cpe23Type",
+     "referenceLocator": "cpe:2.3:a:\\@popperjs\\/core:\\@popperjs\\/core:2.11.6:*:*:*:*:*:*:*"
+    },
+    {
+     "referenceCategory": "PACKAGE-MANAGER",
+     "referenceType": "purl",
+     "referenceLocator": "pkg:npm/%40popperjs/core@2.11.6"
+    }
+   ]
+  },
+  {
+   "name": "bootstrap",
+   "SPDXID": "SPDXRef-Package-npm-bootstrap-903c7daa692c4b87",
+   "versionInfo": "5.2.3",
+   "supplier": "NOASSERTION",
+   "downloadLocation": "https://registry.npmjs.org/bootstrap/-/bootstrap-5.2.3.tgz",
+   "filesAnalyzed": false,
+   "sourceInfo": "acquired package info from installed node module manifest file: /package-lock.json",
+   "licenseConcluded": "NOASSERTION",
+   "licenseDeclared": "NOASSERTION",
+   "copyrightText": "NOASSERTION",
+   "externalRefs": [
+    {
+     "referenceCategory": "SECURITY",
+     "referenceType": "cpe23Type",
+     "referenceLocator": "cpe:2.3:a:bootstrap:bootstrap:5.2.3:*:*:*:*:*:*:*"
+    },
+    {
+     "referenceCategory": "PACKAGE-MANAGER",
+     "referenceType": "purl",
+     "referenceLocator": "pkg:npm/bootstrap@5.2.3"
+    }
+   ]
+  },
+  {
+   "name": "startbootstrap-agency",
+   "SPDXID": "SPDXRef-Package-npm-startbootstrap-agency-20a718a9af0d2a40",
+   "versionInfo": "7.0.12",
+   "supplier": "NOASSERTION",
+   "downloadLocation": "NOASSERTION",
+   "filesAnalyzed": false,
+   "sourceInfo": "acquired package info from installed node module manifest file: /package-lock.json",
+   "licenseConcluded": "NOASSERTION",
+   "licenseDeclared": "MIT",
+   "copyrightText": "NOASSERTION",
+   "externalRefs": [
+    {
+     "referenceCategory": "SECURITY",
+     "referenceType": "cpe23Type",
+     "referenceLocator": "cpe:2.3:a:startbootstrap-agency:startbootstrap-agency:7.0.12:*:*:*:*:*:*:*"
+    },
+    {
+     "referenceCategory": "SECURITY",
+     "referenceType": "cpe23Type",
+     "referenceLocator": "cpe:2.3:a:startbootstrap-agency:startbootstrap_agency:7.0.12:*:*:*:*:*:*:*"
+    },
+    {
+     "referenceCategory": "SECURITY",
+     "referenceType": "cpe23Type",
+     "referenceLocator": "cpe:2.3:a:startbootstrap_agency:startbootstrap-agency:7.0.12:*:*:*:*:*:*:*"
+    },
+    {
+     "referenceCategory": "SECURITY",
+     "referenceType": "cpe23Type",
+     "referenceLocator": "cpe:2.3:a:startbootstrap_agency:startbootstrap_agency:7.0.12:*:*:*:*:*:*:*"
+    },
+    {
+     "referenceCategory": "SECURITY",
+     "referenceType": "cpe23Type",
+     "referenceLocator": "cpe:2.3:a:startbootstrap:startbootstrap-agency:7.0.12:*:*:*:*:*:*:*"
+    },
+    {
+     "referenceCategory": "SECURITY",
+     "referenceType": "cpe23Type",
+     "referenceLocator": "cpe:2.3:a:startbootstrap:startbootstrap_agency:7.0.12:*:*:*:*:*:*:*"
+    },
+    {
+     "referenceCategory": "PACKAGE-MANAGER",
+     "referenceType": "purl",
+     "referenceLocator": "pkg:npm/startbootstrap-agency@7.0.12"
+    }
+   ]
+  },
+  {
+   "name": "/home/anashadi/sdb-targets/oss-sb-agency-b2d5d5c",
+   "SPDXID": "SPDXRef-DocumentRoot-Directory--home-anashadi-sdb-targets-oss-sb-agency-b2d5d5c",
+   "supplier": "NOASSERTION",
+   "downloadLocation": "NOASSERTION",
+   "filesAnalyzed": false,
+   "licenseConcluded": "NOASSERTION",
+   "licenseDeclared": "NOASSERTION",
+   "copyrightText": "NOASSERTION",
+   "primaryPackagePurpose": "FILE"
+  }
+ ],
+ "files": [
+  {
+   "fileName": "package-lock.json",
+   "SPDXID": "SPDXRef-File-package-lock.json-fd71c2238fc07657",
+   "fileTypes": [
+    "APPLICATION"
+   ],
+   "checksums": [
+    {
+     "algorithm": "SHA1",
+     "checksumValue": "da8d73970cbdd618ea9a79d4d643a816fe40b962"
+    },
+    {
+     "algorithm": "SHA256",
+     "checksumValue": "b263ad12f5725861d9173db022129c946359e20bd8f4560f7f9c8109ec92065a"
+    }
+   ],
+   "licenseConcluded": "NOASSERTION",
+   "licenseInfoInFiles": [
+    "NOASSERTION"
+   ],
+   "copyrightText": "NOASSERTION"
+  }
+ ],
+ "relationships": [
+  {
+   "spdxElementId": "SPDXRef-Package-npm-bootstrap-903c7daa692c4b87",
+   "relatedSpdxElement": "SPDXRef-Package-npm-startbootstrap-agency-20a718a9af0d2a40",
+   "relationshipType": "DEPENDENCY_OF"
+  },
+  {
+   "spdxElementId": "SPDXRef-Package-npm-startbootstrap-agency-20a718a9af0d2a40",
+   "relatedSpdxElement": "SPDXRef-File-package-lock.json-fd71c2238fc07657",
+   "relationshipType": "OTHER",
+   "comment": "evident-by: indicates the package's existence is evident by the given file"
+  },
+  {
+   "spdxElementId": "SPDXRef-Package-npm-bootstrap-903c7daa692c4b87",
+   "relatedSpdxElement": "SPDXRef-File-package-lock.json-fd71c2238fc07657",
+   "relationshipType": "OTHER",
+   "comment": "evident-by: indicates the package's existence is evident by the given file"
+  },
+  {
+   "spdxElementId": "SPDXRef-Package-npm--popperjs-core-a574ad7e7bd13657",
+   "relatedSpdxElement": "SPDXRef-File-package-lock.json-fd71c2238fc07657",
+   "relationshipType": "OTHER",
+   "comment": "evident-by: indicates the package's existence is evident by the given file"
+  },
+  {
+   "spdxElementId": "SPDXRef-DocumentRoot-Directory--home-anashadi-sdb-targets-oss-sb-agency-b2d5d5c",
+   "relatedSpdxElement": "SPDXRef-Package-npm--popperjs-core-a574ad7e7bd13657",
+   "relationshipType": "CONTAINS"
+  },
+  {
+   "spdxElementId": "SPDXRef-DocumentRoot-Directory--home-anashadi-sdb-targets-oss-sb-agency-b2d5d5c",
+   "relatedSpdxElement": "SPDXRef-Package-npm-bootstrap-903c7daa692c4b87",
+   "relationshipType": "CONTAINS"
+  },
+  {
+   "spdxElementId": "SPDXRef-DocumentRoot-Directory--home-anashadi-sdb-targets-oss-sb-agency-b2d5d5c",
+   "relatedSpdxElement": "SPDXRef-Package-npm-startbootstrap-agency-20a718a9af0d2a40",
+   "relationshipType": "CONTAINS"
+  },
+  {
+   "spdxElementId": "SPDXRef-DOCUMENT",
+   "relatedSpdxElement": "SPDXRef-DocumentRoot-Directory--home-anashadi-sdb-targets-oss-sb-agency-b2d5d5c",
+   "relationshipType": "DESCRIBES"
+  }
+ ],
+ "provenance": "SBOM (inventaris dependensi) — output mentah sesi 2026-10-04, dianotasi kontrak 2026-10-05",
+ "captured_at": "2026-10-04 (sesi asal)",
+ "redaction_status": "clean",
+ "status": "OBSERVED"
+}

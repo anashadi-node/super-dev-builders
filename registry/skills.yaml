@@ -1,5 +1,5 @@
 # Skill Registry — Super Dev Builders Ecosystem V2.2
-# Status: KEEP | UPDATE | REPLACE | ADD | REMOVE | QUARANTINE | PENDING_APPROVAL
+# Status: KEEP | UPDATE | REPLACE | ADD | REMOVE | QUARANTINE | PENDING_APPROVAL | INSTALLED | REJECTED_BLUEPRINT | REJECTED_LICENSE | REJECTED_COVERED
 # Aturan: tidak ada skill pihak ketiga yang diaktifkan tanpa pipeline supply-chain + approval manusia.
 version: 2.2.0
 updated: 2026-10-04
@@ -123,6 +123,8 @@ custom:
 
 # ---------- B. Sumber pihak ketiga (terverifikasi metadata 2026-10-04, revisi terpin) ----------
 # status PENDING_APPROVAL = sumber diverifikasi + revisi dipin, BELUM dipasang (menunggu approval manusia).
+# status INSTALLED = sudah dipasang lewat hub (audit ALLOWED) — wajib punya `evidence`.
+# status REJECTED_* = DITOLAK permanen sampai bukti baru muncul (alasan WAJIB tertulis).
   - id: local-media-generation
     status: ADD
     divisions: [D4, D5]
@@ -184,23 +186,52 @@ third_party:
     license: MIT
     pinned_commit: 8ca22dba9a94f28898bbce59f2537ff4d87c747d
     pinned_date: 2026-09-27
-    status: PENDING_APPROVAL
-    gate_note: "Blueprint V2.1: instalasi plugin dapat diblokir Skills Guard sebagai dangerous verdict pada beberapa versi Hermes. DILARANG bypass. Prioritaskan port manual metodologi (brainstorming, writing-plans, TDD, systematic-debugging, verification-before-completion) menjadi custom skill kecil."
+    status: REJECTED_BLUEPRINT
+    decided: 2026-10-05
+    decision_note: "DITOLAK sebagai plugin. Alasan: (1) dokumen acuan V2.2 sendiri melarang instalasi plugin otomatis/default; (2) kapabilitas metodologinya sudah ADA sebagai skill Hermes native (systematic-debugging, test-driven-development, requesting-code-review) + custom kami (codebase-map, plan) -> tidak ada gap kapabilitas yang perlu ditambal. methodology_only tetap berlaku: dipakai sebagai REFERENSI bacaan, bukan kode terpasang."
+    evidence: "cek skill native 2026-10-05 (hermes skills list)"
     adopt: [methodology_only]
   - repo: trailofbits/skills
     url: https://github.com/trailofbits/skills
     license: CC-BY-SA-4.0
     pinned_commit: 82fe8226252622fa807643bdca1710901198553a
     pinned_date: 2026-10-02
-    status: PENDING_APPROVAL
-    adopt: [audit-context-building, differential-review, semgrep, codeql, variant-analysis, modern-python]
+    status: INSTALLED
+    decided: 2026-10-05
+    approved_by: "Owner — mandat 2026-10-05: 'approve silahkan jalankan ... lakukan yang paling terbaik untuk Visi, isi dan Tujuan Utama Project sesuai dokumen acuan terakhir'"
+    installed_at: 2026-10-05
+    install_method: "hermes skills install skills-sh/trailofbits/skills/... --yes (hub audit verdict: ALLOWED, scanner skills-guard-v8, provenance fresh)"
+    adopt: [semgrep, codeql, sarif-parsing, differential-review, fp-check, audit-context-building]
+    distribution:
+      cc-security-governor: [semgrep, codeql, sarif-parsing, differential-review, fp-check, audit-context-building]
+      cc-reviewer-qa: [differential-review, fp-check]
+      cc-architect: [differential-review, audit-context-building]
+      cc-devops-docs: [semgrep]
+    blocked:
+      - skill: variant-analysis
+        reason: "Hub menolak: 'BLOCKED — community source + caution verdict, 11 findings'. TIDAK dibypass (aturan ekosistem + memori: dilarang --force). Detail temuan diambil ulang setelah kuota API reset untuk dokumentasi (scratch/variant-block-raw.txt). Catatan kami: pemindaian deterministik sendiri hanya menemukan 6 hit 'eval(' yang merupakan POLA RULE semgrep (mendeteksi eval di kode target) — jadi blokir ini kandidat FALSE POSITIVE yang perlu keputusan manusia, bukan alasan untuk memaksa."
+    pending_install:
+      - skill: modern-python
+        reason: "gagal unduh: kuota GitHub API anonim habis (60/jam) saat instalasi; dijadwalkan ulang"
+      - skill: post-patch-validation
+        reason: "gagal unduh: kuota GitHub API anonim habis (60/jam) saat instalasi; dijadwalkan ulang"
+    evidence: "reports/upgrade-evidence/third-party-integrity.json + docs/THIRD_PARTY_SKILLS_DECISION_2026-10-05.md"
+    license_note: "CC-BY-SA-4.0: wajib atribusi; ShareAlike berlaku untuk versi MODIFIKASI. Skill dipasang APA ADANYA (byte-identik commit pin) dan TIDAK digabung ke skill MIT kami."
+    caveats:
+      - "codeql terpotong oleh hub saat instalasi (hanya 2 dari 34 berkas, 12 references/*.md menggantung) -> dilengkapi dari commit pin yang sama oleh scripts/sync_third_party_skills.py; sebab pemotongan TIDAK terbukti (jangan diklaim)"
+      - "variant-analysis: 6 hit pola 'eval(' = aturan semgrep yang MENDETEKSI eval di kode target, bukan eksekusi"
+      - "modern-python: references memuat baris 'curl -LsSf ... | sh' (dokumentasi installer upstream). DILARANG di host ini -> pakai uv (~/.hermes/bin/uv) atau cargo yang sudah terpasang"
+      - "semgrep workflow memakai 'rm -rf' TER-GUARD pada OUTDIR sendiri -> selalu set OUTDIR eksplisit saat menjalankannya"
   - repo: getsentry/skills
     url: https://github.com/getsentry/skills
     license: Apache-2.0
     pinned_commit: d18b7aa8ba878354e5c348310230e652f7690f9c
     pinned_date: 2026-10-02
-    status: PENDING_APPROVAL
-    adopt: [skill-scanner, security-review, agents-md, code-simplifier]
+    status: REJECTED_COVERED
+    decided: 2026-10-05
+    decision_note: "DITOLAK lewat pengukuran cakupan (bukan selera): skill-scanner ~ skill-inspector + skillspector (KEDUANYA ada di disk); code-simplifier ~ simplify-code (ADA); security-review tertutup set Trail of Bits (differential-review + semgrep/codeql) + security-static-review kami. Sisa 1 gap kecil: agents-md tidak punya padanan persis -> DITUNDA sampai ada deliverable yang benar-benar butuh AGENTS.md (prinsip: jangan pasang spekulatif)."
+    adopt: []
+    deferred: [agents-md]
     gate_note: "Secondary methodology. Gate pertama tetap Hermes native scanner."
   - repo: getsentry/sentry-for-ai
     url: https://github.com/getsentry/sentry-for-ai
@@ -215,9 +246,11 @@ third_party:
     license: none_declared
     pinned_commit: 8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4
     pinned_date: 2026-10-03
-    status: PENDING_APPROVAL
-    adopt: [frontend-design, webapp-testing, mcp-builder]
-    gate_note: "Repo tidak mendeklarasikan license SPDX — wajib konfirmasi lisensi sebelum adopsi."
+    status: REJECTED_LICENSE
+    decided: 2026-10-05
+    decision_note: "DITOLAK. Triangulasi 3 sumber independen: (1) GitHub API license.spdx_id = null; (2) isi root repo TIDAK memuat berkas LICENSE (hanya README.md, THIRD_PARTY_NOTICES.md, .gitignore); (3) frontmatter SKILL.md menulis 'license: Complete terms in LICENSE.txt' padahal LICENSE.txt TIDAK ADA di repo -> kontradiksi internal. Tanpa lisensi = hak cipta penuh pemilik, jadi tidak boleh dipasang. Kebutuhan kapabilitasnya juga sudah tertutup: frontend-design ~ claude-design + design-md + popular-web-designs; webapp-testing ~ dogfood + test-generator + visual-regression-verifier; mcp-builder tidak di jalur kritis proyek."
+    adopt: []
+    gate_note: "Jangan pasang. Bila ingin dilanjutkan: minta pernyataan lisensi tertulis dari pemilik repo lebih dulu — bukan tebakan kami."
   - repo: github/github-mcp-server
     url: https://github.com/github/github-mcp-server
     license: MIT

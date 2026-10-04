@@ -1,69 +1,73 @@
 {
-  "SchemaVersion": 2,
-  "Trivy": {
-    "Version": "0.75.0"
-  },
-  "ReportID": "01a105f8-7742-7efd-b465-a0da4147d6ff",
-  "CreatedAt": "2026-10-04T15:12:11.970983367+07:00",
-  "ArtifactID": "sha256:6ad259e53eda699f8e7c0e5a6fce1b4dcde234c2e95d7d4f2a2bfebcfacb1379",
-  "ArtifactName": "/home/anashadi/sdb-targets/oss-sb-agency-b2d5d5c",
-  "ArtifactType": "repository",
-  "Metadata": {
-    "RepoURL": "https://github.com/startbootstrap/startbootstrap-agency",
-    "Branch": "master",
-    "Tags": [
-      "v7.0.12"
-    ],
-    "Commit": "b2d5d5c6b1396bc5b0e8dd92c693b106cfb7cee1",
-    "CommitMsg": "Bootstrap 5.2.3 update\n\nUpgraded to Bootstrap 5.2.3 and adjusted for the changes to the scrollspy component",
-    "Author": "David Miller \u003chello@davidmiller.io\u003e",
-    "Committer": "David Miller \u003chello@davidmiller.io\u003e"
-  },
-  "Results": [
+ "SchemaVersion": 2,
+ "Trivy": {
+  "Version": "0.75.0"
+ },
+ "ReportID": "01a105f8-7742-7efd-b465-a0da4147d6ff",
+ "CreatedAt": "2026-10-04T15:12:11.970983367+07:00",
+ "ArtifactID": "sha256:6ad259e53eda699f8e7c0e5a6fce1b4dcde234c2e95d7d4f2a2bfebcfacb1379",
+ "ArtifactName": "/home/anashadi/sdb-targets/oss-sb-agency-b2d5d5c",
+ "ArtifactType": "repository",
+ "Metadata": {
+  "RepoURL": "https://github.com/startbootstrap/startbootstrap-agency",
+  "Branch": "master",
+  "Tags": [
+   "v7.0.12"
+  ],
+  "Commit": "b2d5d5c6b1396bc5b0e8dd92c693b106cfb7cee1",
+  "CommitMsg": "Bootstrap 5.2.3 update\n\nUpgraded to Bootstrap 5.2.3 and adjusted for the changes to the scrollspy component",
+  "Author": "David Miller <hello@davidmiller.io>",
+  "Committer": "David Miller <hello@davidmiller.io>"
+ },
+ "Results": [
+  {
+   "Target": "package-lock.json",
+   "Class": "lang-pkgs",
+   "Type": "npm",
+   "Packages": [
     {
-      "Target": "package-lock.json",
-      "Class": "lang-pkgs",
-      "Type": "npm",
-      "Packages": [
-        {
-          "ID": "bootstrap@5.2.3",
-          "Name": "bootstrap",
-          "Identifier": {
-            "PURL": "pkg:npm/bootstrap@5.2.3",
-            "UID": "4539609d84aecee9"
-          },
-          "Version": "5.2.3",
-          "Relationship": "direct",
-          "DependsOn": [
-            "@popperjs/core@2.11.6"
-          ],
-          "Locations": [
-            {
-              "StartLine": 259,
-              "EndLine": 276
-            }
-          ],
-          "AnalyzedBy": "npm"
-        },
-        {
-          "ID": "@popperjs/core@2.11.6",
-          "Name": "@popperjs/core",
-          "Identifier": {
-            "PURL": "pkg:npm/%40popperjs/core@2.11.6",
-            "UID": "8caa6589b9c1fb94"
-          },
-          "Version": "2.11.6",
-          "Indirect": true,
-          "Relationship": "indirect",
-          "Locations": [
-            {
-              "StartLine": 55,
-              "EndLine": 64
-            }
-          ],
-          "AnalyzedBy": "npm"
-        }
-      ]
+     "ID": "bootstrap@5.2.3",
+     "Name": "bootstrap",
+     "Identifier": {
+      "PURL": "pkg:npm/bootstrap@5.2.3",
+      "UID": "4539609d84aecee9"
+     },
+     "Version": "5.2.3",
+     "Relationship": "direct",
+     "DependsOn": [
+      "@popperjs/core@2.11.6"
+     ],
+     "Locations": [
+      {
+       "StartLine": 259,
+       "EndLine": 276
+      }
+     ],
+     "AnalyzedBy": "npm"
+    },
+    {
+     "ID": "@popperjs/core@2.11.6",
+     "Name": "@popperjs/core",
+     "Identifier": {
+      "PURL": "pkg:npm/%40popperjs/core@2.11.6",
+      "UID": "8caa6589b9c1fb94"
+     },
+     "Version": "2.11.6",
+     "Indirect": true,
+     "Relationship": "indirect",
+     "Locations": [
+      {
+       "StartLine": 55,
+       "EndLine": 64
+      }
+     ],
+     "AnalyzedBy": "npm"
     }
-  ]
+   ]
+  }
+ ],
+ "provenance": "output tool sesi 2026-10-04, dianotasi kontrak 2026-10-05",
+ "captured_at": "2026-10-04 (sesi asal)",
+ "redaction_status": "clean",
+ "status": "OBSERVED"
 }

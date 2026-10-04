@@ -1,11 +1,15 @@
 {
-  "gate": "gate0",
-  "verdict": "PASS",
-  "checked_at": "2026-10-04T07:25:23+0700",
-  "manifest": "/tmp/sdb_demo/auth_pass.yaml",
-  "target": "selfowned-demo",
-  "mode": "A",
-  "fail": [],
-  "blocked": [],
-  "warn": []
+ "gate": "gate0",
+ "verdict": "PASS",
+ "checked_at": "2026-10-04T07:25:23+0700",
+ "manifest": "/tmp/sdb_demo/auth_pass.yaml",
+ "target": "selfowned-demo",
+ "mode": "A",
+ "fail": [],
+ "blocked": [],
+ "warn": [],
+ "provenance": "demo gate0 mode PASS (uji fail-closed) — sesi 2026-10-04",
+ "captured_at": "2026-10-04 (sesi asal)",
+ "redaction_status": "clean",
+ "status": "OBSERVED"
 }

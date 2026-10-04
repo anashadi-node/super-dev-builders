@@ -1,13 +1,17 @@
 {
-  "gate": "gate0",
-  "verdict": "BLOCKED",
-  "checked_at": "2026-10-04T07:25:24+0700",
-  "manifest": "/tmp/sdb_demo/auth_modeb.yaml",
-  "target": "selfowned-demo",
-  "mode": "B",
-  "fail": [],
-  "blocked": [
-    "mode B wajib authorization_type=written_permission"
-  ],
-  "warn": []
+ "gate": "gate0",
+ "verdict": "BLOCKED",
+ "checked_at": "2026-10-04T07:25:24+0700",
+ "manifest": "/tmp/sdb_demo/auth_modeb.yaml",
+ "target": "selfowned-demo",
+ "mode": "B",
+ "fail": [],
+ "blocked": [
+  "mode B wajib authorization_type=written_permission"
+ ],
+ "warn": [],
+ "provenance": "demo gate0 mode BLOCKED (uji fail-closed) — sesi 2026-10-04",
+ "captured_at": "2026-10-04 (sesi asal)",
+ "redaction_status": "clean",
+ "status": "OBSERVED"
 }

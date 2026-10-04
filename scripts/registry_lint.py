@@ -14,7 +14,9 @@ from sdb_common import load_yaml, repo_path
 
 REQUIRED_TOOL_SECTIONS = {"present", "pending_approval"}
 VALID_STATUS = {"KEEP", "UPDATE", "REPLACE", "ADD", "REMOVE", "QUARANTINE", "PENDING_APPROVAL",
-                "IN_USE", "OPTIONAL", "DEFER", "NOT_PRESENT"}
+                "IN_USE", "OPTIONAL", "DEFER", "NOT_PRESENT",
+                # 2026-10-05: hasil keputusan pihak ketiga (lihat registry bagian B)
+                "INSTALLED", "REJECTED_BLUEPRINT", "REJECTED_LICENSE", "REJECTED_COVERED"}
 
 
 def frontmatter(path):

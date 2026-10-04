@@ -1,1 +1,29 @@
-{"$schema":"http://cyclonedx.org/schema/bom-1.7.schema.json","bomFormat":"CycloneDX","specVersion":"1.7","serialNumber":"urn:uuid:da5b92e3-2de6-4af5-add6-bb24a679068c","version":1,"metadata":{"timestamp":"2026-10-04T08:52:09+07:00","tools":{"components":[{"type":"application","author":"anchore","name":"syft","version":"1.54.0"}]},"component":{"bom-ref":"af63bd4c8601b7f1","type":"file","name":"."}}}
+{
+ "$schema": "http://cyclonedx.org/schema/bom-1.7.schema.json",
+ "bomFormat": "CycloneDX",
+ "specVersion": "1.7",
+ "serialNumber": "urn:uuid:da5b92e3-2de6-4af5-add6-bb24a679068c",
+ "version": 1,
+ "metadata": {
+  "timestamp": "2026-10-04T08:52:09+07:00",
+  "tools": {
+   "components": [
+    {
+     "type": "application",
+     "author": "anchore",
+     "name": "syft",
+     "version": "1.54.0"
+    }
+   ]
+  },
+  "component": {
+   "bom-ref": "af63bd4c8601b7f1",
+   "type": "file",
+   "name": "."
+  }
+ },
+ "provenance": "SBOM (inventaris dependensi) — output mentah sesi 2026-10-04, dianotasi kontrak 2026-10-05",
+ "captured_at": "2026-10-04 (sesi asal)",
+ "redaction_status": "clean",
+ "status": "OBSERVED"
+}

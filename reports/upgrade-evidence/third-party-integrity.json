@@ -1,0 +1,205 @@
+{
+ "provenance": "scripts/sync_third_party_skills.py",
+ "tool": "sync_third_party_skills.py",
+ "upstream": "trailofbits/skills",
+ "pin": "82fe8226252622fa807643bdca1710901198553a",
+ "license": "CC-BY-SA-4.0",
+ "mode": "fix",
+ "captured_at": "2026-10-05T05:33:10+0700",
+ "redaction_status": "clean",
+ "status": "OBSERVED",
+ "skills": [
+  {
+   "skill": "audit-context-building",
+   "upstream": "trailofbits/skills",
+   "pin": "82fe8226252622fa807643bdca1710901198553a",
+   "license": "CC-BY-SA-4.0",
+   "installed_dir": "/home/anashadi/.hermes/skills/audit-context-building",
+   "copied": [
+    "resources/ANALYSIS_FORMAT.md",
+    "resources/DOMAIN_NOTES.md",
+    "resources/FUNCTION_MICRO_ANALYSIS_EXAMPLE.md"
+   ],
+   "deviations": [],
+   "ok": true,
+   "upstream_files": 6,
+   "installed_files_before": 3,
+   "missing": [],
+   "differing": [],
+   "extra_files": [],
+   "profiles": [
+    "cc-security-governor",
+    "cc-architect"
+   ]
+  },
+  {
+   "skill": "codeql",
+   "upstream": "trailofbits/skills",
+   "pin": "82fe8226252622fa807643bdca1710901198553a",
+   "license": "CC-BY-SA-4.0",
+   "installed_dir": "/home/anashadi/.hermes/skills/codeql",
+   "copied": [
+    "assets/trail-of-bits-mark.svg",
+    "references/build-fixes.md",
+    "references/diagnostic-query-templates.md",
+    "references/extension-yaml-format.md",
+    "references/important-only-suite.md",
+    "references/language-details.md",
+    "references/macos-arm64e-workaround.md",
+    "references/performance-tuning.md",
+    "references/quality-assessment.md",
+    "references/ruleset-catalog.md",
+    "references/run-all-suite.md",
+    "references/sarif-processing.md",
+    "references/threat-models.md",
+    "scripts/build_log.sh",
+    "scripts/check_db_quality.py",
+    "scripts/find_databases.sh",
+    "scripts/generate_suite.sh",
+    "scripts/pyproject.toml",
+    "scripts/test_build_log.py",
+    "scripts/test_build_mode_claims.py",
+    "scripts/test_check_db_quality.py",
+    "scripts/test_find_databases.py",
+    "scripts/test_generation_scripts.py",
+    "scripts/test_script_flags.py",
+    "scripts/test_section_pointers.py",
+    "scripts/test_shell_blocks.py",
+    "scripts/test_suite_templates.py",
+    "scripts/test_verify_query_suite.py",
+    "scripts/verify_query_suite.py",
+    "workflows/build-database.md",
+    "workflows/create-data-extensions.md",
+    "workflows/run-analysis.md"
+   ],
+   "deviations": [],
+   "ok": true,
+   "upstream_files": 34,
+   "installed_files_before": 2,
+   "missing": [],
+   "differing": [],
+   "extra_files": [],
+   "profiles": [
+    "cc-security-governor"
+   ]
+  },
+  {
+   "skill": "differential-review",
+   "upstream": "trailofbits/skills",
+   "pin": "82fe8226252622fa807643bdca1710901198553a",
+   "license": "CC-BY-SA-4.0",
+   "installed_dir": "/home/anashadi/.hermes/skills/differential-review",
+   "copied": [],
+   "deviations": [],
+   "ok": true,
+   "upstream_files": 7,
+   "installed_files_before": 7,
+   "missing": [],
+   "differing": [],
+   "extra_files": [],
+   "profiles": [
+    "cc-security-governor",
+    "cc-architect",
+    "cc-reviewer-qa"
+   ]
+  },
+  {
+   "skill": "fp-check",
+   "upstream": "trailofbits/skills",
+   "pin": "82fe8226252622fa807643bdca1710901198553a",
+   "license": "CC-BY-SA-4.0",
+   "installed_dir": "/home/anashadi/.hermes/skills/fp-check",
+   "copied": [],
+   "deviations": [],
+   "ok": true,
+   "upstream_files": 9,
+   "installed_files_before": 9,
+   "missing": [],
+   "differing": [],
+   "extra_files": [],
+   "profiles": [
+    "cc-security-governor",
+    "cc-reviewer-qa"
+   ]
+  },
+  {
+   "skill": "modern-python",
+   "upstream": "trailofbits/skills",
+   "pin": "82fe8226252622fa807643bdca1710901198553a",
+   "license": "CC-BY-SA-4.0",
+   "installed_dir": "/home/anashadi/.hermes/skills/modern-python",
+   "copied": [],
+   "deviations": [
+    "belum terpasang di profil default"
+   ],
+   "ok": false,
+   "missing_install": true,
+   "upstream_files": 14
+  },
+  {
+   "skill": "post-patch-validation",
+   "upstream": "trailofbits/skills",
+   "pin": "82fe8226252622fa807643bdca1710901198553a",
+   "license": "CC-BY-SA-4.0",
+   "installed_dir": "/home/anashadi/.hermes/skills/post-patch-validation",
+   "copied": [],
+   "deviations": [
+    "belum terpasang di profil default"
+   ],
+   "ok": false,
+   "missing_install": true,
+   "upstream_files": 5
+  },
+  {
+   "skill": "sarif-parsing",
+   "upstream": "trailofbits/skills",
+   "pin": "82fe8226252622fa807643bdca1710901198553a",
+   "license": "CC-BY-SA-4.0",
+   "installed_dir": "/home/anashadi/.hermes/skills/sarif-parsing",
+   "copied": [],
+   "deviations": [],
+   "ok": true,
+   "upstream_files": 8,
+   "installed_files_before": 8,
+   "missing": [],
+   "differing": [],
+   "extra_files": [],
+   "profiles": [
+    "cc-security-governor"
+   ]
+  },
+  {
+   "skill": "semgrep",
+   "upstream": "trailofbits/skills",
+   "pin": "82fe8226252622fa807643bdca1710901198553a",
+   "license": "CC-BY-SA-4.0",
+   "installed_dir": "/home/anashadi/.hermes/skills/semgrep",
+   "copied": [],
+   "deviations": [],
+   "ok": true,
+   "upstream_files": 9,
+   "installed_files_before": 9,
+   "missing": [],
+   "differing": [],
+   "extra_files": [],
+   "profiles": [
+    "cc-security-governor",
+    "cc-devops-docs"
+   ]
+  },
+  {
+   "skill": "variant-analysis",
+   "upstream": "trailofbits/skills",
+   "pin": "82fe8226252622fa807643bdca1710901198553a",
+   "license": "CC-BY-SA-4.0",
+   "installed_dir": "/home/anashadi/.hermes/skills/variant-analysis",
+   "copied": [],
+   "deviations": [
+    "belum terpasang di profil default"
+   ],
+   "ok": false,
+   "missing_install": true,
+   "upstream_files": 18
+  }
+ ]
+}

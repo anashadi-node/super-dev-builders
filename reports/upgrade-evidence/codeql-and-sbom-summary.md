@@ -16,7 +16,27 @@ Instalasi lewat `scripts/bootstrap_tools.sh --install syft codeql --yes` (tanpa 
 | SBOM repo internal | `syft dir:. -o spdx-json` | "No packages discovered" — repo tanpa manifest dependensi; **bukan** bukti bersih |
 | SBOM target ber-manifest | `syft dir:/tmp/oss-click -o spdx-json` | **102 paket** terdeteksi (mis. `actions/checkout v7.0.1`) → tool terbukti bekerja |
 | CodeQL DB | `codeql database create --language=python` | sukses (peringatan `dynload path` tidak fatal) |
-| CodeQL analisis | `codeql database analyze <db> codeql/python-queries:codeql-suites/python-security-and-quality.qls` | SARIF dihasilkan, temuan: `mixed-returns`, `unused-global-variable`, `empty-except`, `clear-text-logging-sensitive-data` (1), `overly-permissive-file` (1) |
+| CodeQL query pack | `codeql pack download codeql/python-queries` | terpasang `codeql/python-queries@1.8.11` di `~/.codeql/packages` |
+| CodeQL analisis | `codeql database analyze /tmp/db-click codeql/python-queries:codeql-suites/python-security-and-quality.qls --format=sarif-latest -j 4` | **174 query dievaluasi**, mencakup **91/91 berkas Python + 6/6 berkas GitHub Actions**; SARIF: **139 temuan** |
+
+### Sebaran temuan CodeQL (nyata, 139)
+| Rule | n | Kelas |
+|---|---|---|
+| `ineffectual-statement` | 44 | maintainability |
+| `cyclic-import` | 31 | struktur |
+| `mixed-returns` | 14 | maintainability |
+| `unused-global-variable` | 11 | maintainability |
+| `empty-except` | 10 | **error handling** |
+| `file-not-closed` | 5 | resource leak |
+| `import-and-import-from` | 5 | maintainability |
+| `unreachable-statement` | 4 | logika |
+| `unnecessary-lambda` | 4 | maintainability |
+| `unused-local-variable` | 3 | maintainability |
+| **`clear-text-logging-sensitive-data`** | **1** | **security (potensi bocor data sensitif ke log)** |
+| **`overly-permissive-file`** | **1** | **security (permission berkas terlalu longgar)** |
+
+Catatan: temuan keamanan (`clear-text-logging-sensitive-data`, `overly-permissive-file`) adalah contoh kelas temuan yang
+**tidak ditangkap** lint cepat — inilah nilai tambah CodeQL saat dipakai pada codebase yang lisensinya mengizinkan.
 
 Artefak: `codeql-oss-click.sarif`, `sbom-oss-click-spdx.json`, `sbom-spdx.json`, `sbom-cyclonedx.json`.
 

@@ -1,0 +1,24 @@
+# bootstrap_tools.sh --install syft codeql --yes — log instalasi (2026-10-04)
+# Perintah: cd /home/anashadi/super-dev-builders && bash scripts/bootstrap_tools.sh --install syft codeql --yes
+# Exit code: 0  (progress unduhan curl dihapus dari log ini; baris keputusan/verifikasi dipertahankan)
+
++ unduh https://github.com/anchore/syft/releases/download/v1.54.0/syft_1.54.0_checksums.txt  (verifikasi SHA256 wajib)
++ tar -xzf -> ambil 'syft' -> pasang ke /home/anashadi/.local/bin/syft
+syft_1.54.0_linux_amd64.tar.gz: OK
+  terpasang: /home/anashadi/.local/bin/syft
++ unduh https://github.com/github/codeql-cli-binaries/releases/download/v2.27.1/codeql-linux64.zip (~400 MB)
++ verifikasi SHA256 dari codeql-linux64.zip.checksum.txt
++ unzip -> /home/anashadi/.local/share/codeql-v2.27.1 ; symlink /home/anashadi/.local/bin/codeql
+codeql-linux64.zip: OK
+  terpasang: /home/anashadi/.local/bin/codeql -> /home/anashadi/.local/share/codeql-v2.27.1/codeql/codeql
+
+  OK   ruff     /home/anashadi/.local/bin/ruff (ruff 0.16.10)
+  OK   semgrep  /home/anashadi/.local/bin/semgrep (1.179.0)
+  OK   trivy    /home/anashadi/.local/bin/trivy (Version: 0.75.0)
+  OK   syft     /home/anashadi/.local/bin/syft (syft 1.54.0)
+  OK   codeql   /home/anashadi/.local/bin/codeql (CodeQL command-line toolchain release 2.27.1.)
+
+# Catatan kepatuhan:
+#  - tidak ada `curl | sh`; unduhan -> verifikasi SHA256 -> ekstraksi -> symlink user-local (tanpa sudo)
+#  - ukuran unduhan CodeQL ±397 MB (satu kali); versi ter-pin 2.27.1 + path versi terpisah (bisa multi-versi)
+#  - batas lisensi CodeQL: hanya codebase OSI-approved / riset akademik, dilarang untuk kode internal & CI/CD

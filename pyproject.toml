@@ -1,0 +1,18 @@
+[tool.ruff]
+# Konfigurasi lint repo Super Dev Builders Ecosystem (dipakai `ruff check scripts tests`).
+line-length = 132
+target-version = "py310"
+
+[tool.ruff.lint]
+# E/F/I/W = bug paling murah untuk dicegah; RUF = aturan ruff-native.
+select = ["E", "F", "I", "W", "RUF"]
+ignore = [
+    "E501",  # panjang baris: dokumen/skill/embed-string panjang sengaja
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E402"]  # test melakukan sys.path.insert sebelum import modul repo
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

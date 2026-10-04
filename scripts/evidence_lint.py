@@ -11,7 +11,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from sdb_common import iter_relative_files, now_iso, read_json, scan_for_secrets, write_json  # noqa: E402
+from sdb_common import iter_relative_files, now_iso, read_json, scan_for_secrets, write_json
 
 REQUIRED_META = ["provenance", "captured_at", "redaction_status", "status"]
 VALID_STATUS = {"FACT", "OBSERVED", "INFERRED", "UNKNOWN", "OUT_OF_SCOPE"}

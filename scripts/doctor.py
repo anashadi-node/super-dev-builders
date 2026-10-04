@@ -13,7 +13,7 @@ import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from sdb_common import HERMES_HOME, PROFILES_DIR, load_yaml, now_iso, repo_path, write_json, yaml_backend  # noqa: E402
+from sdb_common import PROFILES_DIR, load_yaml, now_iso, repo_path, write_json, yaml_backend
 
 REQUIRED = ["git", "python3", "node", "npm"]
 OPTIONAL = ["docker", "jq", "playwright", "pytest", "uv", "gh", "semgrep", "trivy", "syft", "ruff"]
@@ -25,9 +25,9 @@ def which(name: str):
 
 def version_of(cmd, args):
     try:
-        out = subprocess.run([cmd] + args, capture_output=True, text=True, timeout=15)
+        out = subprocess.run([cmd, *args], capture_output=True, text=True, timeout=15)
         return (out.stdout or out.stderr).strip().splitlines()[0][:80]
-    except Exception:  # noqa: BLE001
+    except Exception:
         return "unknown"
 
 
@@ -58,7 +58,7 @@ def main(argv=None) -> int:
                     [candidate, "-c", "import yaml,sys;print('yaml-ok',sys.version.split()[0])"],
                     capture_output=True, text=True, timeout=15)
                 report["host"][f"yaml_in:{candidate}"] = (out.stdout or out.stderr).strip()
-            except Exception:  # noqa: BLE001
+            except Exception:
                 report["host"][f"yaml_in:{candidate}"] = "error"
 
     # profil divisi

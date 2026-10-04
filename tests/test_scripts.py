@@ -8,7 +8,6 @@ import importlib.util
 import json
 import os
 import sys
-import time
 
 import pytest
 
@@ -99,14 +98,14 @@ def good_manifest(**over):
 
 
 def test_gate_pass_on_complete_manifest():
-    fail, blocked, warn = gate.evaluate(good_manifest())
+    fail, blocked, _ = gate.evaluate(good_manifest())
     assert fail == [] and blocked == [], f"harus PASS, dapat fail={fail} blocked={blocked}"
 
 
 def test_gate_fails_when_forbidden_actions_incomplete():
     m = good_manifest()
     m["forbidden_actions"] = ["auth_bypass"]
-    fail, blocked, _ = gate.evaluate(m)
+    fail, _, _ = gate.evaluate(m)
     assert any("forbidden_actions kurang" in f for f in fail)
 
 

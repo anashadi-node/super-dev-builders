@@ -1,0 +1,37 @@
+scripts/doctor.py:1:1: EXE001 Shebang is present but file is not executable
+scripts/doctor.py:16:1: I001 [*] Import block is un-sorted or un-formatted
+scripts/doctor.py:16:24: F401 [*] `sdb_common.HERMES_HOME` imported but unused
+scripts/doctor.py:16:108: RUF100 [*] Unused `noqa` directive (non-enabled: `E402`)
+scripts/doctor.py:28:15: PLW1510 `subprocess.run` without explicit `check` argument
+scripts/doctor.py:57:23: PLW1510 `subprocess.run` without explicit `check` argument
+scripts/evidence_lint.py:1:1: EXE001 Shebang is present but file is not executable
+scripts/evidence_lint.py:14:1: I001 [*] Import block is un-sorted or un-formatted
+scripts/evidence_lint.py:14:95: RUF100 [*] Unused `noqa` directive (non-enabled: `E402`)
+scripts/fidelity_report.py:1:1: EXE001 Shebang is present but file is not executable
+scripts/fidelity_report.py:17:55: RUF100 [*] Unused `noqa` directive (non-enabled: `E402`)
+scripts/gate_check.py:1:1: EXE001 Shebang is present but file is not executable
+scripts/gate_check.py:17:67: RUF100 [*] Unused `noqa` directive (non-enabled: `E402`)
+scripts/init_target.py:1:1: EXE001 Shebang is present but file is not executable
+scripts/init_target.py:14:56: RUF100 [*] Unused `noqa` directive (non-enabled: `E402`)
+scripts/install_skills.py:1:1: EXE001 Shebang is present but file is not executable
+scripts/install_skills.py:17:8: F401 [*] `json` imported but unused
+scripts/install_skills.py:23:1: I001 [*] Import block is un-sorted or un-formatted
+scripts/install_skills.py:23:90: RUF100 [*] Unused `noqa` directive (non-enabled: `E402`)
+scripts/install_skills.py:44:9: S112 `try`-`except`-`continue` detected, consider logging the exception
+scripts/inventory_ecosystem.py:1:1: EXE001 Shebang is present but file is not executable
+scripts/inventory_ecosystem.py:18:1: I001 [*] Import block is un-sorted or un-formatted
+scripts/inventory_ecosystem.py:18:94: RUF100 [*] Unused `noqa` directive (non-enabled: `E402`)
+scripts/redact_network.py:1:1: EXE001 Shebang is present but file is not executable
+scripts/redact_network.py:18:56: RUF100 [*] Unused `noqa` directive (non-enabled: `E402`)
+scripts/registry_lint.py:1:1: EXE001 Shebang is present but file is not executable
+scripts/registry_lint.py:13:46: RUF100 [*] Unused `noqa` directive (non-enabled: `E402`)
+scripts/release_check.py:1:1: EXE001 Shebang is present but file is not executable
+scripts/release_check.py:16:67: RUF100 [*] Unused `noqa` directive (non-enabled: `E402`)
+scripts/sdb_common.py:1:1: EXE001 Shebang is present but file is not executable
+scripts/sdb_common.py:224:31: RUF100 [*] Unused `noqa` directive (unused: `BLE001`)
+scripts/sdb_common.py:309:5: SIM102 Use a single `if` statement instead of nested `if` statements
+tests/test_scripts.py:11:8: F401 [*] `time` imported but unused
+tests/test_scripts.py:102:20: RUF059 Unpacked variable `warn` is never used
+tests/test_scripts.py:109:11: RUF059 Unpacked variable `blocked` is never used
+Found 35 errors.
+[*] 18 fixable with the `--fix` option (3 hidden fixes can be enabled with the `--unsafe-fixes` option).

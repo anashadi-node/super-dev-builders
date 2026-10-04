@@ -14,7 +14,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from sdb_common import load_yaml, now_iso, repo_path, write_json  # noqa: E402
+from sdb_common import load_yaml, now_iso, repo_path, write_json
 
 CORE_FORBIDDEN = {
     "auth_bypass",
@@ -156,7 +156,7 @@ def main(argv=None) -> int:
     else:
         try:
             manifest = load_yaml(manifest_path)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             manifest = None
             result = {
                 "gate": "gate0",

@@ -14,7 +14,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from sdb_common import now_iso, read_json, repo_path  # noqa: E402
+from sdb_common import now_iso, read_json, repo_path
 
 DIMENSIONS = ["visual", "navigation", "interaction", "responsive", "functional",
               "accessibility", "performance", "api_contract"]

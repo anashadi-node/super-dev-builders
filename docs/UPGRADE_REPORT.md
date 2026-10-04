@@ -36,7 +36,8 @@ repo V1 tetap utuh di `/home/anashadi/copy-cloning-super-dev-builders`, backup t
 | Charter | `agents/*.yaml` (machine-readable, permission eksplisit, alias profil) |
 | Test suite | 21 test pytest — SEMUA PASS |
 | Gate self-test | PASS / FAIL / BLOCKED terbukti (exit 0/1/2) |
-| Skill scan | SkillSpector v2.12.0: 20 bersih, 1 LOW (false positive ditriase) |
+| Skill scan | SkillSpector v2.12.0: 20 bersih, 1 LOW (false positive ditriase); Skills Guard native: 4 DANGEROUS/7 CAUTION/7 SAFE dari 18 skill hub, 11 BLOCKED |
+| Tool deterministik | ruff 0.16.10 + semgrep 1.179.0 + trivy 0.75.0 terpasang (pin + checksum); scan repo: ruff 35->0, semgrep 0/344 rule, trivy 0 (tanpa manifest) |
 | Pemasangan skill | 36 operasi ke 7 profil divisi |
 
 ## 4. Gap-analysis -> klasifikasi keputusan
@@ -81,22 +82,30 @@ gate_check.py template kosong                  -> FAIL   (exit 1)
 gate_check.py manifest lengkap                 -> PASS   (exit 0)
 gate_check.py mode B tanpa izin tertulis       -> BLOCKED (exit 2)
 skillspector scan skills/ --recursive --no-llm -> 21 skill, 20 bersih, 1 LOW (FP ditriase)
-hermes skills audit                            -> 1 skill hub DANGEROUS (inference-sh-cli)
+hermes -p cc-builder skills list               -> 5 skill ekosistem enabled/visible
+hermes skills audit                            -> 18 skill hub: 4 DANGEROUS, 7 CAUTION, 7 SAFE, 11 BLOCKED
+hermes skills uninstall --yes inference-sh-cli -> dibuang; list=0, direktori hilang, audit tidak memindainya lagi
+bash scripts/bootstrap_tools.sh --install ruff semgrep trivy --yes
+                                               -> ruff 0.16.10, semgrep 1.179.0, trivy 0.75.0 (SHA256 OK)
+ruff check scripts tests                       -> 35 temuan -> 0 setelah diperbaiki
+semgrep scan --config p/default                -> 344 rule / 93 file -> 0 findings
+trivy fs --scanners vuln,misconfig,secret      -> 0 hasil (repo belum punya manifest -> tidak ada yang diperiksa)
 hermes security audit (OSV, venv Hermes)       -> 71 advisory / 136 komponen (di luar scope repo)
 ```
 Artefak bukti: `reports/upgrade-evidence/`.
 
 ## 7. Known limitations (jujur)
 1. Belum ada target reconstruction pertama — pipeline belum diuji end-to-end pada target nyata.
-2. Scanner deterministik (Semgrep/CodeQL/Trivy/Syft) belum terpasang (menunggu approval); security scan repo
-   terbatas pada Skills Guard native, SkillSpector, dan pemindaian rahasia internal.
+2. Semgrep/Trivy/ruff sudah terpasang (approval #4). CodeQL/Syft belum (menunggu approval). Hasil trivy saat ini
+   **nihil karena tidak ada manifest dependency/IaC** di repo -> bukan bukti bebas kerentanan.
 3. SkillSpector coverage **parsial (23.81%)** — bukan jaminan bebas temuan.
 4. 21 skill baru diuji struktural + lint + scan, belum diuji lewat pemakaian nyata.
 5. Kepatuhan permission divisi belum diuji runtime (masih kontrak + policy).
 6. Hermes venv membawa 71 advisory (1 CRITICAL PyJWT) — di luar repo ini, butuh keputusan upgrade.
 
 ## 8. Next steps
-1. Approval Owner untuk item di `reports/human-approval-required.md`.
-2. Pilih target pertama (milik sendiri/open-source) -> Gate #0 -> capture Mode A -> rebuild -> fidelity.
-3. Pasang Semgrep + Trivy setelah approval; CodeQL saat milestone.
-4. Putuskan status skill hub DANGEROUS (`inference-sh-cli`).
+1. ~~Pasang Semgrep/Trivy/ruff~~ **SELESAI** (2026-10-04, approval #4).
+2. ~~Buang skill hub DANGEROUS `inference-sh-cli`~~ **SELESAI** (2026-10-04, approval #9; backup + verifikasi).
+3. Putuskan skill hub DANGEROUS lain: `comfyui`, `huggingface-hub`, `reddit-reading`.
+4. Pilih target pertama (milik sendiri/open-source) -> Gate #0 -> capture Mode A -> rebuild -> fidelity.
+5. CodeQL saat milestone; Syft bila SBOM diminta.

@@ -11,7 +11,7 @@ import shutil
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from sdb_common import now_iso, repo_path, write_json  # noqa: E402
+from sdb_common import now_iso, repo_path, write_json
 
 SUBDIRS = ["raw", "screens", "dom", "trace", "assets", "notes"]
 

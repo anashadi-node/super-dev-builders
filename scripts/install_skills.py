@@ -14,14 +14,12 @@ Pemakaian:
 from __future__ import annotations
 
 import argparse
-import json
 import os
 import shutil
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from sdb_common import (HERMES_HOME, PROFILES_DIR, SKILL_NAMESPACE, load_yaml, now_iso,  # noqa: E402
-                        repo_path, write_json)
+from sdb_common import HERMES_HOME, PROFILES_DIR, SKILL_NAMESPACE, load_yaml, now_iso, repo_path, write_json
 
 
 def load_registry():
@@ -41,7 +39,7 @@ def load_profile_aliases():
             continue
         try:
             data = load_yaml(os.path.join(agent_dir, name)) or {}
-        except Exception:  # noqa: BLE001
+        except Exception:
             continue
         logical, real = data.get("id"), data.get("hermes_profile")
         if logical and real:

@@ -221,7 +221,7 @@ def load_yaml(path: str):
         return yaml.safe_load(text)
     except ModuleNotFoundError:
         return fallback_yaml_load(text)
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         raise RuntimeError(f"YAML invalid: {path}: {exc}") from exc
 
 

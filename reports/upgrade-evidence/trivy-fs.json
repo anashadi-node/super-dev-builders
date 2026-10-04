@@ -1,0 +1,18 @@
+{
+  "SchemaVersion": 2,
+  "Trivy": {
+    "Version": "0.75.0"
+  },
+  "ReportID": "01a10487-dbe1-7c63-81aa-9732617e82a3",
+  "CreatedAt": "2026-10-04T08:29:34.945813596+07:00",
+  "ArtifactID": "sha256:1a0fa53c37bcd3a9be000d4a91bb21b25d1f7d638fe1aa602330484a3538f540",
+  "ArtifactName": ".",
+  "ArtifactType": "repository",
+  "Metadata": {
+    "Branch": "master",
+    "Commit": "e37099aee545f072c7cea722867bbb1a62bbf431",
+    "CommitMsg": "fix(scripts): gate_check --out agar test tidak menulis verdict ke repo\n\nData pendukung: 21/21 test PASS; git status bersih setelah commit.\nExpected impact: test suite tidak lagi mencemari reports/ (evidence tetap bersih).\n\nCo-Authored-By: Hermes Super Dev Builders \u003csdb@localhost\u003e",
+    "Author": "Hermes Super Dev Builders \u003csdb@localhost\u003e",
+    "Committer": "Hermes Super Dev Builders \u003csdb@localhost\u003e"
+  }
+}

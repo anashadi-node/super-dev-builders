@@ -10,7 +10,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from sdb_common import load_yaml, repo_path  # noqa: E402
+from sdb_common import load_yaml, repo_path
 
 REQUIRED_TOOL_SECTIONS = {"present", "pending_approval"}
 VALID_STATUS = {"KEEP", "UPDATE", "REPLACE", "ADD", "REMOVE", "QUARANTINE", "PENDING_APPROVAL",

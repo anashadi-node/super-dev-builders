@@ -25,12 +25,41 @@ manipulasi nilai (Mode B tetap butuh izin tertulis + approval manusia).
   **Hasil bersih bukan jaminan bebas temuan.**
 - Verdict agregat scanner: `CAUTION`, max risk score 8/100.
 
-## 3. Skills Guard native Hermes (`hermes skills audit`)
-- Berjalan tanpa `--force`.
-- Temuan: skill hub `inference-sh-cli` -> **DANGEROUS/BLOCKED** (5 CRITICAL: `curl -fsSL https://cli.inference.sh | sh`
-  supply-chain, penulisan ke `/etc/bash_completion.d/`).
-- Dampak: ada di instalasi Hermes, bukan bagian ekosistem ini. Rekomendasi: **uninstall/karantina**; dilarang `--force`.
-  Keputusan = Owner (`reports/human-approval-required.md` #9).
+## 2b. Scan deterministik (setelah approval item #4, 2026-10-04)
+Tool terpasang dengan pin + verifikasi (lihat `registry/tools.yaml`):
+- `ruff 0.16.10` — `uv tool install ruff==0.16.10`
+- `semgrep 1.179.0` — `uv tool install semgrep==1.179.0`
+- `trivy 0.75.0` — binari rilis resmi + **SHA256 terverifikasi** (`trivy_0.75.0_checksums.txt` -> `OK`)
+
+| Tool | Perintah | Hasil | Artefak |
+|---|---|---|---|
+| ruff | `ruff check scripts tests` | **35 temuan awal -> 0 setelah diperbaiki** (EXE001, RUF100, I001, F401, RUF059, RUF005) | `ruff-check.txt` |
+| semgrep | `semgrep scan --config p/default --metrics off .` | 344 rule pada 93 file (tracked git) -> **0 findings** | `semgrep.json` |
+| trivy | `trivy fs --scanners vuln,misconfig,secret .` | **0 hasil** — `Number of language-specific files num=0`, `Detected config files num=0` | `trivy-fs.json` |
+
+**Kejujuran hasil**: trivy 0 temuan berarti "tidak ada manifest dependency/IaC/Dockerfile untuk diperiksa",
+**bukan** bukti bebas kerentanan. Scan trivy baru bermakna setelah repo punya `package.json`/`requirements.txt`/Dockerfile.
+
+## 2c. Remediasi ruff (35 -> 0, tanpa suppress)
+- `chmod +x scripts/*.py` (script ber-shebang memang executable)
+- import diurutkan + import tak terpakai dibuang; `# noqa: E402` menjadi valid setelah `pyproject.toml` mengaktifkan `E402`
+- `[cmd] + args` -> `[cmd, *args]`; variabel hasil unpack yang tak dipakai -> `_`
+- Regresi: `pytest tests -q` tetap **21 passed**; `doctor.py`, `registry_lint.py`, `gate_check.py` tetap berfungsi.
+
+## 3. Skills Guard native Hermes (`hermes skills audit`) — 18 skill hub, 2026-10-04
+Ringkasan nyata (diparsing dari `reports/upgrade-evidence/hermes-skills-audit.txt`):
+**4 DANGEROUS · 7 CAUTION · 7 SAFE · 11 keputusan BLOCKED**.
+- DANGEROUS: `comfyui` (61 temuan), `huggingface-hub`, `reddit-reading`, `inference-sh-cli`.
+- `inference-sh-cli` (katalog `official`, **upstream community**): DANGEROUS 5 temuan —
+  CRITICAL supply_chain `SKILL.md:40 "curl -fsSL https://cli.inference.sh | sh"`,
+  CRITICAL destructive `references/cli-reference.md:78 "infsh completion bash > /etc/bash_completion.d/infsh"`.
+- **Tindakan (approval item #9)**: skill **dibuang** lewat `hermes skills uninstall --yes inference-sh-cli`.
+  Backup lebih dulu: `~/backups/sdb-upgrade-20261004_071800/quarantine/inference-sh-cli-<TS>.tar.gz` (`gzip -t` OK).
+  Verifikasi: terdaftar di `hermes skills list` = **0**, direktori skill hilang, audit ulang tidak lagi memindainya.
+- Catatan kebijakan: BLOCKED juga dikenakan pada skill yang hanya berstatus CAUTION dengan upstream community
+  (mis. `ascii-art`, `touchdesigner-mcp`) -> **BLOCKED != malware**; tetap wajib review manual, dan `--force` dilarang.
+- **Terbuka (belum diputuskan Owner)**: `comfyui` (DANGEROUS), `huggingface-hub` (DANGEROUS), `reddit-reading` (DANGEROUS)
+  masih terpasang di instalasi Hermes — di luar scope approval #4/#9.
 
 ## 4. Supply-chain venv Hermes (`hermes security audit`, OSV.dev)
 - Hasil: **71 advisory / 136 komponen**, termasuk CRITICAL `PyJWT==2.13.0` (GHSA-ffc3-869f-jxw9, fixed 2.14.0)
@@ -53,7 +82,9 @@ manipulasi nilai (Mode B tetap butuh izin tertulis + approval manusia).
 | Risiko | Kelas | Mitigasi | Status |
 |---|---|---|---|
 | Skill/MCP pihak ketiga (belum dipasang) | HIGH bila dipasang | pipeline §6 + approval + pin | terbuka (by design) |
-| Skill hub DANGEROUS terpasang | HIGH | terdeteksi guard; menunggu keputusan Owner | terbuka |
+| Skill hub `inference-sh-cli` DANGEROUS | HIGH | **ditutup**: dibuang + backup + verifikasi audit ulang | SELESAI |
+| Skill hub `comfyui`/`huggingface-hub`/`reddit-reading` DANGEROUS | HIGH | terdeteksi guard; keputusan Owner belum diambil | terbuka |
+| Repo tanpa manifest dependency/IaC -> scan trivy tidak bermakna | LOW | catat sebagai keterbatasan; ulangi saat manifest ada | diakui |
 | Advisory venv Hermes | HIGH | dilaporkan; upgrade menunggu approval | terbuka |
 | SkillSpector coverage rendah | MEDIUM | review manual + guard native + lint internal | diakui |
 | Permission divisi belum diuji runtime | MEDIUM | uji pada target nyata pertama | terbuka |

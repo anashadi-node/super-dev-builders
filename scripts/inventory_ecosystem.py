@@ -15,7 +15,7 @@ import shutil
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from sdb_common import HERMES_HOME, PROFILES_DIR, load_yaml, now_iso, repo_path, write_json  # noqa: E402
+from sdb_common import HERMES_HOME, PROFILES_DIR, load_yaml, now_iso, repo_path, write_json
 
 TOOLS = ["git", "node", "npm", "python3", "docker", "jq", "playwright", "pytest", "uv",
          "semgrep", "codeql", "trivy", "syft", "ruff", "gh", "adb", "nmap", "jadx", "apktool"]
@@ -44,7 +44,7 @@ def profile_info():
             try:
                 data = load_yaml(py) or {}
                 entry["description"] = (data.get("description") or "")[:160]
-            except Exception:  # noqa: BLE001
+            except Exception:
                 entry["description"] = "<unreadable>"
         out[name] = entry
     return out
@@ -58,7 +58,7 @@ def cron_summary():
         import json
         with open(path, "r", encoding="utf-8") as fh:
             data = json.load(fh)
-    except Exception:  # noqa: BLE001
+    except Exception:
         return {"present": True, "error": "unreadable"}
     jobs = data if isinstance(data, list) else data.get("jobs", [])
     return {"present": True, "jobs": len(jobs) if hasattr(jobs, "__len__") else None}
@@ -71,7 +71,7 @@ def config_summary():
         return {"present": False}
     try:
         data = load_yaml(path) or {}
-    except Exception:  # noqa: BLE001
+    except Exception:
         return {"present": True, "parsed": False}
     top = sorted(data.keys()) if isinstance(data, dict) else []
     models = data.get("models") if isinstance(data, dict) else None

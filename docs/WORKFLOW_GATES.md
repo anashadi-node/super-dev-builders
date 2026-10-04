@@ -64,3 +64,24 @@ deploy/migration/secret = HIGH/CRITICAL (berhenti, minta approval manusia, sedia
 - **PASS** — evidence lengkap dan sesuai kriteria, lanjut.
 - **FAIL** — ada pelanggaran/kegagalan, perbaiki dulu.
 - **BLOCKED** — butuh keputusan/artefak manusia (otorisasi, kredensial, akses), berhenti dan tanya.
+
+---
+
+## Perintah scan deterministik (aktif sejak 2026-10-04, approval item #4)
+
+Tool: `ruff 0.16.10`, `semgrep 1.179.0`, `trivy 0.75.0` — pin + checksum di `scripts/bootstrap_tools.sh`
+(instalasi hanya dengan `--install <tool> --yes` setelah approval manusia; tidak ada `curl | sh`).
+
+```bash
+cd /home/anashadi/super-dev-builders
+ruff check scripts tests                       # lint cepat, target: 0 temuan
+semgrep scan --config p/default --metrics off --json -o reports/upgrade-evidence/semgrep.json .
+trivy fs --scanners vuln,misconfig,secret --format json -o reports/upgrade-evidence/trivy-fs.json .
+/usr/bin/python3 scripts/release_check.py --project .   # gate rilis (butuh artefak < 24 jam)
+```
+
+Aturan pemakaian:
+- Semgrep/ruff = scan cepat harian (murah); CodeQL hanya milestone/release (berat).
+- Trivy hanya bermakna bila repo punya manifest (`package.json`, `requirements.txt`) atau IaC/Dockerfile;
+  "0 temuan" pada repo tanpa manifest berarti "tidak ada yang diperiksa".
+- Semua temuan masuk `reports/` sebagai artefak; temuan critical/high memblokir rilis.

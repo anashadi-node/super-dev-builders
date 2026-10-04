@@ -1,8 +1,10 @@
 # Tool Registry — deterministic evidence tools
 # Aturan: pin versi, verifikasi checksum untuk binary, install user-local (tanpa sudo) bila memungkinkan.
+# Pemasangan nyata: `bash scripts/bootstrap_tools.sh --install <tool> --yes` (butuh approval manusia dulu).
 version: 2.2.0
 updated: 2026-10-04
 host_checked: 2026-10-04
+tools_installed: "ruff 0.16.10, semgrep 1.179.0, trivy 0.75.0 (approval item #4, 2026-10-04)"
 
 present:
   - id: git
@@ -21,6 +23,7 @@ present:
     note: "JANGAN beri akses socket Docker ke pekerjaan untrusted"
   - id: uv
     path: /home/anashadi/.hermes/bin/uv
+    version_pin: "0.12.5"
     role: python_tool_isolation
   - id: pytest
     path: /home/anashadi/.local/bin/pytest
@@ -32,31 +35,39 @@ present:
   - id: jq
     path: /usr/bin/jq
     role: json_evidence_processing
+  # --- dipasang 2026-10-04 setelah approval manusia (item #4) ---
+  - id: ruff
+    version_pin: "0.16.10"
+    path: /home/anashadi/.local/bin/ruff
+    role: python_lint_format
+    install_method: "uv tool install ruff==0.16.10"
+    evidence: reports/upgrade-evidence/ruff-check.txt
+    approved_by: mas anas
+    approved_at: 2026-10-04
+  - id: semgrep
+    version_pin: "1.179.0"
+    path: /home/anashadi/.local/bin/semgrep
+    role: fast_sast
+    install_method: "uv tool install semgrep==1.179.0"
+    evidence: reports/upgrade-evidence/semgrep.json
+    policy: "scan cepat; read-only; --metrics off"
+    approved_by: mas anas
+    approved_at: 2026-10-04
+  - id: trivy
+    version_pin: "0.75.0"
+    path: /home/anashadi/.local/bin/trivy
+    role: dependency_container_iac_secret_scan
+    install_method: "GH release v0.75.0 Linux-64bit.tar.gz + verifikasi SHA256 (checksum OK)"
+    evidence: reports/upgrade-evidence/trivy-fs.json
+    approved_by: mas anas
+    approved_at: 2026-10-04
 
 pending_approval:
-  - id: semgrep
-    role: fast_sast
-    priority: A
-    install: "uv tool install semgrep==<pin>"
-    verify: "semgrep --version && semgrep --test"
-    policy: "frequent fast scan; output SARIF; read-only"
-    reason_pending: "tool pihak ketiga -> butuh approval manusia (blueprint §6)"
-  - id: trivy
-    role: dependency_container_iac_secret_scan
-    priority: A
-    install: "unduh binary rilis resmi aquasecurity/trivy + verifikasi checksum SHA256"
-    verify: "trivy --version && trivy fs --scanners vuln,secret,misconfig ."
-    reason_pending: "butuh approval manusia"
   - id: syft
     role: sbom_spdx_cyclonedx
     priority: B
-    install: "binary rilis resmi anchore/syft + checksum"
-    reason_pending: "butuh approval manusia; hanya bila SBOM diminta"
-  - id: ruff
-    role: python_lint_format
-    priority: A
-    install: "uv tool install ruff==<pin>"
-    reason_pending: "butuh approval manusia"
+    install: "bash scripts/bootstrap_tools.sh --install syft --yes"
+    reason_pending: "hanya bila SBOM diminta"
   - id: codeql
     role: deep_interprocedural_sast
     priority: A_but_heavy

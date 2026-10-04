@@ -97,6 +97,23 @@ Artinya angka itu **artefak run rusak**, bukan temuan. Yang menyelamatkan: harne
 
 ---
 
+### 4.4 Scan ketiga: 6 skill terpasang (`skillspector --no-llm`, statis)
+
+Angka mentah: `coverage_percent = 79.5` (status `partial` — mode LLM tidak tersedia), **35 temuan** (26 MEDIUM, 9 HIGH), agregat `risk_score = 100 / CRITICAL / DO_NOT_INSTALL`.
+
+Tanpa membaca isinya, angka itu akan menyesatkan. Setelah tiap temuan HIGH dibaca pada baris aslinya:
+
+| Temuan | Baris yang sebenarnya ditandai | Vonis |
+|---|---|---|
+| `Prompt Injection → Hidden Instructions` (audit-context-building:25,28) | **karakter zero-width (U+200B)** tepat sebelum pagar kode ```` ```language ```` pada templat format | bukan instruksi tersembunyi |
+| `System Prompt Leakage → Direct Prompt Extraction` (sarif-parsing ×4) | **akses dict Python biasa**: `rule.get("defaultConfiguration", {}).get("level")` | false positive |
+| `Tool Misuse → Unsafe Defaults` (codeql:32) | **tabel ambang severity** di dokumen ("medium ≥ 6.0 → Keep") | false positive |
+| `Tool Misuse → Chaining/Parameter Abuse` (semgrep:392) | `[ -n "$OUTPUT_DIR" ] && rm -rf "$OUTPUT_DIR/repos"` — ter-guard, dalam OUTDIR sendiri | nyata tapi terkendali → caveat |
+
+**Artefak nyata yang ditemukan (dan diukur, bukan diasumsikan)**: pemindaian seluruh 6 skill menemukan **tepat 2 karakter tak-terlihat (U+200B)** di satu berkas (`audit-context-building/resources/ANALYSIS_FORMAT.md`), keduanya di samping pagar kode, **tanpa teks tersembunyi di belakangnya**. Nol karakter tak-terlihat di 5 skill lainnya.
+
+Kesimpulan yang bisa dipertanggungjawabkan: skor agregat `100/CRITICAL/DO_NOT_INSTALL` **tidak dapat ditindaklanjuti** — ia menjumlahkan salah-kelas antara dokumentasi skill (yang memang berisi instruksi kepada agent; itu hakikat sebuah SKILL) dengan kode. Yang bertindak sebagai bukti tetap: (1) verdict hub `ALLOWED`, (2) pemindai deterministik kami 0 temuan, (3) pemeriksaan baris-demi-baris di tabel ini.
+
 ## 5. Hasil pemasangan & integritas
 
 Metode: `hermes skills install skills-sh/trailofbits/skills/... --yes` → verdict hub **ALLOWED** (scanner `skills-guard-v8`, provenance fresh). Tidak ada `--force`.

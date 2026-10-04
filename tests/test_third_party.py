@@ -107,6 +107,37 @@ def test_sync_reports_incomplete_as_pending_not_deviation(tmp_path, monkeypatch)
     assert (installed / "s" / "ref.md").read_text() == "A\n"
 
 
+def test_sync_accepts_registered_patch_but_not_unregistered_diff(tmp_path, monkeypatch):
+    """Patch terdaftar (hash cocok) diterima; diff di luar daftar tetap ditandai.
+
+    Ini mencegah dua kesalahan sekaligus: menuduh patch yang memang kita buat, dan
+    menerima perubahan isi yang tidak pernah kita setujui.
+    """
+    clone, installed = tmp_path / "clone", tmp_path / "skills"
+    _fake_skill(clone, "x/skills/s", {"SKILL.md": "PIN\n", "a.md": "ASLI\n", "b.md": "ASLI\n"})
+    (installed / "s").mkdir(parents=True)
+    (installed / "s" / "SKILL.md").write_text("PIN\n")
+    (installed / "s" / "a.md").write_text("PATCH KITA\n")
+    (installed / "s" / "b.md").write_text("DIUBAH ORANG LAIN\n")
+    monkeypatch.setattr(sync, "HERMES_SKILLS", str(installed))
+    import hashlib
+    ours = hashlib.sha256(b"PATCH KITA\n").hexdigest()
+    monkeypatch.setitem(sync.INTENTIONAL_DEVIATIONS, "s",
+                        {"a.md": {"reason": "uji", "our_sha256": ours}})
+
+    r = sync.sync_skill("s", "x/skills/s", str(clone), fix=False)
+    assert [p["file"] for p in r["patched_files"]] == ["a.md"]
+    assert r["differing"] == ["a.md", "b.md"]          # pelaporan tetap jujur
+    assert r.get("security_deviation") is True          # karena b.md tidak terdaftar
+    assert "b.md" in r["deviations"][0]
+
+    # Hash patch berubah (mis. disunting lagi tanpa persetujuan) -> tidak lagi diterima.
+    (installed / "s" / "a.md").write_text("PATCH KITA LALU DIUBAH\n")
+    r2 = sync.sync_skill("s", "x/skills/s", str(clone), fix=False)
+    assert r2["patched_files"] == []
+    assert any("a.md" in d for d in r2["deviations"])
+
+
 def test_registry_records_four_third_party_decisions():
     """Keputusan 2026-10-05 tidak boleh hilang/terbalik tanpa jejak."""
     text = open(os.path.join(REPO, "registry", "skills.yaml")).read()

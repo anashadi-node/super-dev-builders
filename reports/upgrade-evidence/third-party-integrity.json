@@ -5,7 +5,7 @@
  "pin": "82fe8226252622fa807643bdca1710901198553a",
  "license": "CC-BY-SA-4.0",
  "mode": "fix",
- "captured_at": "2026-10-05T05:33:10+0700",
+ "captured_at": "2026-10-05T06:31:35+0700",
  "redaction_status": "clean",
  "status": "OBSERVED",
  "skills": [
@@ -15,18 +15,24 @@
    "pin": "82fe8226252622fa807643bdca1710901198553a",
    "license": "CC-BY-SA-4.0",
    "installed_dir": "/home/anashadi/.hermes/skills/audit-context-building",
-   "copied": [
-    "resources/ANALYSIS_FORMAT.md",
-    "resources/DOMAIN_NOTES.md",
-    "resources/FUNCTION_MICRO_ANALYSIS_EXAMPLE.md"
-   ],
+   "copied": [],
    "deviations": [],
    "ok": true,
    "upstream_files": 6,
-   "installed_files_before": 3,
+   "installed_files_before": 6,
    "missing": [],
-   "differing": [],
+   "differing": [
+    "resources/ANALYSIS_FORMAT.md"
+   ],
    "extra_files": [],
+   "patched_files": [
+    {
+     "file": "resources/ANALYSIS_FORMAT.md",
+     "reason": "hapus 2 karakter zero-width (U+200B) tepat di samping pagar kode; hub audit menandainya HIGH injection, dan pemindai kami juga menemukannya. Tidak ada teks tersembunyi — hanya sisa format. Pagar kode tetap utuh.",
+     "pin_sha256": "029532945776fb0fcbc866f19cd6114fe4152cd3dea1c0f44b266ec13a2cc6e8",
+     "our_sha256": "351a0b6d61454e09fcd3ae39a4201771e0745687d8b9a2a857e2a74e28caeeb3"
+    }
+   ],
    "profiles": [
     "cc-security-governor",
     "cc-architect"
@@ -38,47 +44,15 @@
    "pin": "82fe8226252622fa807643bdca1710901198553a",
    "license": "CC-BY-SA-4.0",
    "installed_dir": "/home/anashadi/.hermes/skills/codeql",
-   "copied": [
-    "assets/trail-of-bits-mark.svg",
-    "references/build-fixes.md",
-    "references/diagnostic-query-templates.md",
-    "references/extension-yaml-format.md",
-    "references/important-only-suite.md",
-    "references/language-details.md",
-    "references/macos-arm64e-workaround.md",
-    "references/performance-tuning.md",
-    "references/quality-assessment.md",
-    "references/ruleset-catalog.md",
-    "references/run-all-suite.md",
-    "references/sarif-processing.md",
-    "references/threat-models.md",
-    "scripts/build_log.sh",
-    "scripts/check_db_quality.py",
-    "scripts/find_databases.sh",
-    "scripts/generate_suite.sh",
-    "scripts/pyproject.toml",
-    "scripts/test_build_log.py",
-    "scripts/test_build_mode_claims.py",
-    "scripts/test_check_db_quality.py",
-    "scripts/test_find_databases.py",
-    "scripts/test_generation_scripts.py",
-    "scripts/test_script_flags.py",
-    "scripts/test_section_pointers.py",
-    "scripts/test_shell_blocks.py",
-    "scripts/test_suite_templates.py",
-    "scripts/test_verify_query_suite.py",
-    "scripts/verify_query_suite.py",
-    "workflows/build-database.md",
-    "workflows/create-data-extensions.md",
-    "workflows/run-analysis.md"
-   ],
+   "copied": [],
    "deviations": [],
    "ok": true,
    "upstream_files": 34,
-   "installed_files_before": 2,
+   "installed_files_before": 34,
    "missing": [],
    "differing": [],
    "extra_files": [],
+   "patched_files": [],
    "profiles": [
     "cc-security-governor"
    ]
@@ -97,6 +71,7 @@
    "missing": [],
    "differing": [],
    "extra_files": [],
+   "patched_files": [],
    "profiles": [
     "cc-security-governor",
     "cc-architect",
@@ -117,6 +92,7 @@
    "missing": [],
    "differing": [],
    "extra_files": [],
+   "patched_files": [],
    "profiles": [
     "cc-security-governor",
     "cc-reviewer-qa"
@@ -164,6 +140,7 @@
    "missing": [],
    "differing": [],
    "extra_files": [],
+   "patched_files": [],
    "profiles": [
     "cc-security-governor"
    ]
@@ -182,6 +159,7 @@
    "missing": [],
    "differing": [],
    "extra_files": [],
+   "patched_files": [],
    "profiles": [
     "cc-security-governor",
     "cc-devops-docs"

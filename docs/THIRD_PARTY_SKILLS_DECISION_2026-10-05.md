@@ -142,7 +142,40 @@ Metode: `hermes skills install skills-sh/trailofbits/skills/... --yes` → verdi
 
 **Cacat pemasangan yang ditemukan**: hub hanya memasang `codeql` 2 dari 34 berkas — SKILL.md-nya menunjuk 12 `references/*.md` yang **tidak ada** (skill rusak bila dibiarkan). **Sebab pemotongan tidak terbukti** dari sisi kami; yang terbukti adalah efeknya. Penyelesaian: `scripts/sync_third_party_skills.py --fix` yang melengkapi dari **commit pin yang sama** lewat git protocol (bukan API) lalu **membuktikan sha256 byte-identik**.
 
-Karena `codeql` dilengkapi di luar jalur unduh hub, isinya diverifikasi ulang dengan pemindai deterministik (0 temuan) — dan fakta ini dicatat, tidak disembunyikan.
+### 5.1 Verdict `hermes skills audit` per skill — dan satu perbaikan yang terbukti
+
+| Skill | Verdict audit | Temuan | Catatan |
+|---|---|---|---|
+| semgrep | **ALLOWED** (SAFE) | — | — |
+| sarif-parsing | **ALLOWED** | — | — |
+| differential-review | **ALLOWED** | — | — |
+| fp-check | **ALLOWED** (SAFE) | — | — |
+| audit-context-building | **BLOCKED → ALLOWED** | 3 → 0 efektif | setelah 2 ZWSP dihapus (lihat bawah) |
+| codeql | **BLOCKED** (CAUTION) | 25 | semua kelas dokumentasi/harness — keputusan manusia |
+
+**Perbaikan yang terbukti kausal**: hub menandai `resources/ANALYSIS_FORMAT.md:25,28` sebagai `HIGH injection` karena **2 karakter zero-width (U+200B)** — persis 2 karakter yang pemindai mandiri kami temukan (dua pemindai independen, angka identik). Isinya: pagar kode ```` ```language ```` dengan karakter tak-terlihat di depannya, **tanpa teks tersembunyi**. Setelah 2 karakter itu dihapus (berkas 2.613 → 2.607 byte, pagar kode utuh), audit ulang memberi **ALLOWED**. Patch dicatat sebagai deviasi sengaja dengan sha256 kami + sha256 pin di `scripts/sync_third_party_skills.py::INTENTIONAL_DEVIATIONS`, dan diterima hanya bila hash-nya cocok persis — perubahan lain tetap dilaporkan sebagai deviasi keamanan.
+
+**Isi 25 temuan `codeql` (dibaca satu per satu, bukan disimpulkan dari angka)**
+
+| Temuan | Isi sebenarnya |
+|---|---|
+| `HIGH obfuscation` (1) | `compile(body, "<embedded>", "exec")` di **berkas test** skill itu — mengompilasi potongan shell untuk memvalidasi sintaksnya |
+| `HIGH exfiltration` (1) | `os.environ['PATH']` saat menyusun env `subprocess` di test — heuristic "exfiltration" mengenai pembacaan PATH |
+| `MEDIUM execution` (12) | `subprocess.run(...)` di **berkas test/helper** milik skill (`test_build_log.py`, `test_script_flags.py`, `verify_query_suite.py`, …) |
+| `MEDIUM supply_chain` (10) | dokumentasi workflow: `uv run {baseDir}/scripts/…`, `pip install -e .`, `npm install`, `make clean` — perintah yang memang dibutuhkan untuk **membangun database CodeQL** di proyek target |
+| `LOW privilege_escalation` (1) | baris frontmatter `allowed-tools:` — muncul juga di skill yang berverdict SAFE |
+
+Tidak ada: eksfiltrasi data, sudo, `curl \| sh`, kredensial, atau mitigasi bypass. Yang ada: **harness test milik skill itu sendiri** + panduan perintah build. Keputusan menyimpan/menghapus `codeql` diserahkan ke Owner karena gate audit menyebut BLOCKED (keputusan manusia), bukan karena ada bukti perilaku jahat.
+
+### 5.2 Tiga skill yang TIDAK dipasang karena gate hub (tidak ada bypass)
+
+| Skill | Verdict hub saat instalasi | Alasan |
+|---|---|---|
+| `variant-analysis` | BLOCKED (caution, 11 findings) | tidak dibypass; pemindai mandiri kami hanya menemukan pola rule semgrep (`eval(`) — kandidat false positive |
+| `modern-python` | BLOCKED (**dangerous**, 90 findings) | tidak dibypass (catatan: pemindai mandiri kami hanya menemukan 2 baris dokumentasi `curl … \| sh`) |
+| `post-patch-validation` | BLOCKED (caution, 12 findings) | tidak dibypass |
+
+Catatan penting: `variant-block-raw.txt` (hasil `hermes skills inspect`) ternyata berisi **isi SKILL.md**, bukan daftar 11 temuan — jadi rincian temuan `variant-analysis` **belum terdokumentasi** dan tidak saya klaim. Untuk `modern-python`, selisih 90 temuan hub vs 2 temuan pemindai kami juga belum dijelaskan — perlu tinjauan manusia sebelum menyimpulkan apa pun.
 
 **Sebaran ke profil divisi**: `cc-security-governor` 6 · `cc-reviewer-qa` 2 · `cc-architect` 2 · `cc-devops-docs` 1 · `cc-builder` 0 (menunggu `modern-python`).
 

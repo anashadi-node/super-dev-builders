@@ -66,6 +66,21 @@ HERMES_SKILLS = os.path.expanduser("~/.hermes/skills")
 PROFILES = os.path.expanduser("~/.hermes/profiles")
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Patch yang SENGAJA kami terapkan pada skill pihak ketiga.
+# Wajib: alasan tertulis + sha256 MILIK KITA. Berkas yang berbeda dari pin tapi TIDAK
+# terdaftar di sini tetap dilaporkan sebagai security_deviation (rc=1).
+INTENTIONAL_DEVIATIONS: dict[str, dict[str, dict[str, str]]] = {
+    "audit-context-building": {
+        "resources/ANALYSIS_FORMAT.md": {
+            "reason": ("hapus 2 karakter zero-width (U+200B) tepat di samping pagar kode; "
+                       "hub audit menandainya HIGH injection, dan pemindai kami juga menemukannya. "
+                       "Tidak ada teks tersembunyi — hanya sisa format. Pagar kode tetap utuh."),
+            "our_sha256": "351a0b6d61454e09fcd3ae39a4201771e0745687d8b9a2a857e2a74e28caeeb3",
+            "pin_sha256": "029532945776fb0fcbc866f19cd6114fe4152cd3dea1c0f44b266ec13a2cc6e8",
+        },
+    },
+}
+
 
 def sha256(path: str) -> str:
     with open(path, "rb") as fh:
@@ -131,11 +146,22 @@ def sync_skill(name: str, rel: str, clone: str, fix: bool) -> dict:
                 "missing": missing, "differing": differing, "extra_files": extra})
     # Semantik keluar: DEVIASI HANYA bila berkas yang sudah terpasang BERBEDA dari pin
     # (penanda isi diubah orang lain / supply-chain). Berkas yang belum lengkap = state
-    # "belum sinkron" (rc=2), bukan kegagalan keamanan.
-    if differing:
+    # "belum sinkron" (rc=2), bukan kegagalan keamanan. Patch yang terdaftar di
+    # INTENTIONAL_DEVIATIONS diterima hanya bila hash kita cocok persis.
+    allowed = INTENTIONAL_DEVIATIONS.get(name, {})
+    real, patched = [], []
+    for f in differing:
+        spec = allowed.get(f)
+        if spec and inst.get(f) == spec.get("our_sha256"):
+            patched.append({"file": f, "reason": spec["reason"],
+                            "pin_sha256": spec.get("pin_sha256"), "our_sha256": spec["our_sha256"]})
+        else:
+            real.append(f)
+    res["patched_files"] = patched
+    if real:
         res["ok"] = False
         res["security_deviation"] = True
-        res["deviations"] = [f"isi berbeda dari pin: {f}" for f in differing]
+        res["deviations"] = [f"isi berbeda dari pin (TIDAK terdaftar): {f}" for f in real]
     elif missing:
         res["ok"] = False
         res["pending_sync"] = True

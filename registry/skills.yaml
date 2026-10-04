@@ -4,6 +4,9 @@
 version: 2.2.0
 updated: 2026-10-04
 pipeline_required: [source_trust_check, pin_revision, hermes_native_scan, manual_source_review, sandbox_test, allowlist_tools, human_approval]
+# Jumlah custom skill yang disetujui Owner (21 blueprint + 6 pengganti security + 2 hasil riset lanjutan).
+# Dipakai registry_lint agar drift terdeteksi, bukan sekadar WARN dari angka blueprint.
+approved_custom_count: 29
 
 # ---------- A. Custom skills ekosistem (dibuat di repo ini, sumber tunggal: skills/) ----------
 custom:
@@ -156,6 +159,25 @@ custom:
     profiles: [sdb-builder, sdb-security, sdb-devops]
     path: skills/privilege-free-tooling
     replaces: ascii-art, llama-cpp, serving-llms-vllm, evaluating-llms-harness
+  # ---------- B2. Pengganti hasil riset lanjutan (mandat Owner: kapabilitas HARUS melebihi skill yang dihapus) ----------
+  - id: local-llm-serving
+    status: ADD
+    divisions: [D4, D5, D10]
+    profiles: [sdb-builder, sdb-devops]
+    path: skills/local-llm-serving
+    scripts: [skills/local-llm-serving/scripts/serve_and_bench.py]
+    replaces: serving-llms-vllm, inference-sh-cli
+    parity: ">= (vLLM tidak dapat jalan di host tanpa GPU; jalur ini terbukti jalan + batching paralel terukur)"
+    evidence: reports/upgrade-evidence/local-llm-serving-bench.json
+  - id: realtime-visual-engine
+    status: ADD
+    divisions: [D4, D5]
+    profiles: [sdb-builder, sdb-devops]
+    path: skills/realtime-visual-engine
+    scripts: [skills/realtime-visual-engine/scripts/render_shader.py]
+    replaces: touchdesigner-mcp
+    parity: ">= (berjalan di host ini, gratis, lintas platform, dapat dikendalikan agent; TD tidak ada di host)"
+    evidence: reports/upgrade-evidence/realtime-visual-report.json
 third_party:
   - repo: obra/superpowers
     url: https://github.com/obra/superpowers

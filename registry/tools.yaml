@@ -84,6 +84,46 @@ present:
     policy: "LISENSI: hanya codebase OSI-approved atau riset akademik; DILARANG untuk kode proprietary internal & DILARANG di CI/CD"
     approved_by: mas anas
     approved_at: 2026-10-04
+  # --- ditambahkan 2026-10-04 (riset pengganti mandat Owner: kapabilitas > skill yang dihapus) ---
+  - id: llama_cpp_server
+    version_pin: "0.5.0-dev (build 1, commit 7fe450e)"
+    path: /home/anashadi/bin/llama-server
+    role: local_llm_serving_openai_compatible
+    install_method: "bangun dari source, tanpa sudo: git clone --depth 1 --branch v0.5.0 ggml-org/llama.cpp + cmake -DBUILD_SHARED_LIBS=OFF -DGGML_NATIVE=ON -DLLAMA_CURL=OFF (binari statis 18 MB)"
+    evidence: reports/upgrade-evidence/local-llm-serving-bench.json
+    policy: "bind 127.0.0.1 saja; tanpa sudo; tanpa curl|sh; model wajib sha256 terverifikasi (skill model-hub-provenance)"
+    replaces: serving-llms-vllm, inference-sh-cli, llama-cpp
+  - id: ffmpeg
+    version_pin: "host build (lihat ffmpeg -version)"
+    path: /home/anashadi/bin/ffmpeg
+    role: video_encode_evidence
+    evidence: reports/upgrade-evidence/realtime-visual-report.json
+    policy: "encode lokal saja; sumber frame dari Chromium/Playwright; tanpa layanan pihak ketiga"
+  - id: chromium_headless_webgl
+    version_pin: "playwright 1.63.0 / chromium-1243"
+    path: /home/anashadi/.cache/ms-playwright
+    role: realtime_visual_render_engine
+    evidence: reports/upgrade-evidence/realtime-visual-report.json
+    policy: "shader offline (tanpa CDN); kontrol eksternal loopback saja"
+    replaces: touchdesigner-mcp
+
+# Sumber model (provenance) — catat karena HuggingFace langsung DIBLOKIR dari host ini.
+model_sources:
+  - id: modelscope
+    reachable: true
+    verified_at: 2026-10-04
+    note: "unduh via /api/v1/models/<repo>/repo?Revision=&FilePath= ; sha256 tersedia di API"
+  - id: ollama_registry_oci
+    reachable: true
+    verified_at: 2026-10-04
+    note: "manifest OCI berisi digest sha256 per layer (GGUF) — provenance kuat tanpa registry model lain"
+  - id: huggingface_direct
+    reachable: false
+    verified_at: 2026-10-04
+    note: "huggingface.co dan hf-mirror.com sama-sama gagal (mirror me-redirect ke HF)"
+  - id: github_releases
+    reachable: true
+    note: "rilis ggml-org/llama.cpp v0.5.0 TIDAK menyediakan binari Linux siap pakai (hanya nightly-tag.txt) -> wajib build dari source"
 
 pending_approval:
   # catatan: syft & codeql sudah dipasang (lihat `present`)

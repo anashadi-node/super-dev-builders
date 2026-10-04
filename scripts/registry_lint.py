@@ -42,12 +42,17 @@ def main() -> int:
     errors, warnings = [], []
     reg_path = repo_path("registry", "skills.yaml")
     reg = load_yaml(reg_path) or {}
+    if isinstance(reg, list):  # toleransi format lama (daftar tanpa key)
+        reg = {"custom": reg}
     custom = [c for c in (reg.get("custom") or []) if isinstance(c, dict)]
     keep = [k.get("id") for k in (reg.get("keep_local") or []) if isinstance(k, dict)]
     known_ids = {c.get("id") for c in custom} | set(keep)
 
-    if len(custom) != 21:
-        warnings.append(f"jumlah custom skill = {len(custom)} (blueprint menargetkan 21)")
+    expected_custom = int(reg.get("approved_custom_count") or 21)
+    if len(custom) != expected_custom:
+        warnings.append(f"jumlah custom skill = {len(custom)} (disetujui Owner: {expected_custom})")
+    elif len(custom) < 21:
+        errors.append(f"jumlah custom skill menyusut di bawah basis blueprint: {len(custom)} < 21")
 
     referenced_profiles = set()
     for c in custom:

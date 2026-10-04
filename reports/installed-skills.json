@@ -1,5 +1,5 @@
 {
-  "at": "2026-10-04T08:46:46+0700",
+  "at": "2026-10-04T19:53:55+0700",
   "uninstall": false,
   "operations": [
     {
@@ -244,6 +244,18 @@
     },
     {
       "action": "install",
+      "skill": "local-llm-serving",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/local-llm-serving"
+    },
+    {
+      "action": "install",
+      "skill": "realtime-visual-engine",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/realtime-visual-engine"
+    },
+    {
+      "action": "install",
       "skill": "database-migration-safety",
       "profile": "cc-devops-docs",
       "path": "/home/anashadi/.hermes/profiles/cc-devops-docs/skills/super-dev-builders/database-migration-safety"
@@ -295,6 +307,18 @@
       "skill": "privilege-free-tooling",
       "profile": "cc-devops-docs",
       "path": "/home/anashadi/.hermes/profiles/cc-devops-docs/skills/super-dev-builders/privilege-free-tooling"
+    },
+    {
+      "action": "install",
+      "skill": "local-llm-serving",
+      "profile": "cc-devops-docs",
+      "path": "/home/anashadi/.hermes/profiles/cc-devops-docs/skills/super-dev-builders/local-llm-serving"
+    },
+    {
+      "action": "install",
+      "skill": "realtime-visual-engine",
+      "profile": "cc-devops-docs",
+      "path": "/home/anashadi/.hermes/profiles/cc-devops-docs/skills/super-dev-builders/realtime-visual-engine"
     }
   ],
   "missing_profiles": []

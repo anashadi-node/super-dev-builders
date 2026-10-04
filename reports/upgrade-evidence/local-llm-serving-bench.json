@@ -1,0 +1,224 @@
+{
+  "provenance": "scripts/serve_and_bench.py; server=/home/anashadi/bin/llama-server; build=?",
+  "captured_at": "2026-10-04T19:56:49+0700",
+  "redaction_status": "clean",
+  "status": "OBSERVED",
+  "server": "/home/anashadi/bin/llama-server",
+  "model": "/home/anashadi/models/qwen2.5-0.5b-instruct-q4_k_m.gguf",
+  "parallel": 4,
+  "ctx": 2048,
+  "threads": 16,
+  "version_head": [],
+  "cmd": [
+    "/home/anashadi/bin/llama-server",
+    "-m",
+    "/home/anashadi/models/qwen2.5-0.5b-instruct-q4_k_m.gguf",
+    "-c",
+    "2048",
+    "-np",
+    "4",
+    "-t",
+    "16",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "8091",
+    "--metrics"
+  ],
+  "ready_seconds": 1.02,
+  "health": [
+    200,
+    {
+      "status": "ok"
+    }
+  ],
+  "models_endpoint": {
+    "models": [
+      {
+        "name": "/home/anashadi/models/qwen2.5-0.5b-instruct-q4_k_m.gguf",
+        "model": "/home/anashadi/models/qwen2.5-0.5b-instruct-q4_k_m.gguf",
+        "modified_at": "",
+        "size": "",
+        "digest": "",
+        "type": "model",
+        "description": "",
+        "tags": [
+          ""
+        ],
+        "capabilities": [
+          "completion"
+        ],
+        "parameters": "",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "",
+          "families": [
+            ""
+          ],
+          "parameter_size": "",
+          "quantization_level": ""
+        }
+      }
+    ],
+    "object": "list",
+    "data": [
+      {
+        "id": "/home/anashadi/models/qwen2.5-0.5b-instruct-q4_k_m.gguf",
+        "aliases": [
+          "/home/anashadi/models/qwen2.5-0.5b-instruct-q4_k_m.gguf"
+        ],
+        "tags": [],
+        "object": "model",
+        "created": 1791118610,
+        "owned_by": "llamacpp",
+        "meta": {
+          "vocab_type": 2,
+          "n_vocab": 151936,
+          "n_ctx": 512,
+          "n_ctx_train": 32768,
+          "n_embd": 896,
+          "n_params": 630167424,
+          "size": 485452288,
+          "ftype": "Q4_K - Medium"
+        }
+      }
+    ]
+  },
+  "rss_mb_after_run1": 599.2,
+  "rss_mb_after_run2": 601.2,
+  "rss_mb_after_run3": 601.9,
+  "runs": [
+    {
+      "run": 1,
+      "loadavg": [
+        10.55,
+        9.73,
+        7.16
+      ],
+      "single": {
+        "status": 200,
+        "wall_s": 3.977,
+        "completion_tokens": 51,
+        "tok_per_s": 12.82,
+        "text_head": "Cache memori penting untuk sistem produksi karena memungkinkan sistem untuk mengakses data yang telah diperbarui atau diperlukan sebelumnya, menghemat waktu dan"
+      },
+      "parallel": {
+        "n": 4,
+        "wall_s": 3.711,
+        "total_completion_tokens": 204,
+        "aggregate_tok_per_s": 54.97,
+        "per_request_tok_per_s": [
+          13.75,
+          13.86,
+          13.75,
+          13.75
+        ],
+        "all_http_200": true,
+        "sample_text": "Cache memori penting untuk sistem produksi karena memungkinkan sistem untuk mengakses data yang telah diperbarui atau diperlukan sebelumnya, menghemat waktu dan"
+      },
+      "benefit_x": 4.29
+    },
+    {
+      "run": 2,
+      "loadavg": [
+        11.63,
+        9.97,
+        7.25
+      ],
+      "single": {
+        "status": 200,
+        "wall_s": 1.806,
+        "completion_tokens": 53,
+        "tok_per_s": 29.34,
+        "text_head": "Cache memori penting untuk sistem produksi karena memungkinkan sistem untuk mengakses data yang telah diperbarui atau diperlukan sebelumnya, menghemat waktu dan"
+      },
+      "parallel": {
+        "n": 4,
+        "wall_s": 4.637,
+        "total_completion_tokens": 204,
+        "aggregate_tok_per_s": 43.99,
+        "per_request_tok_per_s": [
+          11.01,
+          11.01,
+          11.0,
+          11.01
+        ],
+        "all_http_200": true,
+        "sample_text": "Cache memori penting untuk sistem produksi karena memungkinkan sistem untuk mengakses data yang telah diperbarui atau diperlukan sebelumnya, menghemat waktu dan"
+      },
+      "benefit_x": 1.5
+    },
+    {
+      "run": 3,
+      "loadavg": [
+        13.23,
+        10.36,
+        7.41
+      ],
+      "single": {
+        "status": 200,
+        "wall_s": 3.242,
+        "completion_tokens": 53,
+        "tok_per_s": 16.35,
+        "text_head": "Cache memori penting untuk sistem produksi karena memungkinkan sistem untuk mengakses data yang telah diperbarui atau diperlukan sebelumnya, menghemat waktu dan"
+      },
+      "parallel": {
+        "n": 4,
+        "wall_s": 3.935,
+        "total_completion_tokens": 206,
+        "aggregate_tok_per_s": 52.36,
+        "per_request_tok_per_s": [
+          13.15,
+          13.47,
+          13.15,
+          13.16
+        ],
+        "all_http_200": true,
+        "sample_text": "Cache memori penting untuk sistem produksi karena memungkinkan sistem untuk mengakses data yang telah diperbarui atau diperlukan sebelumnya, menghemat waktu dan"
+      },
+      "benefit_x": 3.2
+    }
+  ],
+  "repeats": 3,
+  "single": {
+    "status": 200,
+    "wall_s": 3.242,
+    "completion_tokens": 53,
+    "tok_per_s": 16.35,
+    "text_head": "Cache memori penting untuk sistem produksi karena memungkinkan sistem untuk mengakses data yang telah diperbarui atau diperlukan sebelumnya, menghemat waktu dan"
+  },
+  "parallel_run": {
+    "n": 4,
+    "wall_s": 3.935,
+    "total_completion_tokens": 206,
+    "aggregate_tok_per_s": 52.36,
+    "per_request_tok_per_s": [
+      13.15,
+      13.47,
+      13.15,
+      13.16
+    ],
+    "all_http_200": true,
+    "sample_text": "Cache memori penting untuk sistem produksi karena memungkinkan sistem untuk mengakses data yang telah diperbarui atau diperlukan sebelumnya, menghemat waktu dan"
+  },
+  "representative_run": 3,
+  "single_tok_per_s": {
+    "median": 16.35,
+    "min": 12.82,
+    "max": 29.34
+  },
+  "aggregate_tok_per_s": {
+    "median": 52.36,
+    "min": 43.99,
+    "max": 54.97
+  },
+  "batching_benefit_x": {
+    "median": 3.2,
+    "min": 1.5,
+    "max": 4.29
+  },
+  "continuous_batching_proven": true,
+  "rss_mb_after_parallel": 601.9,
+  "total_seconds": 22.44
+}

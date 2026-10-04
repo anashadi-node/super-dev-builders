@@ -1,0 +1,58 @@
+{
+  "provenance": "scripts/render_shader.py; engine=Playwright/Chromium WebGL; encoder=ffmpeg",
+  "captured_at": "2026-10-04T19:55:36+0700",
+  "redaction_status": "clean",
+  "status": "OBSERVED",
+  "frames": 32,
+  "fps": 16,
+  "size": [
+    480,
+    270
+  ],
+  "udp_port": 45871,
+  "gl_renderer": "WebKit WebGL|WebGL 1.0 (OpenGL ES 2.0 Chromium)",
+  "render_seconds": 2.235,
+  "fps_effective": 14.3,
+  "applied_at_last_frame": [
+    0.95,
+    1.35
+  ],
+  "udp_override_active": true,
+  "causality_hashes": {
+    "hue_low": "4ae211a0fb1d91249ca4d90fc6ac9c3ba37d587e151693e1dc5d8def541c1c44",
+    "hue_high": "77ac276cf768509017d6519b9a841f831366230be2bd90154190a2b0b65af538"
+  },
+  "param_changes_pixels": true,
+  "last_frame_differs_from_internal_default": true,
+  "applied_value_reproduces_last_frame": true,
+  "udp_received": [
+    "hue=0.95 zoom=1.35"
+  ],
+  "frame_hashes": {
+    "first": "a6f0026ba3b8be0a2e96b3960d7eca2e97ba4e48a0388e100734d3f0e39a5f29",
+    "mid": "ff3d141e4595718b54d083a484a2c3363a25afe789f739217a72724c246b61a9",
+    "last": "5cd61ef5fe85dd2bdc49a920f9c4b9414aadab29f34d7f0d13b67d342b718896"
+  },
+  "unique_frames": 32,
+  "frames_change_with_param": true,
+  "ffmpeg_rc": 0,
+  "mp4": "/tmp/rv-evidence/realtime-visual.mp4",
+  "mp4_bytes": 101705,
+  "mp4_sha256": "a8f1501c330f2615d5947b69f804009f94b3017d8e9ac2a4c7e85171a9133ef2",
+  "ffprobe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 480,
+        "height": 270,
+        "nb_frames": "32"
+      }
+    ],
+    "format": {
+      "duration": "2.000000",
+      "size": "101705"
+    }
+  }
+}

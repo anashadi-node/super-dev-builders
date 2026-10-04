@@ -607,5 +607,18 @@ PERIODIC RE-AUDIT ON UPDATE</pre>
 <p class="small"><b>Kejujuran/limitasi:</b> dokumen ini tidak mengklaim setiap skill pihak ketiga aman secara absolut atau native-Hermes tanpa adaptasi. Superpowers upstream mendokumentasikan instalasi Hermes, tetapi kompatibilitas/security verdict dapat berubah antar-versi dan saat audit terdapat laporan instalasi yang diblokir. Hermes mengikuti Agent Skills/progressive disclosure dan memiliki native Skills Guard. Skill Anthropic, Trail of Bits dan Sentry harus diuji kompatibilitas dan keamanan pada versi Hermes Anda sebelum diaktifkan. Tool/repository dapat berubah setelah tanggal riset; pin revision dan audit update. NIST SSDF 1.1 adalah final; SSDF 1.2 yang ditemukan dalam riset masih Initial Public Draft, sehingga baseline normative di dokumen ini tetap 1.1.</p>
 </section>
 
+<section class="card" id="addendum">
+<h2>Addendum eksekusi — 2026-10-04 (pasca-approval Owner)</h2>
+<p>Dokumen ini tetap acuan arsitektur. Bagian di bawah hanya <b>catatan eksekusi</b> dan tidak mengubah keputusan desain di atas.</p>
+<table>
+<tr><th>Perubahan</th><th>Hasil</th><th>Bukti</th></tr>
+<tr><td>6 skill pengganti hasil pembersihan keamanan dipasang ke profil divisi</td><td>53 operasi pemasangan, 0 profil hilang</td><td><code>reports/installed-skills.json</code></td></tr>
+<tr><td>Riset pengganti lanjutan (mandat Owner: kapabilitas wajib melebihi skill yang dihapus)</td><td>+2 skill: <code>local-llm-serving</code> (menggantikan <code>serving-llms-vllm</code>, <code>inference-sh-cli</code>) dan <code>realtime-visual-engine</code> (menggantikan <code>touchdesigner-mcp</code>) → total <b>29</b></td><td><code>docs/RESEARCH_REPLACEMENT_2026-10-04.md</code></td></tr>
+<tr><td>Sel parity <code>&lt;</code> dan <code>n/a</code> pada matriks penggantian</td><td>0 tersisa; semua tertutup dan disertai bukti uji nyata</td><td><code>docs/CAPABILITY_REPLACEMENT_MATRIX.md</code></td></tr>
+<tr><td>Gate mutu ulang</td><td><code>pytest</code> 49 passed · <code>registry_lint</code> PASS · <code>doctor</code> exit 0 · <code>ruff</code> bersih · <code>evidence_lint</code> PASS</td><td><code>reports/upgrade-evidence/</code></td></tr>
+</table>
+<p class="small">Jumlah custom skill resmi = <b>29</b> (21 dari daftar instruksi §10 butir 8 + 6 pengganti keamanan + 2 hasil riset lanjutan). Angka ini dicatat di <code>registry/skills.yaml → approved_custom_count</code> sehingga lint mendeteksi drift nyata, bukan menampilkan peringatan palsu.</p>
+</section>
+
 <footer>Hermes AI Software Engineering Company — Super Dev Builders Ecosystem V2.2 · Reverse Engineering & Reconstruction Edition, 2026-10-04 · Designed for controlled resource usage, low token overhead, secure SDLC, and practical migration from an existing Hermes project.</footer>
 </main></body></html>

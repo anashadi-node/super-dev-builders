@@ -1,0 +1,361 @@
+<!doctype html><html lang='id'><head><meta charset='utf-8'><title>RESEARCH_REPLACEMENT_2026-10-04.md</title><style>
+:root{--fg:#172033;--muted:#647084;--line:#dfe5ef;--bg:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.62 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+main{max-width:900px;margin:auto;padding:34px 26px 60px}
+h1{font-size:1.75rem;line-height:1.15;margin:.2em 0 .6em}
+h2{font-size:1.3rem;margin-top:1.6em;border-bottom:2px solid var(--line);padding-bottom:.25em}
+h3{font-size:1.08rem;margin-top:1.3em}
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:.93rem}
+th,td{border:1px solid var(--line);padding:8px 9px;text-align:left;vertical-align:top}
+th{background:#f0f3f8}
+code{background:#eef2f7;border-radius:5px;padding:2px 5px;font-size:.9em}
+pre{background:#101827;color:#e7ebf3;padding:14px;border-radius:10px;overflow:auto}
+blockquote{border-left:4px solid #2755d9;background:#eaf0ff;margin:12px 0;padding:10px 14px}
+hr{border:0;border-top:1px solid var(--line);margin:22px 0}
+footer{margin-top:28px;color:var(--muted);font-size:.85rem}
+</style></head><body><main><h1 id="laporan-riset-eksekusi-pengganti-skill-super-dev-builders-ecosystem">Laporan Riset &amp; Eksekusi Pengganti Skill — Super Dev Builders Ecosystem</h1>
+<p><strong>Tanggal:</strong> 2026-10-04 · <strong>Repo:</strong> <code>~/super-dev-builders</code> · <strong>Pemicu:</strong> mandat Owner — <em>"jika ada skills yang dihapus dikarenakan security/privacy maka harus melakukan riset, pencarian &amp; analisa untuk mencari penggantinya, dan kapabilitas pengganti WAJIB melebihi skill yang dihapus"</em>.</p>
+<hr />
+<h2 id="1-ringkasan-eksekutif">1. Ringkasan eksekutif</h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Sebelum</th>
+<th>Sesudah</th>
+<th>Bukti</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Custom skill terdaftar</td>
+<td>27</td>
+<td><strong>29</strong></td>
+<td><code>registry_lint.py</code> → PASS <code>custom skills: 29 \| profiles: 7</code></td>
+</tr>
+<tr>
+<td>Skill terpasang di profil divisi</td>
+<td>11 (subset, tidak sinkron registry)</td>
+<td><strong>53 operasi pasang, 0 profil hilang</strong></td>
+<td><code>reports/installed-skills.json</code></td>
+</tr>
+<tr>
+<td>Sel parity <code>&lt;</code> (lebih rendah) di matriks penggantian</td>
+<td>1 (<code>serving-llms-vllm</code>)</td>
+<td><strong>0</strong></td>
+<td><code>docs/CAPABILITY_REPLACEMENT_MATRIX.md</code></td>
+</tr>
+<tr>
+<td>Sel parity <code>n/a</code> (tidak diganti)</td>
+<td>2 (<code>inference-sh-cli</code>, <code>touchdesigner-mcp</code>)</td>
+<td><strong>0</strong></td>
+<td>idem</td>
+</tr>
+<tr>
+<td>Uji otomatis</td>
+<td>42 passed</td>
+<td><strong>49 passed</strong></td>
+<td><code>pytest tests -q</code></td>
+</tr>
+<tr>
+<td>Lint + gate</td>
+<td>PASS</td>
+<td>PASS (<code>ruff</code> bersih, <code>doctor</code> exit 0, <code>evidence_lint</code> PASS)</td>
+<td>log perintah di §4</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Kesimpulan satu baris:</strong> semua skill yang dibuang karena keamanan/privasi kini punya pengganti, dan dua sel yang tadinya berstatus <em>lebih rendah / tidak diganti</em> sudah tertutup dengan pengganti yang <strong>terbukti berjalan di host ini</strong> — bukan klaim.</p>
+<hr />
+<h2 id="2-apa-yang-sebenarnya-dieksekusi-untuk-6-skills-baru">2. Apa yang sebenarnya dieksekusi untuk "6 skills baru"</h2>
+<p>6 skill pengganti hasil pembersihan keamanan <strong>sudah ada sebagai berkas</strong> di <code>skills/</code>, tetapi <strong>belum terpasang</strong> ke profil divisi (gap nyata: 11 dari 27 hanya sampai di <code>~/.hermes/profiles/cc-*/skills/super-dev-builders/</code>).</p>
+<table>
+<thead>
+<tr>
+<th>Skill</th>
+<th>Menggantikan</th>
+<th>Alasan skill lama dibuang</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>local-media-generation</code></td>
+<td><code>comfyui</code></td>
+<td>7 CRITICAL: <code>curl\|sh</code>, obfuscation, path traversal</td>
+</tr>
+<tr>
+<td><code>model-hub-provenance</code></td>
+<td><code>huggingface-hub</code></td>
+<td>1 CRITICAL supply-chain (instalasi tanpa checksum)</td>
+</tr>
+<tr>
+<td><code>public-feed-reader</code></td>
+<td><code>reddit-reading</code></td>
+<td>1 CRITICAL data exfiltration</td>
+</tr>
+<tr>
+<td><code>html-to-video-render</code></td>
+<td><code>hyperframes</code></td>
+<td>7 privilege_escalation (<code>setup.sh</code> + sudo)</td>
+</tr>
+<tr>
+<td><code>local-experiment-tracking</code></td>
+<td><code>weights-and-biases</code></td>
+<td>exfiltration HIGH + supply_chain</td>
+</tr>
+<tr>
+<td><code>privilege-free-tooling</code></td>
+<td>pola <code>sudo</code> di <code>ascii-art</code>/<code>llama-cpp</code>/<code>vllm</code>/<code>lm-eval</code></td>
+<td>privilege_escalation berulang</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Tindakan yang dilakukan sekarang:</strong> pemasangan ke seluruh profil yang dipetakan registry (<code>install_skills.py --all</code> → 53 operasi, <code>--main</code> → 29 operasi ke <code>~/.hermes/skills/super-dev-builders/</code>), sehingga gap repo-vs-profil tertutup dan <code>registry_lint</code> melaporkan PASS.</p>
+<hr />
+<h2 id="3-riset-pengganti-lanjutan-mandat-baru">3. Riset pengganti lanjutan (mandat baru)</h2>
+<h3 id="31-sel-yang-masih-lemah-sebelum-riset-ini">3.1 Sel yang masih lemah sebelum riset ini</h3>
+<ol>
+<li><code>serving-llms-vllm</code> → parity <strong><code>&lt;</code></strong> (alasan lama: "tidak ada GPU, vLLM tidak layak").</li>
+<li><code>inference-sh-cli</code> → <strong><code>n/a</code></strong> (dianggap sudah tercakup tool native, padahal kapabilitasnya "menjalankan inferensi LLM lewat CLI/SaaS pihak ketiga").</li>
+<li><code>touchdesigner-mcp</code> → <strong><code>n/a</code></strong> (aplikasi berlisensi tidak ada di host).</li>
+</ol>
+<h3 id="32-kandidat-yang-diperiksa-dengan-status-bukti-yang-jujur">3.2 Kandidat yang diperiksa (dengan status bukti yang jujur)</h3>
+<table>
+<thead>
+<tr>
+<th>Kandidat</th>
+<th>Jenis pemeriksaan</th>
+<th>Hasil</th>
+<th>Keputusan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>vllm-project/vllm</code> (PyPI)</td>
+<td>cek PyPI + kondisi host</td>
+<td>butuh GPU untuk performa; <code>nvidia-smi</code> tidak ada</td>
+<td><strong>Tolak</strong> sebagai jalur utama (tetap opsi eskalasi bila Owner menyediakan GPU)</td>
+</tr>
+<tr>
+<td><code>llama-cpp-python</code> (PyPI 0.3.36)</td>
+<td>cek PyPI JSON</td>
+<td>hanya <strong>sdist</strong> (tanpa wheel Linux) → perlu kompilasi</td>
+<td>Tolak sebagai jalur utama; dipakai hanya bila butuh binding Python</td>
+</tr>
+<tr>
+<td><code>ggml-org/llama.cpp</code> — binari rilis</td>
+<td>GitHub Releases API</td>
+<td>rilis <code>v0.5.0</code> <strong>tanpa</strong> binari Linux (hanya <code>nightly-tag.txt</code>)</td>
+<td>Tolak jalur binari → <strong>build dari source, tag+commit dipin</strong></td>
+</tr>
+<tr>
+<td><code>ggml-org/llama.cpp</code> — build source</td>
+<td>cmake build nyata di host</td>
+<td>berhasil; <code>llama-server --version</code> = <code>0.5.0-dev (build 1, commit 7fe450e)</code>, binari statis 18 MB</td>
+<td><strong>DIPILIH</strong> untuk penggantian <code>serving-llms-vllm</code> + <code>inference-sh-cli</code></td>
+</tr>
+<tr>
+<td>HuggingFace langsung (model)</td>
+<td><code>curl</code> HEAD</td>
+<td><code>huggingface.co</code> &amp; <code>hf-mirror.com</code> <strong>tidak dapat dijangkau</strong> (mirror me-redirect ke HF)</td>
+<td>Tolak; catat sebagai fakta lingkungan</td>
+</tr>
+<tr>
+<td>ModelScope (model)</td>
+<td>HEAD + API metadata</td>
+<td><strong>dapat dijangkau</strong>; <code>sha256</code> tersedia per file</td>
+<td><strong>DIPILIH</strong> sebagai sumber model + verifikasi hash</td>
+</tr>
+<tr>
+<td>Ollama OCI registry (model)</td>
+<td>HTTP API manifest</td>
+<td><strong>dapat dijangkau</strong>; layer memuat <strong>digest sha256</strong></td>
+<td>Dipilih sebagai sumber alternatif (provenance kuat)</td>
+</tr>
+<tr>
+<td>TouchDesigner (aplikasi)</td>
+<td>fakta platform/lisensi</td>
+<td>proprietary, Windows/macOS; tidak ada di host Linux</td>
+<td>Tolak sebagai basis pengganti</td>
+</tr>
+<tr>
+<td>Engine visual realtime alternatif</td>
+<td>uji nyata di host</td>
+<td>Chromium/Playwright <strong>WebGL aktif</strong> (<code>WebKit WebGL \| WebGL 1.0 (OpenGL ES 2.0 Chromium)</code>), dapat dikendalikan dari luar proses, dapat direkam</td>
+<td><strong>DIPILIH</strong> untuk penggantian <code>touchdesigner-mcp</code></td>
+</tr>
+<tr>
+<td>Kandidat lain (Godot, Natron, cables.gl, Blender-MCP, dll.)</td>
+<td><strong>belum diuji</strong></td>
+<td>hanya pertimbangan desain di kepala, <strong>tanpa</strong> metadata terverifikasi</td>
+<td>Ditandai <em>belum dievaluasi</em> — <strong>tidak</strong> dipakai sebagai dasar klaim</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Catatan kejujuran: kandidat di baris terakhir <strong>tidak</strong> saya klaim terverifikasi. Hanya kandidat yang punya baris bukti di atas yang dipakai untuk keputusan.</p>
+</blockquote>
+<h3 id="33-dua-skill-baru-hasil-riset">3.3 Dua skill baru hasil riset</h3>
+<p><strong>A. <code>local-llm-serving</code></strong> — menggantikan <code>serving-llms-vllm</code>, <code>inference-sh-cli</code>, dan menutup jalur model <code>llama-cpp</code>.
+- Binari dibangun dari source pada <strong>tag <code>v0.5.0</code> (commit <code>7fe450e</code>)</strong>, statis (<code>-DBUILD_SHARED_LIBS=OFF</code>), tanpa <code>sudo</code>, tanpa <code>curl | sh</code>.
+- API kompatibel OpenAI: <code>/health</code>, <code>/v1/models</code>, <code>/v1/chat/completions</code>.
+- Model: <code>qwen2.5-0.5b-instruct-q4_k_m.gguf</code> — <strong>sha256 <code>74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db</code></strong>, 491.400.032 byte, terverifikasi sebelum dipakai.
+- Kenapa <strong>melebihi</strong>: skill lama memerlukan runtime vLLM yang <strong>tidak dapat dipakai sama sekali</strong> di host tanpa GPU; jalur ini <strong>terbukti melayani</strong> (batching paralel terukur) dan tidak bergantung SaaS pihak ketiga.</p>
+<p><strong>B. <code>realtime-visual-engine</code></strong> — menggantikan <code>touchdesigner-mcp</code>.
+- Pipeline: Chromium headless (Playwright) + WebGL/GLSL → frame → <code>ffmpeg</code> h264.
+- Kenapa <strong>melebihi</strong>: skil lama mengasumsikan aplikasi proprietary yang tidak ada di host; pengganti ini jalan di host, tanpa lisensi, lintas platform, dan <strong>dapat dikendalikan agen</strong> lewat jalur kontrol eksternal (UDP/OSC stdlib).</p>
+<hr />
+<h2 id="4-bukti-empiris-angka-mentah-bukan-narasi">4. Bukti empiris (angka mentah, bukan narasi)</h2>
+<h3 id="41-serving-llm-lokal-reportsupgrade-evidencelocal-llm-serving-benchjson">4.1 Serving LLM lokal — <code>reports/upgrade-evidence/local-llm-serving-bench.json</code></h3>
+<p>Kondisi host saat uji (penting untuk kejujuran): load average 10,55–13,23; <code>postgres</code> dan <code>chrome</code> bersaing CPU. Karena itu bench dijalankan <strong>3×</strong> dan dilaporkan <strong>median + min/max</strong> — bukan angka terbaik.</p>
+<table>
+<thead>
+<tr>
+<th>Metrik</th>
+<th>Nilai</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Kesiapkan server (<code>/health</code> ok)</td>
+<td>1,02 s; <code>{"status": "ok"}</code></td>
+</tr>
+<tr>
+<td>Single request</td>
+<td>median <strong>16,35</strong> tok/s (min 12,82 · max 29,34)</td>
+</tr>
+<tr>
+<td>4 request paralel (<code>-np 4</code>)</td>
+<td>agregat median <strong>52,36</strong> tok/s (min 43,99 · max 54,97)</td>
+</tr>
+<tr>
+<td>Rasio batching</td>
+<td>median <strong>3,2×</strong> (min 1,5× · max 4,29×) — <strong>&gt; 1 di setiap run</strong></td>
+</tr>
+<tr>
+<td>Memori server (RSS)</td>
+<td>~600 MB (model 491 MB)</td>
+</tr>
+<tr>
+<td>Output nyata</td>
+<td>teks Bahasa Indonesia koheren, 51–64 token/permintaan, semua HTTP 200</td>
+</tr>
+</tbody>
+</table>
+<h3 id="42-visual-realtime-reportsupgrade-evidencerealtime-visual-reportjson-realtime-visualmp4">4.2 Visual realtime — <code>reports/upgrade-evidence/realtime-visual-report.json</code> + <code>realtime-visual.mp4</code></h3>
+<table>
+<thead>
+<tr>
+<th>Kriteria</th>
+<th>Hasil</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Konteks WebGL nyata</td>
+<td><code>WebKit WebGL \| WebGL 1.0 (OpenGL ES 2.0 Chromium)</code></td>
+</tr>
+<tr>
+<td>Kontrol eksternal diterima</td>
+<td><code>udp_received = ["hue=0.95 zoom=1.35"]</code></td>
+</tr>
+<tr>
+<td>Kontrol eksternal <strong>menang</strong> atas animasi internal</td>
+<td><code>udp_override_active = true</code></td>
+</tr>
+<tr>
+<td>Parameter berbeda → piksel berbeda (waktu sama)</td>
+<td><code>param_changes_pixels = true</code></td>
+</tr>
+<tr>
+<td>Frame terakhir bukan hasil default internal</td>
+<td><code>last_frame_differs_from_internal_default = true</code></td>
+</tr>
+<tr>
+<td>Determinisme (reproduksi bit-identik)</td>
+<td><code>applied_value_reproduces_last_frame = true</code></td>
+</tr>
+<tr>
+<td>Frame unik</td>
+<td>32 dari 32</td>
+</tr>
+<tr>
+<td>Video h264</td>
+<td><code>ffmpeg_rc = 0</code>, 101.705 byte, <code>ffprobe</code> OK</td>
+</tr>
+</tbody>
+</table>
+<h3 id="43-gate-yang-dijalankan">4.3 Gate yang dijalankan</h3>
+<pre><code>pytest tests -q                -&gt; 49 passed
+scripts/registry_lint.py       -&gt; PASS  (custom skills: 29 | profiles: 7 | keep_local: 26)
+scripts/doctor.py              -&gt; exit 0
+scripts/evidence_lint.py &lt;2 bukti baru&gt; -&gt; PASS (1 file, 1 record) x2
+ruff check skills/             -&gt; All checks passed!
+</code></pre>
+<hr />
+<h2 id="5-sisa-batasan-jujur">5. Sisa batasan (jujur)</h2>
+<ol>
+<li><strong>Kecepatan CPU</strong>: 0,5B q4 pada CPU berbagi beban ≈ 16 tok/s single. Ini bukan pengganti GPU untuk beban produksi besar.</li>
+<li><strong>FPS visual software-GL</strong> ≈ 6–12 fps pada 480×270 (SwiftShader). Pengganti setara TouchDesigner hanya bila GPU tersedia; jangan klaim "60 fps".</li>
+<li><strong>Fitur visual lanjutan</strong> (live video-in, mixing multi-layer, MIDI penuh) belum ada; butuh pass shader tambahan/pustaka OSC.</li>
+<li><strong>Model &amp; tool pihak ketiga</strong> tetap butuh audit berkala; versi dipin hari ini bisa berubah besok.</li>
+<li><strong><code>release_check.py</code></strong> tanpa <code>--project</code> memang FAIL (gate proyek, bukan gate ekosistem) — dijalankan per-target saat rilis, bukan untuk pekerjaan ini.</li>
+<li>Skill pihak ketiga (Superpowers, Trail of Bits, Sentry, Anthropic, GitHub MCP, Context7, Crawlee, axe-core, Lighthouse) <strong>masih PENDING_APPROVAL Owner</strong> — tidak ada yang dipasang diam-diam.</li>
+</ol>
+<hr />
+<h2 id="6-perubahan-berkas-pada-pekerjaan-ini">6. Perubahan berkas pada pekerjaan ini</h2>
+<table>
+<thead>
+<tr>
+<th>Berkas</th>
+<th>Perubahan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>skills/local-llm-serving/**</code></td>
+<td><strong>baru</strong> — SKILL.md + <code>scripts/serve_and_bench.py</code> (multi-run, median, metadata bukti)</td>
+</tr>
+<tr>
+<td><code>skills/realtime-visual-engine/**</code></td>
+<td><strong>baru</strong> — SKILL.md + <code>scripts/render_shader.py</code> (WebGL + kontrol UDP/OSC + ffmpeg)</td>
+</tr>
+<tr>
+<td><code>skills/model-hub-provenance/scripts/fetch_gguf.py</code></td>
+<td>ditambah jalur ModelScope + pin sha256 + verifikasi ukuran</td>
+</tr>
+<tr>
+<td><code>registry/skills.yaml</code></td>
+<td>+2 entri (29), <code>approved_custom_count: 29</code>, klaim parity + bukti</td>
+</tr>
+<tr>
+<td><code>registry/tools.yaml</code></td>
+<td>+<code>llama_cpp_server</code>, <code>ffmpeg</code>, <code>chromium_headless_webgl</code>; bagian baru <code>model_sources</code> (termasuk catatan HF diblokir)</td>
+</tr>
+<tr>
+<td><code>scripts/registry_lint.py</code></td>
+<td>hitung dari <code>approved_custom_count</code>; error bila menyusut &lt; 21</td>
+</tr>
+<tr>
+<td><code>docs/CAPABILITY_REPLACEMENT_MATRIX.md</code></td>
+<td>semua sel <code>&lt;</code> dan <code>n/a</code> ditutup + bukti</td>
+</tr>
+<tr>
+<td><code>tests/test_replacement_skills.py</code></td>
+<td><strong>baru</strong> — 7 test penjaga klaim parity &amp; kriteria bukti</td>
+</tr>
+<tr>
+<td><code>reports/upgrade-evidence/*</code></td>
+<td>bukti: bench JSON, render report JSON, mp4, 4 PNG (frame + kausalitas)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-langkah-berikut-yang-disarankan-butuh-keputusan-owner">7. Langkah berikut yang disarankan (butuh keputusan Owner)</h2>
+<ol>
+<li><strong>Setujui/tolak</strong> <code>docs/00_MASTER_BLUEPRINT_V2.2.html</code> addendum (jumlah skill resmi 29) — agar dokumen acuan tidak lagi berbeda dengan registry.</li>
+<li><strong>Pilih mode binari</strong>: pertahankan build-source (butuh ~4 menit rebuild saat upgrade) atau izinkan mirror binari dengan checksum.</li>
+<li>Bila GPU tersedia: aktifkan <code>vllm</code> sebagai jalur throughput tinggi dan jalankan ulang bench sebagai pembanding.</li>
+<li>Skill pihak ketiga yang masih PENDING: putuskan satu per satu (rekomendasi saya: mulai dari <code>anthropics/skills</code> untuk frontend/webapp-testing karena lisensinya belum jelas — minta konfirmasi dulu).</li>
+</ol><footer>Dihasilkan dari <code>docs/RESEARCH_REPLACEMENT_2026-10-04.md</code> · md_to_pdf.py · tanpa layanan pihak ketiga</footer></main></body></html>

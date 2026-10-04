@@ -137,6 +137,7 @@ def main(argv=None) -> int:
     ap.add_argument("--target", help="slug target (membaca evidence/<slug>/authorization.yaml)")
     ap.add_argument("--manifest", help="path authorization manifest langsung")
     ap.add_argument("--quiet", action="store_true")
+    ap.add_argument("--out", help="tulis verdict ke path ini (default: reports/<target>/gate0-verdict.json)")
     args = ap.parse_args(argv)
 
     if not args.target and not args.manifest:
@@ -184,7 +185,7 @@ def main(argv=None) -> int:
             }
 
     slug = args.target or (result.get("target") or "unknown")
-    out_path = repo_path("reports", str(slug), "gate0-verdict.json")
+    out_path = args.out or repo_path("reports", str(slug), "gate0-verdict.json")
     write_json(out_path, result)
 
     if not args.quiet:

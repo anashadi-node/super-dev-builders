@@ -149,7 +149,7 @@ def test_gate_main_exit_codes(tmp_path):
         " docker_socket: false, host_credentials_mounted: false}\n"
         "approved_by: tester\napproved_at: 2026-10-04T00:00:00+07:00\n",
         encoding="utf-8")
-    code = gate.main(["--manifest", str(manifest), "--quiet"])
+    code = gate.main(["--manifest", str(manifest), "--quiet", "--out", str(tmp_path / "v1.json")])
     assert code == 1, "manifest tidak lengkap harus FAIL (exit 1)"
     manifest.write_text(
         "target_name: exitcode-test\nmode: A\nauthorization_type: owned\n"
@@ -162,7 +162,7 @@ def test_gate_main_exit_codes(tmp_path):
         " network_egress: restricted, docker_socket: false, host_credentials_mounted: false}\n"
         "approved_by: tester\napproved_at: 2026-10-04T00:00:00+07:00\n",
         encoding="utf-8")
-    assert gate.main(["--manifest", str(manifest), "--quiet"]) == 0
+    assert gate.main(["--manifest", str(manifest), "--quiet", "--out", str(tmp_path / "v2.json")]) == 0
 
 
 # --------------------------------------------------------------- evidence lint

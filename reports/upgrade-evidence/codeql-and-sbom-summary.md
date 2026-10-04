@@ -40,6 +40,13 @@ Catatan: temuan keamanan (`clear-text-logging-sensitive-data`, `overly-permissiv
 
 Artefak: `codeql-oss-click.sarif`, `sbom-oss-click-spdx.json`, `sbom-spdx.json`, `sbom-cyclonedx.json`.
 
+## Jebakan yang sudah terverifikasi (jangan diulang)
+| Salah | Gejala | Benar |
+|---|---|---|
+| `codeql database analyze <db> --download --format=sarif-latest` | `A fatal error occurred: Missing required parameter: <scope/name[@version]|suite.qls>` | `codeql pack download codeql/python-queries` **lalu** `codeql database analyze <db> codeql/python-queries:codeql-suites/python-security-and-quality.qls …` |
+| `codeql database create` | peringatan `Failed to find dynload path` | **tidak fatal** — indeks tetap jalan (91/91 berkas Python) |
+| `syft` pada repo tanpa manifest | `No packages discovered` | **bukan** bukti bebas kerentanan; jalankan pada tree yang ber-manifest untuk bukti nyata |
+
 ## ⚠️ Batas lisensi CodeQL (WAJIB dipatuhi)
 Dari README resmi rilis CodeQL CLI:
 

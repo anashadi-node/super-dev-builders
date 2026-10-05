@@ -224,6 +224,46 @@ Pemeriksaan jaringan: **tidak ada** `requests`/`urllib`/`socket` sama sekali (sa
 - **TIDAK DIADOPSI**: `mutation-testing`, `property-based-testing` (butuh dependensi baru; prinsip minimal).
 - **DIBLOKIR/DITOLAK di tingkat sumber**: `anthropics/skills` (lisensi), `obra/superpowers` (acuan), `getsentry/skills` (cakupan).
 
+### 5.5 Temuan resmi hub (verdict ulang) + AKAR PENYEBAB yang kini terbukti
+
+Kali ini daftar temuan resmi berhasil diambil, dan **nama rules-nya menjelaskan segalanya**:
+
+**`variant-analysis`** — audit: CAUTION, 11 temuan. **Seluruh 11 temuan berada di `resources/semgrep/*.yaml`**, dan isinya adalah **aturan pendeteksi**, bukan kode yang dijalankan:
+
+```
+resources/semgrep/java.yaml:22        - pattern: Runtime.getRuntime().exec($SINK, ...)
+resources/semgrep/python.yaml:27      - pattern: os.system($SINK)
+resources/semgrep/javascript.yaml:22  - pattern: child_process.exec($SINK, ...)
+resources/semgrep/javascript.yaml:59  - pattern-not: eval("...")
+```
+
+Hub menandai **aturan yang justru mencari `os.system`/`exec`** sebagai "execution"/"obfuscation". Tidak ada satu pun baris yang dieksekusi. (Ini juga mengoreksi catatan lama saya: hit `eval(` bukan 6, melainkan bagian dari 11 temuan — semuanya pola rule.)
+
+**`post-patch-validation`** — audit: CAUTION, 12 temuan, rules: `allowed_tools_field, python_os_environ, …`. Prediksi saya dari pembacaan kode **cocok persis**:
+
+| Temuan hub | Baris | Kenyataan |
+|---|---|---|
+| `HIGH exfiltration` @265 | `env = {key: value for key, value in os.environ.items() if key in BASE_ENV_KEYS}` | whitelist env (scrubbing) |
+| `HIGH exfiltration` @762/764 | `if CREDENTIAL_ENV_RE.search(upper): raise PlanError("--allow-env refuses {name}: forwarded values are recorded verbatim in result.json, so it reads as a credential")` | kode ini **MENOLAK** meneruskan env mirip kredensial — pengerasan, ditandai sebagai kebocoran |
+| `MEDIUM execution` ×3 | `subprocess.run/Popen` untuk `git worktree` + menjalankan test suite | inti fungsi |
+
+**`modern-python`** — hub: DANGEROUS, rules: `curl_pipe_shell, destructive_home_rm, dump_all_env, remote_fetch, uv_run`. Isi 90 temuan itu:
+
+| Rule hub | Pemicu nyata | Vonis |
+|---|---|---|
+| `uv_run` (mayoritas dari 90) | `uv run ruff check .`, `uv run pytest`, `uv run ty check`, `#!/usr/bin/env -S uv run --script` | tool yang kita pakai sendiri; hitungan membengkak karena satu rule mengenai puluhan baris dokumentasi |
+| `curl_pipe_shell` | 2 baris installer (`astral.sh/uv/install.sh`) | **nyata & dilarang di host ini** |
+| `destructive_home_rm` | `rm -rf ~/.cache/pre-commit` (prek.md:200) | pembersihan cache milik user sendiri |
+| `dump_all_env`, `remote_fetch` | contoh dokumentasi | bukan eksekusi |
+| `HIGH exfiltration` @SKILL.md:66,272 | **baris tabel** berisi `uv run <cmd>` | salah-kelas |
+
+**AKAR PENYEBAB (kini terbukti, bukan hipotesis)**: `hermes skills install` hanya mengunduh **sebagian** berkas (codeql 2/34, variant-analysis 9/18, audit-context-building 3/6). Berkas yang tidak terunduh **tidak pernah discan saat instalasi**, sehingga skill lolos dengan verdict ALLOWED. Ketika saya **melengkapi** berkas dari commit pin, `hermes skills audit` men-scan isi lengkap dan menemukan temuannya — dan **setiap temuan berada persis di berkas yang tadinya tidak terunduh**:
+
+- `variant-analysis`: 11/11 temuan di `resources/semgrep/*.yaml` (bagian dari 9 berkas yang hilang)
+- `codeql`: 25/25 temuan di `scripts/`, `workflows/`, `references/` (bagian dari 32 berkas yang hilang)
+
+Artinya **aturan audit hub menandai berkas yang tidak pernah ia unduh** — itu menjelaskan mengapa verdict bisa `ALLOWED` saat instalasi lalu `BLOCKED` saat audit, tanpa ada perubahan pada skill itu sendiri.
+
 ---
 
 ## 6. Caveat operasional yang mengikat

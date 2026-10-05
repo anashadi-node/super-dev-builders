@@ -1,0 +1,65 @@
+[
+  {
+    "dimension": "visual",
+    "status": "match",
+    "coverage": 1.0,
+    "evidence": "verification/sdb-local-demo/diffs/visual-index.png",
+    "note": "pixel diff full-page / (coverage = 1 - rasio piksel berbeda; selisih gaya disengaja dilaporkan apa adanya)"
+  },
+  {
+    "dimension": "navigation",
+    "status": "ok",
+    "coverage": 1.0,
+    "evidence": "normalized/sdb-local-demo/screens.json",
+    "note": "Jaccard tautan (original=2, rebuild=2)"
+  },
+  {
+    "dimension": "interaction",
+    "status": "ok",
+    "coverage": 1.0,
+    "evidence": "capture.json#pages[].interaction.effect",
+    "note": "selector sama=True; dialog original/rebuild=0/0; aria-expanded=None/None; dom_delta=3/3; status_text=True/True"
+  },
+  {
+    "dimension": "api_contract",
+    "status": "ok",
+    "coverage": 1.0,
+    "evidence": "capture.json#interaction.api_calls",
+    "note": "1 endpoint dibandingkan; status+kunci JSON sama=True"
+  },
+  {
+    "dimension": "functional",
+    "status": "ok",
+    "coverage": 1.0,
+    "evidence": "normalized/sdb-local-demo/inventory.json",
+    "note": "status HTTP per halaman sama"
+  },
+  {
+    "dimension": "accessibility",
+    "status": "ok",
+    "coverage": 1.0,
+    "evidence": "normalized/<target>/components.json",
+    "note": "fitur original terpenuhi 6/6"
+  },
+  {
+    "dimension": "responsive",
+    "status": "NOT_MEASURED",
+    "coverage": null,
+    "evidence": "-",
+    "note": "capture mobile tidak dijalankan"
+  },
+  {
+    "dimension": "performance",
+    "status": "ok",
+    "coverage": 1.0,
+    "evidence": "capture.json#pages[].load_ms",
+    "note": "load original 914 ms vs rebuild 926 ms (coverage=rasio dibatasi 1.0)"
+  },
+  {
+    "dimension": "external_dependency",
+    "status": "NOT_OBSERVED",
+    "coverage": null,
+    "evidence": "normalized/<target>/network.json",
+    "note": "original juga tidak menghubungi host pihak ketiga"
+  }
+]

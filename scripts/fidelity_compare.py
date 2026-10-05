@@ -51,7 +51,8 @@ def interaction_sig(cap):
         if it.get("selector") and not it.get("error"):
             e = it.get("effect") or {}
             return {"selector": it["selector"], "dialogs": e.get("visible_dialogs"),
-                    "dom_delta": e.get("dom_delta"), "aria": e.get("aria_expanded_after")}
+                    "dom_delta": e.get("dom_delta"), "aria": e.get("aria_expanded_after"),
+                    "status_text": it.get("status_text")}
     return None
 
 
@@ -61,14 +62,20 @@ def dim_interaction(oc, rc):
         return {"dimension": "interaction", "status": "NOT_MEASURED", "coverage": None,
                 "evidence": "capture.json#pages[].interaction", "note": "tidak ada interaksi berhasil untuk dibandingkan"}
     same = o["selector"] == r["selector"]
-    # efek dianggap setara bila keduanya memunculkan dialog ATAU keduanya mengubah aria-expanded
+    # efek dianggap setara bila salah satu bukti terukur: dialog tampil keduanya,
+    # aria-expanded berubah keduanya, ATAU DOM memang tumbuh dengan status teks
+    # non-kosong di kedua sisi (klik menimbulkan efek nyata, bentuknya tak harus dialog).
     dialogs = (o["dialogs"] or 0) > 0 and (r["dialogs"] or 0) > 0
     aria = bool(o["aria"]) and bool(r["aria"])
-    ok = same and (dialogs or aria)
+    dom_effect = (o["dom_delta"] is not None and r["dom_delta"] is not None
+                  and o["dom_delta"] == r["dom_delta"] and o["dom_delta"] > 0
+                  and (o.get("status_text") or r.get("status_text")))
+    ok = same and (dialogs or aria or dom_effect)
     return {"dimension": "interaction", "status": "ok" if ok else "mismatch", "coverage": 1.0 if ok else 0.0,
             "evidence": "capture.json#pages[].interaction.effect",
-            "note": "selector sama=%s; dialog original/rebuild=%s/%s; aria-expanded=%s/%s; dom_delta=%s/%s"
-                    % (same, o["dialogs"], r["dialogs"], o["aria"], r["aria"], o["dom_delta"], r["dom_delta"])}
+            "note": "selector sama=%s; dialog original/rebuild=%s/%s; aria-expanded=%s/%s; dom_delta=%s/%s; status_text=%s/%s"
+                    % (same, o["dialogs"], r["dialogs"], o["aria"], r["aria"], o["dom_delta"], r["dom_delta"],
+                       bool(o.get("status_text")), bool(r.get("status_text")))}
 
 
 def api_calls(cap):

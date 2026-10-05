@@ -59,7 +59,6 @@ Resolver uv (minimal-change) menahan `tornado`/`oauthlib` → dipaksa lewat `ove
 - Pasca `hermes update`: jalankan `git status --short` di `~/.hermes/hermes-agent`; bila patch hilang → `git apply` patch di atas, lalu `hermes pm lock && hermes pm install` dan verifikasi ulang langkah §3.2–3.5.
 
 ## 5. Perintah verifikasi cepat
-
 ```bash
 K=8f187687540a47e8
 V=$(python3 -c "import json;print(json.load(open('$HOME/.hermes/installs/'+'$K'+'/facts.json'))['packages']['venv']['environment'])")
@@ -68,3 +67,34 @@ V=$(python3 -c "import json;print(json.load(open('$HOME/.hermes/installs/'+'$K'+
 ps -eo pid,args | grep -m1 "hermes-agent/.hermes/bin/hermes" | awk '{print $1}' \
   | xargs -I{} grep -o "/installs/[^ ]*site-packages" /proc/{}/maps | sort -u
 ```
+
+## 6. Hardening 3 workspace npm (item #4 lanjutan) — 2026-10-05
+
+Baseline `npm audit` (pohon yang diperiksa `hermes doctor`): root `--workspaces=false` **2**, `web` **5**, `ui-tui` **4** → **sesudah: 0 / 0 / 0**.
+
+| Paket | Sebelum | Sesudah | Mekanisme |
+|---|---|---|---|
+| brace-expansion | 5.0.9 | **5.0.12** | `overrides` root |
+| js-yaml | 4.3.1 | **4.3.2** | `overrides` root + dep langsung root |
+| undici (^7) | 7.29.0 | **7.29.1** | `overrides` root |
+| undici (^6, node-gyp/nodejs + ui-tui) | 6.28.0 | **6.28.1** | `overrides` + dep langsung `ui-tui` |
+| yaml | 2.8.1 | **2.9.1** | `overrides` root (baru) |
+| vitest + @vitest/mocker | 4.1.10 | **4.1.11** | devDep `web` + `ui-tui` |
+
+Catatan mekanika (penting untuk pengulangan):
+1. Perbaikan **wajib di root** — repo ini memakai npm workspaces; `npm audit` di dalam `web/`/`ui-tui/` mengukur pohon hoisted yang sama.
+2. `.npmrc` repo memakai **`min-release-age=14`** (kuarantina 14 hari, analog PM). Versi yang lebih baru dari 14 hari ditolak (`ETARGET`) kecuali ditambah `min-release-age-exclude[]`; pilih versi fix yang **sudah** melewati kuarantina (undici `6.28.1`, bukan `6.29.0`).
+3. `EOVERRIDE` muncul bila paket yang di-override juga dependency langsung — bump keduanya (`js-yaml` root).
+4. `npm install` biasa **tidak** selalu me-reify override pada entri lock yang sudah ada → jalankan `npm update <pkg>` untuk memaksa re-resolve (`undici`).
+5. `hermes update` menjalankan `npm ci` deterministik dari lockfile, jadi patch ini hidup selama lockfile lokal tetap ada (autostash). **Bila hilang** → `git apply` patch npm di §6.
+
+Bukti uji (bukan sekadar audit):
+```bash
+npm test --workspace web     # 51 file / 369 tes PASS
+npm run build:ink --workspace ui-tui && npm test --workspace ui-tui   # 176 file / 1620 tes PASS (2 skip)
+```
+`build:ink` wajib lebih dulu: 77 file uji `ui-tui` gagal collect (**pre-existing**, bukan regresi bump) karena `packages/hermes-ink/dist/entry-exports.js` belum dibundel.
+
+Patch: `~/backups/sdb-hardening-20261005_full/hermes-agent-npm-20261005.patch`
+sha256 `e36df7d1db8dec6cb14beb9cd177458b630f57f77e65c1d559a0a06ecfd6847d`.
+`ui-tui/packages/hermes-ink/dist/` ditambahkan ke `.git/info/exclude` (artefak build lokal, bukan tracked).

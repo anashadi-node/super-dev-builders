@@ -1,8 +1,8 @@
 {
-  "captured_at": "2026-10-04T07:25:03+0700",
+  "captured_at": "2026-10-05T19:41:23+0700",
   "repo": "/home/anashadi/super-dev-builders/.",
-  "repo_files": 92,
-  "custom_skills": 21,
+  "repo_files": 334,
+  "custom_skills": 29,
   "profiles": {
     ".deleted": {
       "skills": 0,
@@ -34,13 +34,13 @@
       "description": "Auditor internal ekosistem Anantara Sakti - scan kelemahan & kekurangan semua divisi"
     },
     "cc-architect": {
-      "skills": 94,
+      "skills": 96,
       "soul_md": true,
       "memories": 0,
       "description": "<unreadable>"
     },
     "cc-builder": {
-      "skills": 93,
+      "skills": 103,
       "soul_md": true,
       "memories": 0,
       "description": "<unreadable>"
@@ -52,25 +52,25 @@
       "description": "<unreadable>"
     },
     "cc-devops-docs": {
-      "skills": 94,
+      "skills": 101,
       "soul_md": true,
       "memories": 0,
       "description": "<unreadable>"
     },
     "cc-orchestrator": {
-      "skills": 89,
+      "skills": 90,
       "soul_md": true,
       "memories": 0,
       "description": "<unreadable>"
     },
     "cc-reviewer-qa": {
-      "skills": 92,
+      "skills": 96,
       "soul_md": true,
       "memories": 0,
       "description": "<unreadable>"
     },
     "cc-security-governor": {
-      "skills": 94,
+      "skills": 105,
       "soul_md": true,
       "memories": 0,
       "description": "<unreadable>"
@@ -152,11 +152,11 @@
     "playwright": true,
     "pytest": true,
     "uv": true,
-    "semgrep": false,
-    "codeql": false,
-    "trivy": false,
-    "syft": false,
-    "ruff": false,
+    "semgrep": true,
+    "codeql": true,
+    "trivy": true,
+    "syft": true,
+    "ruff": true,
     "gh": false,
     "adb": true,
     "nmap": false,
@@ -173,6 +173,7 @@
     "top_level_keys": [
       "_config_version",
       "agent",
+      "approvals",
       "auxiliary",
       "browser",
       "code_execution",
@@ -194,6 +195,7 @@
       "model",
       "onboarding",
       "platform_toolsets",
+      "plugins",
       "prompt_caching",
       "providers",
       "runtime",
@@ -209,5 +211,9 @@
       "web"
     ]
   },
-  "plugins": []
+  "plugins": [
+    ".install-metadata.json",
+    ".install-metadata.json.lock",
+    "hermes-session-reset-policy"
+  ]
 }

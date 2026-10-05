@@ -62,15 +62,29 @@ def main(argv=None) -> int:
                 report["host"][f"yaml_in:{candidate}"] = "error"
 
     # profil divisi
+    # Resolusi id logis sdb-* -> direktori profil aktual cc-* memakai agents/*.yaml
+    # (pola sama dengan scripts/install_skills.py:load_profile_aliases).
     expected = ["sdb-orchestrator", "sdb-recon", "sdb-architect", "sdb-builder",
                 "sdb-reviewer", "sdb-security", "sdb-devops"]
-    legacy = ["cc-orchestrator", "cc-capture-forensics", "cc-architect", "cc-builder",
-              "cc-reviewer-qa", "cc-security-governor", "cc-devops-docs"]
-    for name in expected + legacy:
-        d = os.path.join(PROFILES_DIR, name)
+    aliases = {}
+    agent_dir = repo_path("agents")
+    if os.path.isdir(agent_dir):
+        for name in os.listdir(agent_dir):
+            if not name.endswith(".yaml"):
+                continue
+            try:
+                data = load_yaml(os.path.join(agent_dir, name)) or {}
+            except Exception:
+                continue
+            logical, real = data.get("id"), data.get("hermes_profile")
+            if logical and real:
+                aliases[logical] = real
+    for logical in expected:
+        d = os.path.join(PROFILES_DIR, aliases.get(logical, logical))
         present = os.path.isdir(d)
-        report["profiles"][name] = {
+        report["profiles"][logical] = {
             "present": present,
+            "resolved": d if present else aliases.get(logical, logical),
             "soul_md": os.path.exists(os.path.join(d, "SOUL.md")) if present else False,
             "skills_dir": os.path.isdir(os.path.join(d, "skills")) if present else False,
         }

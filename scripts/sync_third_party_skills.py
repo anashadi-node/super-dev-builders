@@ -59,7 +59,6 @@ PROFILE_MAP = {
     "audit-context-building": ["cc-security-governor", "cc-architect"],
     "modern-python": ["cc-builder", "cc-devops-docs"],
     "post-patch-validation": ["cc-builder", "cc-security-governor", "cc-reviewer-qa"],
-    "variant-analysis": ["cc-security-governor", "cc-reviewer-qa"],
 }
 
 CLONE = os.path.join(os.path.expanduser("~/.hermes/cache/scratch"), "tob-skills-pin")

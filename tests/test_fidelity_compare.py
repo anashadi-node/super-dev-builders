@@ -11,7 +11,7 @@ import tempfile
 import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "scripts"))
-import fidelity_compare as fc  # noqa: E402
+import fidelity_compare as fc
 
 
 def cap(interaction=None, api=None, facts=None, status=200, load_ms=100, path="/index.html"):

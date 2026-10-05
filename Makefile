@@ -22,7 +22,10 @@ lint-registry:
 	$(PY_SYS) scripts/registry_lint.py
 
 release-check:
-	$(PY_SYS) scripts/release_check.py --project .
+	@slug=$$(python3 -c "import sys,os;runs='runs';c=[(os.path.getmtime(os.path.join(runs,d)),d) for d in (os.listdir(runs) if os.path.isdir(runs) else [])];print(max(c)[1] if c else '')" 2>/dev/null); \
+	if [ -z "$$slug" ]; then echo "Tidak ada run di runs/"; exit 1; fi; \
+	echo "release gate untuk: runs/$$slug"; \
+	$(PY_SYS) scripts/release_check.py --project runs/$$slug
 
 skills-list:
 	$(PY_SYS) scripts/install_skills.py --list

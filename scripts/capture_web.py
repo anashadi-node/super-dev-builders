@@ -10,7 +10,12 @@ Exit: 0 sukses, 2 argumen/target tidak sah, 3 gate #0 belum PASS.
 """
 from __future__ import annotations
 
-import argparse, json, os, sys, time, hashlib, pathlib
+import argparse
+import hashlib
+import os
+import pathlib
+import sys
+import time
 from urllib.parse import urlparse
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -44,7 +49,8 @@ def main(argv=None) -> int:
 
     from playwright.sync_api import sync_playwright  # import di dalam agar pesan rapi
 
-    out = pathlib.Path(args.out); out.mkdir(parents=True, exist_ok=True)
+    out = pathlib.Path(args.out)
+    out.mkdir(parents=True, exist_ok=True)
     pages = [urlparse(args.url).path or "/"] + [p for p in args.pages.split(",") if p]
     net = []
     with sync_playwright() as pw:
@@ -100,14 +106,14 @@ def main(argv=None) -> int:
                             try:
                                 bodies.append({"url": a["url"], "status": a["status"],
                                                "body": page.request.get(a["url"]).json()})
-                            except Exception as exc:  # noqa: BLE001
+                            except Exception as exc:
                                 bodies.append({"url": a["url"], "status": a["status"], "error": str(exc)})
                         interaction = {"selector": args.click, "status_text": status_txt, "api_calls": bodies,
                                        "aria_expanded_before": aria_before, "effect": {"dom_len_before": dom_before, "dom_len_after": dom_after,
                                                   "dom_delta": dom_after - dom_before,
                                                   "visible_dialogs": visible_dialogs,
                                                   "aria_expanded_after": page.eval_on_selector(args.click, "e => e.getAttribute('aria-expanded')") if page.query_selector(args.click) else None}}
-                except Exception as exc:  # noqa: BLE001
+                except Exception as exc:
                     interaction = {"selector": args.click, "error": str(exc)}
             result["pages"].append({"path": pth, "url": url, "http_status": resp.status if resp else None,
                                     "interaction": interaction,
@@ -117,7 +123,8 @@ def main(argv=None) -> int:
                                     "facts": facts})
             if i + 1 < len(pages):
                 time.sleep(args.rate_delay_s)
-        ctx.close(); browser.close()
+        ctx.close()
+        browser.close()
 
     write_json(out / "network.json", {"target": args.target, "captured_at": result["captured_at"],
                                       "base": base, "items": net})

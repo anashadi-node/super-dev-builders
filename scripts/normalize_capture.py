@@ -6,7 +6,10 @@ Exit 0 sukses, 2 bila artefak capture tidak ada.
 """
 from __future__ import annotations
 
-import argparse, os, sys, time
+import argparse
+import os
+import sys
+import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from sdb_common import now_iso, read_json, repo_path, write_json

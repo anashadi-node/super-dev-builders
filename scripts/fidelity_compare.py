@@ -10,11 +10,13 @@ jangan dikarang angkanya. Exit 0 sukses, 2 input kurang.
 """
 from __future__ import annotations
 
-import argparse, json, os, re, sys
+import argparse
+import os
+import sys
 from urllib.parse import urlparse
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from sdb_common import now_iso, read_json, repo_path, write_json
+from sdb_common import read_json, repo_path, write_json
 
 DIMS = ["visual", "navigation", "interaction", "responsive", "functional",
         "accessibility", "performance", "api_contract", "external_dependency"]
@@ -181,8 +183,8 @@ def main(argv=None) -> int:
                      "note": "pixel diff full-page %s (coverage = 1 - rasio piksel berbeda; selisih gaya disengaja dilaporkan apa adanya)" % first})
 
     # navigation
-    ol = {l["href"] for p in op.values() for l in p["facts"]["links"]}
-    rl = {l["href"] for p in rp.values() for l in p["facts"]["links"]}
+    ol = {lk["href"] for p in op.values() for lk in p["facts"]["links"]}
+    rl = {lk["href"] for p in rp.values() for lk in p["facts"]["links"]}
     nav = len(ol & rl) / len(ol | rl) if (ol | rl) else 1.0
     rows.append({"dimension": "navigation", "status": "ok" if nav == 1 else "partial",
                  "coverage": round(nav, 4), "evidence": "normalized/%s/screens.json" % args.target,

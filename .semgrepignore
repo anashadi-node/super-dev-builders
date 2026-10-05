@@ -1,0 +1,11 @@
+# Semgrepignore — Super Dev Builders Ecosystem
+# File evidence/verification/reconstruction adalah ARTEFAKTANGKAPAN target audit
+# (HTML tangkapan situs demo target), bukan kode produksi repo → rules
+# python.django.* (csrf) selalu FP di sana. Scan tetap penuh di scripts/, skills/, tests/.
+evidence/
+targets/
+reconstruction/
+normalization/
+screens/
+trace/
+dom/

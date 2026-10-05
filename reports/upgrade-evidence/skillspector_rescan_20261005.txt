@@ -1,0 +1,2621 @@
+Multi-skill directory detected: 29 skills found
+
+  [1/29] Scanning accessibility-audit (accessibility-audit/)
+         Score: 0/100 (LOW)
+
+  [2/29] Scanning api-contract (api-contract/)
+         Score: 0/100 (LOW)
+
+  [3/29] Scanning architecture-compliance-audit (architecture-compliance-audit/)
+         Score: 0/100 (LOW)
+
+  [4/29] Scanning architecture-decision-record (architecture-decision-record/)
+         Score: 0/100 (LOW)
+
+  [5/29] Scanning architecture-docs (architecture-docs/)
+         Score: 0/100 (LOW)
+
+  [6/29] Scanning authz-authn-review (authz-authn-review/)
+         Score: 0/100 (LOW)
+
+  [7/29] Scanning ci-cd-release-gate (ci-cd-release-gate/)
+         Score: 8/100 (LOW)
+
+  [8/29] Scanning database-migration-safety (database-migration-safety/)
+         Score: 0/100 (LOW)
+
+  [9/29] Scanning engineering-release-audit (engineering-release-audit/)
+         Score: 0/100 (LOW)
+
+  [10/29] Scanning evidence-normalizer (evidence-normalizer/)
+         Score: 0/100 (LOW)
+
+  [11/29] Scanning html-to-video-render (html-to-video-render/)
+         Score: 33/100 (MEDIUM)
+
+  [12/29] Scanning local-experiment-tracking (local-experiment-tracking/)
+         Score: 0/100 (LOW)
+
+  [13/29] Scanning local-llm-serving (local-llm-serving/)
+         Score: 67/100 (HIGH)
+
+  [14/29] Scanning local-media-generation (local-media-generation/)
+         Score: 41/100 (MEDIUM)
+
+  [15/29] Scanning model-hub-provenance (model-hub-provenance/)
+         Score: 23/100 (MEDIUM)
+
+  [16/29] Scanning observed-network-contract (observed-network-contract/)
+         Score: 0/100 (LOW)
+
+  [17/29] Scanning privilege-free-tooling (privilege-free-tooling/)
+         Score: 51/100 (HIGH)
+
+  [18/29] Scanning public-feed-reader (public-feed-reader/)
+         Score: 5/100 (LOW)
+
+  [19/29] Scanning realtime-visual-engine (realtime-visual-engine/)
+         Score: 20/100 (LOW)
+
+  [20/29] Scanning reconstruction-fidelity (reconstruction-fidelity/)
+         Score: 0/100 (LOW)
+
+  [21/29] Scanning reconstruction-scope-gate (reconstruction-scope-gate/)
+         Score: 0/100 (LOW)
+
+  [22/29] Scanning reconstruction-spec (reconstruction-spec/)
+         Score: 0/100 (LOW)
+
+  [23/29] Scanning release-handover-docs (release-handover-docs/)
+         Score: 0/100 (LOW)
+
+  [24/29] Scanning rollback-and-recovery (rollback-and-recovery/)
+         Score: 0/100 (LOW)
+
+  [25/29] Scanning target-inventory (target-inventory/)
+         Score: 0/100 (LOW)
+
+  [26/29] Scanning technology-profiler (technology-profiler/)
+         Score: 0/100 (LOW)
+
+  [27/29] Scanning technology-selection (technology-selection/)
+         Score: 0/100 (LOW)
+
+  [28/29] Scanning test-pyramid-and-risk (test-pyramid-and-risk/)
+         Score: 0/100 (LOW)
+
+  [29/29] Scanning ui-ux-state-mapper (ui-ux-state-mapper/)
+         Score: 0/100 (LOW)
+
+
+═══ Multi-Skill Summary ═══
+
+  Skill                          Score    Severity     Findings   Execution 
+  ────────────────────────────── ──────── ──────────── ────────── ──────────
+  accessibility-audit            0        LOW          0          successful
+  api-contract                   0        LOW          0          successful
+  architecture-compliance-audit  0        LOW          0          successful
+  architecture-decision-record   0        LOW          0          successful
+  architecture-docs              0        LOW          0          successful
+  authz-authn-review             0        LOW          0          successful
+  ci-cd-release-gate             8        LOW          1          successful
+  database-migration-safety      0        LOW          0          successful
+  engineering-release-audit      0        LOW          0          successful
+  evidence-normalizer            0        LOW          0          successful
+  html-to-video-render           33       MEDIUM       2          successful
+  local-experiment-tracking      0        LOW          0          successful
+  local-llm-serving              67       HIGH         7          successful
+  local-media-generation         41       MEDIUM       3          successful
+  model-hub-provenance           23       MEDIUM       3          successful
+  observed-network-contract      0        LOW          0          successful
+  privilege-free-tooling         51       HIGH         4          successful
+  public-feed-reader             5        LOW          1          successful
+  realtime-visual-engine         20       LOW          3          successful
+  reconstruction-fidelity        0        LOW          0          successful
+  reconstruction-scope-gate      0        LOW          0          successful
+  reconstruction-spec            0        LOW          0          successful
+  release-handover-docs          0        LOW          0          successful
+  rollback-and-recovery          0        LOW          0          successful
+  target-inventory               0        LOW          0          successful
+  technology-profiler            0        LOW          0          successful
+  technology-selection           0        LOW          0          successful
+  test-pyramid-and-risk          0        LOW          0          successful
+  ui-ux-state-mapper             0        LOW          0          successful
+--- accessibility-audit ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: accessibility-audit
+Source: /home/anashadi/super-dev-builders/skills/accessibility-audit
+Scanned: 2026-10-05 12:58:53 UTC
+
+
+     Risk Assessment     
+ Score           0/100   
+ Severity        LOW     
+ Recommendation  CAUTION 
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    40 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+No security issues detected.
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                partial    
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Ledger exceptions
+  - reference_missing SKILL.md:35-35: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- api-contract ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: api-contract
+Source: /home/anashadi/super-dev-builders/skills/api-contract
+Scanned: 2026-10-05 12:58:53 UTC
+
+
+    Risk Assessment    
+ Score           0/100 
+ Severity        LOW   
+ Recommendation  SAFE  
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    40 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+No security issues detected.
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                complete   
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- architecture-compliance-audit ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: architecture-compliance-audit
+Source: /home/anashadi/super-dev-builders/skills/architecture-compliance-audit
+Scanned: 2026-10-05 12:58:53 UTC
+
+
+    Risk Assessment    
+ Score           0/100 
+ Severity        LOW   
+ Recommendation  SAFE  
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    41 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+No security issues detected.
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                complete   
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- architecture-decision-record ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: architecture-decision-record
+Source: /home/anashadi/super-dev-builders/skills/architecture-decision-record
+Scanned: 2026-10-05 12:58:53 UTC
+
+
+     Risk Assessment     
+ Score           0/100   
+ Severity        LOW     
+ Recommendation  CAUTION 
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    41 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+No security issues detected.
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                partial    
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Ledger exceptions
+  - reference_missing SKILL.md:28-28: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:31-31: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:41-41: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- architecture-docs ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: architecture-docs
+Source: /home/anashadi/super-dev-builders/skills/architecture-docs
+Scanned: 2026-10-05 12:58:54 UTC
+
+
+     Risk Assessment     
+ Score           0/100   
+ Severity        LOW     
+ Recommendation  CAUTION 
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    37 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+No security issues detected.
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                partial    
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Ledger exceptions
+  - reference_missing SKILL.md:36-36: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:37-37: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- authz-authn-review ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: authz-authn-review
+Source: /home/anashadi/super-dev-builders/skills/authz-authn-review
+Scanned: 2026-10-05 12:58:54 UTC
+
+
+    Risk Assessment    
+ Score           0/100 
+ Severity        LOW   
+ Recommendation  SAFE  
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    43 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+No security issues detected.
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                complete   
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- ci-cd-release-gate ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: ci-cd-release-gate
+Source: /home/anashadi/super-dev-builders/skills/ci-cd-release-gate
+Scanned: 2026-10-05 12:58:54 UTC
+
+
+     Risk Assessment     
+ Score           8/100   
+ Severity        LOW     
+ Recommendation  CAUTION 
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    40 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+
+Issues (1)
+
+  MEDIUM: EA2 - Autonomous Decision Making...
+    Location: SKILL.md:35
+    Confidence: 85%
+    Remediation: Add human-in-the-loop confirmation for destructive, 
+irreversible, or high-impact operations. Never auto-execute commands that modify
+files, send data,...
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                partial    
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Ledger exceptions
+  - reference_missing SKILL.md:27-27: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:29-29: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- database-migration-safety ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: database-migration-safety
+Source: /home/anashadi/super-dev-builders/skills/database-migration-safety
+Scanned: 2026-10-05 12:58:54 UTC
+
+
+     Risk Assessment     
+ Score           0/100   
+ Severity        LOW     
+ Recommendation  CAUTION 
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    38 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+No security issues detected.
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                partial    
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Ledger exceptions
+  - reference_missing SKILL.md:38-38: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- engineering-release-audit ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: engineering-release-audit
+Source: /home/anashadi/super-dev-builders/skills/engineering-release-audit
+Scanned: 2026-10-05 12:58:54 UTC
+
+
+     Risk Assessment     
+ Score           0/100   
+ Severity        LOW     
+ Recommendation  CAUTION 
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    46 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+No security issues detected.
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                partial    
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Ledger exceptions
+  - reference_missing SKILL.md:23-23: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:28-28: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:29-29: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:34-34: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:46-46: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- evidence-normalizer ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: evidence-normalizer
+Source: /home/anashadi/super-dev-builders/skills/evidence-normalizer
+Scanned: 2026-10-05 12:58:54 UTC
+
+
+     Risk Assessment     
+ Score           0/100   
+ Severity        LOW     
+ Recommendation  CAUTION 
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    42 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+No security issues detected.
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                partial    
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Ledger exceptions
+  - reference_missing SKILL.md:22-22: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:28-28: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:29-29: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:30-30: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- html-to-video-render ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: html-to-video-render
+Source: /home/anashadi/super-dev-builders/skills/html-to-video-render
+Scanned: 2026-10-05 12:58:54 UTC
+
+
+     Risk Assessment     
+ Score           33/100  
+ Severity        MEDIUM  
+ Recommendation  CAUTION 
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    46 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+
+Issues (3)
+
+  HIGH: SC2 - External Script Fetching...
+    Location: SKILL.md:19
+    Confidence: 90%
+    Remediation: Avoid downloading and executing remote scripts. Use trusted 
+packages from PyPI/npm. If remote fetch is required, verify checksums and use 
+HTTPS....
+
+  MEDIUM: PE2 - Sudo/Root Execution...
+    Location: SKILL.md:19
+    Confidence: 70%
+    Remediation: Avoid sudo/root unless strictly required. Prefer 
+least-privilege patterns. If elevation is needed, document the justification and
+scope....
+
+  MEDIUM: PE2 - Sudo/Root Execution...
+    Location: SKILL.md:38
+    Confidence: 70%
+    Remediation: Avoid sudo/root unless strictly required. Prefer 
+least-privilege patterns. If elevation is needed, document the justification and
+scope....
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                partial    
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Ledger exceptions
+  - reference_missing SKILL.md:19-19: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:38-38: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- local-experiment-tracking ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: local-experiment-tracking
+Source: /home/anashadi/super-dev-builders/skills/local-experiment-tracking
+Scanned: 2026-10-05 12:58:54 UTC
+
+
+     Risk Assessment     
+ Score           0/100   
+ Severity        LOW     
+ Recommendation  CAUTION 
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    34 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+No security issues detected.
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                partial    
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Ledger exceptions
+  - reference_missing SKILL.md:23-23: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:31-31: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:34-34: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- local-llm-serving ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: local-llm-serving
+Source: /home/anashadi/super-dev-builders/skills/local-llm-serving
+Scanned: 2026-10-05 12:58:56 UTC
+
+
+        Risk Assessment         
+ Score           67/100         
+ Severity        HIGH           
+ Recommendation  DO NOT INSTALL 
+
+
+                        Components (2)                        
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File                       ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md                   │ markdown │    72 │ No         │
+│ scripts/serve_and_bench.py │ python   │   194 │ Yes        │
+└────────────────────────────┴──────────┴───────┴────────────┘
+
+
+Issues (7)
+
+  HIGH: SC2 - External Script Fetching...
+    Location: SKILL.md:18
+    Confidence: 90%
+    Remediation: Avoid downloading and executing remote scripts. Use trusted 
+packages from PyPI/npm. If remote fetch is required, verify checksums and use 
+HTTPS....
+
+  HIGH: SC2 - External Script Fetching...
+    Location: SKILL.md:26
+    Confidence: 90%
+    Remediation: Avoid downloading and executing remote scripts. Use trusted 
+packages from PyPI/npm. If remote fetch is required, verify checksums and use 
+HTTPS....
+
+  HIGH: SC2 - External Script Fetching...
+    Location: SKILL.md:26
+    Confidence: 90%
+    Remediation: Avoid downloading and executing remote scripts. Use trusted 
+packages from PyPI/npm. If remote fetch is required, verify checksums and use 
+HTTPS....
+
+  MEDIUM: LP3 - Skill declares no tool scope ('permissions' or 'allowed-tool...
+    Location: SKILL.md:1
+    Confidence: 70%
+    Remediation: Declare the skill's tool scope: for Claude Code / Agent Skills 
+SKILL.md, list the tools the skill may invoke in the 'allowed-tools' frontmatter
+field;...
+
+  MEDIUM: PE2 - Sudo/Root Execution...
+    Location: SKILL.md:18
+    Confidence: 70%
+    Remediation: Avoid sudo/root unless strictly required. Prefer 
+least-privilege patterns. If elevation is needed, document the justification and
+scope....
+
+  MEDIUM: AST4 - subprocess module call...
+    Location: scripts/serve_and_bench.py:88
+    Confidence: 70%
+    Remediation: Use subprocess.run() with shell=False and an explicit argument 
+list. Validate all inputs and avoid passing user-controlled data to commands....
+
+  MEDIUM: AST4 - subprocess module call...
+    Location: scripts/serve_and_bench.py:92
+    Confidence: 70%
+    Remediation: Use subprocess.run() with shell=False and an explicit argument 
+list. Validate all inputs and avoid passing user-controlled data to commands....
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                partial    
+ Coverage              100.0%     
+ Fully inspected       2          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Ledger exceptions
+  - reference_missing SKILL.md:27-27: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:32-32: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:53-53: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:56-56: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+Analyzer statuses
+  - completed : 
+  - completed : 
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - completed : 
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: Yes
+
+
+--- local-media-generation ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: local-media-generation
+Source: /home/anashadi/super-dev-builders/skills/local-media-generation
+Scanned: 2026-10-05 12:58:56 UTC
+
+
+     Risk Assessment     
+ Score           41/100  
+ Severity        MEDIUM  
+ Recommendation  CAUTION 
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    40 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+
+Issues (3)
+
+  HIGH: SC2 - External Script Fetching...
+    Location: SKILL.md:31
+    Confidence: 90%
+    Remediation: Avoid downloading and executing remote scripts. Use trusted 
+packages from PyPI/npm. If remote fetch is required, verify checksums and use 
+HTTPS....
+
+  HIGH: SC2 - External Script Fetching...
+    Location: SKILL.md:31
+    Confidence: 90%
+    Remediation: Avoid downloading and executing remote scripts. Use trusted 
+packages from PyPI/npm. If remote fetch is required, verify checksums and use 
+HTTPS....
+
+  MEDIUM: RP1 - Docker image referenced without tag or digest: 'docker run -...
+    Location: SKILL.md:26
+    Confidence: 75%
+    Remediation: Pin the image: image:tag or image@sha256:abc123...
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                partial    
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Ledger exceptions
+  - reference_missing SKILL.md:31-31: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- model-hub-provenance ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: model-hub-provenance
+Source: /home/anashadi/super-dev-builders/skills/model-hub-provenance
+Scanned: 2026-10-05 12:58:56 UTC
+
+
+     Risk Assessment     
+ Score           23/100  
+ Severity        MEDIUM  
+ Recommendation  CAUTION 
+
+
+                     Components (2)                      
+┏━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File                  ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md              │ markdown │    42 │ No         │
+│ scripts/fetch_gguf.py │ python   │    91 │ Yes        │
+└───────────────────────┴──────────┴───────┴────────────┘
+
+
+Issues (3)
+
+  MEDIUM: LP3 - Skill declares no tool scope ('permissions' or 'allowed-tool...
+    Location: SKILL.md:1
+    Confidence: 70%
+    Remediation: Declare the skill's tool scope: for Claude Code / Agent Skills 
+SKILL.md, list the tools the skill may invoke in the 'allowed-tools' frontmatter
+field;...
+
+  MEDIUM: E3 - File System Enumeration...
+    Location: SKILL.md:37
+    Confidence: 70%
+    Remediation: Remove unnecessary filesystem scanning. If file access is 
+needed, use explicit, scoped paths. Avoid reading ~/.ssh, ~/.aws, or credential 
+directories....
+
+  MEDIUM: AST4 - subprocess module call...
+    Location: scripts/fetch_gguf.py:55
+    Confidence: 70%
+    Remediation: Use subprocess.run() with shell=False and an explicit argument 
+list. Validate all inputs and avoid passing user-controlled data to commands....
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                partial    
+ Coverage              100.0%     
+ Fully inspected       2          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Ledger exceptions
+  - reference_missing SKILL.md:25-25: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:36-36: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+Analyzer statuses
+  - completed : 
+  - completed : 
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - completed : 
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: Yes
+
+
+--- observed-network-contract ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: observed-network-contract
+Source: /home/anashadi/super-dev-builders/skills/observed-network-contract
+Scanned: 2026-10-05 12:58:56 UTC
+
+
+     Risk Assessment     
+ Score           0/100   
+ Severity        LOW     
+ Recommendation  CAUTION 
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    40 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+No security issues detected.
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                partial    
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Ledger exceptions
+  - reference_missing SKILL.md:24-24: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- privilege-free-tooling ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: privilege-free-tooling
+Source: /home/anashadi/super-dev-builders/skills/privilege-free-tooling
+Scanned: 2026-10-05 12:58:57 UTC
+
+
+        Risk Assessment         
+ Score           51/100         
+ Severity        HIGH           
+ Recommendation  DO NOT INSTALL 
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    43 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+
+Issues (9)
+
+  HIGH: SC2 - External Script Fetching...
+    Location: SKILL.md:19
+    Confidence: 90%
+    Remediation: Avoid downloading and executing remote scripts. Use trusted 
+packages from PyPI/npm. If remote fetch is required, verify checksums and use 
+HTTPS....
+
+  HIGH: SC2 - External Script Fetching...
+    Location: SKILL.md:27
+    Confidence: 90%
+    Remediation: Avoid downloading and executing remote scripts. Use trusted 
+packages from PyPI/npm. If remote fetch is required, verify checksums and use 
+HTTPS....
+
+  HIGH: SC2 - External Script Fetching...
+    Location: SKILL.md:19
+    Confidence: 90%
+    Remediation: Avoid downloading and executing remote scripts. Use trusted 
+packages from PyPI/npm. If remote fetch is required, verify checksums and use 
+HTTPS....
+
+  HIGH: SC2 - External Script Fetching...
+    Location: SKILL.md:27
+    Confidence: 90%
+    Remediation: Avoid downloading and executing remote scripts. Use trusted 
+packages from PyPI/npm. If remote fetch is required, verify checksums and use 
+HTTPS....
+
+  MEDIUM: PE2 - Sudo/Root Execution...
+    Location: SKILL.md:16
+    Confidence: 70%
+    Remediation: Avoid sudo/root unless strictly required. Prefer 
+least-privilege patterns. If elevation is needed, document the justification and
+scope....
+
+  MEDIUM: PE2 - Sudo/Root Execution...
+    Location: SKILL.md:19
+    Confidence: 70%
+    Remediation: Avoid sudo/root unless strictly required. Prefer 
+least-privilege patterns. If elevation is needed, document the justification and
+scope....
+
+  MEDIUM: PE2 - Sudo/Root Execution...
+    Location: SKILL.md:19
+    Confidence: 70%
+    Remediation: Avoid sudo/root unless strictly required. Prefer 
+least-privilege patterns. If elevation is needed, document the justification and
+scope....
+
+  MEDIUM: PE2 - Sudo/Root Execution...
+    Location: SKILL.md:31
+    Confidence: 70%
+    Remediation: Avoid sudo/root unless strictly required. Prefer 
+least-privilege patterns. If elevation is needed, document the justification and
+scope....
+
+  MEDIUM: PE2 - Sudo/Root Execution...
+    Location: SKILL.md:41
+    Confidence: 70%
+    Remediation: Avoid sudo/root unless strictly required. Prefer 
+least-privilege patterns. If elevation is needed, document the justification and
+scope....
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                partial    
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Ledger exceptions
+  - reference_missing SKILL.md:27-27: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:28-28: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:34-34: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- public-feed-reader ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: public-feed-reader
+Source: /home/anashadi/super-dev-builders/skills/public-feed-reader
+Scanned: 2026-10-05 12:58:57 UTC
+
+
+     Risk Assessment     
+ Score           5/100   
+ Severity        LOW     
+ Recommendation  CAUTION 
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    43 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+
+Issues (1)
+
+  MEDIUM: E1 - External Transmission...
+    Location: SKILL.md:26
+    Confidence: 50%
+    Remediation: Verify the destination URL is trusted and necessary. Remove or 
+replace with documented APIs. Ensure no secrets, tokens, or PII are 
+transmitted....
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                partial    
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Ledger exceptions
+  - reference_missing SKILL.md:31-31: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- realtime-visual-engine ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: realtime-visual-engine
+Source: /home/anashadi/super-dev-builders/skills/realtime-visual-engine
+Scanned: 2026-10-05 12:58:58 UTC
+
+
+     Risk Assessment     
+ Score           20/100  
+ Severity        LOW     
+ Recommendation  CAUTION 
+
+
+                       Components (2)                       
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File                     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md                 │ markdown │    66 │ No         │
+│ scripts/render_shader.py │ python   │   245 │ Yes        │
+└──────────────────────────┴──────────┴───────┴────────────┘
+
+
+Issues (3)
+
+  MEDIUM: LP3 - Skill declares no tool scope ('permissions' or 'allowed-tool...
+    Location: SKILL.md:1
+    Confidence: 70%
+    Remediation: Declare the skill's tool scope: for Claude Code / Agent Skills 
+SKILL.md, list the tools the skill may invoke in the 'allowed-tools' frontmatter
+field;...
+
+  MEDIUM: AST4 - subprocess module call...
+    Location: scripts/render_shader.py:220
+    Confidence: 70%
+    Remediation: Use subprocess.run() with shell=False and an explicit argument 
+list. Validate all inputs and avoid passing user-controlled data to commands....
+
+  MEDIUM: AST4 - subprocess module call...
+    Location: scripts/render_shader.py:226–228
+    Confidence: 70%
+    Remediation: Use subprocess.run() with shell=False and an explicit argument 
+list. Validate all inputs and avoid passing user-controlled data to commands....
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                partial    
+ Coverage              100.0%     
+ Fully inspected       2          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Ledger exceptions
+  - reference_missing SKILL.md:36-36: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:45-45: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:50-50: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+Analyzer statuses
+  - completed : 
+  - completed : 
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - completed : 
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: Yes
+
+
+--- reconstruction-fidelity ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: reconstruction-fidelity
+Source: /home/anashadi/super-dev-builders/skills/reconstruction-fidelity
+Scanned: 2026-10-05 12:58:58 UTC
+
+
+     Risk Assessment     
+ Score           0/100   
+ Severity        LOW     
+ Recommendation  CAUTION 
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    42 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+No security issues detected.
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                partial    
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Ledger exceptions
+  - reference_missing SKILL.md:33-33: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- reconstruction-scope-gate ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: reconstruction-scope-gate
+Source: /home/anashadi/super-dev-builders/skills/reconstruction-scope-gate
+Scanned: 2026-10-05 12:58:59 UTC
+
+
+     Risk Assessment     
+ Score           0/100   
+ Severity        LOW     
+ Recommendation  CAUTION 
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    56 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+No security issues detected.
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                partial    
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Ledger exceptions
+  - reference_missing SKILL.md:27-27: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:28-28: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:30-30: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- reconstruction-spec ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: reconstruction-spec
+Source: /home/anashadi/super-dev-builders/skills/reconstruction-spec
+Scanned: 2026-10-05 12:58:59 UTC
+
+
+     Risk Assessment     
+ Score           0/100   
+ Severity        LOW     
+ Recommendation  CAUTION 
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    37 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+No security issues detected.
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                partial    
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Ledger exceptions
+  - reference_missing SKILL.md:20-20: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:23-23: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:24-24: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:36-36: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- release-handover-docs ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: release-handover-docs
+Source: /home/anashadi/super-dev-builders/skills/release-handover-docs
+Scanned: 2026-10-05 12:58:59 UTC
+
+
+     Risk Assessment     
+ Score           0/100   
+ Severity        LOW     
+ Recommendation  CAUTION 
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    40 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+No security issues detected.
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                partial    
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Ledger exceptions
+  - reference_missing SKILL.md:20-20: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:36-36: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:40-40: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- rollback-and-recovery ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: rollback-and-recovery
+Source: /home/anashadi/super-dev-builders/skills/rollback-and-recovery
+Scanned: 2026-10-05 12:58:59 UTC
+
+
+    Risk Assessment    
+ Score           0/100 
+ Severity        LOW   
+ Recommendation  SAFE  
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    41 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+No security issues detected.
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                complete   
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- target-inventory ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: target-inventory
+Source: /home/anashadi/super-dev-builders/skills/target-inventory
+Scanned: 2026-10-05 12:58:59 UTC
+
+
+     Risk Assessment     
+ Score           0/100   
+ Severity        LOW     
+ Recommendation  CAUTION 
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    41 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+No security issues detected.
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                partial    
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Ledger exceptions
+  - reference_missing SKILL.md:31-31: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- technology-profiler ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: technology-profiler
+Source: /home/anashadi/super-dev-builders/skills/technology-profiler
+Scanned: 2026-10-05 12:58:59 UTC
+
+
+    Risk Assessment    
+ Score           0/100 
+ Severity        LOW   
+ Recommendation  SAFE  
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    39 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+No security issues detected.
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                complete   
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- technology-selection ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: technology-selection
+Source: /home/anashadi/super-dev-builders/skills/technology-selection
+Scanned: 2026-10-05 12:58:59 UTC
+
+
+     Risk Assessment     
+ Score           0/100   
+ Severity        LOW     
+ Recommendation  CAUTION 
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    36 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+No security issues detected.
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                partial    
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Ledger exceptions
+  - reference_missing SKILL.md:22-22: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:26-26: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+  - reference_missing SKILL.md:29-29: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- test-pyramid-and-risk ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: test-pyramid-and-risk
+Source: /home/anashadi/super-dev-builders/skills/test-pyramid-and-risk
+Scanned: 2026-10-05 12:59:00 UTC
+
+
+     Risk Assessment     
+ Score           0/100   
+ Severity        LOW     
+ Recommendation  CAUTION 
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    43 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+No security issues detected.
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                partial    
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Ledger exceptions
+  - reference_missing SKILL.md:43-43: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- ui-ux-state-mapper ---
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ SkillSpector Security Report                                                 │
+╰────────────────────────────────── v2.12.0 ───────────────────────────────────╯
+
+Skill: ui-ux-state-mapper
+Source: /home/anashadi/super-dev-builders/skills/ui-ux-state-mapper
+Scanned: 2026-10-05 12:59:00 UTC
+
+
+     Risk Assessment     
+ Score           0/100   
+ Severity        LOW     
+ Recommendation  CAUTION 
+
+
+               Components (1)               
+┏━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━┓
+┃ File     ┃ Type     ┃ Lines ┃ Executable ┃
+┡━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━┩
+│ SKILL.md │ markdown │    40 │ No         │
+└──────────┴──────────┴───────┴────────────┘
+
+No security issues detected.
+
+
+     Inspection Completeness      
+ Execution             successful 
+ Status                partial    
+ Coverage              100.0%     
+ Fully inspected       1          
+ Partially inspected   0          
+ Entirely uninspected  0          
+Ledger exceptions
+  - reference_missing SKILL.md:31-31: A local path-like reference does not match
+any bundled artifact, such as a file the skill writes at runtime.
+Analyzer statuses
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - completed : 
+  - completed : 
+  - no_applicable_files : No files matched this analyzer's applicability 
+contract.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - disabled_by_configuration : Analyzer was disabled by the requested 
+configuration.
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+  - completed : 
+Executable scripts: No
+
+
+--- Recursive Risk Assessment ---
+
+Maximum score: 67/100
+
+Severity: HIGH
+
+Recommendation: DO NOT INSTALL
+
+--- Recursive Inspection Completeness ---
+
+Status: partial
+
+- One or more recursive skill scans were incomplete.

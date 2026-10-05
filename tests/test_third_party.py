@@ -14,6 +14,8 @@ import json
 import os
 import sys
 
+import pytest
+
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRIPTS = os.path.join(REPO, "scripts")
 sys.path.insert(0, SCRIPTS)
@@ -158,6 +160,31 @@ def test_annotate_evidence_adds_missing_without_touching_content(tmp_path):
     assert {"captured_at", "redaction_status", "status"} <= set(out)
 
     assert annotate.annotate(str(f), "skillspector").startswith("OK")  # idempoten
+
+
+def test_local_install_refuses_skill_without_owner_approval(tmp_path, monkeypatch):
+    """Pasang-lokal TANPA persetujuan Owner harus GAGAL (fail-closed).
+
+    Ini pengaman untuk kasus gate hub menolak: `--force` tidak pernah dipakai, dan
+    pemasangan lokal hanya boleh untuk skill yang tercatat disetujui Owner.
+    """
+    clone = tmp_path / "clone"
+    _fake_skill(clone, "x/skills/tak-disetujui", {"SKILL.md": "apa saja\n"})
+    monkeypatch.setattr(sync, "HERMES_SKILLS", str(tmp_path / "skills"))
+    assert "tak-disetujui" not in sync.OWNER_APPROVED_LOCAL_INSTALL
+    with pytest.raises(SystemExit) as exc:
+        sync.local_install("tak-disetujui", "x/skills/tak-disetujui", str(clone))
+    assert "OWNER_APPROVED_LOCAL_INSTALL" in str(exc.value)
+    assert not (tmp_path / "skills" / "tak-disetujui").exists()   # tidak ada yang terpasang
+
+
+def test_owner_approved_local_installs_have_notice_on_disk():
+    """Skill yang lolos-lewat-gate (dipasang lokal) WAJIB punya NOTICE host-policy tertulis."""
+    for name, spec in sync.OWNER_APPROVED_LOCAL_INSTALL.items():
+        assert spec.get("approved_by"), f"{name}: tanpa jejak persetujuan Owner"
+        assert spec.get("reason") and spec.get("notice"), f"{name}: tanpa alasan/notice"
+        notice = os.path.expanduser(f"~/.hermes/skills/{name}/HOST-POLICY-NOTICE.md")
+        assert os.path.isfile(notice), f"NOTICE tidak ada di disk: {notice}"
 
 
 def test_registry_records_four_third_party_decisions():

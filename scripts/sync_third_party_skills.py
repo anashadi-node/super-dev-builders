@@ -59,6 +59,7 @@ PROFILE_MAP = {
     "audit-context-building": ["cc-security-governor", "cc-architect"],
     "modern-python": ["cc-builder", "cc-devops-docs"],
     "post-patch-validation": ["cc-builder", "cc-security-governor", "cc-reviewer-qa"],
+    "variant-analysis": ["cc-security-governor", "cc-reviewer-qa"],
 }
 
 CLONE = os.path.join(os.path.expanduser("~/.hermes/cache/scratch"), "tob-skills-pin")
@@ -78,6 +79,35 @@ INTENTIONAL_DEVIATIONS: dict[str, dict[str, dict[str, str]]] = {
             "our_sha256": "351a0b6d61454e09fcd3ae39a4201771e0745687d8b9a2a857e2a74e28caeeb3",
             "pin_sha256": "029532945776fb0fcbc866f19cd6114fe4152cd3dea1c0f44b266ec13a2cc6e8",
         },
+    },
+}
+
+# Skill yang gate hub MENOLAK, tetapi Owner secara eksplisit menyetujui pemasangan
+# LOKAL dari commit pin yang sama (2026-10-05). Daftar ini SENGAJA hard-code di kode
+# supaya tidak bisa "kebablasan": skill di luar daftar ini TIDAK pernah dipasang lokal.
+# `--force` pada hub TIDAK PERNAH dipakai (aturan ekosistem).
+OWNER_APPROVED_LOCAL_INSTALL: dict[str, dict[str, object]] = {
+    "modern-python": {
+        "approved_by": "Owner 2026-10-05 (opsi 'PASANG keduanya dengan NOTICE host-policy')",
+        "hub_verdict": "BLOCKED — dangerous, 90 findings",
+        "hub_rules": ["uv_run", "curl_pipe_shell", "destructive_home_rm", "dump_all_env", "remote_fetch"],
+        "reason": ("Mayoritas 90 temuan = baris 'uv run ruff/pytest/ty' + shebang PEP 723 (tool yang "
+                   "kami pakai sendiri); 2 temuan NYATA = baris installer 'curl … | sh' yang DILARANG "
+                   "di host ini; 1 = 'rm -rf ~/.cache/pre-commit' (cache milik user)."),
+        "notice": ["DILARANG menjalankan baris 'curl -LsSf https://astral.sh/uv/install.sh | sh' "
+                   "(uv-commands.md:11, security-setup.md:19) — pakai uv/cargo yang sudah terpasang.",
+                   "Baris pembersihan cache hanya menyentuh ~/.cache milik user sendiri."],
+    },
+    "post-patch-validation": {
+        "approved_by": "Owner 2026-10-05 (opsi 'PASANG keduanya dengan NOTICE host-policy')",
+        "hub_verdict": "BLOCKED — caution, 12 findings",
+        "hub_rules": ["allowed_tools_field", "python_os_environ"],
+        "reason": ("Temuan HIGH terbukti TERBALIK setelah verifikasi baris-per-baris: 'exfiltration' "
+                   "@265 = whitelist env; @762/764 = kode yang MENOLAK meneruskan env mirip kredensial; "
+                   "3 'execution' = subprocess untuk git worktree + menjalankan test suite (inti fungsi). "
+                   "Nol kode jaringan."),
+        "notice": ["Menjalankan test suite proyek target — pastikan target memang proyek yang berwenang.",
+                   "Ingin menghindari sandbox? periksa dulu opsi '--allow-env' (menolak kredensial)."],
     },
 }
 
@@ -110,6 +140,26 @@ def walk(root: str) -> dict[str, str]:
             p = os.path.join(dirpath, fn)
             out[os.path.relpath(p, root)] = sha256(p)
     return out
+
+
+def local_install(name: str, rel: str, clone: str) -> str:
+    """Pasang skill LOKAL dari commit pin, hanya bila Owner menyetujuinya eksplisit.
+
+    Dipakai ketika gate hub menolak (BLOCKED). Tidak pernah memakai `--force`.
+    Mengembalikan path tujuan.
+    """
+    if name not in OWNER_APPROVED_LOCAL_INSTALL:
+        raise SystemExit(f"FATAL: {name} TIDAK ada di OWNER_APPROVED_LOCAL_INSTALL — "
+                         f"pemasangan lokal tanpa persetujuan Owner dilarang")
+    src = os.path.join(clone, "plugins", rel)
+    if not os.path.isdir(src):
+        raise SystemExit(f"FATAL: sumber pin tidak ada: {src}")
+    dst = os.path.join(HERMES_SKILLS, name)
+    if os.path.isdir(dst):
+        shutil.rmtree(dst)
+    os.makedirs(os.path.dirname(dst), exist_ok=True)
+    shutil.copytree(src, dst)
+    return dst
 
 
 def sync_skill(name: str, rel: str, clone: str, fix: bool) -> dict:
@@ -186,12 +236,22 @@ def main() -> int:
     ap.add_argument("--check", action="store_true", help="laporan saja (default)")
     ap.add_argument("--fix", action="store_true", help="lengkapi berkas yang hilang")
     ap.add_argument("--profiles", action="store_true", help="sebar ke profil divisi")
+    ap.add_argument("--install-local", action="store_true",
+                    help="pasang skill yang disetujui Owner tapi diblokir hub (dari commit pin)")
     ap.add_argument("--evidence", default=os.path.join(
         REPO_ROOT, "reports", "upgrade-evidence", "third-party-integrity.json"))
     args = ap.parse_args()
 
     clone = ensure_clone()
+    if args.install_local:
+        for n in sorted(OWNER_APPROVED_LOCAL_INSTALL):
+            target = local_install(n, SKILLS[n], clone)
+            print(f"PASANG-LOKAL {n} -> {target} "
+                  f"({OWNER_APPROVED_LOCAL_INSTALL[n]['hub_verdict']})")
+
     report = {"provenance": "scripts/sync_third_party_skills.py", "tool": "sync_third_party_skills.py",
+              "owner_approved_local_installs": {k: OWNER_APPROVED_LOCAL_INSTALL[k]["hub_verdict"]
+                                                for k in OWNER_APPROVED_LOCAL_INSTALL},
               "upstream": UPSTREAM_OWNER,
               "pin": PIN, "license": LICENSE, "mode": "fix" if args.fix else "check",
               "captured_at": time.strftime("%Y-%m-%dT%H:%M:%S%z", time.localtime()),

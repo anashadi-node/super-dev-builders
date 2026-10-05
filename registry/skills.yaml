@@ -200,13 +200,14 @@ third_party:
     decided: 2026-10-05
     approved_by: "Owner — mandat 2026-10-05: 'approve silahkan jalankan ... lakukan yang paling terbaik untuk Visi, isi dan Tujuan Utama Project sesuai dokumen acuan terakhir'"
     installed_at: 2026-10-05
-    install_method: "hermes skills install skills-sh/trailofbits/skills/... --yes (hub audit verdict: ALLOWED, scanner skills-guard-v8, provenance fresh)"
-    adopt: [semgrep, codeql, sarif-parsing, differential-review, variant-analysis, fp-check, audit-context-building]
+    install_method: "hermes skills install skills-sh/trailofbits/skills/... --yes (7 skill; hub verdict ALLOWED saat instalasi, scanner skills-guard-v8, provenance fresh). 2 skill (modern-python, post-patch-validation) gate hub menolak -> dipasang LOKAL dari commit pin atas persetujuan Owner + NOTICE host-policy; `--force` TIDAK PERNAH dipakai."
+    adopt: [semgrep, codeql, sarif-parsing, differential-review, variant-analysis, fp-check, audit-context-building, modern-python, post-patch-validation]
     distribution:
-      cc-security-governor: [semgrep, codeql, sarif-parsing, differential-review, variant-analysis, fp-check, audit-context-building]
-      cc-reviewer-qa: [differential-review, variant-analysis, fp-check]
+      cc-security-governor: [semgrep, codeql, sarif-parsing, differential-review, variant-analysis, fp-check, audit-context-building, post-patch-validation]
+      cc-reviewer-qa: [differential-review, variant-analysis, fp-check, post-patch-validation]
+      cc-builder: [modern-python, post-patch-validation]
       cc-architect: [differential-review, audit-context-building]
-      cc-devops-docs: [semgrep]
+      cc-devops-docs: [semgrep, modern-python]
     verdict_flip:
       - skill: variant-analysis
         at: 2026-10-04T23:39:14Z
@@ -215,22 +216,20 @@ third_party:
         implication: "Blokir sebelumnya datang dari scan/cache ruleset yang berbeda; pada ruleset sekarang TIDAK ADA temuan untuk ditinjau. Karena itu tidak ada temuan yang bisa saya laporkan untuk ditinjau — yang ada adalah fakta verdict berubah, dan itu yang dilaporkan ke Owner."
     truncation_pattern: "hub memasang sebagian berkas pada skill berisi banyak file: codeql 2/34, variant-analysis 9/18, audit-context-building 3/6 (bandingkan semgrep 9/9, sarif-parsing 8/8, fp-check 9/9, differential-review 7/7 yang lengkap). KONSEKUENSI yang terbukti: berkas yang tidak terunduh juga tidak discan saat instalasi -> skill lolos ALLOWED, lalu BLOCKED ketika audit men-scan isi lengkap setelah kita melengkapinya dari pin. Ambiguitas ini WAJIB diingat: jangan pernah membaca 'ALLOWED saat instalasi' sebagai bukti seluruh isi skill aman."
     codeql_owner_decision: "Owner 2026-10-05: SIMPAN codeql dengan pengecualian terdokumentasi (audit hub BLOCKED/CAUTION, 25 findings = harness test milik skill + panduan build; tidak ada eksfiltrasi data/sudo/curl|sh/kredensial). Pengecualian ini TERBATAS pada codeql; tidak mengubah aturan `no --force` untuk skill lain."
-    audit_status: "hermes skills audit 2026-10-05: semgrep SAFE/ALLOWED · sarif-parsing ALLOWED · differential-review ALLOWED · fp-check SAFE/ALLOWED · audit-context-building BLOCKED->ALLOWED setelah 2 ZWSP dihapus · variant-analysis BLOCKED/CAUTION (11 temuan, SEMUA di resources/semgrep/*.yaml = pola rule pendeteksi, bukan kode) · codeql BLOCKED/CAUTION (25 temuan di scripts/workflows/references)"
+    audit_status: "hermes skills audit 2026-10-05 (9/9 terpasang): semgrep SAFE/ALLOWED · sarif-parsing ALLOWED · differential-review ALLOWED · fp-check SAFE/ALLOWED · audit-context-building BLOCKED->ALLOWED setelah 2 ZWSP dihapus · variant-analysis CAUTION (11 temuan = SEMUA pola rule semgrep di resources/semgrep/*.yaml) = DISIMPAN atas keputusan Owner · codeql CAUTION (25 temuan di scripts/workflows/references) = DISIMPAN atas keputusan Owner · modern-python DANGEROUS (90, dominan rule uv_run) & post-patch-validation CAUTION (12, temuan HIGH terbukti TERBALIK) = DIPASANG LOKAL DARI COMMIT PIN dengan NOTICE host-policy (gate hub tetap BLOCKED; --force tidak pernah dipakai)"
     post_completion_audit_insight: "AKAR (terbukti): hub install hanya mengunduh sebagian berkas (codeql 2/34, variant-analysis 9/18, acb 3/6) dan berkas yang tidak terunduh TIDAK discan saat instalasi -> verdict ALLOWED. Setelah berkas dilengkapi dari pin, audit men-scan isi lengkap dan BLOCKED. Setiap temuan audit berada PERSIS di berkas yang tadinya tidak terunduh (variant-analysis 11/11 di resources/semgrep/*.yaml; codeql 25/25 di scripts/workflows/references). Jadi BLOCKED pasca-audit BUKAN perubahan sifat skill, melainkan berkas yang belum pernah discan."
-    pending_owner_decision:
+    pending_owner_decision: []
+    owner_decisions_2026_10_05:
       - skill: variant-analysis
-        question: "Same treatment as codeql (keep with documented exception) atau hapus?"
-        evidence: "11 temuan = 100% pola rule semgrep (os.system/child_process.exec/eval) yang fungsinya MENDETEKSI; 0 baris dieksekusi"
-        recommendation: "SIMPAN seperti codeql (pengecualian terdokumentasi)"
+        decision: "SIMPAN dengan pengecualian terdokumentasi (sama seperti codeql) — 11/11 temuan adalah POLA RULE semgrep, 0 baris dieksekusi"
+        status: "TERPASANG, lengkap 18/18, tersebar cc-security-governor + cc-reviewer-qa"
       - skill: modern-python
-        question: "Pasang dengan caveat host-policy (dua baris curl|sh dilarang; rm -rf ~/.cache milik user) atau tetap ditahan?"
-        evidence: "rules hub: uv_run (mayoritas 90 temuan = baris 'uv run ruff/pytest/ty' yang kita pakai sendiri), curl_pipe_shell x2, destructive_home_rm (rm -rf ~/.cache/pre-commit), dump_all_env/remote_fetch = contoh dokumentasi"
-        recommendation: "PASANG dengan NOTICE host-policy — substansinya (uv/ruff/ty/pytest/PEP723) berguna untuk stack Python kita dan baris berisiko sudah punya alternatif aman di sebelahnya (cargo install / uv tool install)"
-    blocked:
-      - skill: modern-python
-        reason: "Hub: 'BLOCKED — dangerous verdict, 90 findings', rules: uv_run, curl_pipe_shell, destructive_home_rm, dump_all_env, remote_fetch (daftar resmi sudah dibaca 2026-10-05). TIDAK dibypass. Rincian: mayoritas 90 temuan = baris 'uv run ruff/pytest/ty' dan shebang PEP 723 (tool yang kita pakai sendiri); 2 temuan NYATA = 'curl -LsSf https://astral.sh/uv/install.sh | sh' (uv-commands.md:11, security-setup.md:19) yang DILARANG di host ini; 1 = 'rm -rf ~/.cache/pre-commit' (cache milik user); sisanya contoh dokumentasi + baris tabel yang salah-kelas. DITAHAN menunggu keputusan Owner (rekomendasi: pasang dengan NOTICE host-policy)."
+        decision: "PASANG dengan NOTICE host-policy — gate hub tetap BLOCKED, dipasang LOKAL dari commit pin (bukan --force)"
+        status: "TERPASANG, lengkap 14/14, tersebar cc-builder + cc-devops-docs, NOTICE tertulis"
       - skill: post-patch-validation
-        reason: "Hub: 'BLOCKED — caution verdict, 12 findings', rules: allowed_tools_field, python_os_environ, ... (daftar resmi sudah dibaca 2026-10-05). TIDAK dibypass. Verifikasi baris-per-baris: 'HIGH exfiltration' @265 = WHITELIST env (env = {k:v for k,v in os.environ.items() if k in BASE_ENV_KEYS}); 'HIGH exfiltration' @762/764 = kode yang MENOLAK meneruskan env mirip kredensial (CREDENTIAL_ENV_RE -> PlanError); 3 'execution' @275/1076/1643 = subprocess untuk git worktree + menjalankan test suite (inti fungsi); LOW @SKILL.md:9 = allowed-tools frontmatter (muncul juga di skill berverdict SAFE). NOL kode jaringan. DITAHAN menunggu keputusan Owner (rekomendasi: pasang, temuan HIGH terbukti terbalik)."
+        decision: "PASANG dengan NOTICE host-policy — temuan HIGH terbukti TERBALIK; dipasang LOKAL dari commit pin (bukan --force)"
+        status: "TERPASANG, lengkap 5/5, tersebar cc-builder + cc-security-governor + cc-reviewer-qa, NOTICE tertulis"
+    blocked: []
     resolved_decisions:
       - question: "Simpan atau hapus `codeql` (audit hub BLOCKED/CAUTION, 25 findings)?"
         owner_answer: "SIMPAN dengan pengecualian terdokumentasi (2026-10-05)"

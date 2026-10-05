@@ -8,8 +8,8 @@
  "upstream": "trailofbits/skills",
  "pin": "82fe8226252622fa807643bdca1710901198553a",
  "license": "CC-BY-SA-4.0",
- "mode": "fix",
- "captured_at": "2026-10-05T07:59:58+0700",
+ "mode": "check",
+ "captured_at": "2026-10-05T09:48:29+0700",
  "redaction_status": "clean",
  "status": "OBSERVED",
  "skills": [

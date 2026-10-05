@@ -98,3 +98,41 @@ npm run build:ink --workspace ui-tui && npm test --workspace ui-tui   # 176 file
 Patch: `~/backups/sdb-hardening-20261005_full/hermes-agent-npm-20261005.patch`
 sha256 `e36df7d1db8dec6cb14beb9cd177458b630f57f77e65c1d559a0a06ecfd6847d`.
 `ui-tui/packages/hermes-ink/dist/` ditambahkan ke `.git/info/exclude` (artefak build lokal, bukan tracked).
+
+## 7. Sesi lanjutan — token Telegram, plugin, migrasi multiplex, reclaim disk (2026-10-05, pasca-approval Owner)
+
+Semua dijalankan tanpa `--force`, tanpa `sudo`. Gateway di-restart **sekali** (untuk migrasi), bukan untuk npm/config.
+
+### 7.1 Dedupe `TELEGRAM_BOT_TOKEN` (13 profil) — tanpa restart
+- Metode berbasis bukti: sha256 nilai token tiap profil dibandingkan milik `default` (`89fcfb04…`) → **13 identik** (persis daftar doctor), 9 profil lain tidak memuat token (cc-*, lokal, villa-agency).
+- Aksi: baris `TELEGRAM_BOT_TOKEN=` dihapus dari 13 `.env`; backup per-file mode 600 di `~/backups/sdb-hardening-20261005_full/profiles_env/` (dir 700).
+- Skrip idempoten (dry-run default): `~/.hermes/cache/scratch/dedupe_telegram_tokens.py` (`--apply` untuk eksekusi).
+- Hasil: salinan secret **14 → 1**.
+
+### 7.2 Plugin `hermes-session-reset-policy` — audit dulu, baru pasang
+- Audit kode @ SHA terpin `493df020496d2782d3fe15308cc3b6672c2224c4`: 395 baris, dep runtime **nihil**, satu hook `pre_gateway_dispatch`; grep pola berisiko (`subprocess|socket|requests|urllib|eval|exec|open|environ`) = **0 temuan**.
+- `plugins install … --ref <SHA>` (tanpa `--force`); verifikasi `cmp` kode lokal vs kode yang diaudit → **identik** (sha256 `f2a6a662…`); `git rev-parse HEAD` = SHA terpin.
+- Status awal **not enabled** (patuh aturan "plugin tidak default aktif") → di-`enable` eksplisit; gateway memuat ulang plugin tanpa restart.
+
+### 7.3 Migrasi multiplex (arsitektur)
+`hermes gateway migrate --multiplex` → satu host gateway melayani **23 profil**; unit gagal `hermes-gateway-sodex-cex-monitor.service` dicopot; `gateway.multiplex_profiles: true` tertulis di `config.yaml`; entri hantu systemd dibersihkan (`daemon-reload` + `reset-failed`). Bukti: `systemctl --user is-active` = active; log Telegram "Connected to Telegram (polling mode)".
+
+### 7.4 Reclaim disk 3,0 GB
+Dihapus: `state.db.pre-update-emergency-2026-09-29…bak` (1,53 GB) + `…2026-09-30…bak` (1,63 GB) + sidecar `-shm`/`-wal`. **Disimpan**: `…2026-10-03T23-08-47-576Z.bak` (1,9 GB).
+Dasar: state.db live memuat 313.027 pesan sejak 2026-08-26 (lebih tua dari kedua backup) → keduanya strict subset.
+
+### 7.5 urllib3 `2.7.0` → `2.8.0`
+`~/anantara-sakti/requirements-research-venv.txt` (murni file spec; venv-nya tidak ada di disk → sistem trading live tak tersentuh, tanpa install/restart).
+
+### 7.6 DITUNDA (butuh jendela offline) — VACUUM state.db
+`hermes sessions optimize` menolak dengan aman: semua pemegang harus berhenti (gateway, Desktop app, cron) dan itu tak bisa dari dalam sesi Desktop. Prosedur saat app ditutup:
+```bash
+systemctl --user stop hermes-gateway
+hermes sessions optimize && hermes sessions optimize-storage
+systemctl --user start hermes-gateway
+```
+Catatan: `sessions.auto_prune` default **sudah True** (retensi 90 hari) → warning doctor soal state.db adalah soal **ukuran**, bukan kebijakan hapus. `auto_archive` **tidak** diaktifkan (tak mengurangi ukuran, hanya soft-hide).
+
+### 7.7 Tidak dilakukan (keputusan sadar)
+- rename `cc-*` → `sdb-*` (item #8): alias via `agents/*.yaml` sudah berfungsi; risiko riwayat sesi tanpa manfaat nyata.
+- `hermes setup` (API key platform): butuh kredensial Owner.

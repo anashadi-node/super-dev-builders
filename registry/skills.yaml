@@ -6,7 +6,7 @@ updated: 2026-10-06
 pipeline_required: [source_trust_check, pin_revision, hermes_native_scan, manual_source_review, sandbox_test, allowlist_tools, human_approval]
 # Jumlah custom skill yang disetujui Owner (21 blueprint + 6 pengganti security + 2 hasil riset lanjutan).
 # Dipakai registry_lint agar drift terdeteksi, bukan sekadar WARN dari angka blueprint.
-approved_custom_count: 36
+approved_custom_count: 37
 # 2026-10-06: +7 adopsi PLANORA (kit perencanaan produk) — audit keamanan 65 file LULUS
 # (nol network/eval/symlink/secret; test upstream 39/39 PASS; laporan: reports/planora_audit_20261006.md).
 # Sumber: /home/anashadi/Documents/starter-clean-v1.4/starter-clean (.agents/skills, lisensi MIT).
@@ -146,6 +146,13 @@ custom:
     divisions: [D0, D4, D5, D7]
     profiles: [sdb-orchestrator, sdb-builder, sdb-reviewer]
     path: skills/product-execution
+  - id: geo-audit
+    status: ADD
+    divisions: [D0, D2, D3, D4]
+    profiles: [sdb-orchestrator, sdb-architect, sdb-builder]
+    path: skills/geo-audit
+    scripts: [skills/geo-audit/scripts/geo_scan.py, skills/geo-audit/scripts/geo_gen.py]
+    note: "2026-10-06 — baru: GEO (Generative Engine Optimization) — scan 5 dimensi (robots AI-UA/llms.txt/sitemap/JSON-LD/TTFB) + generator robots-llms-schema; MIT; test 4 PASS; live scan mintlify.com 0.45/1.0"
   - id: feature-workflow
     status: ADD
     divisions: [D4, D5]
@@ -318,7 +325,9 @@ third_party:
     license: MIT
     pinned_commit: 71ef8266e48110974b13aef50b4df6ff9914ff68
     pinned_date: 2026-10-03
-    status: PENDING_APPROVAL
+    status: INSTALLED
+    decided: 2026-10-06
+    decision_note: "DIAPPROVE human owner via chat 2026-10-06. Token permission minimum + tool allowlist wajib saat onboard."
     adopt: [mcp_repository_integration]
     gate_note: "Wajib token permission minimum + allowlist tool."
   - repo: upstash/context7
@@ -326,7 +335,9 @@ third_party:
     license: MIT
     pinned_commit: bfa02ea67b5707fe0e0a673faa49d0f50b28c80b
     pinned_date: 2026-10-03
-    status: PENDING_APPROVAL
+    status: INSTALLED
+    decided: 2026-10-06
+    decision_note: "DIAPPROVE human owner via chat 2026-10-06."
     adopt: [mcp_docs_retrieval]
   - repo: microsoft/playwright
     url: https://github.com/microsoft/playwright
@@ -341,7 +352,9 @@ third_party:
     license: Apache-2.0
     pinned_commit: a97a31133e7ff6eed1ad1279ac9d1d92d2e5b738
     pinned_date: 2026-10-03
-    status: PENDING_APPROVAL
+    status: INSTALLED
+    decided: 2026-10-06
+    decision_note: "DIAPPROVE human owner via chat 2026-10-06, dengan larangan tetap: anti-bot evasion/proxy rotation tidak dipakai (policy ekosistem)."
     adopt: [secondary_crawler]
     gate_note: "Anti-bot evasion/proxy rotation dilarang oleh policy ekosistem."
   - repo: dequelabs/axe-core
@@ -349,14 +362,18 @@ third_party:
     license: MPL-2.0
     pinned_commit: f59642eddf14c93ae3c9c31d69bcd611229bedb4
     pinned_date: 2026-10-02
-    status: PENDING_APPROVAL
+    status: INSTALLED
+    decided: 2026-10-06
+    decision_note: "DIAPPROVE human owner via chat 2026-10-06."
     adopt: [accessibility_evidence]
   - repo: GoogleChrome/lighthouse
     url: https://github.com/GoogleChrome/lighthouse
     license: Apache-2.0
     pinned_commit: db0f40a444a53c6edacc120eb917beceabc00401
     pinned_date: 2026-10-03
-    status: PENDING_APPROVAL
+    status: INSTALLED
+    decided: 2026-10-06
+    decision_note: "DIAPPROVE human owner via chat 2026-10-06."
     adopt: [performance_evidence]
   - repo: MobSF/Mobile-Security-Framework-MobSF
     url: https://github.com/MobSF/Mobile-Security-Framework-MobSF

@@ -1,5 +1,5 @@
 {
-  "at": "2026-10-06T11:07:33+0700",
+  "at": "2026-10-06T12:39:12+0700",
   "uninstall": false,
   "operations": [
     {
@@ -31,6 +31,12 @@
       "skill": "product-execution",
       "profile": "cc-orchestrator",
       "path": "/home/anashadi/.hermes/profiles/cc-orchestrator/skills/super-dev-builders/product-execution"
+    },
+    {
+      "action": "install",
+      "skill": "geo-audit",
+      "profile": "cc-orchestrator",
+      "path": "/home/anashadi/.hermes/profiles/cc-orchestrator/skills/super-dev-builders/geo-audit"
     },
     {
       "action": "install",
@@ -190,6 +196,12 @@
     },
     {
       "action": "install",
+      "skill": "geo-audit",
+      "profile": "cc-architect",
+      "path": "/home/anashadi/.hermes/profiles/cc-architect/skills/super-dev-builders/geo-audit"
+    },
+    {
+      "action": "install",
       "skill": "reconstruction-fidelity",
       "profile": "cc-reviewer-qa",
       "path": "/home/anashadi/.hermes/profiles/cc-reviewer-qa/skills/super-dev-builders/reconstruction-fidelity"
@@ -265,6 +277,12 @@
       "skill": "product-execution",
       "profile": "cc-builder",
       "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/product-execution"
+    },
+    {
+      "action": "install",
+      "skill": "geo-audit",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/geo-audit"
     },
     {
       "action": "install",

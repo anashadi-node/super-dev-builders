@@ -124,13 +124,16 @@ Dasar: state.db live memuat 313.027 pesan sejak 2026-08-26 (lebih tua dari kedua
 ### 7.5 urllib3 `2.7.0` → `2.8.0`
 `~/anantara-sakti/requirements-research-venv.txt` (murni file spec; venv-nya tidak ada di disk → sistem trading live tak tersentuh, tanpa install/restart).
 
-### 7.6 DITUNDA (butuh jendela offline) — VACUUM state.db
-`hermes sessions optimize` menolak dengan aman: semua pemegang harus berhenti (gateway, Desktop app, cron) dan itu tak bisa dari dalam sesi Desktop. Prosedur saat app ditutup:
+### 7.6 VACUUM state.db — dieksekusi otomatis di jendela offline (2026-10-05)
+Temuan verifikasi: pemegang `state.db` = `hermes-gateway.service` **dan** proses `hermes … serve --host 127.0.0.1 --port 0` milik Desktop app (anak app Electron) → VACUUM mustahil dari dalam sesi Desktop. `hermes sessions optimize` menolak dengan aman selama masih ada pemegang; `--force` **dilarang** (menulis ulang store di bawah live writer bisa membuat semua agent menolak turn).
+Eksekutor: `scripts/vacuum_state_db_offline.sh` dijalankan sebagai unit systemd user transient `hermes-vacuum-offline` (cgroup terpisah → bertahan saat app ditutup). Watcher menunggu sampai satu-satunya pemegang = gateway, lalu menjalankan:
 ```bash
 systemctl --user stop hermes-gateway
-hermes sessions optimize && hermes sessions optimize-storage
+hermes sessions optimize && hermes sessions optimize-storage --yes
 systemctl --user start hermes-gateway
 ```
+Sifat: fail-closed (batal + gateway dinyalakan kembali bila masih ada pemegang lain), timeout `VACUUM_WAIT_HOURS` (default 18 jam), log `~/.hermes/logs/state-db-vacuum-*.log`. Batalkan: `systemctl --user stop hermes-vacuum-offline`.
+Baseline 2026-10-05: state.db **2,09 GB** + WAL **67 MB**; `freelist` ~0 → ruang yang direklaim bukan dari baris terhapus, melainkan **duplikasi indeks FTS lama** → sasaran utama `optimize-storage` (layout v23), disusul `optimize` (merge segmen FTS5 + VACUUM). Disk bebas 119 GB; preflight v23 butuh ~ukuran file → aman.
 Catatan: `sessions.auto_prune` default **sudah True** (retensi 90 hari) → warning doctor soal state.db adalah soal **ukuran**, bukan kebijakan hapus. `auto_archive` **tidak** diaktifkan (tak mengurangi ukuran, hanya soft-hide).
 
 ### 7.7 Tidak dilakukan (keputusan sadar)

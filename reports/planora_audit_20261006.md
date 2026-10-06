@@ -59,6 +59,9 @@ Pemindaian **65 file** granular. Sistem audit 4 lapis:
 - Belum ada perubahan apa pun di repo `super-dev-builders`. Sebelum adopsi, butuh keputusan Anda (protective default: approval manusia > otomatis). Sekarang lewat `patch`/salin ke skills/ + update registry + registry_lint + update bump approved_custom_count 29 → 29+6(a) jika diambil — semuanya masuk 1 PR kecil.
 - Kredensial tidak pernah disentuh; tidak ada kredensial di file PLANORA; `.env` disebut hanya di `.gitignore` (fitur ablasi).
 
-## KEPUTUSAN YANG DIPERLUKAN
-1. **Ambil 6 ide di atas YA/TIDAK** (rekomendasi: ALL YA — total lokasi + risiko rendah + kompatibel charter).
-2. Jika YA: integrasi dikerjakan sebagai patch SDB berikutnya (skills/sb-planora/* + registry.yaml + rerun 59/59 + lint PASS, plus preview before-after).
+## KEPUTUSAN & HASIL EKSEKUSI (UPDATE 2026-10-06 11:2x WIB)
+Owner approve (pesan: "silahkan ambil & manfaatkan... cek dulu keamanan, security dan privacy") → audit LULUS → **EKSEKUSI SELESAI**, commit `f58d45d`:
+- 7 skill adopsi: `product-kit`, `product-status`, `product-change`, `product-execution` (= planora-next), `feature/bug/chore-workflow` — upstream SKILL.md dipertahankan sebagai `WORKFLOW.md` + SKILL.md pembungkus gaya rumah; fix 1 path test lintas-skill pasca-rename (`../product-status`).
+- Registry 29→**36** custom; `install_skills.py --all` dieksekusi: terpasang cc-orchestrator 4, cc-architect 2, cc-builder 4, cc-reviewer-qa 3; recon/security/devops 0 (by design, sesuai matriks divisi).
+- Verifikasi: **pytest 100 PASS** (59 ekosistem + 39 adopsi + 2 lintas), registry_lint PASS (custom=36, profiles=7), secret scan BERSIH, `sisa dirty: 0`.
+- Ide #5 (template AGENTS.md lintas-project) DITUNDA — tersedia di starter bila diperlukan; ide #6 (eksplisit-invocation) tertulis di SKILL.md pembungkus.

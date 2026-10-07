@@ -59,7 +59,17 @@ Semua gate punya exit criteria; tidak ada gate "kira-kira lulus".
    `env -i PATH=<venv>/bin:/usr/bin:/bin HOME=/tmp/fakehome bash -c 'cd /tmp/sim && make check'`.
 2. Jalankan juga di host nyata — keduanya harus hijau (atau SKIP dengan alasan).
 3. Baru push; setelah push tonton run dan baca `--log-failed` bila merah.
-; **jangan** memberikan socket Docker host ke pekerjaan tak-terpercaya.
+4. **Output gerbang dari proses latar WAJIB dicek identitas/waktunya dulu.** Output `make check`/
+   test yang datang lewat notifikasi proses bisa milik revisi KODE LAMA (stale) dan melaporkan
+   kegagalan yang sudah diperbaiki — atau sebaliknya. Hanya output yang dijalankan pada revisi
+   kerja saat ini yang sahih; kalau ragu, jalankan ulang. (Nyata: notifikasi EXIT=2 dari
+   `proc_8b9b42feac50` pra-perbaikan `SLUG_RE` nyaris memicu "perbaikan" bug yang sudah hilang.)
+5. **Triase temuan scanner tidak boleh melemahkan kontrol positifnya.** Menambahkan `nosemgrep`
+   hanya sah bila (a) jalur berisiko sudah dijaga fail-closed DI TITIK PAKAI (bukan bergantung
+   pemanggil) — pindahkan gerbang ke dalam fungsi, bukan cukup di `main()`; (b) ada kontrol
+   positif yang membuktikan penolakan (mis. `file:///etc/passwd` DITOLAK); (c) kontrol positif
+   tes keamanan tetap LULUS setelah anotasi — jangan pernah mengubah fixture jadi placeholder
+   lemah agar scanner diam, itu mematikan tes yang menguji keamanan itu sendiri.
 - Tidak ada `--force`, `--no-verify`, atau bypass gate. Tidak ada auto-approve untuk aksi destruktif/
   publikasi/produksi.
 - Credential hanya lewat secret store; tanpa secret di log/artefak.

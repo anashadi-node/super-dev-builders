@@ -1,0 +1,28 @@
+# Bukti scan pihak ketiga — 2026-10-07
+
+Semua hasil di bawah dieksekusi dengan trivy 0.75.0 (exit code + output nyata).
+Kontrol positif (canary): `requests==2.31.0` -> 3 CVE (CVE-2024-35195 dll) => scanner bekerja.
+
+## microsoft/playwright 1.63.0 (benar-benar terpasang di host, uv tool)
+
+```
+$ trivy fs --scanners vuln /tmp/pw-req   # requirements.txt: playwright==1.63.0
+targets 1  vuln 0
+```
+
+Hasil: 0 advisory terbuka untuk 1.63.0. Bukti positif scanner hidup: canary di atas.
+
+## 6 entri pihak ketiga lain
+
+github-mcp-server, context7, crawlee, axe-core, lighthouse, sentry-for-ai:
+tidak ada artefak terpasang di host saat diaudit (uv tool list, npm ls -g,
+`hermes mcp list` kosong). Karena tidak ada artefak, tidak ada yang bisa dipindai —
+bukti scan tidak sah dikarang. Status registry dikoreksi menjadi BELUM_TERPASANG,
+bukan INSTALLED: klaim "terpasang" sebelumnya tidak didukung fakta.
+
+## Pemisahan bukti (mk.note)
+
+- Inilah PERTAMA KALI registry punya bukti scan untuk entri pihak ketiga.
+- Entri yang benar-benar dipakai WAJIB punya bukti scan; test
+  `tests/test_registry_third_party.py::test_adopted_third_party_have_scan_evidence`
+  menjadi gerbangnya dan akan MERAH bila ada yang kurang.

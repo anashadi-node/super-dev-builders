@@ -303,11 +303,13 @@ third_party:
     deferred: [agents-md]
     gate_note: "Secondary methodology. Gate pertama tetap Hermes native scanner."
   - repo: getsentry/sentry-for-ai
+    scan_status: "BELUM ADA BUKTI SCAN — aturan #6 belum tertutup (audit 2026-10-07)"
+    install_state: "TIDAK terpasang (kandidat observability)"
     url: https://github.com/getsentry/sentry-for-ai
     license: MIT
     pinned_commit: d8fd106782e609625704f5348b25c43b2f5dbeff
     pinned_date: 2026-10-02
-    status: OPTIONAL
+    status: BELUM_TERPASANG
     adopt: [observability_integration]
     gate_note: "Repo lama getsentry/sentry-agent-skills SUDAH ARCHIVED — pakai sentry-for-ai."
   - repo: anthropics/skills
@@ -321,25 +323,33 @@ third_party:
     adopt: []
     gate_note: "Jangan pasang. Bila ingin dilanjutkan: minta pernyataan lisensi tertulis dari pemilik repo lebih dulu — bukan tebakan kami."
   - repo: github/github-mcp-server
+    scan_status: "BELUM ADA BUKTI SCAN — aturan #6 belum tertutup (audit 2026-10-07)"
+    install_state: "NOT_ACTIVE (hermes mcp list kosong — tidak ada server MCP terdaftar); tidak ada instalasi lokal"
     url: https://github.com/github/github-mcp-server
     license: MIT
     pinned_commit: 71ef8266e48110974b13aef50b4df6ff9914ff68
     pinned_date: 2026-10-03
-    status: INSTALLED
+    status: BELUM_TERPASANG
     decided: 2026-10-06
     decision_note: "DIAPPROVE human owner via chat 2026-10-06. Token permission minimum + tool allowlist wajib saat onboard."
     adopt: [mcp_repository_integration]
     gate_note: "Wajib token permission minimum + allowlist tool."
   - repo: upstash/context7
+    scan_status: "BELUM ADA BUKTI SCAN — aturan #6 belum tertutup (audit 2026-10-07)"
+    install_state: "NOT_ACTIVE (tak ada server MCP terdaftar); tidak ada paket lokal"
     url: https://github.com/upstash/context7
     license: MIT
     pinned_commit: bfa02ea67b5707fe0e0a673faa49d0f50b28c80b
     pinned_date: 2026-10-03
-    status: INSTALLED
+    status: BELUM_TERPASANG
     decided: 2026-10-06
     decision_note: "DIAPPROVE human owner via chat 2026-10-06."
     adopt: [mcp_docs_retrieval]
   - repo: microsoft/playwright
+    scan: "trivy vuln 1.63.0 -> 0 advisory; canary requests==2.31.0 -> 3 CVE (scanner hidup)"
+    scan_evidence: reports/upgrade-evidence/third-party-scan-20261007.txt
+    scan_status: "BELUM ADA BUKTI SCAN — aturan #6 belum tertutup (audit 2026-10-07)"
+    install_state: "PLAYWRIGHT CLI v1.63.0 terpasang (uv tool); python module belum ada; package resmi tak punya advisory terbuka"
     url: https://github.com/microsoft/playwright
     license: Apache-2.0
     pinned_commit: 7ad3fba1aad9471c7e46d67a11b0e710a5d77ea8
@@ -348,30 +358,36 @@ third_party:
     adopt: [capture_engine_primary]
     gate_note: "CLI Playwright sudah tersedia di host; python module belum — lihat registry/tools.yaml."
   - repo: apify/crawlee
+    scan_status: "BELUM ADA BUKTI SCAN — aturan #6 belum tertutup (audit 2026-10-07)"
+    install_state: "TIDAK terpasang di host"
     url: https://github.com/apify/crawlee
     license: Apache-2.0
     pinned_commit: a97a31133e7ff6eed1ad1279ac9d1d92d2e5b738
     pinned_date: 2026-10-03
-    status: INSTALLED
+    status: BELUM_TERPASANG
     decided: 2026-10-06
     decision_note: "DIAPPROVE human owner via chat 2026-10-06, dengan larangan tetap: anti-bot evasion/proxy rotation tidak dipakai (policy ekosistem)."
     adopt: [secondary_crawler]
     gate_note: "Anti-bot evasion/proxy rotation dilarang oleh policy ekosistem."
   - repo: dequelabs/axe-core
+    scan_status: "BELUM ADA BUKTI SCAN — aturan #6 belum tertutup (audit 2026-10-07)"
+    install_state: "TIDAK terpasang di host"
     url: https://github.com/dequelabs/axe-core
     license: MPL-2.0
     pinned_commit: f59642eddf14c93ae3c9c31d69bcd611229bedb4
     pinned_date: 2026-10-02
-    status: INSTALLED
+    status: BELUM_TERPASANG
     decided: 2026-10-06
     decision_note: "DIAPPROVE human owner via chat 2026-10-06."
     adopt: [accessibility_evidence]
   - repo: GoogleChrome/lighthouse
+    scan_status: "BELUM ADA BUKTI SCAN — aturan #6 belum tertutup (audit 2026-10-07)"
+    install_state: "TIDAK terpasang di host"
     url: https://github.com/GoogleChrome/lighthouse
     license: Apache-2.0
     pinned_commit: db0f40a444a53c6edacc120eb917beceabc00401
     pinned_date: 2026-10-03
-    status: INSTALLED
+    status: BELUM_TERPASANG
     decided: 2026-10-06
     decision_note: "DIAPPROVE human owner via chat 2026-10-06."
     adopt: [performance_evidence]

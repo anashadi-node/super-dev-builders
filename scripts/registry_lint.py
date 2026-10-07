@@ -16,7 +16,9 @@ REQUIRED_TOOL_SECTIONS = {"present", "pending_approval"}
 VALID_STATUS = {"KEEP", "UPDATE", "REPLACE", "ADD", "REMOVE", "QUARANTINE", "PENDING_APPROVAL",
                 "IN_USE", "OPTIONAL", "DEFER", "NOT_PRESENT",
                 # 2026-10-05: hasil keputusan pihak ketiga (lihat registry bagian B)
-                "INSTALLED", "REJECTED_BLUEPRINT", "REJECTED_LICENSE", "REJECTED_COVERED"}
+                "INSTALLED", "REJECTED_BLUEPRINT", "REJECTED_LICENSE", "REJECTED_COVERED",
+                # 2026-10-07: diklaim terpakai tetapi tidak ada artefak di host
+                "BELUM_TERPASANG"}
 
 def frontmatter(path):
     try:
@@ -136,7 +138,9 @@ def main() -> int:
     # - ADOPTED (INSTALLED/IN_USE/OPTIONAL): sudah dipakai -> WAJIB punya bukti scan.
     # - DITAHAN (QUARANTINE/DEFER) atau DITOLAK (REJECTED_*): tidak dipakai -> cukup punya
     #   ALASAN; alasan boleh ada di entri ini atau di seksi quarantine/deferred tools.yaml.
-    ADOPTED = {"INSTALLED", "IN_USE", "OPTIONAL"}
+    ADOPTED = {"INSTALLED", "IN_USE", "OPTIONAL", "BELUM_TERPASANG"}
+    # BELUM_TERPASANG = diklaim terpakai tetapi tidak ada artefak di host saat diaudit;
+    # status ini SENGAJA menandai utang bukti, bukan penerimaan risiko.
     SCAN_FIELDS = ("scan", "scanner", "scan_evidence", "security_scan", "audit", "audit_status")
     NOTE_FIELDS = ("gate_note", "decision_note", "evidence", "caveats", "license_note",
                    "codeql_owner_decision", "post_completion_audit_insight", "reason")

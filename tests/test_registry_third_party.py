@@ -45,6 +45,25 @@ def test_adopted_third_party_have_scan_evidence():
     assert missing == [], f"terpakai tapi tanpa bukti scan: {missing}"
 
 
+# Daftar utang bukti yang diketahui (audit 2026-10-07): entri diklaim terpakai tetapi
+# tidak ada artefak terpasang di host, jadi belum ada yang bisa dipindai. Daftar ini
+# hanya boleh MENYUSUT: kalau entri baru muncul di sini tanpa bukti scan, test gagal.
+SCAN_DEBT_20261007 = {
+    "github/github-mcp-server", "upstash/context7", "apify/crawlee",
+    "dequelabs/axe-core", "GoogleChrome/lighthouse", "getsentry/sentry-for-ai",
+}
+
+
+def test_scan_debt_list_does_not_grow():
+    reg = load_yaml(repo_path("registry", "skills.yaml")) or {}
+    debt = {x.get("repo") for x in (reg.get("third_party") or [])
+            if x.get("status") == "BELUM_TERPASANG"}
+    unexpected = debt - SCAN_DEBT_20261007
+    assert unexpected == set(), (
+        f"utang bukti scan bertambah: {sorted(unexpected)} — pasang + pindai artefaknya, "
+        "atau turunkan statusnya menjadi QUARANTINE/DEFER. Jangan tambahkan ke daftar utang.")
+
+
 def test_held_third_party_have_a_reason_somewhere():
     """QUARANTINE/DEFER: tidak dipakai, jadi cukup ada alasan (di entri atau tools.yaml)."""
     reg = load_yaml(repo_path("registry", "skills.yaml")) or {}

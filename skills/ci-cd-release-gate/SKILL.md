@@ -79,6 +79,16 @@ Semua gate punya exit criteria; tidak ada gate "kira-kira lulus".
    `out["raw"] == raw` True. **Tutup dengan tes**, bukan disiplin manual — gate manual terbukti
    terlewat saat commit: `assert evidence_lint.main(<dir bukti terlacak>) == 0` + kontrol negatif
    (`evidence_lint.main(<bentuk mentah apa adanya>) == 1`). Gate yang hanya "diingat" bukan gate.
+7. **Re-run artefak bukti: bandingkan ANGKA, bukan byte.** Skrip bukti yang menstempel
+   `captured_at`/ID alat (`ReportID`, `CreatedAt`) dan urutan temuan menghasilkan byte BERBEDA
+   di tiap jalan walau angkanya sama — jangan mengklaim "idempoten byte" tanpa membuktikannya.
+   Sebelum commit: bandingkan angka substantif (findings/severity/secret/misconfig); bila sama,
+   `git restore` berkas bukti dan JANGAN commit timestamp baru. **Warning nyata:** scanner bisa
+   TIDAK deterministik antar-jalan (semgrep `p/default` context7: 90 -> 88 temuan; 0/0 rahasia
+   tetap) — catat angka, jangan jadikan jaminan reproducibility. Untuk skrip scan pihak-ketiga:
+   serialkan dengan `fcntl.flock` (cegah balapan `__pycache__` antar-instance -> `ModuleNotFoundError:
+   sdb_common` intermiten), set `sys.dont_write_bytecode = True`, dan tulis ulang HANYA bila
+   tanda-tangan substantif berubah (sisanya "TIDAK BERUBAH").
 - Tidak ada `--force`, `--no-verify`, atau bypass gate. Tidak ada auto-approve untuk aksi destruktif/
   publikasi/produksi.
 - Credential hanya lewat secret store; tanpa secret di log/artefak.

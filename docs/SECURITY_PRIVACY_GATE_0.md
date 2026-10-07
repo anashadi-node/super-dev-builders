@@ -3,7 +3,7 @@
 Migrasi dari V1 + penyesuaian V2.2. Gate ini wajib **sebelum** aksi apa pun: membuka target, clone repo,
 install dependency, capture network, rebuild, test, deploy.
 
-Implementasi deterministik: `python3 scripts/gate_check.py --target <name>` (membaca `evidence/<target>/authorization.yaml`).
+Implementasi deterministik: `python3 scripts/gate_check.py <name>` (membaca `evidence/<target>/authorization.yaml`; bentuk lama `--target <name>` tetap didukung).
 
 ## 0. Otorisasi (salah satu wajib benar)
 - Milik user/perusahaan sendiri.

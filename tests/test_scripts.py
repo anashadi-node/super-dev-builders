@@ -398,10 +398,12 @@ def test_init_target_creates_workspace_and_is_idempotent():
         base = os.path.join(REPO, "evidence", slug)
         assert os.path.exists(os.path.join(base, "authorization.yaml"))
         assert os.path.exists(os.path.join(base, "workspace.json"))
+        # workdir run 16-tahap + root implementasi harus ikut dibuat,
+        # supaya `sdb workflow <slug>` tidak menolak target yang baru di-init.
+        assert os.path.isdir(os.path.join(REPO, "runs", slug, "reports"))
+        assert os.path.isdir(os.path.join(REPO, "targets", slug, "src"))
     finally:
         import shutil
-        shutil.rmtree(os.path.join(REPO, "evidence", slug), ignore_errors=True)
-        shutil.rmtree(os.path.join(REPO, "normalized", slug), ignore_errors=True)
-        shutil.rmtree(os.path.join(REPO, "reconstruction", slug), ignore_errors=True)
-        shutil.rmtree(os.path.join(REPO, "verification", slug), ignore_errors=True)
-        shutil.rmtree(os.path.join(REPO, "reports", slug), ignore_errors=True)
+        for tree in ("evidence", "normalized", "reconstruction", "verification",
+                     "reports", "runs", "targets"):
+            shutil.rmtree(os.path.join(REPO, tree, slug), ignore_errors=True)

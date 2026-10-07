@@ -295,7 +295,7 @@ sekadar laporan.
 ## Langkah 7 — Release gate
 
 ```bash
-sdb release --target nama-target-saya
+sdb release nama-target-saya
 # atau:  make release-check TARGET=nama-target-saya
 ```
 

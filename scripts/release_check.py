@@ -1,8 +1,9 @@
 #!/usr/bin/python3
 """Release Gate (tahap 12) — tolak PASS bila artefak evidence tidak ada/kedaluwarsa.
 
-Pemakaian: /usr/bin/python3 scripts/release_check.py --project <dir> [--max-age-hours 24]
-Exit: 0 PASS, 1 FAIL.
+Pemakaian: /usr/bin/python3 scripts/release_check.py <slug> [--max-age-hours 24]
+           (bentuk lama `--project <dir>` tetap didukung)
+Exit: 0 PASS, 1 FAIL, 2 BLOCKED/argumen tak sah.
 """
 from __future__ import annotations
 
@@ -13,7 +14,7 @@ import sys
 import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from sdb_common import load_yaml, now_iso, repo_path, write_json
+from sdb_common import load_yaml, now_iso, repo_path, validate_slug, write_json
 
 
 def newest(pattern: str):
@@ -26,11 +27,25 @@ def newest(pattern: str):
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Release gate evidence check")
-    ap.add_argument("--project", default=".", help="root proyek yang dirilis")
+    ap.add_argument("target_pos", nargs="?", help="slug target (alias --project runs/<slug>)")
+    ap.add_argument("--project", default=None, help="root proyek yang dirilis")
+    ap.add_argument("--target", default=None, help="slug target (sama dengan bentuk posisional)")
     ap.add_argument("--max-age-hours", type=float, default=None)
     ap.add_argument("--config", default=None, help="default: workflows/release-gate.yaml")
     ap.add_argument("--out", default=None)
     args = ap.parse_args(argv)
+
+    # Resolusi: slug posisional / --target / --project. Slug fail-closed (CWE-22).
+    slug = args.target or args.target_pos
+    if slug and not args.project:
+        try:
+            validate_slug(slug)
+        except ValueError as e:
+            print(f"FATAL: {e}", file=sys.stderr)
+            return 2
+        args.project = repo_path("runs", slug)
+    if not args.project:
+        args.project = "."
 
     cfg_path = args.config or repo_path("workflows", "release-gate.yaml")
     cfg = load_yaml(cfg_path) or {}

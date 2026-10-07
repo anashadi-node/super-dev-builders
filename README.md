@@ -51,12 +51,12 @@ sdb doctor                                    # kapabilitas host + drift skill (
 sdb init nama-target                          # workspace per target (evidence/normalized/...)
 sdb gate nama-target                          # Gate #0 -> PASS/FAIL/BLOCKED
 sdb workflow nama-target                      # laporan 18 baris tahap: ada / MISSING
-sdb release --target nama-target               # release gate berbasis artefak
+sdb release nama-target                        # release gate berbasis artefak
 make check                                    # gerbang lokal wajib sebelum commit
 
 # tanpa perintah `sdb` pun bisa:
 python3 scripts/doctor.py                     # kapabilitas host (deterministik)
-python3 scripts/gate_check.py --target <name> # validasi authorization manifest -> PASS/FAIL/BLOCKED
+python3 scripts/gate_check.py <name>          # validasi authorization manifest -> PASS/FAIL/BLOCKED
 python3 scripts/init_target.py <name>         # workspace per target (evidence/normalized/...)
 python3 scripts/install_skills.py --profile sdb-builder
 python3 -m pytest tests -q                    # test suite skrip

@@ -31,3 +31,14 @@ evidence/**/*.raw
 # Data besar / hasil sementara
 data/raw/
 *.log.tmp
+
+# Workspace uji E2E / self-test (dibuat `sdb init` saat uji) — jangan ikut commit
+evidence/e2e-*/
+normalized/e2e-*/
+reconstruction/e2e-*/
+verification/e2e-*/
+reports/e2e-*/
+runs/e2e-*/
+targets/e2e-*/
+**/_selftest*/
+**/zz-*/

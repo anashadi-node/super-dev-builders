@@ -77,7 +77,8 @@ cd /home/anashadi/super-dev-builders
 ruff check scripts tests                       # lint cepat, target: 0 temuan
 semgrep scan --config p/default --metrics off --json -o reports/upgrade-evidence/semgrep.json .
 trivy fs --scanners vuln,misconfig,secret --format json -o reports/upgrade-evidence/trivy-fs.json .
-/usr/bin/python3 scripts/release_check.py --project .   # gate rilis (butuh artefak < 24 jam)
+/usr/bin/python3 scripts/release_check.py sdb-local-demo   # gate rilis (butuh artefak < 24 jam)
+# bentuk lama `--project <dir>` tetap didukung; bentuk slug = runs/<slug>
 ```
 
 Aturan pemakaian:

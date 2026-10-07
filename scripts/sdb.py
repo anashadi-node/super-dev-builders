@@ -16,7 +16,7 @@ Aturan desain:
 Pemakaian:
     sdb list                 # daftar perintah (mesin-terbaca dengan --json)
     sdb doctor               # kapabilitas host
-    sdb gate --target X      # Gate #0 (izin/scope) -> PASS/FAIL/BLOCKED
+    sdb gate X               # Gate #0 (izin/scope) -> PASS/FAIL/BLOCKED
     sdb init X               # workspace target
     ...
 Semua argumen setelah nama perintah diteruskan apa adanya ke skrip tujuan.
@@ -76,7 +76,7 @@ def usage() -> str:
     for name in sorted(COMMANDS):
         lines.append(f"  {name:<{width}}  {COMMANDS[name][2]}")
     lines += ["", "Semua argumen setelah nama perintah diteruskan ke skrip tujuan."]
-    lines += ["Contoh: sdb gate --target sdb-local-demo", "        sdb workflow sdb-local-demo"]
+    lines += ["Contoh: sdb init sdb-local-demo", "        sdb gate sdb-local-demo", "        sdb workflow sdb-local-demo", "        sdb release sdb-local-demo"]
     return "\n".join(lines)
 
 

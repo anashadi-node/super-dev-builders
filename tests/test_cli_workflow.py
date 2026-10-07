@@ -37,6 +37,7 @@ sdb = load("sdb")
 wf = load("workflow_run")
 common = load("sdb_common")
 gate = load("gate_check")
+release = load("release_check")
 
 DEMO = "sdb-local-demo"
 
@@ -245,3 +246,31 @@ def test_gate_check_missing_target_is_usage_error():
 def test_workflow_rejects_traversal_slug():
     """Runner juga harus fail-closed pada slug traversal."""
     assert wf.main(["../../../tmp/zz-should-not-exist"]) == 2
+
+
+def test_release_accepts_positional_target_like_other_commands(tmp_path):
+    """`sdb release <slug>` harus jalan seperti `sdb init/gate/workflow <slug>`.
+
+    Uji regresi: sebelumnya hanya `--project <dir>` yang didukung, sehingga
+    Langkah 7 di docs/GETTING_STARTED.md gagal dengan argparse error.
+    """
+    out_a, out_b = tmp_path / "a.json", tmp_path / "b.json"
+    rc_pos = release.main(["zz-release-posisional", "--out", str(out_a)])
+    rc_flag = release.main(["--target", "zz-release-posisional", "--out", str(out_b)])
+    assert rc_pos == rc_flag, f"posisional={rc_pos} vs --target={rc_flag} harus identik"
+    assert rc_pos != 0, "tanpa artefak fresh wajib FAIL (bukan PASS)"
+    assert out_a.read_text() == out_b.read_text(), "kedua bentuk harus menghasilkan verdict sama"
+
+
+def test_release_rejects_traversal_slug_before_writing(tmp_path):
+    """Slug traversal -> exit 2 (BLOCKED) dan tidak menulis apa pun ke luar repo."""
+    rc = release.main(["../../../tmp/zz-release-escape", "--out", str(tmp_path / "v.json")])
+    assert rc == 2, f"slug traversal seharusnya ditolak fail-closed (exit 2), dapat {rc}"
+    assert not os.path.exists(tmp_path / "v.json"), "tidak boleh menulis verdict untuk slug tak sah"
+    assert not os.path.exists("/tmp/zz-release-escape")
+
+
+def test_release_legacy_project_flag_still_works(tmp_path):
+    """Bentuk lama `--project <dir>` tetap didukung (kompatibilitas Makefile lama)."""
+    rc = release.main(["--project", str(tmp_path / "kosong"), "--out", str(tmp_path / "v.json")])
+    assert rc == 1, "direktori proyek tanpa artefak -> FAIL (exit 1)"

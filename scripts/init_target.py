@@ -14,6 +14,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from sdb_common import now_iso, repo_path, validate_slug, write_json
 
 SUBDIRS = ["raw", "screens", "dom", "trace", "assets", "notes"]
+# Workdir run (16 tahap, lihat scripts/workflow_run.py STAGES) + root implementasi.
+# Tanpa ini, `sdb workflow <slug>` menolak target yang baru saja di-`sdb init`.
+RUN_SUBDIRS = ["docs", "logs", "reports"]
+TARGET_SUBDIRS = ["src"]
 
 
 def main(argv=None) -> int:
@@ -40,11 +44,17 @@ def main(argv=None) -> int:
         "reconstruction": repo_path("reconstruction", slug),
         "verification": repo_path("verification", slug),
         "reports": repo_path("reports", slug),
+        "run": repo_path("runs", slug),
+        "target": repo_path("targets", slug),
     }
     for p in paths.values():
         os.makedirs(p, exist_ok=True)
     for sub in SUBDIRS:
         os.makedirs(os.path.join(paths["evidence"], sub), exist_ok=True)
+    for sub in RUN_SUBDIRS:
+        os.makedirs(os.path.join(paths["run"], sub), exist_ok=True)
+    for sub in TARGET_SUBDIRS:
+        os.makedirs(os.path.join(paths["target"], sub), exist_ok=True)
 
     manifest_dst = os.path.join(paths["evidence"], "authorization.yaml")
     platform_path = os.path.join(paths["evidence"], "target_manifest.yaml")
@@ -62,10 +72,10 @@ def main(argv=None) -> int:
         "mode": args.mode,
         "created_at": now_iso(),
         "paths": paths,
-        "next_step": "isi authorization.yaml lalu jalankan scripts/gate_check.py --target " + slug,
+        "next_step": f"isi authorization.yaml lalu jalankan scripts/gate_check.py {slug}",
     })
     print(f"workspace siap: {paths['evidence']}")
-    print(f"NEXT: isi authorization.yaml -> /usr/bin/python3 scripts/gate_check.py --target {slug}")
+    print(f"NEXT: isi authorization.yaml -> /usr/bin/python3 scripts/gate_check.py {slug}")
     return 0
 
 

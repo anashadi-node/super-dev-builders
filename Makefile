@@ -43,16 +43,17 @@ drift:
 check: lint lint-registry test drift
 
 gate-init:
-	@echo "gunakan: $(PY_SYS) scripts/init_target.py <slug> && $(PY_SYS) scripts/gate_check.py --target <slug>"
+	@echo "gunakan: $(PY_SYS) scripts/init_target.py <slug> && $(PY_SYS) scripts/gate_check.py <slug>"
 
 lint-registry:
 	$(PY_SYS) scripts/registry_lint.py
 
 release-check:
-	@slug=$$($(PY_SYS) -c "import os;runs='runs';c=[(os.path.getmtime(os.path.join(runs,d)),d) for d in (os.listdir(runs) if os.path.isdir(runs) else [])];print(max(c)[1] if c else '')" 2>/dev/null); \
-	if [ -z "$$slug" ]; then echo "Tidak ada run di runs/"; exit 1; fi; \
+	@slug="$(TARGET)"; \
+	if [ -z "$$slug" ]; then slug=$$($(PY_SYS) -c "import os;runs='runs';c=[(os.path.getmtime(os.path.join(runs,d)),d) for d in (os.listdir(runs) if os.path.isdir(runs) else [])];print(max(c)[1] if c else '')" 2>/dev/null); fi; \
+	if [ -z "$$slug" ]; then echo "Tidak ada run di runs/ — pakai: make release-check TARGET=<slug>"; exit 1; fi; \
 	echo "release gate untuk: runs/$$slug"; \
-	$(PY_SYS) scripts/release_check.py --project runs/$$slug
+	$(PY_SYS) scripts/release_check.py "$$slug"
 
 skills-list:
 	$(PY_SYS) scripts/install_skills.py --list

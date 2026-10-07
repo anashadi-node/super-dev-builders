@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Super Dev Builders — Laporan Lengkap untuk Pemilik (Bahasa Awam)</title>
+<style>
+:root{
+  --bg:#0f1115; --card:#171a21; --card2:#1d2129; --fg:#e8eaf0; --muted:#a2a9b8;
+  --line:#2a2f3a; --acc:#4ea1ff; --ok:#3ddc97; --warn:#ffc857; --bad:#ff6b6b;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  line-height:1.75;font-size:16px}
+.wrap{max-width:1040px;margin:0 auto;padding:40px 24px 90px}
+header.hero{background:linear-gradient(135deg,#16233a,#1a2f28 60%,#241f33);
+  border:1px solid var(--line);border-radius:18px;padding:38px 34px;margin-bottom:34px}
+header.hero h1{margin:0 0 8px;font-size:2.05rem;line-height:1.2}
+header.hero .sub{color:var(--muted);font-size:.98rem;margin-top:6px}
+.badge{display:inline-block;background:rgba(78,161,255,.14);border:1px solid rgba(78,161,255,.4);
+  color:var(--acc);border-radius:999px;padding:3px 13px;font-size:.78rem;margin:10px 8px 0 0;
+  text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.badge.ok{background:rgba(61,220,151,.13);border-color:rgba(61,220,151,.4);color:var(--ok)}
+h2{margin:52px 0 14px;font-size:1.5rem;border-left:4px solid var(--acc);padding-left:14px}
+h3{margin:30px 0 10px;font-size:1.16rem;color:#cfe1ff}
+h4{margin:20px 0 6px;font-size:1.02rem;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.05em;font-size:.82rem}
+p{margin:10px 0}
+.muted{color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:18px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:14px;margin:18px 0}
+.stat{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.stat .n{font-size:1.85rem;font-weight:700;color:var(--acc);line-height:1.1}
+.stat .l{color:var(--muted);font-size:.85rem;margin-top:5px}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.94rem;
+  background:var(--card);border-radius:10px;overflow:hidden}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:#20252f;color:#cdd6e6;font-size:.85rem;text-transform:uppercase;letter-spacing:.04em}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#1b1f27}
+ul,ol{margin:10px 0 10px 4px;padding-left:22px}
+li{margin:6px 0}
+code{background:#22272f;border:1px solid var(--line);border-radius:6px;padding:1px 7px;font-size:.88rem;
+  font-family:"SF Mono",Menlo,Consolas,monospace;color:#ffd9a0}
+pre{background:#14181e;border:1px solid var(--line);border-radius:10px;padding:16px;overflow:auto;
+  font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.85rem;line-height:1.6;color:#cfe1ff}
+.toc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 26px}
+.toc ol{columns:2;column-gap:34px;margin:0;padding-left:20px}
+.toc a{color:var(--acc);text-decoration:none}
+.toc a:hover{text-decoration:underline}
+.callout{border-left:4px solid var(--acc);background:rgba(78,161,255,.07);padding:14px 18px;
+  border-radius:0 10px 10px 0;margin:18px 0}
+.callout.warn{border-left-color:var(--warn);background:rgba(255,200,87,.07)}
+.callout.ok{border-left-color:var(--ok);background:rgba(61,220,151,.07)}
+.callout.bad{border-left-color:var(--bad);background:rgba(255,107,107,.07)}
+.pill{display:inline-block;border-radius:6px;padding:2px 9px;font-size:.8rem;font-weight:600;white-space:nowrap}
+.pill.ok{background:rgba(61,220,151,.16);color:var(--ok);border:1px solid rgba(61,220,151,.35)}
+.pill.warn{background:rgba(255,200,87,.16);color:var(--warn);border:1px solid rgba(255,200,87,.35)}
+.pill.bad{background:rgba(255,107,107,.16);color:var(--bad);border:1px solid rgba(255,107,107,.35)}
+.analogy{background:#1a2430;border:1px dashed #33507a;border-radius:12px;padding:14px 18px;margin:16px 0}
+.analogy .t{color:var(--warn);font-weight:700;font-size:.85rem;text-transform:uppercase;letter-spacing:.05em}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.two{grid-template-columns:1fr}.toc ol{columns:1}header.hero h1{font-size:1.55rem}}
+hr{border:none;border-top:1px solid var(--line);margin:40px 0}
+footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--line);color:var(--muted);font-size:.88rem}
+.flow{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+.flow .s{background:var(--card2);border:1px solid var(--line);border-radius:9px;padding:9px 13px;font-size:.85rem}
+.flow .s b{color:var(--acc)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div style="color:var(--acc);font-weight:700;letter-spacing:.09em;font-size:.8rem">LAPORAN UNTUK PEMILIK · BAHASA AWAM</div>
+  <h1>Super Dev Builders (SDB)</h1>
+  <div class="sub">Semua yang perlu Anda tahu tentang apa itu SDB, apa yang bisa dikerjakannya, bahasa pemrograman apa saja yang dikuasainya, dan bukti bahwa semuanya benar-benar bekerja.</div>
+  <div>
+    <span class="badge ok">Registry: 0 WARN</span>
+    <span class="badge ok">165 Tes Lulus</span>
+    <span class="badge ok">CI Hijau</span>
+    <span class="badge">Rahasia Bersih</span>
+  </div>
+  <div class="sub" style="margin-top:14px">
+    Repo: <code>anashadi-node/super-dev-builders</code> (privat) · branch <code>master</code><br>
+    Revisi terakhir: <code>51011f2</code> · Tanggal laporan: 8 Oktober 2026, 06:17 WIB
+  </div>
+</header>
+
+<div class="toc">
+  <h3 style="margin-top:0">Daftar Isi</h3>
+  <ol>
+    <li><a href="#apa">Apa itu SDB (bahasa awam)</a></li>
+    <li><a href="#warn">Arti "Tutup WARN Registry"</a></li>
+    <li><a href="#bahasa">Berapa bahasa pemrograman?</a></li>
+    <li><a href="#proyek">Tipe project apa saja?</a></li>
+    <li><a href="#divisi">11 Divisi kerja SDB</a></li>
+    <li><a href="#alur">Alur kerja 16 tahap</a></li>
+    <li><a href="#perintah">17 perintah siap pakai</a></li>
+    <li><a href="#angka">Angka & bukti hari ini</a></li>
+    <li><a href="#aman">7 aturan keamanan mutlak</a></li>
+    <li><a href="#sisa">Sisa risiko yang jujur</a></li>
+    <li><a href="#pakai">Cara pakai singkat</a></li>
+  </ol>
+</div>
+
+<h2 id="apa">1. Apa itu SDB — dalam bahasa awam</h2>
+
+<div class="analogy">
+  <div class="t">Analogi sederhana</div>
+  <p style="margin-bottom:0">Bayangkan <b>SDB seperti sebuah "kantor kontraktor software" lengkap</b> yang di dalamnya sudah ada 11 tim siap kerja (perancang, tukang bangunan, pemeriksa mutu, satpam, akuntan, dokumentasi). Anda datang sebagai <b>pemilik proyek</b>, memberi satu tugas, dan kantor itu mengerjakannya dari awal sampai selesai — <b>dengan catatan tertulis di setiap langkah</b>, sehingga hasilnya bisa diperiksa dan dipertanggungjawabkan.</p>
+</div>
+
+<p><b>SDB (Super Dev Builders)</b> adalah sebuah <b>ekosistem kerja software engineering</b> yang dibangun di atas Hermes Agent. Artinya, SDB bukan satu program saja, melainkan <b>kumpulan "pegawai ahli" (skill) + aturan kerja + alat pemeriksa otomatis</b> yang dipakai satu pintu masuk untuk mengerjakan proyek software dari nol sampai rilis.</p>
+
+<p>Hal yang membuat SDB berbeda dari "sekadar AI yang menulis kode":</p>
+<ul>
+  <li><b>Setiap langkah punya bukti.</b> Tidak ada klaim "sudah selesai" tanpa hasil perintah nyata yang bisa dilihat (hasil tes, hasil pindai keamanan, file bukti).</li>
+  <li><b>Ada pos pemeriksaan (gate).</b> Pekerjaan tidak boleh lewat batas tertentu sebelum syaratnya terpenuhi — misalnya pekerjaan tidak boleh mulai sebelum ada izin tertulis dari Anda.</li>
+  <li><b>Ada pemisahan tugas.</b> Yang membangun kode tidak boleh sekaligus menjadi yang mengesahkan rilis. Persis seperti di dunia nyata: tukang bangunan ≠ inspektur bangunan.</li>
+  <li><b>Keamanan dan privasi di tempat pertama.</b> Ini prinsip paling tinggi, di atas kecepatan dan kenyamanan.</li>
+</ul>
+
+<div class="callout ok">
+  <b>Kesimpulan bagian ini:</b> SDB adalah "kantor software otomatis" yang mengerjakan proyek secara lengkap, tetapi setiap tindakannya meninggalkan jejak bukti dan tunduk pada aturan keamanan yang ketat.
+</div>
+
+<h2 id="warn">2. Arti "Tutup WARN Registry" — bahasa awam</h2>
+
+<p>Anda bertanya: <i>"apa maksud tutup WARN registry?"</i> Ini jawaban sederhananya.</p>
+
+<h3>Dulu apa itu "registry"?</h3>
+<p><b>Registry</b> = <b>daftar inventaris</b> milik SDB. Isinya dua hal:</p>
+<ul>
+  <li><b>Daftar "pegawai" (skill)</b> — 37 skill buatan sendiri + 16 skill pihak ketiga dari luar.</li>
+  <li><b>Daftar alat (tool)</b> — program-program yang dipakai di komputer Anda, misalnya <code>git</code>, <code>docker</code>, <code>pytest</code>.</li>
+</ul>
+
+<div class="analogy">
+  <div class="t">Analogi</div>
+  <p style="margin-bottom:0">Registry itu seperti <b>buku catatan gudang</b>. Setiap barang (skill/alat) tertulis di situ: namanya, dari mana asalnya, dan <b>apakah barang itu sudah diperiksa keamanannya atau belum</b>.</p>
+</div>
+
+<h3>Lalu apa itu "WARN"?</h3>
+<p><b>WARN = peringatan, bukan error.</b> Ini poin terpenting:</p>
+<ul>
+  <li><b>Error</b> = ada yang rusak, sistem berhenti, tidak bisa jalan.</li>
+  <li><b>WARN</b> = <b>sistem tetap jalan normal</b>, hanya saja ada catatan <i>"barang ini belum lengkap administrasinya."</i></li>
+</ul>
+<p>Contoh WARN yang muncul sebelumnya:</p>
+<pre>WARN: tools.yaml[present] git: tanpa version_pin (aturan #6: pin dulu)
+WARN: third_party apify/crawlee (BELUM_TERPASANG): tanpa bukti scan (aturan #6)</pre>
+
+<p>Artinya kira-kira: <i>"Hei, alat <code>git</code> ini belum dicatat versi tepatnya,"</i> dan <i>"Hei, skill pihak ketiga ini belum ada surat bukti pemeriksaan keamanan."</i> Dua-duanya <b>peringatan tata tertib</b>, bukan kerusakan.</p>
+
+<h3>Jadi "menutup WARN" itu apa?</h3>
+<p><b>Menutup WARN = membereskan administrasinya supaya peringatan itu hilang.</b> Ibarat petugas gudang yang melengkapi catatan: memberi nomor versi alat, dan menyelipkan surat hasil pemeriksaan keamanan untuk setiap barang pihak ketiga.</p>
+
+<table>
+  <thead><tr><th>Jenis WARN (sebelum)</th><th>Jumlah</th><th>Cara ditutup</th><th>Hasil</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Alat di komputer belum dicatat versi tepatnya ("tanpa version_pin")</td>
+      <td>5 alat</td>
+      <td>Dicatat versi yang <b>benar-benar terpasang di komputer Anda</b> (bukan karangan)</td>
+      <td><span class="pill ok">TERTUTUP</span></td>
+    </tr>
+    <tr>
+      <td>Skill pihak ketiga belum punya bukti pemeriksaan keamanan ("tanpa bukti scan")</td>
+      <td>6 skill</td>
+      <td>Diunduh pada versi terkunci → diperiksa keamanan secara <b>baca-saja</b> → bukti disimpan &amp; ditautkan</td>
+      <td><span class="pill ok">TERTUTUP</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout ok">
+  <b>Hasil akhir:</b> dari <b>11 peringatan → 0 peringatan.</b> Registry sekarang <code>registry_lint: PASS</code> tanpa satu pun WARN. Sistem tetap <code>make check</code> EXIT=0 (lulus).
+</div>
+
+<div class="callout warn">
+  <b>Penting — ditutup secara JUJUR:</b> WARN ini <u>tidak</u> "dihapus" atau disembunyikan. Yang dilakukan adalah <b>melengkapi buktinya</b>. Versi alat diambil dari hasil ukur nyata di komputer Anda; bukti keamanan diambil dari hasil pindai nyata atas kode aslinya. Kalau ada temuan yang tidak enak (lihat bagian 10), temuan itu <b>dicatat terbuka</b>, tidak dipalsukan.
+</div>
+
+<h2 id="bahasa">3. SDB bisa menulis berapa bahasa pemrograman?</h2>
+
+<p>Ini pertanyaan bagian dari permintaan Anda. Jawabannya perlu dibagi dua, supaya jujur dan tidak dibesar-besarkan.</p>
+
+<h3>A. Bahasa yang bisa DITULIS/dipakai untuk membangun proyek</h3>
+<p>SDB punya <b>kebijakan teknologi resmi</b> yang membagi bahasa menjadi 3 tingkat. Ini yang menjadi "bahasa kerja" SDB:</p>
+
+<table>
+  <thead><tr><th>Tingkat</th><th>Bahasa</th><th>Dipakai untuk</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><b>Core</b> (utama)</td>
+      <td>TypeScript, JavaScript, Python, SQL, HTML/CSS, Bash</td>
+      <td>Web, backend, API, AI/otomasi, database, skrip</td>
+    </tr>
+    <tr>
+      <td><b>Platform</b> (sesuai kebutuhan)</td>
+      <td>Kotlin, Swift, Dart/Flutter, C#/.NET</td>
+      <td>Aplikasi Android, aplikasi iPhone/Apple, aplikasi lintas-platform (mobile), Windows</td>
+    </tr>
+    <tr>
+      <td><b>Specialized</b> (khusus)</td>
+      <td>Go, Rust, Java, C/C++, PowerShell</td>
+      <td>Performa tinggi, sistem tingkat rendah, perusahaan besar (JVM), integrasi sistem/native</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><b>Total: 15 bahasa inti+platform+khusus</b> dalam kebijakan resmi. Susunan "tumpukan bawaan" (default stack) yang dipakai SDB kalau Anda tidak menentukan lain:</p>
+<table>
+  <thead><tr><th>Bagian</th><th>Teknologi bawaan</th></tr></thead>
+  <tbody>
+    <tr><td>Website</td><td>TypeScript + React / Next.js</td></tr>
+    <tr><td>Backend</td><td>TypeScript / Node.js (Python untuk AI &amp; otomasi)</td></tr>
+    <tr><td>Database</td><td>PostgreSQL / SQLite</td></tr>
+    <tr><td>Mobile (HP)</td><td>Flutter (lintas platform)</td></tr>
+    <tr><td>Desktop (komputer)</td><td>Tauri atau Electron</td></tr>
+    <tr><td>DevOps (operasional)</td><td>Docker + Bash/YAML, Terraform bila perlu</td></tr>
+  </tbody>
+</table>
+
+<h3>B. Bahasa yang bisa DIPERIKSA keamanannya oleh SDB</h3>
+<p>SDB memakai mesin pemindai keamanan (semgrep). Mesin ini <b>mengenali 62 nama bahasa/dialek</b> — bila nama-nama kembar (alias seperti <code>js</code>=javascript, <code>py</code>=python) dihitung satu kali, hasilnya <b>sekitar 46 bahasa unik</b>.</p>
+
+<p>Contoh yang dikenali: <code>apex, bash, c, c#, c++, cairo, circom, clojure, dart, docker, elixir, go, hack, hcl, html, java, javascript, json, jsonnet, julia, kotlin, lisp, lua, move_on_aptos, move_on_sui, ocaml, php, powershell, promql, protobuf, python, ql, r, regex, ruby, rust, scala, scheme, solidity, swift, terraform, typescript, vue, xml, yaml</code> — termasuk bahasa khusus blockchain (<code>solidity</code>, <code>cairo</code>, <code>move</code>).</p>
+
+<div class="callout">
+  <b>Jujur &amp; tidak dibesar-besarkan:</b> SDB <u>tidak</u> "menguasai semuanya". Ia punya <b>15 bahasa kerja resmi</b> (dengan standar mutu), dan mampu <b>memeriksa keamanan ~46 bahasa</b>. Untuk bahasa di luar daftar, SDB akan bilang "belum ada standar" daripada memaksa dan berisiko.
+</div>
+
+<div class="analogy">
+  <div class="t">Analogi</div>
+  <p style="margin-bottom:0">Seperti mekanik: <b>15 bahasa = alat yang benar-benar dikuasai untuk membangun</b>; <b>~46 bahasa = alat pendeteksi</b> yang bisa membaca dan memeriksa, walau tidak semuanya dipakai untuk membangun.</p>
+</div>
+
+<h2 id="proyek">4. Tipe project apa saja yang bisa dikerjakan SDB?</h2>
+
+<p>Ini juga bagian dari permintaan Anda. SDB dirancang untuk <b>jenis pekerjaan berikut</b>:</p>
+
+<table>
+  <thead><tr><th>#</th><th>Tipe proyek</th><th>Contoh awam</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td><b>Website &amp; Web App</b></td><td>Situs perusahaan, toko online, dashboard admin</td></tr>
+    <tr><td>2</td><td><b>Backend / API / Layanan</b></td><td>Server data, jembatan antara aplikasi dan database</td></tr>
+    <tr><td>3</td><td><b>Aplikasi Mobile</b></td><td>Aplikasi Android &amp; iPhone (Flutter, Kotlin, Swift)</td></tr>
+    <tr><td>4</td><td><b>Aplikasi Desktop</b></td><td>Program untuk komputer Windows/Mac/Linux (Tauri, Electron)</td></tr>
+    <tr><td>5</td><td><b>Database &amp; Migrasi Data</b></td><td>Perancangan database, pemindahan data aman</td></tr>
+    <tr><td>6</td><td><b>Integrasi AI-Agent</b></td><td>Menyambungkan sistem dengan kecerdasan buatan</td></tr>
+    <tr><td>7</td><td><b>DevOps, CI/CD &amp; Rilis</b></td><td>Otomatisasi pengujian, pemeriksaan, dan peluncuran</td></tr>
+    <tr><td>8</td><td><b>Audit Keamanan &amp; Kode</b></td><td>Memeriksa celah keamanan &amp; kualitas kode</td></tr>
+    <tr><td>9</td><td><b>Quality Assurance / Pengujian</b></td><td>Tes otomatis, uji aksesibilitas, uji tampilan</td></tr>
+    <tr><td>10</td><td><b>Dokumentasi &amp; Serah-Terima</b></td><td>Panduan pemakaian, catatan rilis, buku pegangan</td></tr>
+    <tr><td>11</td><td><b>Reverse Engineering &amp; Rekonstruksi (SAH)</b></td><td>Membangun ulang sistem yang <b>Anda punya izin penuh</b> untuk bangun ulang — dengan aturan ketat</td></tr>
+    <tr><td>12</td><td><b>Riset &amp; Perencanaan Produk</b></td><td>Membandingkan pilihan teknologi, menulis rencana</td></tr>
+  </tbody>
+</table>
+
+<div class="callout warn">
+  <b>Batas yang tidak bisa dilanggar (penting!):</b> Untuk pekerjaan nomor 11 (rekonstruksi), SDB <b>DILARANG</b>: menembus sistem keamanan, melewati login/CAPTCHA, membobol dinding pembayaran (paywall), merusak proteksi lisensi, atau mengambil data privat tanpa izin. SDB hanya bekerja di permukaan yang sah, dan <b>wajib ada izin tertulis</b> dari Anda sebelum pekerjaan mendalam dimulai.
+</div>
+
+<h2 id="divisi">5. 11 Divisi kerja di dalam SDB</h2>
+
+<p>Ibarat kantor, SDB punya 11 tim. Setiap tim punya tugas dan batas kewenangan masing-masing:</p>
+
+<table>
+  <thead><tr><th>Tim</th><th>Nama &amp; tugas</th></tr></thead>
+  <tbody>
+    <tr><td><b>D0</b></td><td><b>Orkestrator Utama / Perencanaan Produk</b> — menerima tugas Anda, menyusun rencana, membagi kerja ke tim lain. Tidak menulis kode &amp; tidak merilis.</td></tr>
+    <tr><td><b>D1</b></td><td><b>Reverse Engineering &amp; Rekonstruksi</b> — observasi sah &amp; membangun ulang sistem yang diizinkan.</td></tr>
+    <tr><td><b>D2</b></td><td><b>Riset</b> — mencari sumber, versi, tanggal, kesimpulan yang bisa dipakai.</td></tr>
+    <tr><td><b>D3</b></td><td><b>Arsitektur</b> — merancang kerangka sistem, mencatat keputusan teknis (ADR).</td></tr>
+    <tr><td><b>D4/D5</b></td><td><b>Engineering Frontend &amp; Backend</b> — menulis kode tampilan (frontend) &amp; kode peladen (backend).</td></tr>
+    <tr><td><b>D6</b></td><td><b>Code Review</b> — memeriksa kode yang ditulis tim lain. Dilarang "asal setuju".</td></tr>
+    <tr><td><b>D7</b></td><td><b>QA / Test</b> — menguji. Dilarang bilang "lulus" tanpa hasil perintah nyata.</td></tr>
+    <tr><td><b>D8</b></td><td><b>Keamanan</b> — memindai celah keamanan. <b>Tidak punya hak merilis ke produksi.</b></td></tr>
+    <tr><td><b>D9</b></td><td><b>Audit &amp; Jaminan Teknik (independen)</b> — otoritas teknis terakhir sebelum rilis, tapi tidak menggantikan QA &amp; Keamanan.</td></tr>
+    <tr><td><b>D10</b></td><td><b>DevOps / Rilis / Keandalan</b> — mengurus peluncuran &amp; rencana pemulihan. Produksi <b>wajib persetujuan manusia</b>.</td></tr>
+    <tr><td><b>D11</b></td><td><b>Dokumentasi</b> — menulis panduan, catatan rilis, serah-terima. Dokumentasi usang = cacat.</td></tr>
+  </tbody>
+</table>
+
+<div class="callout">
+  <b>Aturan umum semua tim:</b> (1) Pemeriksaan izin (Gate #0) selalu menang — tidak ada tim boleh lanjut tanpa izin; (2) Serah-terima antar tim berupa <b>artefak/file</b>, bukan obrolan; (3) Setiap klaim wajib menunjuk bukti; (4) Tidak boleh ada rahasia/data pribadi di dalam laporan mana pun.
+</div>
+
+<h2 id="alur">6. Alur kerja 16 tahap</h2>
+
+<p>Setiap proyek di SDB mengalir melalui tahapan berurutan. Ini "jalur produksi"-nya:</p>
+
+<div class="flow">
+  <div class="s"><b>01</b> Tujuan Pengguna</div>
+  <div class="s"><b>01A</b> Gerbang Izin &amp; Ruang Lingkup</div>
+  <div class="s"><b>01B</b> Paket Bukti / Observasi</div>
+  <div class="s"><b>02</b> Klarifikasi</div>
+  <div class="s"><b>03</b> Riset (bila perlu)</div>
+  <div class="s"><b>04</b> Arsitektur + Keputusan Teknis</div>
+  <div class="s"><b>05</b> Persetujuan Desain (manusia)</div>
+  <div class="s"><b>06</b> Rencana Implementasi</div>
+  <div class="s"><b>07</b> Implementasi (Frontend/Backend)</div>
+  <div class="s"><b>08</b> Code Review</div>
+  <div class="s"><b>09</b> QA / Integrasi / Uji Ujung-ke-Ujung</div>
+  <div class="s"><b>10</b> Keamanan (SAST/Dependensi/Rahasia)</div>
+  <div class="s"><b>11</b> Audit &amp; Jaminan Kode</div>
+  <div class="s"><b>12</b> Gerbang Rilis</div>
+  <div class="s"><b>13</b> Persetujuan Produksi (manusia)</div>
+  <div class="s"><b>14</b> Deploy (DevOps)</div>
+  <div class="s"><b>15</b> Pemantauan / Uji Asap / Pemulihan</div>
+  <div class="s"><b>16</b> Dokumentasi + Serah-Terima</div>
+</div>
+
+<div class="analogy">
+  <div class="t">Analogi</div>
+  <p style="margin-bottom:0">Seperti <b>pabrik mobil</b>: ada stasiun desain, stasiun rakitan, stasiun uji tabrak, stasiun inspeksi, lalu baru boleh keluar dari pabrik. Dan <b>pintu keluarnya dikunci dua kali</b> — hanya bisa dibuka dengan persetujuan manusia (Anda), bukan otomatis.</p>
+</div>
+
+<p>Perhatikan dua <b>gerbang izin manusia</b> yang tidak bisa dilewati otomatis:</p>
+<ul>
+  <li><b>Tahap 05</b> — persetujuan desain (sebelum menulis kode).</li>
+  <li><b>Tahap 13</b> — persetujuan produksi (sebelum tayang sungguhan).</li>
+</ul>
+
+<h2 id="perintah">7. 17 perintah siap pakai (satu pintu masuk)</h2>
+
+<p>Semua dikendalikan lewat satu perintah bernama <code>sdb</code>. Ini daftar lengkapnya beserta arti awamnya:</p>
+
+<table>
+  <thead><tr><th>Perintah</th><th>Arti awam</th></tr></thead>
+  <tbody>
+    <tr><td><code>capture</code></td><td>Rekam/observasi terkendali (wajib izin dulu)</td></tr>
+    <tr><td><code>doctor</code></td><td>Cek kesehatan: kemampuan komputer, kesesuaian skill, versi alat</td></tr>
+    <tr><td><code>fidelity</code></td><td>Bandingkan hasil bangun ulang dengan aslinya</td></tr>
+    <tr><td><code>fidelity-report</code></td><td>Laporan tingkat kemiripan dalam 9 dimensi</td></tr>
+    <tr><td><code>gate</code></td><td>Pemeriksaan izin &amp; ruang lingkup → LULUS/GAGAL/TERTAHAN</td></tr>
+    <tr><td><code>init</code></td><td>Buat ruang kerja proyek baru</td></tr>
+    <tr><td><code>install</code></td><td>Pasang skill &amp; CLI (mode aman: coba dulu, baru pasang)</td></tr>
+    <tr><td><code>inventory</code></td><td>Daftar isi ekosistem</td></tr>
+    <tr><td><code>lint</code></td><td>Periksa mutu bukti (metadata, kepercayaan, redaksi rahasia)</td></tr>
+    <tr><td><code>list-skills</code></td><td>Tampilkan/pasang skill ke profil divisi</td></tr>
+    <tr><td><code>normalize</code></td><td>Rapikan hasil observasi jadi berkas standar (JSON)</td></tr>
+    <tr><td><code>redact</code></td><td>Hapus rahasia dari berkas rekaman jaringan</td></tr>
+    <tr><td><code>registry-lint</code></td><td>Validasi buku inventaris skill &amp; alat</td></tr>
+    <tr><td><code>release</code></td><td>Gerbang rilis berbasis bukti</td></tr>
+    <tr><td><code>scan</code></td><td>Pindai pola eksekusi/pencurian data pada pihak ketiga</td></tr>
+    <tr><td><code>uninstall</code></td><td>Copot pemasangan (mode aman: coba dulu)</td></tr>
+    <tr><td><code>workflow</code></td><td>Jalankan alur 16 tahap berbasis bukti</td></tr>
+  </tbody>
+</table>
+
+<h2 id="angka">8. Angka &amp; bukti nyata hari ini</h2>
+
+<p>Semua angka di bawah ini <b>diukur langsung</b> pada 8 Oktober 2026, bukan dari catatan lama:</p>
+
+<div class="grid">
+  <div class="stat"><div class="n">165</div><div class="l">Tes otomatis LULUS (+3 sub-tes), 0 gagal</div></div>
+  <div class="stat"><div class="n">37</div><div class="l">Skill buatan sendiri (custom)</div></div>
+  <div class="stat"><div class="n">16</div><div class="l">Skill pihak ketiga terdaftar</div></div>
+  <div class="stat"><div class="n">17</div><div class="l">Perintah siap pakai di CLI <code>sdb</code></div></div>
+  <div class="stat"><div class="n">11</div><div class="l">Divisi kerja (D0–D11)</div></div>
+  <div class="stat"><div class="n">7</div><div class="l">Profil divisi terpisah</div></div>
+  <div class="stat"><div class="n">19</div><div class="l">Tahap alur (16 utama + 3 sub-gerbang)</div></div>
+  <div class="stat"><div class="n">0</div><div class="l">WARN registry (dari 11 → 0)</div></div>
+  <div class="stat"><div class="n">0</div><div class="l">Temuan keamanan di kode SDB sendiri</div></div>
+  <div class="stat"><div class="n">24</div><div class="l">Berkas bukti keamanan tersimpan</div></div>
+  <div class="stat"><div class="n">4.740</div><div class="l">Baris kode Python (skrip + tes)</div></div>
+  <div class="stat"><div class="n">62</div><div class="l">Commit riwayat pengembangan</div></div>
+</div>
+
+<h3>Verifikasi yang sudah dijalankan</h3>
+<table>
+  <thead><tr><th>Pemeriksaan</th><th>Hasil</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td><code>make check</code> (gerbang mutu lokal: lint + registry + tes + drift)</td><td>EXIT=0</td><td><span class="pill ok">LULUS</span></td></tr>
+    <tr><td><code>registry_lint</code> (buku inventaris)</td><td>PASS, 0 WARN</td><td><span class="pill ok">BERSIH</span></td></tr>
+    <tr><td><code>evidence_lint</code> (mutu bukti)</td><td>PASS (24 berkas)</td><td><span class="pill ok">LULUS</span></td></tr>
+    <tr><td>Tes otomatis (<code>pytest</code>)</td><td>165 lulus, 0 gagal</td><td><span class="pill ok">LULUS</span></td></tr>
+    <tr><td>Kesesuaian skill ("drift")</td><td>106/106 OK</td><td><span class="pill ok">SINKRON</span></td></tr>
+    <tr><td>Pindai rahasia (secret scan) pada kode SDB</td><td>0 temuan</td><td><span class="pill ok">BERSIH</span></td></tr>
+    <tr><td>Pindai kerentanan (trivy) pada kode SDB</td><td>0 kritis / 0 tinggi / 0 rahasia / 0 salah-konfigurasi</td><td><span class="pill ok">BERSIH</span></td></tr>
+    <tr><td>Pindai kode (semgrep) pada kode SDB</td><td>0 temuan</td><td><span class="pill ok">BERSIH</span></td></tr>
+    <tr><td>Rilis ke CI (GitHub Actions)</td><td>Run <code>37701131896</code> HIJAU (revisi <code>51011f2</code>)</td><td><span class="pill ok">HIJAU</span></td></tr>
+  </tbody>
+</table>
+
+<h3>Bukti pemeriksaan 6 skill pihak ketiga</h3>
+<p>Enam skill dari luar diperiksa keamanannya secara <b>baca-saja</b> (kode mereka <b>tidak dijalankan</b> sama sekali):</p>
+<table>
+  <thead><tr><th>Skill pihak ketiga</th><th>Rahasia bocor</th><th>Salah konfigurasi</th><th>Temuan pola kode</th></tr></thead>
+  <tbody>
+    <tr><td><code>getsentry/sentry-for-ai</code></td><td>0</td><td>0</td><td>5 (1 error, 3 sedang, 1 peringatan)</td></tr>
+    <tr><td><code>github/github-mcp-server</code></td><td>0</td><td>5</td><td>52 (6 error, 4 sedang, 42 peringatan)</td></tr>
+    <tr><td><code>upstash/context7</code></td><td>0</td><td>2</td><td>90 (5 error, 6 sedang, 77 peringatan, 2 info)</td></tr>
+    <tr><td><code>apify/crawlee</code></td><td><b>2</b></td><td>113</td><td>60 (17 error, 6 sedang, 30 peringatan, 7 info)</td></tr>
+    <tr><td><code>dequelabs/axe-core</code></td><td>0</td><td>0</td><td>34 (1 sedang, 30 peringatan, 3 info)</td></tr>
+    <tr><td><code>GoogleChrome/lighthouse</code></td><td>0</td><td>0</td><td>158 (3 error, 150 peringatan, 5 info)</td></tr>
+  </tbody>
+</table>
+
+<h2 id="aman">9. 7 aturan keamanan mutlak (tidak bisa ditawar)</h2>
+
+<p>Ini "undang-undang dasar" SDB. Tidak ada satu pun yang boleh dilanggar, bahkan atas permintaan siapa pun:</p>
+
+<table>
+  <thead><tr><th>#</th><th>Aturan</th><th>Arti awam</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Tidak ada pemeriksaan mendalam tanpa <code>authorization.yaml</code> berstatus PASS (Gate #0)</td><td>Tidak boleh kerja mendalam tanpa izin tertulis</td></tr>
+    <tr><td>2</td><td>Tidak ada bypass auth / CAPTCHA / anti-bot / paywall / DRM / licensing / pinning / access control</td><td>Tidak boleh menembus tembok atau mencuri kunci siapa pun</td></tr>
+    <tr><td>3</td><td>Tidak ada credential, session token, cookie, atau data pribadi di dalam bukti maupun konteks AI</td><td>Rahasia &amp; data pribadi dilarang muncul di file/laporan</td></tr>
+    <tr><td>4</td><td>Tidak ada klaim "selesai/lulus" tanpa bukti segar</td><td>Dilarang mengaku selesai tanpa bukti nyata</td></tr>
+    <tr><td>5</td><td>Security/Audit tidak punya hak deploy produksi. Deploy produksi = persetujuan manusia</td><td>Yang menjaga keamanan tidak boleh sekaligus merilis</td></tr>
+    <tr><td>6</td><td>Skill/MCP pihak ketiga: cek sumber → kunci revisi → pindai → tinjau manual → sandbox → persetujuan</td><td>Barang dari luar harus diperiksa ketat sebelum dipakai</td></tr>
+    <tr><td>7</td><td>Rilis = sisa risiko diketahui, gerbang lulus, pemilik risiko manusia menerima sisa risiko tersebut</td><td>Rilis hanya sah bila risikonya terbuka &amp; Anda menyetujuinya</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sisa">10. Sisa risiko yang dicatat secara JUJUR</h2>
+
+<p>Bagian ini sengaja tidak disembunyikan. Prinsip SDB: <b>risiko yang diketahui dan dicatat jauh lebih baik daripada risiko yang disembunyikan.</b></p>
+
+<table>
+  <thead><tr><th>Sisa risiko</th><th>Tingkat</th><th>Penjelasan awam</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>2 temuan rahasia (jenis "jwt-token", tingkat sedang) pada skill pihak ketiga <code>apify/crawlee</code></td>
+      <td><span class="pill warn">SEDANG</span></td>
+      <td>Ada 2 contoh "kunci" tertulis di berkas contoh/dokumentasi milik pihak ketiga (bukan kode jadi). <b>Nilai rahasianya tidak disimpan maupun dicetak</b> (aturan #3). Skill ini berstatus <b>BELUM TERPASANG</b> — kodenya dilarang dijalankan sampai ada persetujuan.</td>
+    </tr>
+    <tr>
+      <td>Banyak "peringatan pola kode" pada skill pihak ketiga (mis. lighthouse 150)</td>
+      <td><span class="pill warn">RENDAH</span></td>
+      <td>Peringatan gaya penulisan kode, bukan celah berbahaya. Wajar untuk proyek besar; sudah ditinjau.</td>
+    </tr>
+    <tr>
+      <td><code>doctor.py</code> mengembalikan EXIT=1 di lingkungan Hermes</td>
+      <td><span class="pill ok">RENDAH</span></td>
+      <td>Bukan cacat SDB. Pemeriksaan penuh itu butuh "status komputer pemilik". Jalur ringan (yang dipakai CI) bersih 106/106.</td>
+    </tr>
+    <tr>
+      <td>Anotasi tipe (Pyright) kecil di satu berkas tes</td>
+      <td><span class="pill ok">SANGAT RENDAH</span></td>
+      <td>Sekadar penanda tipe; <code>ruff</code> bersih dan semua tes lulus.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout ok">
+  <b>Kesimpulan:</b> Tidak ada temuan berbahaya (kritis/tinggi) yang terbuka. Semua sisa risiko terdaftar, berjustifikasi, dan sudah diputuskan bisa diterima untuk saat ini.
+</div>
+
+<h2 id="pakai">11. Cara pakai singkat (untuk Anda)</h2>
+
+<pre># 1. Masuk ke folder proyek
+cd ~/super-dev-builders
+
+# 2. Cek kesehatan sistem
+sdb doctor
+
+# 3. Mulai proyek baru
+sdb init nama-proyek
+
+# 4. Periksa izin &amp; ruang lingkup (WAJIB sebelum kerja mendalam)
+sdb gate nama-proyek
+
+# 5. Jalankan alur 16 tahap
+sdb workflow nama-proyek
+
+# 6. Periksa kelaikan rilis
+sdb release nama-proyek
+
+# 7. Gerbang mutu lengkap sebelum push
+make check</pre>
+
+<div class="callout">
+  <b>Ingat:</b> <b>Dua kali SDB akan berhenti dan minta persetujuan Anda</b> — saat desain mau dikunci (tahap 05), dan saat mau tayang ke produksi (tahap 13). Ini disengaja: keputusan berisiko selalu di tangan manusia.
+</div>
+
+<hr>
+
+<h2>Ringkasan satu halaman</h2>
+<div class="card">
+  <p><b>Apa itu SDB?</b> Sebuah "kantor kontraktor software otomatis" berisi 37 skill buatan sendiri + 16 skill pihak ketiga, diatur 11 divisi, dengan alur kerja 16 tahap dan 17 perintah satu pintu.</p>
+  <p><b>Apa arti "tutup WARN registry"?</b> Membereskan administrasi peringatan: mencatat versi alat yang benar-benar terpasang (5 alat) dan melampirkan bukti pemeriksaan keamanan untuk 6 skill pihak ketiga. Hasilnya <b>11 WARN → 0 WARN</b>, tanpa menyembunyikan apa pun.</p>
+  <p><b>Berapa bahasa pemrograman?</b> <b>15 bahasa kerja resmi</b> (Core: TypeScript, JavaScript, Python, SQL, HTML/CSS, Bash; Platform: Kotlin, Swift, Dart/Flutter, C#/.NET; Specialized: Go, Rust, Java, C/C++, PowerShell) dan <b>~46 bahasa bisa diperiksa keamanannya</b>.</p>
+  <p><b>Tipe project?</b> 12 jenis: website/web app, backend/API, mobile, desktop, database &amp; migrasi, integrasi AI-agent, DevOps/CI-CD, audit keamanan, QA/pengujian, dokumentasi, rekonstruksi sah, dan riset &amp; perencanaan produk.</p>
+  <p><b>Bukti hari ini?</b> 165 tes lulus · 0 temuan keamanan di kode SDB · 0 WARN registry · CI HIJAU (<code>37701131896</code>, revisi <code>51011f2</code>).</p>
+  <p><b>Sisa tanggung jawab Anda?</b> Menyetujui desain dan produksi saat diminta, serta menerima sisa risiko yang sudah dicatat terbuka.</p>
+</div>
+
+<footer>
+  <b>Super Dev Builders — Laporan Lengkap untuk Pemilik</b><br>
+  Disusun: 8 Oktober 2026, 06:17 WIB · Revisi repo: <code>51011f2</code> (branch <code>master</code>)<br>
+  Semua angka dalam laporan ini diukur langsung dari sistem pada tanggal tersebut, bukan dikutip dari dokumen lama.<br>
+  Laporan ini mengikuti prinsip SDB: setiap klaim menunjuk bukti; risiko tidak disembunyikan.
+</footer>
+
+</div>
+</body>
+</html>

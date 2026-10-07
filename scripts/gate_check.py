@@ -30,6 +30,53 @@ CORE_FORBIDDEN_DATA = {"credentials", "session_tokens", "cookies", "payment_data
 VALID_AUTH_TYPES = {"owned", "open_source", "staging", "written_permission"}
 
 
+def allowed_urls(allowed_targets) -> list[str]:
+    """Semua URL yang diizinkan dari manifest — semua nama kunci yang berbeda.
+
+    Bug nyata (audit 2026-10-07): template menulis `allowed_targets.urls` sementara
+    capture_web.py membaca `allowed_targets.web_urls`, sehingga daftar izin selalu
+    kosong dan capture ditolak untuk semua URL. Fungsi ini jadi satu sumber kebenaran.
+    """
+    if not isinstance(allowed_targets, dict):
+        return []
+    out = []
+    for key in ("urls", "web_urls"):
+        vals = allowed_targets.get(key)
+        if isinstance(vals, list):
+            out += [as_text(v) for v in vals if as_text(v)]
+    return out
+
+
+def count_allowed(allowed_targets) -> int:
+    """Jumlah target yang diizinkan lintas semua nama kunci (urls/web_urls dan lainnya)."""
+    if not isinstance(allowed_targets, dict):
+        return 0
+    n = len(allowed_urls(allowed_targets))
+    for key in ("repos", "apps", "apk_ipa_binaries"):
+        vals = allowed_targets.get(key)
+        if isinstance(vals, list):
+            n += len([v for v in vals if as_text(v)])
+    return n
+
+
+def as_bool(value):
+    """Kembalikan (bool|None, error|None).
+
+    YAML tulis-tangan sering memberi string "false"/"true" (kutip). Python menilainya
+    TRUTHY, sehingga `redact_before_prompt: "false"` lolos gate dan `docker_socket:
+    "false"` malah diblokir — keduanya terbalik. Field keamanan wajib boolean tegas.
+    """
+    if isinstance(value, bool):
+        return value, None
+    if isinstance(value, str):
+        low = value.strip().lower()
+        if low in ("true", "yes", "on", "1"):
+            return True, None
+        if low in ("false", "no", "off", "0"):
+            return False, None
+    return None, f"nilai bukan boolean tegas: {value!r}"
+
+
 def as_text(value) -> str:
     """Normalisasi YAML scalar (str/datetime/int/None) menjadi teks aman."""
     if value is None:
@@ -73,11 +120,14 @@ def evaluate(manifest: dict):
     if not isinstance(targets, dict):
         fail.append("allowed_targets harus mapping")
         targets = {}
-    total_targets = sum(len(v) for v in targets.values() if isinstance(v, list))
+    total_targets = count_allowed(targets)
     if total_targets == 0:
         fail.append("allowed_targets kosong (minimal satu url/repo/app)")
 
-    deep = bool(get("deep_analysis_allowed"))
+    raw_deep = get("deep_analysis_allowed")
+    deep, err = (False, None) if raw_deep is None else as_bool(raw_deep)
+    if err:
+        fail.append(f"deep_analysis_allowed: {err}")
     binaries = targets.get("apk_ipa_binaries") or []
     if mode == "A":
         if deep:
@@ -92,6 +142,10 @@ def evaluate(manifest: dict):
 
     if get("network_capture_allowed") is None:
         warn.append("network_capture_allowed belum diisi (eksplisit true/false lebih baik)")
+    else:
+        _, err = as_bool(get("network_capture_allowed"))
+        if err:
+            fail.append(f"network_capture_allowed: {err}")
 
     forbidden = set(get("forbidden_actions") or [])
     missing_forbidden = CORE_FORBIDDEN - forbidden
@@ -104,25 +158,41 @@ def evaluate(manifest: dict):
         fail.append(f"forbidden_data kurang: {sorted(missing_data)}")
 
     retention = get("retention") or {}
-    if not isinstance(retention, dict) or not retention.get("redact_before_prompt"):
+    if not isinstance(retention, dict):
+        fail.append("retention harus mapping")
+        retention = {}
+    redact, err = as_bool(retention.get("redact_before_prompt"))
+    if err:
+        fail.append(f"retention.redact_before_prompt: {err}")
+    elif redact is not True:
         fail.append("retention.redact_before_prompt wajib true")
 
     sandbox = get("sandbox") or {}
     if not isinstance(sandbox, dict):
         fail.append("sandbox harus mapping")
         sandbox = {}
-    if not sandbox.get("whole_process_isolation"):
-        fail.append("sandbox.whole_process_isolation wajib true (terminal sandbox bukan containment)")
-    if not sandbox.get("non_root"):
-        fail.append("sandbox.non_root wajib true")
-    if not sandbox.get("workspace_only_mounts"):
-        fail.append("sandbox.workspace_only_mounts wajib true")
-    if sandbox.get("docker_socket"):
-        fail.append("sandbox.docker_socket wajib false")
-    if sandbox.get("host_credentials_mounted"):
-        fail.append("sandbox.host_credentials_mounted wajib false")
-    if not sandbox.get("network_egress"):
-        warn.append("sandbox.network_egress sebaiknya 'restricted'")
+
+    def sb(key, want: bool, must: bool = True):
+        """want = nilai wajib. must=True -> salah tipe/missing = FAIL, nilai lawan = FAIL.
+        must=False -> hanya 'true' tegas yang FAIL (field opsional, bawaannya false)."""
+        raw = sandbox.get(key)
+        if raw is None:
+            if must:
+                fail.append(f"sandbox.{key} wajib diisi")
+            return
+        val, err = as_bool(raw)
+        if err:
+            fail.append(f"sandbox.{key}: {err}")
+        elif val is not want:
+            fail.append(f"sandbox.{key} wajib {str(want).lower()}")
+
+    sb("whole_process_isolation", True)
+    sb("non_root", True)
+    sb("workspace_only_mounts", True)
+    sb("docker_socket", False, must=False)
+    sb("host_credentials_mounted", False, must=False)
+    if sandbox.get("network_egress") and as_text(sandbox.get("network_egress")) != "restricted":
+        warn.append(f"sandbox.network_egress '{sandbox.get('network_egress')}' (disarankan 'restricted')")
 
     if not as_text(get("approved_by")):
         blocked.append("approved_by kosong — butuh orang yang mengesahkan (keputusan manusia)")

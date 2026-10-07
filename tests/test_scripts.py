@@ -250,16 +250,65 @@ def _load(name, rel):
     return mod
 
 
-def test_capture_web_menolak_url_di_luar_scope(tmp_path):
-    """Gate #0 ditegakkan di dalam capture: URL di luar allowed_targets -> exit 2, tanpa buka browser."""
+def _manifest_t1(tmp_path):
+    """Manifest Gate #0 lengkap + disahkan untuk target t1 (allowed http://127.0.0.1:8100)."""
     tgt = tmp_path / "evidence" / "t1"
-    tgt.mkdir(parents=True)
+    tgt.mkdir(parents=True, exist_ok=True)
     (tgt / "authorization.yaml").write_text(
-        "target_name: t1\nallowed_targets:\n  urls: [\"http://127.0.0.1:8100\"]\n", encoding="utf-8")
+        "schema_version: 2.2\n"
+        "target_name: t1\n"
+        "mode: A\n"
+        "authorization_type: owned\n"
+        "license_or_permission_ref: milik sendiri\n"
+        "allowed_targets:\n  urls: [\"http://127.0.0.1:8100\"]\n"
+        "network_capture_allowed: false\n"
+        "deep_analysis_allowed: false\n"
+        "forbidden_data: [credentials, session_tokens, cookies, payment_data, private_user_data]\n"
+        "forbidden_actions: [auth_bypass, captcha_or_anti_bot_bypass, paywall_bypass, "
+        "rate_limit_bypass, drm_or_licensing_bypass, certificate_pinning_bypass, "
+        "private_endpoint_bruteforce, hidden_backend_source_extraction]\n"
+        "retention:\n  redact_before_prompt: true\n"
+        "sandbox:\n"
+        "  whole_process_isolation: true\n  non_root: true\n  workspace_only_mounts: true\n"
+        "  docker_socket: false\n  host_credentials_mounted: false\n  network_egress: restricted\n"
+        "approved_by: \"Mas Anas\"\n"
+        "approved_at: \"2026-10-07T11:50:00+07:00\"\n",
+        encoding="utf-8")
+    return tgt
+
+
+def test_capture_web_menolak_url_di_luar_scope(tmp_path):
+    """Gate #0 PASS, tapi URL di luar allowed_targets -> exit 2, tanpa buka browser."""
+    _manifest_t1(tmp_path)
     cap = _load("cap", "scripts/capture_web.py")
     cap.repo_path = lambda *parts: os.path.join(str(tmp_path), *parts)   # sandbox manifest
     rc = cap.main(["--target", "t1", "--url", "https://pihak-lain.example/x", "--out", str(tmp_path / "o")])
     assert rc == 2
+
+
+def test_capture_web_fail_closed_tanpa_gate0_pass(tmp_path):
+    """Aturan #1: manifest belum disahkan (approved_by kosong) -> capture DITOLAK lebih dulu.
+
+    Sebelum audit 2026-10-07, capture_web hanya mencocokkan daftar URL dan tidak pernah
+    memanggil Gate #0, jadi manifest tanpa pengesahan pun tetap bisa membuka browser.
+    """
+    tgt = tmp_path / "evidence" / "t1"
+    tgt.mkdir(parents=True)
+    (tgt / "authorization.yaml").write_text(
+        "target_name: t1\nallowed_targets:\n  urls: [\"http://127.0.0.1:8100\"]\n", encoding="utf-8")
+    cap = _load("cap2", "scripts/capture_web.py")
+    cap.repo_path = lambda *parts: os.path.join(str(tmp_path), *parts)
+    rc_gate = cap.gate0_or_die("t1")
+    assert rc_gate in (1, 2), f"manifest belum disahkan harus ditolak (dapat {rc_gate})"
+    rc = cap.main(["--target", "t1", "--url", "http://127.0.0.1:8100/", "--out", str(tmp_path / "o")])
+    assert rc in (1, 2), "capture harus dibatalkan sebelum menyentuh jaringan"
+
+
+def test_capture_web_gate0_lolos_dengan_manifest_lengkap(tmp_path):
+    _manifest_t1(tmp_path)
+    cap = _load("cap3", "scripts/capture_web.py")
+    cap.repo_path = lambda *parts: os.path.join(str(tmp_path), *parts)
+    assert cap.gate0_or_die("t1", quiet=True) == 0
 
 
 def test_fidelity_compare_butuh_input(tmp_path, capsys):

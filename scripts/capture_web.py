@@ -19,12 +19,45 @@ import time
 from urllib.parse import urlparse
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from gate_check import allowed_urls, evaluate
 from sdb_common import load_yaml, repo_path, write_json
 
 
 def load_scope(target: str) -> dict:
     p = repo_path("evidence", target, "authorization.yaml")
     return load_yaml(p) or {}
+
+
+def gate0_or_die(target: str, quiet: bool = False) -> int:
+    """Fail-closed: capture jaringan hanya boleh jalan bila Gate #0 PASS.
+
+    Aturan #1 repo: 'Tidak ada deep scan/capture tanpa authorization.yaml PASS'.
+    Sebelumnya capture_web.py hanya mencocokkan daftar allowed_targets dan TIDAK
+    pernah memanggil gate — manifest terisi tapi tidak disahkan pun tetap bisa
+    capture. Sekarang: verdict harus PASS (exit 0), selain itu TOLAK.
+
+    Mengembalikan 0 bila lolos, atau exit code 1/2 bila tidak (FAIL/BLOCKED).
+    """
+    p = repo_path("evidence", target, "authorization.yaml")
+    if not os.path.exists(p):
+        print(f"TOLAK: manifest tidak ada: {p} (jalankan scripts/init_target.py {target})", file=sys.stderr)
+        return 2
+    try:
+        manifest = load_yaml(p) or {}
+    except Exception as exc:
+        print(f"TOLAK: manifest tidak bisa dibaca: {exc}", file=sys.stderr)
+        return 1
+    fail, blocked, warn = evaluate(manifest if isinstance(manifest, dict) else {})
+    if fail or blocked:
+        print("TOLAK: Gate #0 tidak PASS — capture jaringan dibatalkan.", file=sys.stderr)
+        for label, items in (("FAIL", fail), ("BLOCKED", blocked)):
+            for it in items:
+                print(f"  {label}: {it}", file=sys.stderr)
+        return 2 if blocked and not fail else 1
+    if warn and not quiet:
+        for w in warn:
+            print(f"  WARN: {w}", file=sys.stderr)
+    return 0
 
 
 def main(argv=None) -> int:
@@ -41,8 +74,14 @@ def main(argv=None) -> int:
     args = ap.parse_args(argv)
 
     scope = load_scope(args.target)
-    allowed = (scope.get("allowed_targets") or {}).get("urls") or []
+    rc = gate0_or_die(args.target)
+    if rc != 0:
+        return rc
+    allowed = allowed_urls(scope.get("allowed_targets") or {})
     base = "{u.scheme}://{u.netloc}".format(u=urlparse(args.url))
+    if not allowed:
+        print("TOLAK: allowed_targets kosong di manifest", file=sys.stderr)
+        return 2
     if not any(base.startswith(a.rstrip("/")) or a.rstrip("/").startswith(base) for a in allowed):
         print(f"TOLAK: {base} tidak ada di allowed_targets manifest", file=sys.stderr)
         return 2

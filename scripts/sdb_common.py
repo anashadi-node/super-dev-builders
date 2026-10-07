@@ -258,7 +258,11 @@ SECRET_KEY_PATTERN = re.compile(
 SECRET_VALUE_PATTERN = re.compile(
     r"(bearer\s+[A-Za-z0-9._\-]+|eyJ[A-Za-z0-9_\-]{10,}\.[A-Za-z0-9_\-]{10,}|"
     r"AKIA[0-9A-Z]{16}|sk-[A-Za-z0-9]{16,}|gh[pousr]_[A-Za-z0-9]{20,}|"
-    r"-----BEGIN [A-Z ]*PRIVATE KEY-----)"
+    r"-----BEGIN [A-Z ]*PRIVATE KEY-----)",
+    # Tanpa IGNORECASE, header "Authorization: Bearer ..." (huruf B kapital, bentuk
+    # yang sebenarnya dikirim browser) TIDAK ketahuan — ditemukan lewat test canary
+    # 2026-10-07. Aturan #3 repo: tidak ada credential yang boleh lolos ke evidence.
+    re.IGNORECASE,
 )
 PII_PATTERNS = [
     re.compile(r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}"),

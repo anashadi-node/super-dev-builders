@@ -14,7 +14,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from sdb_common import load_yaml, now_iso, repo_path, write_json
+from sdb_common import load_yaml, now_iso, repo_path, validate_slug, write_json
 
 CORE_FORBIDDEN = {
     "auth_bypass",
@@ -212,6 +212,12 @@ def main(argv=None) -> int:
 
     if not args.target and not args.manifest:
         ap.error("butuh --target atau --manifest")
+    if args.target:
+        try:
+            args.target = validate_slug(args.target)
+        except ValueError as exc:
+            print(f"FATAL: {exc}", file=sys.stderr)
+            return 2
     manifest_path = args.manifest or repo_path("evidence", args.target, "authorization.yaml")
     if not os.path.exists(manifest_path):
         result = {

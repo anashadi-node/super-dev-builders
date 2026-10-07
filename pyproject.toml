@@ -27,9 +27,13 @@ ignore = [
 [tool.pytest.ini_options]
 # skills/*/tests ikut dijalankan: tes bawaan skill (product-kit, product-status) dulu tidak pernah masuk `make test`
 testpaths = ["tests", "skills"]
-addopts = "-q"
-# CLU: laporan instalasi dependency — repo ini memakai uv (bukan pip)
-# uv.lock hanya berisi metadata (version/revision/requires-python); TIDAK ADA paket terkunci.
-# Artinya: uv sync memasang versi terbaru saat dijalankan => tidak ada pin, dan Trivy tidak
-# bisa memindai apa pun dari repo ini. Semua "vuln: 0" di bawah = belum teruji terhadap
-# dependency, bukan bukti bersih. Lihat docs/AUDIT_20261007_R2.md batas metodologi.
+# -rs: tampilkan ALASAN skip. Uji yang khusus-host (skill terpasang) memang di-skip di
+# runner CI; tanpa -rs, skip itu tidak terlihat dan orang bisa mengira semua terperiksa.
+# Skip tanpa alasan yang terbaca = lubang bukti. Jangan hapus -rs.
+addopts = "-q -rs"
+# Dependency dev dipin di [project.dependencies] (ruff/pytest/pyyaml) dan TERKUNCI di
+# uv.lock (12 paket, termasuk transitive: colorama, exceptiongroup, iniconfig, packaging,
+# pluggy, pygments). Inilah yang membuat `trivy fs` punya sasaran nyata: sebelumnya uv.lock
+# hanya metadata sehingga "0 vuln" berarti "belum teruji", bukan "bersih".
+# Bila pin berubah: jalankan `uv lock` lagi, lalu `trivy fs --scanners vuln .`
+# (kontrol positif ada di docs/AUDIT_20261007_R2.md: canary requests==2.31.0 -> 3 CVE).

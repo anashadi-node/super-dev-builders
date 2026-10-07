@@ -15,7 +15,7 @@ PY_SYS ?= $(shell \
   elif /usr/bin/python3 -c "import pytest" 2>/dev/null; then echo /usr/bin/python3; \
   else echo python3; fi)
 
-.PHONY: help check lint drift doctor inventory test gate-init lint-registry release-check skills-list install-main clean-pyc
+.PHONY: help check lint drift doctor inventory test gate-init lint-registry release-check skills-list install-main workflow install-dry-run clean-pyc
 
 help:
 	@grep -E "^[a-z-]+:" Makefile | sed "s/:.*//" | column -c 80
@@ -49,13 +49,25 @@ lint-registry:
 	$(PY_SYS) scripts/registry_lint.py
 
 release-check:
-	@slug=$$(python3 -c "import sys,os;runs='runs';c=[(os.path.getmtime(os.path.join(runs,d)),d) for d in (os.listdir(runs) if os.path.isdir(runs) else [])];print(max(c)[1] if c else '')" 2>/dev/null); \
+	@slug=$$($(PY_SYS) -c "import os;runs='runs';c=[(os.path.getmtime(os.path.join(runs,d)),d) for d in (os.listdir(runs) if os.path.isdir(runs) else [])];print(max(c)[1] if c else '')" 2>/dev/null); \
 	if [ -z "$$slug" ]; then echo "Tidak ada run di runs/"; exit 1; fi; \
 	echo "release gate untuk: runs/$$slug"; \
 	$(PY_SYS) scripts/release_check.py --project runs/$$slug
 
 skills-list:
 	$(PY_SYS) scripts/install_skills.py --list
+
+# runner 16 tahap (TARGET=<slug>); tanpa TARGET pakai run terbaru di runs/
+workflow:
+	@slug="$(TARGET)"; \
+	if [ -z "$$slug" ]; then slug=$$($(PY_SYS) -c "import os;r='runs';c=[(os.path.getmtime(os.path.join(r,d)),d) for d in (os.listdir(r) if os.path.isdir(r) else [])];print(max(c)[1] if c else '')" 2>/dev/null); fi; \
+	if [ -z "$$slug" ]; then echo "Tidak ada run di runs/ — pakai: make workflow TARGET=<slug>"; exit 1; fi; \
+	$(PY_SYS) scripts/workflow_run.py "$$slug"
+
+# rencana pemasangan ke host (TIDAK mengubah apa pun)
+install-dry-run:
+	@echo "Prasyarat: jalankan dari root repo; detail di GETTING_STARTED.md"
+	./install.sh --dry-run
 
 install-main:
 	$(PY_SYS) scripts/install_skills.py --main --dry-run

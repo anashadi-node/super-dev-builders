@@ -14,7 +14,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from sdb_common import now_iso, read_json, repo_path
+from sdb_common import now_iso, read_json, repo_path, validate_slug
 
 DIMENSIONS = ["visual", "navigation", "interaction", "responsive", "functional",
               "accessibility", "performance", "api_contract"]
@@ -28,6 +28,11 @@ def main(argv=None) -> int:
     ap.add_argument("--out", dest="out_md")
     args = ap.parse_args(argv)
 
+    try:
+        validate_slug(args.target)
+    except ValueError as e:
+        print(f"ERROR: {e}", file=sys.stderr)
+        return 2
     src = args.json_in or repo_path("verification", args.target, "fidelity.json")
     if not os.path.exists(src):
         print(f"input tidak ada: {src}", file=sys.stderr)

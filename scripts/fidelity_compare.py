@@ -16,7 +16,7 @@ import sys
 from urllib.parse import urlparse
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from sdb_common import read_json, repo_path, write_json
+from sdb_common import read_json, repo_path, validate_slug, write_json
 
 DIMS = ["visual", "navigation", "interaction", "responsive", "functional",
         "accessibility", "performance", "api_contract", "external_dependency"]
@@ -168,6 +168,11 @@ def main(argv=None) -> int:
     ap.add_argument("--diff-dir", default="")
     args = ap.parse_args(argv)
 
+    try:
+        validate_slug(args.target)
+    except ValueError as e:
+        print(f"ERROR: {e}", file=sys.stderr)
+        return 2
     oc, rc = read_json(os.path.join(args.original, "capture.json")), read_json(os.path.join(args.rebuilt, "capture.json"))
     if not oc or not rc:
         print("capture.json tidak ditemukan", file=sys.stderr)

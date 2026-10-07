@@ -12,7 +12,7 @@ import sys
 import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from sdb_common import now_iso, read_json, repo_path, write_json
+from sdb_common import now_iso, read_json, repo_path, validate_slug, write_json
 
 PROV = "evidence/{t}/capture/capture.json"
 
@@ -24,6 +24,11 @@ def main(argv=None) -> int:
     ap.add_argument("--rebuilt", default="", help="folder hasil rebuild (untuk teknologi/functional)")
     args = ap.parse_args(argv)
 
+    try:
+        validate_slug(args.target)
+    except ValueError as e:
+        print(f"ERROR: {e}", file=sys.stderr)
+        return 2
     cap_dir = args.capture or repo_path("evidence", args.target, "capture")
     cap = read_json(os.path.join(cap_dir, "capture.json"))
     net = read_json(os.path.join(cap_dir, "network.json"))

@@ -31,6 +31,37 @@ def repo_path(*parts: str) -> str:
     return os.path.join(REPO_ROOT, *parts)
 
 
+# ------------------------------------------------------------------- slug aman
+# Temuan nyata (uji coba 2026-10-07): `gate_check.py --target ../../../tmp/x`
+# membuat direktori DI LUAR repo (PermissionError pada /home/tmp). Itu CWE-22
+# (path traversal) pada argumen yang dipakai membentuk jalur. Slug harus selalu
+# berupa satu segmen nama: huruf/angka/._- saja, tanpa '..', tanpa '/' dan '\\'.
+# Huruf/angka di awal; '_' diizinkan karena konvensi artefak uji repo ini
+# (mis. `_selftest_init` di tests/test_scripts.py, `zz-sintetis-test`).
+# '-' di awal TETAP ditolak: slug yang tampak seperti flag bisa disalahartikan
+# CLI lain; '.' di awal ditolak karena direktori tersembunyi + '.' sendiri ambigu.
+# '..' dan pemisah jalur adalah inti CWE-22 -> ditolak di validate_slug().
+SLUG_RE = re.compile(r"^[A-Za-z0-9_][A-Za-z0-9._-]{0,63}$")
+
+
+def validate_slug(slug: str) -> str:
+    """Kembalikan slug bila aman dipakai sebagai nama direktori; jika tidak, ValueError.
+
+    Dipakai SEMUA skrip yang membentuk jalur dari input pengguna (gate_check,
+    init_target, workflow_run, ...). Fail-closed: lebih baik menolak daripada
+    menulis di tempat yang tidak dimaksudkan.
+    """
+    if not isinstance(slug, str):
+        raise ValueError(f"slug harus string, dapat {type(slug).__name__}")
+    s = slug.strip()
+    if not SLUG_RE.match(s) or ".." in s:
+        raise ValueError(
+            f"slug tidak sah: {slug!r} — huruf/angka/_ di awal, sisanya huruf/angka/._- , "
+            "maksimal 64 karakter, tanpa '/' atau '..'"
+        )
+    return s
+
+
 # ---------------------------------------------------------------- YAML subset
 def _strip_comment(line: str) -> str:
     out, quote = [], None

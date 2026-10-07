@@ -20,7 +20,7 @@ from urllib.parse import urlparse
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from gate_check import allowed_urls, evaluate
-from sdb_common import load_yaml, repo_path, write_json
+from sdb_common import load_yaml, repo_path, validate_slug, write_json
 
 
 def load_scope(target: str) -> dict:
@@ -73,6 +73,11 @@ def main(argv=None) -> int:
     ap.add_argument("--viewport", default="1280x720", help="WxH")
     args = ap.parse_args(argv)
 
+    try:
+        validate_slug(args.target)
+    except ValueError as e:
+        print(f"ERROR: {e}", file=sys.stderr)
+        return 2
     scope = load_scope(args.target)
     rc = gate0_or_die(args.target)
     if rc != 0:

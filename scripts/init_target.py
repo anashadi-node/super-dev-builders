@@ -11,7 +11,7 @@ import shutil
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from sdb_common import now_iso, repo_path, write_json
+from sdb_common import now_iso, repo_path, validate_slug, write_json
 
 SUBDIRS = ["raw", "screens", "dom", "trace", "assets", "notes"]
 
@@ -24,6 +24,11 @@ def main(argv=None) -> int:
     ap.add_argument("--force", action="store_true", help="timpa manifest bila sudah ada")
     args = ap.parse_args(argv)
 
+    try:
+        validate_slug(args.slug)
+    except ValueError as e:
+        print(f"ERROR: {e}", file=sys.stderr)
+        return 2
     slug = args.slug.strip().lower()
     if not slug or " " in slug:
         print("slug harus lowercase tanpa spasi", file=sys.stderr)

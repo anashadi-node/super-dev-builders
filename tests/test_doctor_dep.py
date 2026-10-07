@@ -19,8 +19,9 @@ def test_dep_check_reports_pinned_status():
 def test_dep_check_flags_unpinned():
     """Unit test perilaku UNPINNED: pakai venv kosong (tanpa METADATA) agar tidak
     bergantung pada isi .venv nyata; dependency unpinned harus selalu UNPINNED."""
-    import glob
     import email.parser
+    import glob
+
     from doctor import repo_path
     sp = glob.glob(str(repo_path(".venv", "lib/python*/site-packages"))) or \
          glob.glob(str(repo_path(".venv", "Lib/site-packages")))

@@ -204,14 +204,17 @@ def evaluate(manifest: dict):
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Gate #0 authorization & scope gate")
+    ap.add_argument("target_pos", nargs="?", help="slug target (posisional; alternatif --target)")
     ap.add_argument("--target", help="slug target (membaca evidence/<slug>/authorization.yaml)")
     ap.add_argument("--manifest", help="path authorization manifest langsung")
     ap.add_argument("--quiet", action="store_true")
     ap.add_argument("--out", help="tulis verdict ke path ini (default: reports/<target>/gate0-verdict.json)")
     args = ap.parse_args(argv)
 
+    if args.target_pos and not args.target:
+        args.target = args.target_pos
     if not args.target and not args.manifest:
-        ap.error("butuh --target atau --manifest")
+        ap.error("butuh <target> atau --target atau --manifest")
     if args.target:
         try:
             args.target = validate_slug(args.target)

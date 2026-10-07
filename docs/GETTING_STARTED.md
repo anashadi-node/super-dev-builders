@@ -221,7 +221,7 @@ Contoh nama yang sah: `sdb-local-demo`, `target_1`, `_selftest_init`, `x.y-z`.
 bisa dilewati.
 
 ```bash
-sdb gate --target nama-target-saya
+sdb gate nama-target-saya
 ```
 
 Hasilnya salah satu dari tiga:
@@ -334,7 +334,7 @@ menghasilkan exit `2`, bukan diam-diam sukses.
 Semua argumen setelah nama perintah diteruskan apa adanya ke skrip tujuan:
 
 ```bash
-sdb gate --target sdb-local-demo
+sdb gate sdb-local-demo
 sdb workflow sdb-local-demo
 ```
 

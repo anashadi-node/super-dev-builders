@@ -19,6 +19,8 @@ import json
 import os
 import sys
 
+import pytest
+
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRIPTS = os.path.join(REPO, "scripts")
 sys.path.insert(0, SCRIPTS)
@@ -211,6 +213,33 @@ def test_gate_check_rejects_traversal_before_creating_dirs():
     rc = gate.main(["--target", "../../../tmp/zz-should-not-exist", "--quiet"])
     assert rc == 2, f"slug traversal seharusnya BLOCKED (exit 2), dapat {rc}"
     assert not os.path.exists("/tmp/zz-should-not-exist")
+
+
+def test_gate_check_accepts_positional_target_like_other_commands(tmp_path):
+    """`sdb gate <slug>` harus jalan seperti `sdb init <slug>` (posisional).
+
+    Uji regresi: sebelumnya hanya `--target` yang didukung, sehingga alur
+    Quickstart di README/GETTING_STARTED gagal dengan argparse error.
+    """
+    out_a, out_b = tmp_path / "a.json", tmp_path / "b.json"
+    rc_pos = gate.main(["zz-posisional-gate", "--quiet", "--out", str(out_a)])
+    rc_flag = gate.main(["--target", "zz-posisional-gate", "--quiet", "--out", str(out_b)])
+    assert rc_pos == rc_flag, f"posisional={rc_pos} vs --target={rc_flag} harus identik"
+    assert rc_pos != 0, "manifest kosong/tidak ada wajib fail-closed (bukan PASS)"
+    assert out_a.read_text() == out_b.read_text(), "kedua bentuk harus menghasilkan verdict sama"
+
+
+def test_gate_check_blocks_missing_target_without_crashing(tmp_path):
+    """Target tanpa manifest -> BLOCKED terhormat (exit 2), bukan traceback."""
+    rc = gate.main(["zz-manifest-tidak-ada", "--quiet", "--out", str(tmp_path / "v.json")])
+    assert rc == 2, f"manifest tidak ada seharusnya BLOCKED (exit 2), dapat {rc}"
+
+
+def test_gate_check_missing_target_is_usage_error():
+    """Tanpa target/manifest sama sekali -> argparse usage error (exit 2)."""
+    with pytest.raises(SystemExit) as exc:
+        gate.main([])
+    assert exc.value.code == 2
 
 
 def test_workflow_rejects_traversal_slug():

@@ -49,7 +49,7 @@ release gate, troubleshooting, copot pemasangan).
 
 sdb doctor                                    # kapabilitas host + drift skill (read-only)
 sdb init nama-target                          # workspace per target (evidence/normalized/...)
-sdb gate --target nama-target                 # Gate #0 -> PASS/FAIL/BLOCKED
+sdb gate nama-target                          # Gate #0 -> PASS/FAIL/BLOCKED
 sdb workflow nama-target                      # laporan 18 baris tahap: ada / MISSING
 sdb release --target nama-target               # release gate berbasis artefak
 make check                                    # gerbang lokal wajib sebelum commit

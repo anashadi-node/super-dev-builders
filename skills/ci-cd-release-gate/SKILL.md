@@ -47,6 +47,12 @@ Semua gate punya exit criteria; tidak ada gate "kira-kira lulus".
 - **Action pihak ketiga dipin ke commit SHA**, bukan tag bergerak; dependensi uji dibaca dari satu
   sumber (`pyproject.toml`), jangan diduplikasi di YAML.
 
+- **Skill yang dicerminkan ke profil**: mengubah berkas repo saja membuat salinan
+  terpasang (main + tiap profil di `~/.hermes/profiles/<p>/skills/...`) menyimpang →
+  `make drift` MERAH. Urutan benar: patch repo -> sinkronkan SEMUA salinan terpasang
+  -> `make check` hijau -> baru commit/push. Jangan pernah push sebelum gerbang lokal
+  hijau walau CI lolos: CI tidak boleh jadi penemu cacat yang bisa dicegah lokal.
+
 ## Verifikasi SEBELUM push (jangan menyerahkan ke CI untuk menemukan cacat mendasar)
 1. Reproduksi lingkungan runner secara lokal: salinan bersih (`git archive HEAD | tar -x -C /tmp/sim`),
    venv terpisah berisi hanya dependensi pyproject, `HOME` kosong, `PATH` hanya venv:

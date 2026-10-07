@@ -3,7 +3,9 @@
 
 License: MIT.
 """
-import argparse, json, os, textwrap
+import argparse
+import json
+import os
 
 AI_SEARCH_UA = "OAI-SearchBot ChatGPT-User PerplexityBot Perplexity-User Claude-SearchBot claude-web".split()
 AI_TRAIN_UA = "GPTBot ClaudeBot anthropic-ai Google-Extended CCBot Applebot-Extended".split()

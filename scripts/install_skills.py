@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Pasang/copot 21 custom skill ekosistem ke profil Hermes atau skills utama.
+"""Pasang/copot custom skill ekosistem (daftar: registry/skills.yaml) ke profil Hermes atau skills utama.
 
 Sumber tunggal: <repo>/skills/<id>/SKILL.md (registry: registry/skills.yaml).
 
@@ -80,7 +80,8 @@ def install_one(skill_id: str, profile, dry_run: bool, uninstall: bool, log):
     os.makedirs(os.path.dirname(dst), exist_ok=True)
     if os.path.isdir(dst):
         shutil.rmtree(dst)
-    shutil.copytree(src, dst)
+    # jangan bawa cache bytecode/test ke lokasi terpasang (sumber drift palsu)
+    shutil.copytree(src, dst, ignore=shutil.ignore_patterns("__pycache__", "*.pyc", ".pytest_cache"))
 
 
 def main(argv=None) -> int:

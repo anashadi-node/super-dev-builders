@@ -7,7 +7,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("planora_status", SKILL_ROOT / "scripts/inspect_product.py")
 if spec is None or spec.loader is None:

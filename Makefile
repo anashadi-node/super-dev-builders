@@ -1,7 +1,7 @@
 # Super Dev Builders Ecosystem — task runner
 PY_SYS := /usr/bin/python3
 
-.PHONY: help doctor inventory test gate-init lint-registry release-check skills-list install-main clean-pyc
+.PHONY: help check lint drift doctor inventory test gate-init lint-registry release-check skills-list install-main clean-pyc
 
 help:
 	@grep -E "^[a-z-]+:" Makefile | sed "s/:.*//" | column -c 80
@@ -13,7 +13,17 @@ inventory:
 	$(PY_SYS) scripts/inventory_ecosystem.py --out reports/inventory_after.json
 
 test:
-	$(PY_SYS) -m pytest tests -q
+	$(PY_SYS) -m pytest tests skills -q
+
+lint:
+	ruff check scripts tests skills
+
+# skill terpasang (main + profil) vs sumber repo; exit 1 bila MISSING/DIFF
+drift:
+	$(PY_SYS) scripts/doctor.py --drift-only
+
+# gerbang lokal sebelum commit: lint + registry + test + drift
+check: lint lint-registry test drift
 
 gate-init:
 	@echo "gunakan: $(PY_SYS) scripts/init_target.py <slug> && $(PY_SYS) scripts/gate_check.py --target <slug>"

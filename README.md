@@ -23,7 +23,7 @@ link, dependency, skill, MCP, dan artefak capture diperlakukan **untrusted** sam
 ```text
 docs/            blueprint + architecture, divisi, workflow/gate, policy, rollback
 registry/        skill registry + tool registry (sumber, revisi terpin, status)
-skills/          sumber kanonik 21 custom skill ekosistem ini (dipasang ke profil, bukan disalin liar)
+skills/          sumber kanonik custom skill ekosistem ini (jumlah = registry/skills.yaml, kini 37; cek `make drift`) (dipasang ke profil, bukan disalin liar)
 agents/          charter mesin-terbaca per divisi (permission, input/output, batas)
 workflows/       definisi gate + tahap workflow (machine-readable)
 templates/       manifest otorisasi, target manifest, ADR, laporan akhir, handover

@@ -33,6 +33,8 @@ Lihat `docs/EVIDENCE_SCHEMA.md`. Metadata wajib setiap record:
 5. Baru serahkan ke D3 (architect) / D4-D5 (builder).
 
 ## Aturan
+- Capture mobile/desktop (Appium, MobSF, Windows UIA) + aturan redaksi header/query: lihat
+  `references/multi-platform-capture.md`.
 - Aset: hash konten (sha256) + label lisensi (`authorized|open|substituted`); aset tanpa lisensi jelas
   tidak boleh dibawa ke reconstruction.
 - Deduplikasi berdasarkan hash, bukan nama file.

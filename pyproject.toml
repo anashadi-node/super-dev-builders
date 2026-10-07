@@ -1,5 +1,5 @@
 [tool.ruff]
-# Konfigurasi lint repo Super Dev Builders Ecosystem (dipakai `ruff check scripts tests`).
+# Konfigurasi lint repo Super Dev Builders Ecosystem (dipakai `make lint` = ruff check scripts tests skills).
 line-length = 132
 target-version = "py310"
 
@@ -12,7 +12,9 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["E402"]  # test melakukan sys.path.insert sebelum import modul repo
+"skills/*/tests/*" = ["E402"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+# skills/*/tests ikut dijalankan: tes bawaan skill (product-kit, product-status) dulu tidak pernah masuk `make test`
+testpaths = ["tests", "skills"]
 addopts = "-q"

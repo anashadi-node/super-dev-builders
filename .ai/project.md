@@ -10,7 +10,7 @@ website/app/platform dengan gate yang kuat, evidence deterministik, dan konsumsi
 
 ## Success Criteria V2.2
 - 12 divisi V2.2 terdefinisi dengan charter, permission, dan owner profile eksplisit.
-- 21 custom skill ekosistem terpasang, kecil, ter-test, dan tercatat di registry dengan sumber+pin.
+- Custom skill ekosistem (37 per 2026-10-07; sumber hitungan = registry/skills.yaml) terpasang, kecil, ter-test, dan tercatat di registry dengan sumber+pin.
 - Gate #0 (authorization/scope) berjalan sebagai tool deterministik, bukan checklist manual.
 - Release gate tidak bisa PASS dari pernyataan LLM; wajib fresh build/test/scan evidence.
 - Whole-process isolation + least privilege untuk input untrusted/produksi.

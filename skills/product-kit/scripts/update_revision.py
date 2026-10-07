@@ -9,7 +9,6 @@ import re
 from datetime import date
 from pathlib import Path
 
-
 SOURCE_TO_ARTIFACT = {
     "prd": "prd",
     "ui": "uiGuide",

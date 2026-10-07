@@ -10,7 +10,6 @@ import unicodedata
 from datetime import date
 from pathlib import Path
 
-
 GUIDE_TYPES = ("ui", "dx", "hybrid")
 LOCALES = ("id-ID", "en-US")
 

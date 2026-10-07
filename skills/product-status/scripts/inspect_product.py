@@ -9,7 +9,6 @@ import re
 import subprocess
 from pathlib import Path
 
-
 TASK_RE = re.compile(
     r"^- \[(?P<checked>[ xX])\]\s+`(?P<id>(?:TASK|BUG|CHG)-\d{3})`\s+[—-]\s+(?P<title>.+)$",
     re.MULTILINE,

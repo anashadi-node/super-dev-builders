@@ -1,19 +1,22 @@
 #!/usr/bin/python3
 """Doctor — cek kapabilitas host ekosistem vs registry/tools.yaml.
 
-Pemakaian: /usr/bin/python3 scripts/doctor.py [--json out.json]
-Exit: 0 bila kapabilitas wajib tersedia, 3 bila ada yang kurang.
+Pemakaian: /usr/bin/python3 scripts/doctor.py [--json out.json] [--drift-only]
+Exit: 0 bila kapabilitas wajib tersedia, 3 bila ada yang kurang,
+      1 bila --drift-only dan ada skill MISSING/DIFF/COLLISION.
 """
 from __future__ import annotations
 
 import argparse
+import filecmp
 import os
 import shutil
 import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from sdb_common import PROFILES_DIR, load_yaml, now_iso, repo_path, write_json, yaml_backend
+from install_skills import dest_root, load_profile_aliases, load_registry, resolve_profile
+from sdb_common import HERMES_HOME, PROFILES_DIR, load_yaml, now_iso, repo_path, write_json, yaml_backend
 
 REQUIRED = ["git", "python3", "node", "npm"]
 OPTIONAL = ["docker", "jq", "playwright", "pytest", "uv", "gh", "semgrep", "trivy", "syft", "ruff"]
@@ -31,12 +34,73 @@ def version_of(cmd, args):
         return "unknown"
 
 
+_IGNORE = ["__pycache__", ".pytest_cache"]
+
+
+def _same_tree(a: str, b: str) -> bool:
+    c = filecmp.dircmp(a, b, ignore=_IGNORE)
+    if c.left_only or c.right_only or c.diff_files or c.funny_files:
+        return False
+    # dircmp membandingkan shallow (stat); bandingkan isi agar tidak lolos palsu
+    _, mismatch, errors = filecmp.cmpfiles(a, b, c.common_files, shallow=False)
+    return not mismatch and not errors and all(_same_tree(os.path.join(a, d), os.path.join(b, d)) for d in c.common_dirs)
+
+
+def _skill_names(root: str) -> dict:
+    """nama skill (frontmatter / nama dir) -> path, untuk SKILL.md di luar namespace kita."""
+    out = {}
+    if not os.path.isdir(root):
+        return out
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [d for d in dirnames if d not in ("node_modules", ".git", "super-dev-builders", *_IGNORE)]
+        if "SKILL.md" in filenames:
+            out.setdefault(os.path.basename(dirpath), dirpath)
+    return out
+
+
+def skill_drift() -> list[dict]:
+    """Bandingkan skill terpasang (main + profil per registry) dengan sumber repo.
+
+    Status: OK | MISSING | DIFF | COLLISION (nama sama dengan skill lain di luar
+    namespace -> Hermes tidak bisa memuat salah satunya)."""
+    aliases = load_profile_aliases()
+    rows = []
+    for c in load_registry():
+        sid = c["id"]
+        src = repo_path("skills", sid)
+        for logical in [None, *(c.get("profiles") or [])]:
+            profile = resolve_profile(logical, aliases)
+            if profile and not os.path.isdir(os.path.join(PROFILES_DIR, profile)):
+                continue
+            dst = os.path.join(dest_root(profile), sid)
+            status = "MISSING" if not os.path.isdir(dst) else ("OK" if _same_tree(src, dst) else "DIFF")
+            rows.append({"skill": sid, "where": profile or "main", "status": status})
+    # tabrakan hanya nyata bila skill kita TERPASANG di root yang sama dengan skill senama lain
+    installed = {(r["where"], r["skill"]) for r in rows if r["status"] != "MISSING"}
+    for where, root in [("main", os.path.join(HERMES_HOME, "skills")),
+                        *[(p, os.path.join(PROFILES_DIR, p, "skills")) for p in sorted(set(aliases.values()))]]:
+        for name, path in _skill_names(root).items():
+            if (where, name) in installed:
+                rows.append({"skill": name, "where": where, "status": "COLLISION", "other": path})
+    return rows
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Capability check")
     ap.add_argument("--json", dest="json_out")
+    ap.add_argument("--drift-only", action="store_true", help="hanya cek drift skill terpasang vs repo")
     args = ap.parse_args(argv)
 
-    report = {"checked_at": now_iso(), "yaml_backend": yaml_backend(), "host": {}, "profiles": {}, "registry": {}}
+    drift = skill_drift()
+    bad = [r for r in drift if r["status"] != "OK"]
+    if args.drift_only:
+        for r in bad:
+            print(f"  {r['status']:<9} {r['skill']:<32} @ {r['where']} {r.get('other', '')}")
+        print(f"skill drift: {len(drift) - len(bad)}/{len(drift)} OK, {len(bad)} bermasalah")
+        return 1 if bad else 0
+
+    report = {"checked_at": now_iso(), "yaml_backend": yaml_backend(), "host": {}, "profiles": {}, "registry": {},
+              "skill_drift": drift}
     missing_required = []
     for name in REQUIRED + OPTIONAL:
         path = which(name)
@@ -110,6 +174,8 @@ def main(argv=None) -> int:
     print("  profil divisi:")
     for name, info in report["profiles"].items():
         print(f"    {'OK ' if info['present'] else 'MISS'} {name} (soul={info.get('soul_md')})")
+    print(f"  skill drift: {len(drift) - len(bad)}/{len(drift)} OK, {len(bad)} bermasalah"
+          + (" -> jalankan `make drift`" if bad else ""))
     if missing_required:
         print(f"  KURANG (wajib): {missing_required}")
         return 3

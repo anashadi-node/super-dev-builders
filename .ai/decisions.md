@@ -18,7 +18,7 @@ Blueprint §1: "jangan membuat agent baru jika masalah dapat diselesaikan dengan
 Security/Audit dipisah dari Builder (independence), DevOps satu-satunya pemegang hak deploy (dengan approval manusia).
 
 ## ADR-005 — Skill kanonik di repo, dipasang ke profil via script
-21 custom skill hidup di `skills/` repo ini sebagai sumber tunggal; `scripts/install_skills.py` memasangnya
+Custom skill (jumlah: registry/skills.yaml) hidup di `skills/` repo ini sebagai sumber tunggal; `scripts/install_skills.py` memasangnya
 ke profil sesuai matriks divisi. Menghindari duplikasi liar dan memudahkan rollback/uninstall.
 
 ## ADR-006 — Evidence taxonomy anti-halusinasi

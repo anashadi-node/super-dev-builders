@@ -10,7 +10,6 @@ from datetime import date
 from pathlib import Path, PurePosixPath
 from urllib.parse import unquote
 
-
 ALLOWED_GUIDE_TYPES = {"ui", "dx", "hybrid"}
 ALLOWED_STATUSES = {"draft", "ready", "blocked", "stale"}
 ALLOWED_LOCALES = {"id-ID", "en-US"}

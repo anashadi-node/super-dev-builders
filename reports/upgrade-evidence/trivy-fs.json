@@ -1,22 +1,192 @@
 {
- "SchemaVersion": 2,
- "Trivy": {
-  "Version": "0.75.0"
- },
- "ReportID": "01a10487-dbe1-7c63-81aa-9732617e82a3",
- "CreatedAt": "2026-10-04T08:29:34.945813596+07:00",
- "ArtifactID": "sha256:1a0fa53c37bcd3a9be000d4a91bb21b25d1f7d638fe1aa602330484a3538f540",
- "ArtifactName": ".",
- "ArtifactType": "repository",
- "Metadata": {
-  "Branch": "master",
-  "Commit": "e37099aee545f072c7cea722867bbb1a62bbf431",
-  "CommitMsg": "fix(scripts): gate_check --out agar test tidak menulis verdict ke repo\n\nData pendukung: 21/21 test PASS; git status bersih setelah commit.\nExpected impact: test suite tidak lagi mencemari reports/ (evidence tetap bersih).\n\nCo-Authored-By: Hermes Super Dev Builders <sdb@localhost>",
-  "Author": "Hermes Super Dev Builders <sdb@localhost>",
-  "Committer": "Hermes Super Dev Builders <sdb@localhost>"
- },
- "provenance": "trivy fs (pemindaian filesystem) — output mentah sesi 2026-10-04, dianotasi kontrak 2026-10-05",
- "captured_at": "2026-10-04 (sesi asal)",
- "redaction_status": "clean",
- "status": "OBSERVED"
+  "tool": "trivy-fs.json",
+  "provenance": "trivy Version: 0.75.0 fs --scanners vuln,secret,misconfig .",
+  "captured_at": "2026-10-07T23:02:00+0700",
+  "redaction_status": "clean",
+  "status": "FACT",
+  "raw": {
+    "SchemaVersion": 2,
+    "Trivy": {
+      "Version": "0.75.0"
+    },
+    "ReportID": "01a11719-4ae5-7609-ba2f-60f8e545b8ac",
+    "CreatedAt": "2026-10-07T23:01:35.973396576+07:00",
+    "ArtifactID": "sha256:5d418c634038849843b2b2815e4404b56fea3a9294ff891747d6ca76982ba811",
+    "ArtifactName": ".",
+    "ArtifactType": "repository",
+    "Metadata": {
+      "RepoURL": "git@github.com:anashadi-node/super-dev-builders.git",
+      "Branch": "master",
+      "Commit": "40b0825178fe45b9328859984c536b0b029b4c15",
+      "CommitMsg": "fix(cli): sdb release/init/workflow konsisten posisional — tutup 2 bug E2E\n\nTemuan E2E 2026-10-07 (target e2e-ready, jalur penuh init->doctor->gate->workflow->release):\n- BUG #1: `sdb workflow <slug>` menolak target yang baru di-init karena\n  `init_target.py` hanya membuat `evidence/<slug>`, sedangkan runner 16 tahap\n  menuntut `runs/<slug>` + `targets/<slug>`. Fix: init kini membuat\n  runs/<slug>/{docs,logs,reports} dan targets/<slug>/src.\n- BUG #2: `sdb release <slug>` gagal argparse karena hanya mendukung\n  `--project <dir>`. Fix: terima slug POSISIONAL + `--target`, `--project`\n  tetap didukung (kompatibilitas); slug divalidasi fail-closed via\n  validate_slug (CWE-22, exit 2, nol tulisan ke luar repo).\n\nSelaras: Makefile (gate-init/release-check TARGET=), sdb.py (help posisional),\nREADME, GETTING_STARTED, SECURITY_PRIVACY_GATE_0, WORKFLOW_GATES.\n\nBukti:\n- make check EXIT=0: 163 test PASS, skill drift 106/106, lint bersih.\n- E2E segar: init=0 doctor=0 gate=1(FATAL: authorization kosong) workflow=0\n  release=1(FAIL: artefak belum ada). Traversal -> exit 2 tanpa artefak.\n- Test regresi baru 4: posisional==--target (identik), traversal exit 2,\n  --project lama tetap FAIL exit 1; + assertion runs/targets di test_scripts.\n- Pre-Deploy Review §6: secret BERSIH (hits = prosa docs), shuffle BERSIH,\n  dry_run BERSIH, py_compile 5/5 OK.\n- .gitignore: abaikan workspace uji e2e-*/_selftest*/zz-*.\n\nCo-Authored-By: Hermes Anantara v3",
+      "Author": "Hermes Super Dev Builders <sdb@localhost>",
+      "Committer": "Hermes Super Dev Builders <sdb@localhost>"
+    },
+    "Results": [
+      {
+        "Target": "uv.lock",
+        "Class": "lang-pkgs",
+        "Type": "uv",
+        "Packages": [
+          {
+            "ID": "sdb-ecosystem@0.3.0",
+            "Name": "sdb-ecosystem",
+            "Identifier": {
+              "PURL": "pkg:pypi/sdb-ecosystem@0.3.0",
+              "UID": "e0e9a8e97962ebb7"
+            },
+            "Version": "0.3.0",
+            "Relationship": "root",
+            "DependsOn": [
+              "pytest@9.1.1",
+              "pyyaml@6.0.1",
+              "ruff@0.16.10"
+            ],
+            "AnalyzedBy": "uv"
+          },
+          {
+            "ID": "pytest@9.1.1",
+            "Name": "pytest",
+            "Identifier": {
+              "PURL": "pkg:pypi/pytest@9.1.1",
+              "UID": "35b2e984d64b528f"
+            },
+            "Version": "9.1.1",
+            "Relationship": "direct",
+            "DependsOn": [
+              "colorama@0.4.6",
+              "exceptiongroup@1.3.1",
+              "iniconfig@2.3.1",
+              "packaging@26.3",
+              "pluggy@1.6.0",
+              "pygments@2.21.0",
+              "tomli@2.4.1"
+            ],
+            "AnalyzedBy": "uv"
+          },
+          {
+            "ID": "pyyaml@6.0.1",
+            "Name": "pyyaml",
+            "Identifier": {
+              "PURL": "pkg:pypi/pyyaml@6.0.1",
+              "UID": "cf2cc4a63b236993"
+            },
+            "Version": "6.0.1",
+            "Relationship": "direct",
+            "AnalyzedBy": "uv"
+          },
+          {
+            "ID": "ruff@0.16.10",
+            "Name": "ruff",
+            "Identifier": {
+              "PURL": "pkg:pypi/ruff@0.16.10",
+              "UID": "583e164a7eacb392"
+            },
+            "Version": "0.16.10",
+            "Relationship": "direct",
+            "AnalyzedBy": "uv"
+          },
+          {
+            "ID": "colorama@0.4.6",
+            "Name": "colorama",
+            "Identifier": {
+              "PURL": "pkg:pypi/colorama@0.4.6",
+              "UID": "a9b0f41cf3bb79cc"
+            },
+            "Version": "0.4.6",
+            "Indirect": true,
+            "Relationship": "indirect",
+            "AnalyzedBy": "uv"
+          },
+          {
+            "ID": "exceptiongroup@1.3.1",
+            "Name": "exceptiongroup",
+            "Identifier": {
+              "PURL": "pkg:pypi/exceptiongroup@1.3.1",
+              "UID": "ca1f868969d97f3a"
+            },
+            "Version": "1.3.1",
+            "Indirect": true,
+            "Relationship": "indirect",
+            "DependsOn": [
+              "typing-extensions@4.16.0"
+            ],
+            "AnalyzedBy": "uv"
+          },
+          {
+            "ID": "iniconfig@2.3.1",
+            "Name": "iniconfig",
+            "Identifier": {
+              "PURL": "pkg:pypi/iniconfig@2.3.1",
+              "UID": "2ff8fa9660602baf"
+            },
+            "Version": "2.3.1",
+            "Indirect": true,
+            "Relationship": "indirect",
+            "AnalyzedBy": "uv"
+          },
+          {
+            "ID": "packaging@26.3",
+            "Name": "packaging",
+            "Identifier": {
+              "PURL": "pkg:pypi/packaging@26.3",
+              "UID": "281e14bb06db5be"
+            },
+            "Version": "26.3",
+            "Indirect": true,
+            "Relationship": "indirect",
+            "AnalyzedBy": "uv"
+          },
+          {
+            "ID": "pluggy@1.6.0",
+            "Name": "pluggy",
+            "Identifier": {
+              "PURL": "pkg:pypi/pluggy@1.6.0",
+              "UID": "fb8af1ba97572ef7"
+            },
+            "Version": "1.6.0",
+            "Indirect": true,
+            "Relationship": "indirect",
+            "AnalyzedBy": "uv"
+          },
+          {
+            "ID": "pygments@2.21.0",
+            "Name": "pygments",
+            "Identifier": {
+              "PURL": "pkg:pypi/pygments@2.21.0",
+              "UID": "2c187de8ce1ac8e"
+            },
+            "Version": "2.21.0",
+            "Indirect": true,
+            "Relationship": "indirect",
+            "AnalyzedBy": "uv"
+          },
+          {
+            "ID": "tomli@2.4.1",
+            "Name": "tomli",
+            "Identifier": {
+              "PURL": "pkg:pypi/tomli@2.4.1",
+              "UID": "b68376496ebc1c00"
+            },
+            "Version": "2.4.1",
+            "Indirect": true,
+            "Relationship": "indirect",
+            "AnalyzedBy": "uv"
+          },
+          {
+            "ID": "typing-extensions@4.16.0",
+            "Name": "typing-extensions",
+            "Identifier": {
+              "PURL": "pkg:pypi/typing-extensions@4.16.0",
+              "UID": "23fd9c45aea880bf"
+            },
+            "Version": "4.16.0",
+            "Indirect": true,
+            "Relationship": "indirect",
+            "AnalyzedBy": "uv"
+          }
+        ]
+      }
+    ]
+  }
 }

@@ -1,794 +1,351 @@
 {
- "version": "1.179.0",
- "results": [],
- "errors": [
-  {
-   "code": 3,
-   "level": "warn",
-   "type": [
-    "PartialParsing",
-    [
-     {
-      "path": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-      "start": {
-       "line": 25,
-       "col": 375,
-       "offset": 0
-      },
-      "end": {
-       "line": 25,
-       "col": 391,
-       "offset": 16
-      }
-     },
-     {
-      "path": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-      "start": {
-       "line": 43,
-       "col": 194,
-       "offset": 0
-      },
-      "end": {
-       "line": 43,
-       "col": 210,
-       "offset": 16
-      }
-     },
-     {
-      "path": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-      "start": {
-       "line": 43,
-       "col": 354,
-       "offset": 0
-      },
-      "end": {
-       "line": 43,
-       "col": 361,
-       "offset": 7
-      }
-     },
-     {
-      "path": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-      "start": {
-       "line": 67,
-       "col": 44,
-       "offset": 0
-      },
-      "end": {
-       "line": 101,
-       "col": 63,
-       "offset": 1954
-      }
-     },
-     {
-      "path": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-      "start": {
-       "line": 105,
-       "col": 52,
-       "offset": 0
-      },
-      "end": {
-       "line": 105,
-       "col": 85,
-       "offset": 33
-      }
-     },
-     {
-      "path": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-      "start": {
-       "line": 118,
-       "col": 28,
-       "offset": 0
-      },
-      "end": {
-       "line": 118,
-       "col": 53,
-       "offset": 25
-      }
-     },
-     {
-      "path": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-      "start": {
-       "line": 131,
-       "col": 20,
-       "offset": 0
-      },
-      "end": {
-       "line": 159,
-       "col": 31,
-       "offset": 671
-      }
-     },
-     {
-      "path": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-      "start": {
-       "line": 219,
-       "col": 39,
-       "offset": 0
-      },
-      "end": {
-       "line": 219,
-       "col": 49,
-       "offset": 10
-      }
-     },
-     {
-      "path": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-      "start": {
-       "line": 301,
-       "col": 20,
-       "offset": 0
-      },
-      "end": {
-       "line": 301,
-       "col": 52,
-       "offset": 32
-      }
-     },
-     {
-      "path": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-      "start": {
-       "line": 342,
-       "col": 70,
-       "offset": 0
-      },
-      "end": {
-       "line": 342,
-       "col": 75,
-       "offset": 5
-      }
-     },
-     {
-      "path": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-      "start": {
-       "line": 348,
-       "col": 17,
-       "offset": 0
-      },
-      "end": {
-       "line": 369,
-       "col": 28,
-       "offset": 389
-      }
-     },
-     {
-      "path": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-      "start": {
-       "line": 382,
-       "col": 25,
-       "offset": 0
-      },
-      "end": {
-       "line": 416,
-       "col": 28,
-       "offset": 867
-      }
-     },
-     {
-      "path": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-      "start": {
-       "line": 425,
-       "col": 47,
-       "offset": 0
-      },
-      "end": {
-       "line": 425,
-       "col": 68,
-       "offset": 21
-      }
-     },
-     {
-      "path": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-      "start": {
-       "line": 431,
-       "col": 47,
-       "offset": 0
-      },
-      "end": {
-       "line": 431,
-       "col": 67,
-       "offset": 20
-      }
-     },
-     {
-      "path": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-      "start": {
-       "line": 451,
-       "col": 20,
-       "offset": 0
-      },
-      "end": {
-       "line": 451,
-       "col": 33,
-       "offset": 13
-      }
-     },
-     {
-      "path": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-      "start": {
-       "line": 481,
-       "col": 24,
-       "offset": 0
-      },
-      "end": {
-       "line": 559,
-       "col": 53,
-       "offset": 2755
-      }
-     },
-     {
-      "path": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-      "start": {
-       "line": 562,
-       "col": 52,
-       "offset": 0
-      },
-      "end": {
-       "line": 562,
-       "col": 64,
-       "offset": 12
-      }
-     },
-     {
-      "path": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-      "start": {
-       "line": 575,
-       "col": 24,
-       "offset": 0
-      },
-      "end": {
-       "line": 575,
-       "col": 130,
-       "offset": 106
-      }
-     },
-     {
-      "path": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-      "start": {
-       "line": 576,
-       "col": 203,
-       "offset": 0
-      },
-      "end": {
-       "line": 576,
-       "col": 216,
-       "offset": 13
-      }
-     },
-     {
-      "path": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-      "start": {
-       "line": 577,
-       "col": 15,
-       "offset": 0
-      },
-      "end": {
-       "line": 577,
-       "col": 233,
-       "offset": 218
-      }
-     },
-     {
-      "path": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-      "start": {
-       "line": 610,
-       "col": 109,
-       "offset": 0
-      },
-      "end": {
-       "line": 610,
-       "col": 278,
-       "offset": 169
-      }
-     }
-    ]
-   ],
-   "message": "Syntax error at line docs/00_MASTER_BLUEPRINT_V2.2.html:25:\n `& Reconstruction` was unexpected",
-   "path": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-   "spans": [
-    {
-     "file": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-     "start": {
-      "line": 25,
-      "col": 375,
-      "offset": 0
-     },
-     "end": {
-      "line": 25,
-      "col": 391,
-      "offset": 16
-     }
+  "tool": "semgrep.json",
+  "provenance": "semgrep 1.179.0 --config p/default scripts skills",
+  "captured_at": "2026-10-07T23:02:00+0700",
+  "redaction_status": "clean",
+  "status": "FACT",
+  "raw": {
+    "version": "1.179.0",
+    "results": [],
+    "errors": [],
+    "paths": {
+      "scanned": [
+        "scripts/annotate_evidence.py",
+        "scripts/bootstrap_tools.sh",
+        "scripts/capture_web.py",
+        "scripts/doctor.py",
+        "scripts/evidence_lint.py",
+        "scripts/fidelity_compare.py",
+        "scripts/fidelity_report.py",
+        "scripts/gate_check.py",
+        "scripts/init_target.py",
+        "scripts/install_skills.py",
+        "scripts/inventory_ecosystem.py",
+        "scripts/md_to_pdf.py",
+        "scripts/normalize_capture.py",
+        "scripts/redact_network.py",
+        "scripts/registry_lint.py",
+        "scripts/release_check.py",
+        "scripts/sdb.py",
+        "scripts/sdb_common.py",
+        "scripts/sync_third_party_skills.py",
+        "scripts/third_party_scan.py",
+        "scripts/vacuum_state_db_offline.sh",
+        "scripts/workflow_run.py",
+        "skills/accessibility-audit/SKILL.md",
+        "skills/api-contract/SKILL.md",
+        "skills/architecture-compliance-audit/SKILL.md",
+        "skills/architecture-decision-record/SKILL.md",
+        "skills/architecture-docs/SKILL.md",
+        "skills/authz-authn-review/SKILL.md",
+        "skills/bug-workflow/SKILL.md",
+        "skills/bug-workflow/WORKFLOW.md",
+        "skills/chore-workflow/SKILL.md",
+        "skills/chore-workflow/WORKFLOW.md",
+        "skills/ci-cd-release-gate/SKILL.md",
+        "skills/database-migration-safety/SKILL.md",
+        "skills/engineering-release-audit/SKILL.md",
+        "skills/evidence-normalizer/SKILL.md",
+        "skills/evidence-normalizer/references/multi-platform-capture.md",
+        "skills/feature-workflow/SKILL.md",
+        "skills/feature-workflow/WORKFLOW.md",
+        "skills/geo-audit/SKILL.md",
+        "skills/geo-audit/scripts/geo_gen.py",
+        "skills/geo-audit/scripts/geo_scan.py",
+        "skills/html-to-video-render/SKILL.md",
+        "skills/local-experiment-tracking/SKILL.md",
+        "skills/local-llm-serving/SKILL.md",
+        "skills/local-llm-serving/scripts/serve_and_bench.py",
+        "skills/local-media-generation/SKILL.md",
+        "skills/model-hub-provenance/SKILL.md",
+        "skills/model-hub-provenance/scripts/fetch_gguf.py",
+        "skills/observed-network-contract/SKILL.md",
+        "skills/privilege-free-tooling/SKILL.md",
+        "skills/product-change/SKILL.md",
+        "skills/product-change/WORKFLOW.md",
+        "skills/product-change/agents/openai.yaml",
+        "skills/product-execution/SKILL.md",
+        "skills/product-execution/WORKFLOW.md",
+        "skills/product-execution/agents/openai.yaml",
+        "skills/product-kit/SKILL.md",
+        "skills/product-kit/WORKFLOW.md",
+        "skills/product-kit/agents/openai.yaml",
+        "skills/product-kit/assets/templates/document.id-ID.md.tmpl",
+        "skills/product-kit/assets/templates/document.md.tmpl",
+        "skills/product-kit/assets/templates/feature.id-ID.md.tmpl",
+        "skills/product-kit/assets/templates/feature.md.tmpl",
+        "skills/product-kit/assets/templates/phase.id-ID.md.tmpl",
+        "skills/product-kit/assets/templates/phase.md.tmpl",
+        "skills/product-kit/assets/templates/root-readme.id-ID.md.tmpl",
+        "skills/product-kit/assets/templates/root-readme.md.tmpl",
+        "skills/product-kit/assets/templates/todo.en-US.md.tmpl",
+        "skills/product-kit/assets/templates/todo.id-ID.md.tmpl",
+        "skills/product-kit/references/execution-planning.md",
+        "skills/product-kit/references/experience-guide.md",
+        "skills/product-kit/references/intake-and-provenance.md",
+        "skills/product-kit/references/output-contract.md",
+        "skills/product-kit/references/prd-authoring.md",
+        "skills/product-kit/references/quality-gates.md",
+        "skills/product-kit/references/revision-workflow.md",
+        "skills/product-kit/scripts/scaffold_product_kit.py",
+        "skills/product-kit/scripts/update_revision.py",
+        "skills/product-kit/scripts/validate_product_kit.py",
+        "skills/product-kit/tests/test_product_kit.py",
+        "skills/product-status/SKILL.md",
+        "skills/product-status/WORKFLOW.md",
+        "skills/product-status/agents/openai.yaml",
+        "skills/product-status/scripts/inspect_product.py",
+        "skills/product-status/tests/test_inspect_product.py",
+        "skills/public-feed-reader/SKILL.md",
+        "skills/realtime-visual-engine/SKILL.md",
+        "skills/realtime-visual-engine/scripts/render_shader.py",
+        "skills/reconstruction-fidelity/SKILL.md",
+        "skills/reconstruction-scope-gate/SKILL.md",
+        "skills/reconstruction-spec/SKILL.md",
+        "skills/release-handover-docs/SKILL.md",
+        "skills/rollback-and-recovery/SKILL.md",
+        "skills/target-inventory/SKILL.md",
+        "skills/technology-profiler/SKILL.md",
+        "skills/technology-selection/SKILL.md",
+        "skills/test-pyramid-and-risk/SKILL.md",
+        "skills/ui-ux-state-mapper/SKILL.md"
+      ]
     },
-    {
-     "file": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-     "start": {
-      "line": 43,
-      "col": 194,
-      "offset": 0
-     },
-     "end": {
-      "line": 43,
-      "col": 210,
-      "offset": 16
-     }
+    "time": {
+      "rules": [],
+      "rules_parse_time": 0.3720741271972656,
+      "profiling_times": {
+        "config_time": 0.7360572814941406,
+        "core_time": 1.8889381885528564,
+        "ignores_time": 0.001239776611328125,
+        "total_time": 2.634460687637329
+      },
+      "parsing_time": {
+        "total_time": 0.0,
+        "per_file_time": {
+          "mean": 0.0,
+          "std_dev": 0.0
+        },
+        "very_slow_stats": {
+          "time_ratio": 0.0,
+          "count_ratio": 0.0
+        },
+        "very_slow_files": []
+      },
+      "scanning_time": {
+        "total_time": 11.088574171066284,
+        "per_file_time": {
+          "mean": 0.04718542200453737,
+          "std_dev": 0.019896531307103893
+        },
+        "very_slow_stats": {
+          "time_ratio": 0.0,
+          "count_ratio": 0.0
+        },
+        "very_slow_files": []
+      },
+      "matching_time": {
+        "total_time": 0.0,
+        "per_file_and_rule_time": {
+          "mean": 0.0,
+          "std_dev": 0.0
+        },
+        "very_slow_stats": {
+          "time_ratio": 0.0,
+          "count_ratio": 0.0
+        },
+        "very_slow_rules_on_files": []
+      },
+      "tainting_time": {
+        "total_time": 0.0,
+        "per_def_and_rule_time": {
+          "mean": 0.0,
+          "std_dev": 0.0
+        },
+        "very_slow_stats": {
+          "time_ratio": 0.0,
+          "count_ratio": 0.0
+        },
+        "very_slow_rules_on_defs": []
+      },
+      "fixpoint_timeouts": [
+        {
+          "error_type": "Fixpoint timeout",
+          "severity": "warn",
+          "message": "Fixpoint timeout while performing taint analysis at scripts/capture_web.py:63:4 [rules: 1, first: python.boto3.security.hardcoded-token.hardcoded-token]",
+          "location": {
+            "path": "scripts/capture_web.py",
+            "start": {
+              "line": 63,
+              "col": 5,
+              "offset": 2422
+            },
+            "end": {
+              "line": 63,
+              "col": 9,
+              "offset": 2426
+            }
+          }
+        },
+        {
+          "error_type": "Fixpoint timeout",
+          "severity": "warn",
+          "message": "Fixpoint timeout while performing taint analysis at scripts/doctor.py:123:4 [rules: 1, first: python.boto3.security.hardcoded-token.hardcoded-token]",
+          "location": {
+            "path": "scripts/doctor.py",
+            "start": {
+              "line": 123,
+              "col": 5,
+              "offset": 5014
+            },
+            "end": {
+              "line": 123,
+              "col": 9,
+              "offset": 5018
+            }
+          }
+        },
+        {
+          "error_type": "Fixpoint timeout",
+          "severity": "warn",
+          "message": "Fixpoint timeout while performing taint analysis at scripts/fidelity_compare.py:160:4 [rules: 1, first: python.boto3.security.hardcoded-token.hardcoded-token]",
+          "location": {
+            "path": "scripts/fidelity_compare.py",
+            "start": {
+              "line": 160,
+              "col": 5,
+              "offset": 7649
+            },
+            "end": {
+              "line": 160,
+              "col": 9,
+              "offset": 7653
+            }
+          }
+        },
+        {
+          "error_type": "Fixpoint timeout",
+          "severity": "warn",
+          "message": "Fixpoint timeout while performing taint analysis at scripts/normalize_capture.py:20:4 [rules: 1, first: python.boto3.security.hardcoded-token.hardcoded-token]",
+          "location": {
+            "path": "scripts/normalize_capture.py",
+            "start": {
+              "line": 20,
+              "col": 5,
+              "offset": 511
+            },
+            "end": {
+              "line": 20,
+              "col": 9,
+              "offset": 515
+            }
+          }
+        },
+        {
+          "error_type": "Fixpoint timeout",
+          "severity": "warn",
+          "message": "Fixpoint timeout while performing taint analysis at scripts/registry_lint.py:44:4 [rules: 1, first: python.boto3.security.hardcoded-token.hardcoded-token]",
+          "location": {
+            "path": "scripts/registry_lint.py",
+            "start": {
+              "line": 44,
+              "col": 5,
+              "offset": 1359
+            },
+            "end": {
+              "line": 44,
+              "col": 9,
+              "offset": 1363
+            }
+          }
+        },
+        {
+          "error_type": "Fixpoint timeout",
+          "severity": "warn",
+          "message": "Fixpoint timeout while performing taint analysis at scripts/release_check.py:28:4 [rules: 1, first: python.boto3.security.hardcoded-token.hardcoded-token]",
+          "location": {
+            "path": "scripts/release_check.py",
+            "start": {
+              "line": 28,
+              "col": 5,
+              "offset": 750
+            },
+            "end": {
+              "line": 28,
+              "col": 9,
+              "offset": 754
+            }
+          }
+        },
+        {
+          "error_type": "Fixpoint timeout",
+          "severity": "warn",
+          "message": "Fixpoint timeout while performing taint analysis at scripts/sync_third_party_skills.py:233:4 [rules: 1, first: python.boto3.security.hardcoded-token.hardcoded-token]",
+          "location": {
+            "path": "scripts/sync_third_party_skills.py",
+            "start": {
+              "line": 233,
+              "col": 5,
+              "offset": 10790
+            },
+            "end": {
+              "line": 233,
+              "col": 9,
+              "offset": 10794
+            }
+          }
+        },
+        {
+          "error_type": "Fixpoint timeout",
+          "severity": "warn",
+          "message": "Fixpoint timeout while performing taint analysis at skills/local-llm-serving/scripts/serve_and_bench.py:80:4 [rules: 1, first: python.boto3.security.hardcoded-token.hardcoded-token]",
+          "location": {
+            "path": "skills/local-llm-serving/scripts/serve_and_bench.py",
+            "start": {
+              "line": 80,
+              "col": 5,
+              "offset": 3004
+            },
+            "end": {
+              "line": 80,
+              "col": 9,
+              "offset": 3008
+            }
+          }
+        },
+        {
+          "error_type": "Fixpoint timeout",
+          "severity": "warn",
+          "message": "Fixpoint timeout while performing taint analysis at skills/product-kit/scripts/scaffold_product_kit.py:55:4 [rules: 1, first: python.boto3.security.hardcoded-token.hardcoded-token]",
+          "location": {
+            "path": "skills/product-kit/scripts/scaffold_product_kit.py",
+            "start": {
+              "line": 55,
+              "col": 5,
+              "offset": 1835
+            },
+            "end": {
+              "line": 55,
+              "col": 13,
+              "offset": 1843
+            }
+          }
+        }
+      ],
+      "prefiltering": {
+        "project_level_time": 0.0,
+        "file_level_time": 0.0,
+        "rules_with_project_prefilters_ratio": 0.0,
+        "rules_with_file_prefilters_ratio": 0.9809778209486806,
+        "rules_selected_ratio": 0.0412821758135017,
+        "rules_matched_ratio": 0.0412821758135017
+      },
+      "targets": [],
+      "total_bytes": 0,
+      "max_memory_bytes": 1071674816
     },
-    {
-     "file": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-     "start": {
-      "line": 43,
-      "col": 354,
-      "offset": 0
-     },
-     "end": {
-      "line": 43,
-      "col": 361,
-      "offset": 7
-     }
-    },
-    {
-     "file": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-     "start": {
-      "line": 67,
-      "col": 44,
-      "offset": 0
-     },
-     "end": {
-      "line": 101,
-      "col": 63,
-      "offset": 1954
-     }
-    },
-    {
-     "file": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-     "start": {
-      "line": 105,
-      "col": 52,
-      "offset": 0
-     },
-     "end": {
-      "line": 105,
-      "col": 85,
-      "offset": 33
-     }
-    },
-    {
-     "file": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-     "start": {
-      "line": 118,
-      "col": 28,
-      "offset": 0
-     },
-     "end": {
-      "line": 118,
-      "col": 53,
-      "offset": 25
-     }
-    },
-    {
-     "file": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-     "start": {
-      "line": 131,
-      "col": 20,
-      "offset": 0
-     },
-     "end": {
-      "line": 159,
-      "col": 31,
-      "offset": 671
-     }
-    },
-    {
-     "file": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-     "start": {
-      "line": 219,
-      "col": 39,
-      "offset": 0
-     },
-     "end": {
-      "line": 219,
-      "col": 49,
-      "offset": 10
-     }
-    },
-    {
-     "file": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-     "start": {
-      "line": 301,
-      "col": 20,
-      "offset": 0
-     },
-     "end": {
-      "line": 301,
-      "col": 52,
-      "offset": 32
-     }
-    },
-    {
-     "file": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-     "start": {
-      "line": 342,
-      "col": 70,
-      "offset": 0
-     },
-     "end": {
-      "line": 342,
-      "col": 75,
-      "offset": 5
-     }
-    },
-    {
-     "file": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-     "start": {
-      "line": 348,
-      "col": 17,
-      "offset": 0
-     },
-     "end": {
-      "line": 369,
-      "col": 28,
-      "offset": 389
-     }
-    },
-    {
-     "file": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-     "start": {
-      "line": 382,
-      "col": 25,
-      "offset": 0
-     },
-     "end": {
-      "line": 416,
-      "col": 28,
-      "offset": 867
-     }
-    },
-    {
-     "file": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-     "start": {
-      "line": 425,
-      "col": 47,
-      "offset": 0
-     },
-     "end": {
-      "line": 425,
-      "col": 68,
-      "offset": 21
-     }
-    },
-    {
-     "file": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-     "start": {
-      "line": 431,
-      "col": 47,
-      "offset": 0
-     },
-     "end": {
-      "line": 431,
-      "col": 67,
-      "offset": 20
-     }
-    },
-    {
-     "file": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-     "start": {
-      "line": 451,
-      "col": 20,
-      "offset": 0
-     },
-     "end": {
-      "line": 451,
-      "col": 33,
-      "offset": 13
-     }
-    },
-    {
-     "file": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-     "start": {
-      "line": 481,
-      "col": 24,
-      "offset": 0
-     },
-     "end": {
-      "line": 559,
-      "col": 53,
-      "offset": 2755
-     }
-    },
-    {
-     "file": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-     "start": {
-      "line": 562,
-      "col": 52,
-      "offset": 0
-     },
-     "end": {
-      "line": 562,
-      "col": 64,
-      "offset": 12
-     }
-    },
-    {
-     "file": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-     "start": {
-      "line": 575,
-      "col": 24,
-      "offset": 0
-     },
-     "end": {
-      "line": 575,
-      "col": 130,
-      "offset": 106
-     }
-    },
-    {
-     "file": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-     "start": {
-      "line": 576,
-      "col": 203,
-      "offset": 0
-     },
-     "end": {
-      "line": 576,
-      "col": 216,
-      "offset": 13
-     }
-    },
-    {
-     "file": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-     "start": {
-      "line": 577,
-      "col": 15,
-      "offset": 0
-     },
-     "end": {
-      "line": 577,
-      "col": 233,
-      "offset": 218
-     }
-    },
-    {
-     "file": "docs/00_MASTER_BLUEPRINT_V2.2.html",
-     "start": {
-      "line": 610,
-      "col": 109,
-      "offset": 0
-     },
-     "end": {
-      "line": 610,
-      "col": 278,
-      "offset": 169
-     }
-    }
-   ]
+    "engine_requested": "OSS",
+    "skipped_rules": [],
+    "profiling_results": []
   }
- ],
- "paths": {
-  "scanned": [
-   ".ai/decisions.md",
-   ".ai/project.md",
-   ".ai/tasks.json",
-   ".gitignore",
-   "Makefile",
-   "README.md",
-   "agents/sdb-architect.yaml",
-   "agents/sdb-builder.yaml",
-   "agents/sdb-devops.yaml",
-   "agents/sdb-orchestrator.yaml",
-   "agents/sdb-recon.yaml",
-   "agents/sdb-reviewer.yaml",
-   "agents/sdb-security.yaml",
-   "docs/00_MASTER_BLUEPRINT_V2.2.html",
-   "docs/ARCHITECTURE.md",
-   "docs/DIVISIONS.md",
-   "docs/EVIDENCE_SCHEMA.md",
-   "docs/EVIDENCE_TAXONOMY.md",
-   "docs/HANDOFF_CONTRACTS.md",
-   "docs/INSTALLATION_PLAN.md",
-   "docs/MODEL_ROUTING_MATRIX.md",
-   "docs/PERMISSION_MATRIX.md",
-   "docs/RECONSTRUCTION_POLICY.md",
-   "docs/ROLLBACK_PLAN.md",
-   "docs/SECURITY_PRIVACY_GATE_0.md",
-   "docs/SECURITY_SUPPLY_CHAIN.md",
-   "docs/TECHNOLOGY_GOVERNANCE.md",
-   "docs/TOKEN_RESOURCE_POLICY.md",
-   "docs/UPGRADE_REPORT.md",
-   "docs/WORKFLOW_GATES.md",
-   "evidence/.gitkeep",
-   "normalized/.gitkeep",
-   "reconstruction/.gitkeep",
-   "registry/skills.yaml",
-   "registry/tools.yaml",
-   "reports/human-approval-required.md",
-   "reports/installed-skills.json",
-   "reports/inventory_after.json",
-   "reports/inventory_before.json",
-   "reports/security-audit.md",
-   "reports/token-estimate.md",
-   "reports/upgrade-evidence/gate0-demo-blocked.json",
-   "reports/upgrade-evidence/gate0-demo-fail.json",
-   "reports/upgrade-evidence/gate0-demo-pass.json",
-   "reports/upgrade-evidence/hermes-security-audit.txt",
-   "reports/upgrade-evidence/hermes-skills-audit.txt",
-   "reports/upgrade-evidence/ruff-check.txt",
-   "reports/upgrade-evidence/skillspector-custom-skills.json",
-   "reports/upgrade-evidence/verify-01.txt",
-   "scripts/bootstrap_tools.sh",
-   "scripts/doctor.py",
-   "scripts/evidence_lint.py",
-   "scripts/fidelity_report.py",
-   "scripts/gate_check.py",
-   "scripts/init_target.py",
-   "scripts/install_skills.py",
-   "scripts/inventory_ecosystem.py",
-   "scripts/redact_network.py",
-   "scripts/registry_lint.py",
-   "scripts/release_check.py",
-   "scripts/sdb_common.py",
-   "skills/accessibility-audit/SKILL.md",
-   "skills/api-contract/SKILL.md",
-   "skills/architecture-compliance-audit/SKILL.md",
-   "skills/architecture-decision-record/SKILL.md",
-   "skills/architecture-docs/SKILL.md",
-   "skills/authz-authn-review/SKILL.md",
-   "skills/ci-cd-release-gate/SKILL.md",
-   "skills/database-migration-safety/SKILL.md",
-   "skills/engineering-release-audit/SKILL.md",
-   "skills/evidence-normalizer/SKILL.md",
-   "skills/observed-network-contract/SKILL.md",
-   "skills/reconstruction-fidelity/SKILL.md",
-   "skills/reconstruction-scope-gate/SKILL.md",
-   "skills/reconstruction-spec/SKILL.md",
-   "skills/release-handover-docs/SKILL.md",
-   "skills/rollback-and-recovery/SKILL.md",
-   "skills/target-inventory/SKILL.md",
-   "skills/technology-profiler/SKILL.md",
-   "skills/technology-selection/SKILL.md",
-   "skills/test-pyramid-and-risk/SKILL.md",
-   "skills/ui-ux-state-mapper/SKILL.md",
-   "templates/adr.md",
-   "templates/authorization_manifest.yaml",
-   "templates/final_report.md",
-   "templates/handover.md",
-   "templates/reconstruction_spec.md",
-   "templates/security_gate_report.md",
-   "templates/target_manifest.yaml",
-   "verification/.gitkeep",
-   "workflows/gate0.yaml",
-   "workflows/reconstruction-pipeline.yaml",
-   "workflows/release-gate.yaml"
-  ]
- },
- "time": {
-  "rules": [],
-  "rules_parse_time": 0.35769009590148926,
-  "profiling_times": {
-   "config_time": 1.0645899772644043,
-   "core_time": 1.3094758987426758,
-   "ignores_time": 0.001332998275756836,
-   "total_time": 2.3839330673217773
-  },
-  "parsing_time": {
-   "total_time": 0.0,
-   "per_file_time": {
-    "mean": 0.0,
-    "std_dev": 0.0
-   },
-   "very_slow_stats": {
-    "time_ratio": 0.0,
-    "count_ratio": 0.0
-   },
-   "very_slow_files": []
-  },
-  "scanning_time": {
-   "total_time": 5.4573469161987305,
-   "per_file_time": {
-    "mean": 0.02469387744886304,
-    "std_dev": 0.00612435550073102
-   },
-   "very_slow_stats": {
-    "time_ratio": 0.0,
-    "count_ratio": 0.0
-   },
-   "very_slow_files": []
-  },
-  "matching_time": {
-   "total_time": 0.0,
-   "per_file_and_rule_time": {
-    "mean": 0.0,
-    "std_dev": 0.0
-   },
-   "very_slow_stats": {
-    "time_ratio": 0.0,
-    "count_ratio": 0.0
-   },
-   "very_slow_rules_on_files": []
-  },
-  "tainting_time": {
-   "total_time": 0.0,
-   "per_def_and_rule_time": {
-    "mean": 0.0,
-    "std_dev": 0.0
-   },
-   "very_slow_stats": {
-    "time_ratio": 0.0,
-    "count_ratio": 0.0
-   },
-   "very_slow_rules_on_defs": []
-  },
-  "fixpoint_timeouts": [
-   {
-    "error_type": "Fixpoint timeout",
-    "severity": "warn",
-    "message": "Fixpoint timeout while performing taint analysis at scripts/doctor.py:34:4 [rules: 1, first: python.boto3.security.hardcoded-token.hardcoded-token]",
-    "location": {
-     "path": "scripts/doctor.py",
-     "start": {
-      "line": 34,
-      "col": 5,
-      "offset": 976
-     },
-     "end": {
-      "line": 34,
-      "col": 9,
-      "offset": 980
-     }
-    }
-   },
-   {
-    "error_type": "Fixpoint timeout",
-    "severity": "warn",
-    "message": "Fixpoint timeout while performing taint analysis at scripts/registry_lint.py:41:4 [rules: 1, first: python.boto3.security.hardcoded-token.hardcoded-token]",
-    "location": {
-     "path": "scripts/registry_lint.py",
-     "start": {
-      "line": 41,
-      "col": 5,
-      "offset": 1083
-     },
-     "end": {
-      "line": 41,
-      "col": 9,
-      "offset": 1087
-     }
-    }
-   },
-   {
-    "error_type": "Fixpoint timeout",
-    "severity": "warn",
-    "message": "Fixpoint timeout while performing taint analysis at scripts/release_check.py:27:4 [rules: 1, first: python.boto3.security.hardcoded-token.hardcoded-token]",
-    "location": {
-     "path": "scripts/release_check.py",
-     "start": {
-      "line": 27,
-      "col": 5,
-      "offset": 673
-     },
-     "end": {
-      "line": 27,
-      "col": 9,
-      "offset": 677
-     }
-    }
-   }
-  ],
-  "prefiltering": {
-   "project_level_time": 0.0,
-   "file_level_time": 0.0,
-   "rules_with_project_prefilters_ratio": 0.0,
-   "rules_with_file_prefilters_ratio": 0.9330168776371308,
-   "rules_selected_ratio": 0.07713607594936708,
-   "rules_matched_ratio": 0.07713607594936708
-  },
-  "targets": [],
-  "total_bytes": 0,
-  "max_memory_bytes": 1039949120
- },
- "engine_requested": "OSS",
- "skipped_rules": [],
- "profiling_results": [],
- "provenance": "semgrep (static analysis) — output mentah sesi 2026-10-04, dianotasi kontrak 2026-10-05",
- "captured_at": "2026-10-04 (sesi asal)",
- "redaction_status": "clean",
- "status": "OBSERVED"
 }

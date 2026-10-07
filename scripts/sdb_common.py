@@ -280,6 +280,37 @@ def write_json(path: str, obj) -> None:
         fh.write("\n")
 
 
+EVIDENCE_META_KEYS = ("provenance", "captured_at", "redaction_status", "status")
+
+
+def evidence_meta(provenance: str, status: str = "FACT",
+                  redaction_status: str = "clean", captured_at=None) -> dict:
+    """Blok kontrak evidence (docs/EVIDENCE_SCHEMA.md) untuk artefak JSON bukti.
+
+    Artefak bukti ber-kontrak adalah OBJEK yang memuat 4 kunci ini di level atas;
+    keluaran mentah alat pihak ketiga dititipkan di bawah kunci `raw` agar tidak
+    menutupi kontrak (dan agar `evidence_lint` tidak salah baca record nested).
+    """
+    return {
+        "provenance": provenance,
+        "captured_at": captured_at or now_iso(),
+        "redaction_status": redaction_status,
+        "status": status,
+    }
+
+
+def write_evidence_json(path: str, raw, provenance: str, *, key: str = "raw",
+                        status: str = "FACT", redaction_status: str = "clean") -> None:
+    """Tulis artefak bukti JSON yang MEMENUHI kontrak Evidence Schema V2.
+
+    Satu jalan benar untuk bukti skrip: tanpa ini, keluaran mentah alat pihak
+    ketiga (semgrep/trivy/syft/dll) pernah ditulis apa adanya ke reports/ dan
+    memecah gerbang `evidence_lint` di CI (record tanpa metadata wajib).
+    """
+    obj = {"tool": os.path.basename(path), **evidence_meta(provenance, status, redaction_status), key: raw}
+    write_json(path, obj)
+
+
 # ------------------------------------------------------------------ redaction
 SECRET_KEY_PATTERN = re.compile(
     r"(authorization|cookie|set-cookie|x-api-key|api[-_]?key|access[-_]?token|refresh[-_]?token|"

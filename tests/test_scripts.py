@@ -247,6 +247,38 @@ def test_evidence_dir_satisfies_contract():
     assert lint.main([ev]) == 0, "artefak bukti melanggar kontrak docs/EVIDENCE_SCHEMA.md"
 
 
+def test_evidence_meta_helper_is_lint_clean():
+    """`evidence_meta` = satu-satunya jalan benar untuk 4 kunci kontrak."""
+    meta = common.evidence_meta("provenance-uji", captured_at="2026-01-01T00:00:00+0700")
+    assert tuple(meta) == common.EVIDENCE_META_KEYS
+    assert meta["status"] == "FACT" and meta["redaction_status"] == "clean"
+    rec = {"id": "x", **meta}
+    errs, warns = [], []
+    lint.lint_record(rec, "x[0]", errs, warns)
+    assert errs == [], errs
+
+
+def test_write_evidence_json_wraps_raw_under_contract(tmp_path):
+    """Keluaran mentah alat pihak ketiga dititipkan di `raw`, bukan menimpa kontrak.
+
+    Regresi: pernah menulis keluaran mentah semgrep/trivy APA ADANYA ke
+    reports/ → 8 ERROR 'metadata wajib hilang' di CI (gerbang evidence pecah).
+    """
+    out = os.path.join(tmp_path, "tool.json")
+    raw = {"results": [{"check_id": "r.a", "level": "ERROR"}]}
+    common.write_evidence_json(out, raw, "tool-x 1.0 --scan .", status="FACT")
+    obj = json.load(open(out, encoding="utf-8"))
+    for key in common.EVIDENCE_META_KEYS:
+        assert key in obj, f"kontrak hilang: {key}"
+    assert obj["raw"] == raw, "data mentah wajib utuh (nol kehilangan bukti)"
+    assert lint.main([out]) == 0, "artefak hasil write_evidence_json wajib lint-clean"
+
+    # kontrol negatif: bentuk mentah langsung = FAIL kontrak (bukti tes berdaya)
+    bad = os.path.join(tmp_path, "raw-only.json")
+    common.write_json(bad, raw)
+    assert lint.main([bad]) == 1, "keluaran mentah apa adanya harus DITOLAK lint"
+
+
 def test_registry_matches_skill_directories():
     """Registry harus mencerminkan direktori skills/ (invariant, bukan angka mati)."""
     reg = common.load_yaml(os.path.join(REPO, "registry", "skills.yaml"))

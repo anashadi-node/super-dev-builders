@@ -1,0 +1,63 @@
+name: ci
+
+# Gerbang otomatis Super Dev Builders.
+# Padanan "bukti segar" (aturan #4) sebagai pemeriksaan mesin, bukan disiplin manual.
+# Tidak membaca rahasia apa pun: workflow ini hanya menjalankan lint + test + drift.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: check (lint + registry + test + drift)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Setup Python
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+        with:
+          python-version: "3.11"
+
+      - name: Pasang perkakas (versi dipin dari pyproject)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "ruff==0.16.10" "pytest==9.1.1"
+
+      - name: Narasi lingkungan (bukti yang bisa dibaca)
+        run: |
+          python -V
+          ruff --version
+          pytest --version
+
+      - name: Lint (ruff check scripts tests skills)
+        run: make lint
+
+      - name: Lint registry pihak ketiga
+        run: make lint-registry
+
+      - name: Test suite
+        run: make test
+
+      - name: Drift skill (repo vs terpasang)
+        # Drift membutuhkan skill terpasang di ~/.hermes/skills -> pada runner CI
+        # langkah ini di-skip secara terkendali (bukan gagal palsu).
+        run: |
+          if [ -d "$HOME/.hermes/skills" ]; then
+            make drift
+          else
+            echo "SKIP drift: ~/.hermes/skills tidak ada di runner (dijalankan di host)."
+          fi

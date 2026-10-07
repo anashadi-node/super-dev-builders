@@ -1,7 +1,52 @@
-# Temuan: 37 celah dependency di venv Hermes Agent — butuh KEPUTUSAN Anda
+# Temuan: kerentanan dependency — SUDAH DIEKSEKUSI (Opsi 1)
 
-Tanggal audit: 2026-10-07 · Trivy 0.75.0 · Lokasi: `~/.hermes/hermes-agent/venv`
-Hermes terpasang: v0.21.5+6718.g158fd63.dirty (upstream 158fd638)
+Tanggal audit: 2026-10-07 · Trivy 0.75.0 · Status: **SELESAI — temuan turun 37 → 3**
+
+## Koreksi penting atas laporan awal
+
+Laporan awal menyebut lokasi `~/.hermes/hermes-agent/venv` sebagai "runtime 23 profil".
+**Itu keliru.** Pemeriksaan lanjutan atas `docs/HERMES_VENV_HARDENING_2026-10-05.md` §1 dan
+`~/.hermes/installs/8f187687540a47e8/facts.json` menunjukkan:
+
+| Venv | Peran | Kondisi saat diaudit |
+|---|---|---|
+| `~/.hermes/installs/<key>/environments/<gen>/venv` (Python 3.14.7) | **runtime Hermes LIVE** (gateway + Desktop) | sudah tertambal sejak 2026-10-05: PyJWT 2.15.1, httpx2/httpcore2 2.13.1, tornado 6.5.10, urllib3 2.8.0 |
+| `~/.hermes/hermes-agent/venv` (Python 3.11) | **legacy pra-PM** — PM tidak memakainya, TAPI masih hidup | inilah yang memuat 37 temuan; dipakai proses `real_system.prod_server` (milik `~/rt-rw-portal`) |
+
+Jadi angka 37 nyata, tetapi bukan di runtime Hermes.
+
+## Tindakan yang dieksekusi (Opsi 1, disetujui pemilik)
+
+8 paket dinaikkan di venv legacy — target dikoreksi ke tempat temuan benar-benar berada:
+
+| Paket | Sebelum | Sesudah |
+|---|---|---|
+| PyJWT | 2.13.0 | **2.15.1** |
+| pypdf | 6.16.2 | **6.19.0** |
+| httpx2 / httpcore2 | 2.7.0 | **2.13.1** |
+| tornado | 6.5.8 | **6.5.10** |
+| urllib3 | 2.7.0 | **2.8.0** |
+
+Aman karena: (a) `rt-rw-portal` hanya memakai modul standar Python — tidak menyentuh paket terdampak;
+(b) rollback tersedia (`~/backups/sdb-legacyvenv-20261007_204758/pip-freeze-before.txt`, 165 paket);
+(c) target versi sama dengan pin repo Hermes sendiri.
+
+## Hasil terukur
+
+- Trivy: **37 temuan → 3** (1 CRITICAL, 20 HIGH → **0 CRITICAL, 0 HIGH**; sisa 3 MEDIUM tanpa versi perbaikan).
+- Uji impor nyata: `jwt 2.15.1`, `urllib3 2.8.0`, `tornado 6.5.10`, `pypdf 6.19.0`; backend crypto PyJWT untuk HS256 aktif.
+- Proses `real_system.prod_server` (PID 111572) tetap hidup (`Ssl`) setelah upgrade.
+- Runtime Hermes (`hermes-gateway` = active) tidak tersentuh; paketnya tetap 2.15.1/2.13.1/6.5.10.
+- Bukti: `~/.hermes/cache/scratch/{t-hv2.json,hv2/requirements.txt,hermes_venv_baseline.json}`.
+
+## Catatan sisa (perlu keputusan terpisah)
+
+Venv legacy TIDAK dihapus, karena satu proses hidup bergantung padanya. Utang teknis:
+`~/rt-rw-portal` sebaiknya diberi venv sendiri (agar tidak bergantung pada venv legacy Hermes),
+lalu venv legacy dapat dipensiunkan. Ini usulan, belum dieksekusi.
+
+Rollback (bila diperlukan):
+`/home/anashadi/.hermes/hermes-agent/venv/bin/python -m pip install -r ~/backups/sdb-legacyvenv-20261007_204758/pip-freeze-before.txt`
 
 ## Ringkas
 

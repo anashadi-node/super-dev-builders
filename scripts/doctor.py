@@ -85,6 +85,41 @@ def skill_drift() -> list[dict]:
     return rows
 
 
+def dep_check() -> list[dict]:
+    """Pin [project.dependencies] vs metadata .venv (reproducibility, bukan sistem-kernel).
+
+    Baca langsung *.dist-info/METADATA di .venv: metadata sistem python tidak relevan,
+    yang menentukan adalah env yang dibuat `uv sync --frozen`."""
+    import email.parser
+    import glob
+    import os
+
+    import tomllib
+    sp_root = []
+    for pat in ("lib/python*/site-packages", "Lib/site-packages"):
+        sp_root += glob.glob(str(repo_path(".venv", pat)))
+    installed: dict[str, str] = {}
+    parser = email.parser.BytesParser()
+    for meta in glob.glob(os.path.join(sp_root[0], "*.dist-info", "METADATA")) if sp_root else []:
+        msg = parser.parse(open(meta, "rb"))
+        name = msg.get("Name")
+        if name:
+            installed[name.lower().replace("_", "-")] = msg.get("Version", "")
+    with open(repo_path("pyproject.toml"), "rb") as fh:
+        deps = tomllib.load(fh).get("project", {}).get("dependencies") or []
+    rows = []
+    for d in deps:
+        name_spec = d.split(";")[0].split("[")[0].strip()
+        if "==" not in name_spec:
+            rows.append({"dep": name_spec, "status": "UNPINNED"})
+            continue
+        name, ver = name_spec.split("==", 1)
+        got = installed.get(name.lower().replace("_", "-"))
+        rows.append({"dep": name, "want": ver, "installed": got,
+                     "status": "OK" if got == ver else "MISSING_OR_DRIFT"})
+    return rows
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Capability check")
     ap.add_argument("--json", dest="json_out")
@@ -92,7 +127,8 @@ def main(argv=None) -> int:
     args = ap.parse_args(argv)
 
     drift = skill_drift()
-    bad = [r for r in drift if r["status"] != "OK"]
+    deps = dep_check()
+    bad = [r for r in drift if r["status"] != "OK"] +           [{"skill": d["dep"], "status": d["status"]} for d in deps if d["status"] != "OK"]
     if args.drift_only:
         for r in bad:
             print(f"  {r['status']:<9} {r['skill']:<32} @ {r['where']} {r.get('other', '')}")
@@ -174,6 +210,9 @@ def main(argv=None) -> int:
     print("  profil divisi:")
     for name, info in report["profiles"].items():
         print(f"    {'OK ' if info['present'] else 'MISS'} {name} (soul={info.get('soul_md')})")
+    dep_ok = sum(1 for d in deps if d["status"] == "OK")
+    dep_bad = [d["dep"] for d in deps if d["status"] != "OK"]
+    print(f"  deps pinned: {dep_ok}/{len(deps)} OK" + ("" if not dep_bad else f" -> {dep_bad}"))
     print(f"  skill drift: {len(drift) - len(bad)}/{len(drift)} OK, {len(bad)} bermasalah"
           + (" -> jalankan `make drift`" if bad else ""))
     if missing_required:

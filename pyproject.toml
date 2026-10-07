@@ -1,3 +1,13 @@
+
+[project]
+name = "sdb-ecosystem"
+version = "0.3.0"
+requires-python = ">=3.10"
+dependencies = [
+    "ruff==0.16.10",
+    "pytest==9.1.1",
+    "pyyaml==6.0.1",
+]
 [tool.ruff]
 # Konfigurasi lint repo Super Dev Builders Ecosystem (dipakai `make lint` = ruff check scripts tests skills).
 line-length = 132
@@ -18,3 +28,8 @@ ignore = [
 # skills/*/tests ikut dijalankan: tes bawaan skill (product-kit, product-status) dulu tidak pernah masuk `make test`
 testpaths = ["tests", "skills"]
 addopts = "-q"
+# CLU: laporan instalasi dependency — repo ini memakai uv (bukan pip)
+# uv.lock hanya berisi metadata (version/revision/requires-python); TIDAK ADA paket terkunci.
+# Artinya: uv sync memasang versi terbaru saat dijalankan => tidak ada pin, dan Trivy tidak
+# bisa memindai apa pun dari repo ini. Semua "vuln: 0" di bawah = belum teruji terhadap
+# dependency, bukan bukti bersih. Lihat docs/AUDIT_20261007_R2.md batas metodologi.

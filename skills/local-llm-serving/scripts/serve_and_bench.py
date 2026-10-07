@@ -17,21 +17,35 @@ import subprocess
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 
 PROMPT = "Ringkas dalam satu kalimat: mengapa cache memori penting untuk sistem produksi?"
 
 
+def _require_loopback(url: str) -> None:
+    """Tolak apa pun selain http(s)://127.0.0.1|localhost|<port lokal> (anti-SSRF + file://)."""
+    u = urllib.parse.urlsplit(url)
+    if u.scheme not in ("http", "https") or (u.hostname or "") not in ("127.0.0.1", "localhost", "::1"):
+        raise ValueError(f"url harus menunjuk loopback lokal, ditolak: {url}")
+
+
 def post_json(url: str, payload: dict, timeout: float = 300.0) -> tuple[int, dict]:
+    # Fail-closed: urlopen() mendukung file:// — kunci ke loopback lokal untuk
+    # cegah SSRF / baca file bila url kelak berasal dari input.
+    _require_loopback(url)
     req = urllib.request.Request(
         url, data=json.dumps(payload).encode(), headers={"Content-Type": "application/json"}
     )
+    # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected
     with urllib.request.urlopen(req, timeout=timeout) as resp:
         return resp.status, json.loads(resp.read().decode())
 
 
 def get_json(url: str, timeout: float = 10.0):
+    _require_loopback(url)
+    # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected
     with urllib.request.urlopen(url, timeout=timeout) as resp:
         return resp.status, json.loads(resp.read().decode())
 

@@ -27,7 +27,8 @@ skills/          sumber kanonik custom skill ekosistem ini (jumlah = registry/sk
 agents/          charter mesin-terbaca per divisi (permission, input/output, batas)
 workflows/       definisi gate + tahap workflow (machine-readable)
 templates/       manifest otorisasi, target manifest, ADR, laporan akhir, handover
-scripts/         deterministik: doctor, inventory, init-target, install-skills, gate-check, release-check
+scripts/         deterministik: doctor, inventory, init-target, install-skills, gate-check,
+                 release-check, workflow-run, sdb (CLI satu pintu), evidence-lint, redact-network
 evidence/        evidence mentah (wajib redacted)  -> per target
 normalized/      evidence ternormalisasi -> per target
 reconstruction/  hasil rebuild clean-room -> per target
@@ -36,8 +37,24 @@ reports/         laporan gate, audit, upgrade, fidelity, handover
 tests/           test untuk scripts/ (dijalankan sebelum commit)
 ```
 
+## Mulai dari sini
+Baru pertama kali? Ikuti **`docs/GETTING_STARTED.md`** — panduan Bahasa Indonesia dari nol
+sampai bisa dipakai sendiri (pasang, verifikasi, buat target, Gate #0, workflow 16 tahap,
+release gate, troubleshooting, copot pemasangan).
+
 ## Quickstart
 ```bash
+./install.sh                                  # DRY-RUN pemasangan (skill + perintah `sdb`)
+./install.sh --apply                          # baru benar-benar memasang (backup otomatis dulu)
+
+sdb doctor                                    # kapabilitas host + drift skill (read-only)
+sdb init nama-target                          # workspace per target (evidence/normalized/...)
+sdb gate --target nama-target                 # Gate #0 -> PASS/FAIL/BLOCKED
+sdb workflow nama-target                      # laporan 18 baris tahap: ada / MISSING
+sdb release --target nama-target               # release gate berbasis artefak
+make check                                    # gerbang lokal wajib sebelum commit
+
+# tanpa perintah `sdb` pun bisa:
 python3 scripts/doctor.py                     # kapabilitas host (deterministik)
 python3 scripts/gate_check.py --target <name> # validasi authorization manifest -> PASS/FAIL/BLOCKED
 python3 scripts/init_target.py <name>         # workspace per target (evidence/normalized/...)

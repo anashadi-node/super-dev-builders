@@ -31,7 +31,14 @@ def valid_base(url: str) -> bool:
     return u.scheme in ("http", "https") and bool(u.netloc)
 
 def fetch(url: str, timeout: float = 10):
-    """Kembalikan (status, body, detik, redirected). Body dipotong di MAX_BYTES."""
+    """Kembalikan (status, body, detik, redirected). Body dipotong di MAX_BYTES.
+
+    Fail-closed di titik pakai: urlopen() mendukung skema file:// sehingga URL
+    dinamis bisa dipakai membaca file lokal. valid_base() di sini membuat jaminan
+    itu melekat pada fungsinya sendiri, bukan bergantung pada pemanggil.
+    """
+    if not valid_base(url):
+        return None, f"skema tidak diizinkan (wajib http/https + host): {url}", 0.0, False
     wait = MIN_INTERVAL - (time.time() - _last_req[0])
     if wait > 0:
         time.sleep(wait)
@@ -39,6 +46,9 @@ def fetch(url: str, timeout: float = 10):
     req = urllib.request.Request(url, headers={"User-Agent": "geo-audit/1.0"})
     start = time.time()
     try:
+        # Skema/URL sudah dijaga fail-closed oleh valid_base() di awal fungsi ini
+        # (hanya http/https + host) — kontrol positif terverifikasi di tests.
+        # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected
         with urllib.request.urlopen(req, timeout=timeout) as r:
             body = r.read(MAX_BYTES).decode("utf-8", "replace")
             return r.status, body, round(time.time() - start, 3), r.geturl() != url

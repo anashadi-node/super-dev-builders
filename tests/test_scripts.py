@@ -81,8 +81,13 @@ def test_redaction_removes_secret_keys_and_values():
 
 
 def test_scan_for_secrets_detects_jwt_and_aws_key():
+    # Kontrol positif: kedua nilai di bawah SENGAJA tidak nyata — JWT sintetis dan
+    # contoh resmi AWS docs (AKIAIOSFODNN7EXAMPLE). Fungsinya menguji detektor itu
+    # sendiri, jadi polanya HARUS berbentuk valid agar assert-nya bermakna.
+    # nosemgrep: generic.secrets.security.detected-jwt-token.detected-jwt-token
     hits = list(common.scan_for_secrets({"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.abcdEFGH123"}))
     assert hits, "JWT harus terdeteksi"
+    # nosemgrep: generic.secrets.security.detected-aws-access-key-id-value.detected-aws-access-key-id-value
     hits2 = list(common.scan_for_secrets({"aws": "AKIAIOSFODNN7EXAMPLE"}))
     assert hits2, "AWS access key harus terdeteksi"
 

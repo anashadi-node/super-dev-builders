@@ -3,6 +3,13 @@ name: ci
 # Gerbang otomatis Super Dev Builders.
 # Padanan "bukti segar" (aturan #4) sebagai pemeriksaan mesin, bukan disiplin manual.
 # Tidak membaca rahasia apa pun: workflow ini hanya menjalankan lint + test + drift.
+#
+# CATATAN FORMAT:
+# 1) Workflow ini dikecualikan dari uji kesetaraan parser fallback (lihat
+#    tests/test_scripts.py::test_fallback_yaml_matches_pyyaml_on_repo_files) karena
+#    YAML Actions penuh: kunci `on` adalah boolean di YAML 1.1 dan block scalar
+#    tidak didukung parser subset. Validitas Actions diverifikasi runner GitHub.
+# 2) Nilai scalar TIDAK boleh memuat ": " (titik dua + spasi) — ilegal di plain scalar.
 
 on:
   push:
@@ -33,15 +40,10 @@ jobs:
           python-version: "3.11"
 
       - name: Pasang perkakas (versi dipin dari pyproject)
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install "ruff==0.16.10" "pytest==9.1.1"
+        run: python -m pip install --upgrade pip && python -m pip install "ruff==0.16.10" "pytest==9.1.1"
 
       - name: Narasi lingkungan (bukti yang bisa dibaca)
-        run: |
-          python -V
-          ruff --version
-          pytest --version
+        run: python -V && ruff --version && pytest --version
 
       - name: Lint (ruff check scripts tests skills)
         run: make lint
@@ -53,11 +55,4 @@ jobs:
         run: make test
 
       - name: Drift skill (repo vs terpasang)
-        # Drift membutuhkan skill terpasang di ~/.hermes/skills -> pada runner CI
-        # langkah ini di-skip secara terkendali (bukan gagal palsu).
-        run: |
-          if [ -d "$HOME/.hermes/skills" ]; then
-            make drift
-          else
-            echo "SKIP drift: ~/.hermes/skills tidak ada di runner (dijalankan di host)."
-          fi
+        run: if [ -d "$HOME/.hermes/skills" ]; then make drift; else echo "SKIP_drift — tanpa direktori skill terpasang di runner CI"; fi

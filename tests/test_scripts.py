@@ -32,22 +32,36 @@ registry = load("registry_lint")
 
 # ---------------------------------------------------------------- YAML backend
 def test_fallback_yaml_matches_pyyaml_on_repo_files():
-    """Parser fallback harus memberi hasil sama dengan PyYAML untuk semua YAML repo."""
+    """Parser fallback harus memberi hasil sama dengan PyYAML untuk semua YAML repo.
+
+    Pengecualian: .github/workflows/** — YAML Actions penuh (kunci `on:` adalah
+    boolean di YAML 1.1, banyak scalar memakai block scalar), sedangkan parser
+    fallback adalah subset by design. Workflow TIDAK dilewati begitu saja: ia tetap
+    wajib valid menurut PyYAML (minimal satu diperiksa), dan validitas Actions-nya
+    diverifikasi ulang oleh runner GitHub saat push.
+    """
     yaml = pytest.importorskip("yaml")
     checked = 0
+    workflows = 0
     for base, dirs, files in os.walk(REPO):
         dirs[:] = [d for d in dirs if d not in (".git", "__pycache__", "node_modules")]
         for fname in files:
             if not fname.endswith((".yaml", ".yml")):
                 continue
             path = os.path.join(base, fname)
+            rel = os.path.relpath(path, REPO)
             with open(path, "r", encoding="utf-8") as fh:
                 text = fh.read()
+            if rel.replace(os.sep, "/").startswith(".github/workflows/"):
+                assert yaml.safe_load(text) is not None, f"workflow YAML tidak valid: {rel}"
+                workflows += 1
+                continue
             expected = yaml.safe_load(text)
             got = common.fallback_yaml_load(text)
-            assert got == expected, f"fallback parser berbeda untuk {os.path.relpath(path, REPO)}"
+            assert got == expected, f"fallback parser berbeda untuk {rel}"
             checked += 1
     assert checked >= 10, f"hanya {checked} file YAML diperiksa (registry/templates/workflows/agents harus terbaca)"
+    assert workflows >= 1, "harus ada minimal satu workflow yang diperiksa validitasnya"
 
 
 def test_redaction_removes_secret_keys_and_values():

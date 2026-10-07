@@ -70,6 +70,15 @@ Semua gate punya exit criteria; tidak ada gate "kira-kira lulus".
    positif yang membuktikan penolakan (mis. `file:///etc/passwd` DITOLAK); (c) kontrol positif
    tes keamanan tetap LULUS setelah anotasi — jangan pernah mengubah fixture jadi placeholder
    lemah agar scanner diam, itu mematikan tes yang menguji keamanan itu sendiri.
+6. **Artefak bukti buatan skrip WAJIB memenuhi kontrak Evidence Schema.** Keluaran mentah alat
+   pihak ketiga (semgrep/trivy/syft/...) yang ditulis APA ADANYA ke `reports/` menutupi blok
+   metadata level-atas (`provenance`, `captured_at`, `redaction_status`, `status`) → `evidence_lint`
+   FAIL ("metadata wajib hilang") dan gerbang bukti pecah. Satu jalan benar: helper yang menaruh
+   kontrak di level-atas dan **menitipkan keluaran mentah di kunci `raw`** (data utuh, nol
+   kehilangan bukti). Verifikasi sebelum tulis: `scan_for_secrets(raw)` = 0 hit; sesudah tulis:
+   `out["raw"] == raw` True. **Tutup dengan tes**, bukan disiplin manual — gate manual terbukti
+   terlewat saat commit: `assert evidence_lint.main(<dir bukti terlacak>) == 0` + kontrol negatif
+   (`evidence_lint.main(<bentuk mentah apa adanya>) == 1`). Gate yang hanya "diingat" bukan gate.
 - Tidak ada `--force`, `--no-verify`, atau bypass gate. Tidak ada auto-approve untuk aksi destruktif/
   publikasi/produksi.
 - Credential hanya lewat secret store; tanpa secret di log/artefak.

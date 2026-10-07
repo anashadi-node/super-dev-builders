@@ -8,6 +8,7 @@ tools_installed: "ruff 0.16.10, semgrep 1.179.0, trivy 0.75.0 (approval #4), syf
 
 present:
   - id: git
+    version_pin: "2.43.0"  # diukur di host: terverifikasi langsung
     path: /usr/bin/git
     role: version_control_evidence
   - id: node
@@ -18,6 +19,7 @@ present:
     version_pin: "11.19.0"
     role: frontend_tooling
   - id: docker
+    version_pin: "29.8.2"  # diukur di host: terverifikasi langsung
     path: /usr/bin/docker
     role: whole_process_isolation
     note: "JANGAN beri akses socket Docker ke pekerjaan untrusted"
@@ -26,6 +28,7 @@ present:
     version_pin: "0.12.5"
     role: python_tool_isolation
   - id: pytest
+    version_pin: "9.1.1"  # diukur di host: terverifikasi langsung
     path: /home/anashadi/.local/bin/pytest
     role: test_runner
   - id: playwright_cli
@@ -38,6 +41,7 @@ present:
     approved_by: mas anas
     approved_at: 2026-10-04
   - id: jq
+    version_pin: "1.7"  # diukur di host: terverifikasi langsung
     path: /usr/bin/jq
     role: json_evidence_processing
   # --- dipasang 2026-10-04 setelah approval manusia (item #4) ---
@@ -130,6 +134,7 @@ model_sources:
 pending_approval:
   # catatan: syft & codeql sudah dipasang (lihat `present`)
   - id: gh
+    version_pin: "2.102.0"  # diukur di host: terverifikasi langsung
     role: github_ci_pr_release_visibility
     priority: B
     install: "binari resmi GitHub CLI atau apt"

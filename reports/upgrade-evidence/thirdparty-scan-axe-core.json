@@ -1,0 +1,2108 @@
+{
+  "tool": "thirdparty-scan-axe-core.json",
+  "provenance": "codeload.github.com dequelabs/axe-core@f59642eddf14",
+  "captured_at": "2026-10-08T06:11:39+0700",
+  "redaction_status": "clean",
+  "status": "FACT",
+  "raw": {
+    "repo": "dequelabs/axe-core",
+    "pinned_commit": "f59642eddf14c93ae3c9c31d69bcd611229bedb4",
+    "tools": "trivy 0.75.0 + semgrep 1.179.0",
+    "trivy": {
+      "hit_kredensial_terdeteksi": 0,
+      "misconfig": 0,
+      "misconfig_high_critical": 0
+    },
+    "semgrep": {
+      "ruleset": "p/default",
+      "findings": 34,
+      "by_severity": {
+        "INFO": 3,
+        "WARNING": 30,
+        "MEDIUM": 1
+      }
+    },
+    "note": "Read-only scan atas tarball pinned_commit dari codeload.github.com; tidak ada kode dieksekusi. Isi rahasia TIDAK disimpan (aturan #3); hasil mentah penuh di kunci 'raw' dengan isi rahasia diredaksi.",
+    "raw": {
+      "trivy": {
+        "SchemaVersion": 2,
+        "Trivy": {
+          "Version": "0.75.0"
+        },
+        "ReportID": "01a118a0-300d-7418-af5c-5ba3bd1644d5",
+        "CreatedAt": "2026-10-08T06:08:33.677270369+07:00",
+        "ArtifactName": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core",
+        "ArtifactType": "filesystem"
+      },
+      "semgrep": {
+        "results": [
+          {
+            "check_id": "javascript.lang.security.audit.unsafe-formatstring.unsafe-formatstring",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/bin/validate-package.mjs",
+            "start": {
+              "line": 185,
+              "col": 19,
+              "offset": 5459
+            },
+            "end": {
+              "line": 185,
+              "col": 47,
+              "offset": 5487
+            },
+            "extra": {
+              "message": "Detected string concatenation with a non-literal variable in a util.format / console.log function. If an attacker injects a format specifier in the string, it will forge the log message. Try to use constant values for the format string.",
+              "metadata": {
+                "cwe": [
+                  "CWE-134: Use of Externally-Controlled Format String"
+                ],
+                "owasp": [
+                  "A01:2021 - Broken Access Control",
+                  "A01:2025 - Broken Access Control"
+                ],
+                "category": "security",
+                "technology": [
+                  "javascript"
+                ],
+                "subcategory": [
+                  "audit"
+                ],
+                "likelihood": "MEDIUM",
+                "impact": "LOW",
+                "confidence": "LOW",
+                "references": [
+                  "https://cwe.mitre.org/data/definitions/134.html"
+                ],
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Improper Validation"
+                ],
+                "source": "https://semgrep.dev/r/javascript.lang.security.audit.unsafe-formatstring.unsafe-formatstring",
+                "shortlink": "https://sg.run/7Y5R"
+              },
+              "severity": "INFO",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "javascript.lang.security.audit.unsafe-formatstring.unsafe-formatstring",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/bin/validate-package.mjs",
+            "start": {
+              "line": 376,
+              "col": 17,
+              "offset": 11549
+            },
+            "end": {
+              "line": 376,
+              "col": 48,
+              "offset": 11580
+            },
+            "extra": {
+              "message": "Detected string concatenation with a non-literal variable in a util.format / console.log function. If an attacker injects a format specifier in the string, it will forge the log message. Try to use constant values for the format string.",
+              "metadata": {
+                "cwe": [
+                  "CWE-134: Use of Externally-Controlled Format String"
+                ],
+                "owasp": [
+                  "A01:2021 - Broken Access Control",
+                  "A01:2025 - Broken Access Control"
+                ],
+                "category": "security",
+                "technology": [
+                  "javascript"
+                ],
+                "subcategory": [
+                  "audit"
+                ],
+                "likelihood": "MEDIUM",
+                "impact": "LOW",
+                "confidence": "LOW",
+                "references": [
+                  "https://cwe.mitre.org/data/definitions/134.html"
+                ],
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Improper Validation"
+                ],
+                "source": "https://semgrep.dev/r/javascript.lang.security.audit.unsafe-formatstring.unsafe-formatstring",
+                "shortlink": "https://sg.run/7Y5R"
+              },
+              "severity": "INFO",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "javascript.lang.security.audit.unsafe-formatstring.unsafe-formatstring",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/bin/validate-package.mjs",
+            "start": {
+              "line": 377,
+              "col": 17,
+              "offset": 11624
+            },
+            "end": {
+              "line": 377,
+              "col": 50,
+              "offset": 11657
+            },
+            "extra": {
+              "message": "Detected string concatenation with a non-literal variable in a util.format / console.log function. If an attacker injects a format specifier in the string, it will forge the log message. Try to use constant values for the format string.",
+              "metadata": {
+                "cwe": [
+                  "CWE-134: Use of Externally-Controlled Format String"
+                ],
+                "owasp": [
+                  "A01:2021 - Broken Access Control",
+                  "A01:2025 - Broken Access Control"
+                ],
+                "category": "security",
+                "technology": [
+                  "javascript"
+                ],
+                "subcategory": [
+                  "audit"
+                ],
+                "likelihood": "MEDIUM",
+                "impact": "LOW",
+                "confidence": "LOW",
+                "references": [
+                  "https://cwe.mitre.org/data/definitions/134.html"
+                ],
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Improper Validation"
+                ],
+                "source": "https://semgrep.dev/r/javascript.lang.security.audit.unsafe-formatstring.unsafe-formatstring",
+                "shortlink": "https://sg.run/7Y5R"
+              },
+              "severity": "INFO",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/format.yml",
+            "start": {
+              "line": 17,
+              "col": 9,
+              "offset": 458
+            },
+            "end": {
+              "line": 17,
+              "col": 34,
+              "offset": 483
+            },
+            "extra": {
+              "message": "GitHub Actions step uses a mutable tag or branch reference. Tags and branch names can be silently repointed by the action owner, enabling supply-chain attacks — as seen in the trivy-action and kics-github-action compromises. Pin the reference to a full 40-character commit SHA instead, e.g. `uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608`.",
+              "metadata": {
+                "category": "security",
+                "cwe": [
+                  "CWE-1357: Reliance on Insufficiently Trustworthy Component",
+                  "CWE-353: Missing Support for Integrity Check"
+                ],
+                "owasp": [
+                  "A08:2021 - Software and Data Integrity Failures",
+                  "A08:2025 - Software and Data Integrity Failures"
+                ],
+                "references": [
+                  "https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-third-party-actions"
+                ],
+                "technology": [
+                  "github-actions"
+                ],
+                "subcategory": [
+                  "vuln"
+                ],
+                "likelihood": "MEDIUM",
+                "impact": "HIGH",
+                "confidence": "HIGH",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Cryptographic Issues",
+                  "Other"
+                ],
+                "source": "https://semgrep.dev/r/yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag",
+                "shortlink": "https://sg.run/2LgAL"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/format.yml",
+            "start": {
+              "line": 21,
+              "col": 9,
+              "offset": 644
+            },
+            "end": {
+              "line": 21,
+              "col": 35,
+              "offset": 670
+            },
+            "extra": {
+              "message": "GitHub Actions step uses a mutable tag or branch reference. Tags and branch names can be silently repointed by the action owner, enabling supply-chain attacks — as seen in the trivy-action and kics-github-action compromises. Pin the reference to a full 40-character commit SHA instead, e.g. `uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608`.",
+              "metadata": {
+                "category": "security",
+                "cwe": [
+                  "CWE-1357: Reliance on Insufficiently Trustworthy Component",
+                  "CWE-353: Missing Support for Integrity Check"
+                ],
+                "owasp": [
+                  "A08:2021 - Software and Data Integrity Failures",
+                  "A08:2025 - Software and Data Integrity Failures"
+                ],
+                "references": [
+                  "https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-third-party-actions"
+                ],
+                "technology": [
+                  "github-actions"
+                ],
+                "subcategory": [
+                  "vuln"
+                ],
+                "likelihood": "MEDIUM",
+                "impact": "HIGH",
+                "confidence": "HIGH",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Cryptographic Issues",
+                  "Other"
+                ],
+                "source": "https://semgrep.dev/r/yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag",
+                "shortlink": "https://sg.run/2LgAL"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/format.yml",
+            "start": {
+              "line": 22,
+              "col": 9,
+              "offset": 679
+            },
+            "end": {
+              "line": 22,
+              "col": 36,
+              "offset": 706
+            },
+            "extra": {
+              "message": "GitHub Actions step uses a mutable tag or branch reference. Tags and branch names can be silently repointed by the action owner, enabling supply-chain attacks — as seen in the trivy-action and kics-github-action compromises. Pin the reference to a full 40-character commit SHA instead, e.g. `uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608`.",
+              "metadata": {
+                "category": "security",
+                "cwe": [
+                  "CWE-1357: Reliance on Insufficiently Trustworthy Component",
+                  "CWE-353: Missing Support for Integrity Check"
+                ],
+                "owasp": [
+                  "A08:2021 - Software and Data Integrity Failures",
+                  "A08:2025 - Software and Data Integrity Failures"
+                ],
+                "references": [
+                  "https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-third-party-actions"
+                ],
+                "technology": [
+                  "github-actions"
+                ],
+                "subcategory": [
+                  "vuln"
+                ],
+                "likelihood": "MEDIUM",
+                "impact": "HIGH",
+                "confidence": "HIGH",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Cryptographic Issues",
+                  "Other"
+                ],
+                "source": "https://semgrep.dev/r/yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag",
+                "shortlink": "https://sg.run/2LgAL"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/release.yml",
+            "start": {
+              "line": 10,
+              "col": 9,
+              "offset": 152
+            },
+            "end": {
+              "line": 10,
+              "col": 34,
+              "offset": 177
+            },
+            "extra": {
+              "message": "GitHub Actions step uses a mutable tag or branch reference. Tags and branch names can be silently repointed by the action owner, enabling supply-chain attacks — as seen in the trivy-action and kics-github-action compromises. Pin the reference to a full 40-character commit SHA instead, e.g. `uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608`.",
+              "metadata": {
+                "category": "security",
+                "cwe": [
+                  "CWE-1357: Reliance on Insufficiently Trustworthy Component",
+                  "CWE-353: Missing Support for Integrity Check"
+                ],
+                "owasp": [
+                  "A08:2021 - Software and Data Integrity Failures",
+                  "A08:2025 - Software and Data Integrity Failures"
+                ],
+                "references": [
+                  "https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-third-party-actions"
+                ],
+                "technology": [
+                  "github-actions"
+                ],
+                "subcategory": [
+                  "vuln"
+                ],
+                "likelihood": "MEDIUM",
+                "impact": "HIGH",
+                "confidence": "HIGH",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Cryptographic Issues",
+                  "Other"
+                ],
+                "source": "https://semgrep.dev/r/yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag",
+                "shortlink": "https://sg.run/2LgAL"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/release.yml",
+            "start": {
+              "line": 14,
+              "col": 9,
+              "offset": 306
+            },
+            "end": {
+              "line": 14,
+              "col": 35,
+              "offset": 332
+            },
+            "extra": {
+              "message": "GitHub Actions step uses a mutable tag or branch reference. Tags and branch names can be silently repointed by the action owner, enabling supply-chain attacks — as seen in the trivy-action and kics-github-action compromises. Pin the reference to a full 40-character commit SHA instead, e.g. `uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608`.",
+              "metadata": {
+                "category": "security",
+                "cwe": [
+                  "CWE-1357: Reliance on Insufficiently Trustworthy Component",
+                  "CWE-353: Missing Support for Integrity Check"
+                ],
+                "owasp": [
+                  "A08:2021 - Software and Data Integrity Failures",
+                  "A08:2025 - Software and Data Integrity Failures"
+                ],
+                "references": [
+                  "https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-third-party-actions"
+                ],
+                "technology": [
+                  "github-actions"
+                ],
+                "subcategory": [
+                  "vuln"
+                ],
+                "likelihood": "MEDIUM",
+                "impact": "HIGH",
+                "confidence": "HIGH",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Cryptographic Issues",
+                  "Other"
+                ],
+                "source": "https://semgrep.dev/r/yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag",
+                "shortlink": "https://sg.run/2LgAL"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/release.yml",
+            "start": {
+              "line": 15,
+              "col": 9,
+              "offset": 341
+            },
+            "end": {
+              "line": 15,
+              "col": 36,
+              "offset": 368
+            },
+            "extra": {
+              "message": "GitHub Actions step uses a mutable tag or branch reference. Tags and branch names can be silently repointed by the action owner, enabling supply-chain attacks — as seen in the trivy-action and kics-github-action compromises. Pin the reference to a full 40-character commit SHA instead, e.g. `uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608`.",
+              "metadata": {
+                "category": "security",
+                "cwe": [
+                  "CWE-1357: Reliance on Insufficiently Trustworthy Component",
+                  "CWE-353: Missing Support for Integrity Check"
+                ],
+                "owasp": [
+                  "A08:2021 - Software and Data Integrity Failures",
+                  "A08:2025 - Software and Data Integrity Failures"
+                ],
+                "references": [
+                  "https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-third-party-actions"
+                ],
+                "technology": [
+                  "github-actions"
+                ],
+                "subcategory": [
+                  "vuln"
+                ],
+                "likelihood": "MEDIUM",
+                "impact": "HIGH",
+                "confidence": "HIGH",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Cryptographic Issues",
+                  "Other"
+                ],
+                "source": "https://semgrep.dev/r/yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag",
+                "shortlink": "https://sg.run/2LgAL"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/semantic-pr-title.yml",
+            "start": {
+              "line": 15,
+              "col": 9,
+              "offset": 197
+            },
+            "end": {
+              "line": 15,
+              "col": 45,
+              "offset": 233
+            },
+            "extra": {
+              "message": "GitHub Actions step uses a mutable tag or branch reference. Tags and branch names can be silently repointed by the action owner, enabling supply-chain attacks — as seen in the trivy-action and kics-github-action compromises. Pin the reference to a full 40-character commit SHA instead, e.g. `uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608`.",
+              "metadata": {
+                "category": "security",
+                "cwe": [
+                  "CWE-1357: Reliance on Insufficiently Trustworthy Component",
+                  "CWE-353: Missing Support for Integrity Check"
+                ],
+                "owasp": [
+                  "A08:2021 - Software and Data Integrity Failures",
+                  "A08:2025 - Software and Data Integrity Failures"
+                ],
+                "references": [
+                  "https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-third-party-actions"
+                ],
+                "technology": [
+                  "github-actions"
+                ],
+                "subcategory": [
+                  "vuln"
+                ],
+                "likelihood": "MEDIUM",
+                "impact": "HIGH",
+                "confidence": "HIGH",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Cryptographic Issues",
+                  "Other"
+                ],
+                "source": "https://semgrep.dev/r/yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag",
+                "shortlink": "https://sg.run/2LgAL"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/sync-master-develop.yml",
+            "start": {
+              "line": 10,
+              "col": 9,
+              "offset": 156
+            },
+            "end": {
+              "line": 10,
+              "col": 48,
+              "offset": 195
+            },
+            "extra": {
+              "message": "GitHub Actions step uses a mutable tag or branch reference. Tags and branch names can be silently repointed by the action owner, enabling supply-chain attacks — as seen in the trivy-action and kics-github-action compromises. Pin the reference to a full 40-character commit SHA instead, e.g. `uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608`.",
+              "metadata": {
+                "category": "security",
+                "cwe": [
+                  "CWE-1357: Reliance on Insufficiently Trustworthy Component",
+                  "CWE-353: Missing Support for Integrity Check"
+                ],
+                "owasp": [
+                  "A08:2021 - Software and Data Integrity Failures",
+                  "A08:2025 - Software and Data Integrity Failures"
+                ],
+                "references": [
+                  "https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-third-party-actions"
+                ],
+                "technology": [
+                  "github-actions"
+                ],
+                "subcategory": [
+                  "vuln"
+                ],
+                "likelihood": "MEDIUM",
+                "impact": "HIGH",
+                "confidence": "HIGH",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Cryptographic Issues",
+                  "Other"
+                ],
+                "source": "https://semgrep.dev/r/yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag",
+                "shortlink": "https://sg.run/2LgAL"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/update-generated-files.yaml",
+            "start": {
+              "line": 16,
+              "col": 9,
+              "offset": 216
+            },
+            "end": {
+              "line": 16,
+              "col": 34,
+              "offset": 241
+            },
+            "extra": {
+              "message": "GitHub Actions step uses a mutable tag or branch reference. Tags and branch names can be silently repointed by the action owner, enabling supply-chain attacks — as seen in the trivy-action and kics-github-action compromises. Pin the reference to a full 40-character commit SHA instead, e.g. `uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608`.",
+              "metadata": {
+                "category": "security",
+                "cwe": [
+                  "CWE-1357: Reliance on Insufficiently Trustworthy Component",
+                  "CWE-353: Missing Support for Integrity Check"
+                ],
+                "owasp": [
+                  "A08:2021 - Software and Data Integrity Failures",
+                  "A08:2025 - Software and Data Integrity Failures"
+                ],
+                "references": [
+                  "https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-third-party-actions"
+                ],
+                "technology": [
+                  "github-actions"
+                ],
+                "subcategory": [
+                  "vuln"
+                ],
+                "likelihood": "MEDIUM",
+                "impact": "HIGH",
+                "confidence": "HIGH",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Cryptographic Issues",
+                  "Other"
+                ],
+                "source": "https://semgrep.dev/r/yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag",
+                "shortlink": "https://sg.run/2LgAL"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/update-generated-files.yaml",
+            "start": {
+              "line": 20,
+              "col": 9,
+              "offset": 370
+            },
+            "end": {
+              "line": 20,
+              "col": 35,
+              "offset": 396
+            },
+            "extra": {
+              "message": "GitHub Actions step uses a mutable tag or branch reference. Tags and branch names can be silently repointed by the action owner, enabling supply-chain attacks — as seen in the trivy-action and kics-github-action compromises. Pin the reference to a full 40-character commit SHA instead, e.g. `uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608`.",
+              "metadata": {
+                "category": "security",
+                "cwe": [
+                  "CWE-1357: Reliance on Insufficiently Trustworthy Component",
+                  "CWE-353: Missing Support for Integrity Check"
+                ],
+                "owasp": [
+                  "A08:2021 - Software and Data Integrity Failures",
+                  "A08:2025 - Software and Data Integrity Failures"
+                ],
+                "references": [
+                  "https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-third-party-actions"
+                ],
+                "technology": [
+                  "github-actions"
+                ],
+                "subcategory": [
+                  "vuln"
+                ],
+                "likelihood": "MEDIUM",
+                "impact": "HIGH",
+                "confidence": "HIGH",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Cryptographic Issues",
+                  "Other"
+                ],
+                "source": "https://semgrep.dev/r/yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag",
+                "shortlink": "https://sg.run/2LgAL"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/update-generated-files.yaml",
+            "start": {
+              "line": 21,
+              "col": 9,
+              "offset": 405
+            },
+            "end": {
+              "line": 21,
+              "col": 36,
+              "offset": 432
+            },
+            "extra": {
+              "message": "GitHub Actions step uses a mutable tag or branch reference. Tags and branch names can be silently repointed by the action owner, enabling supply-chain attacks — as seen in the trivy-action and kics-github-action compromises. Pin the reference to a full 40-character commit SHA instead, e.g. `uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608`.",
+              "metadata": {
+                "category": "security",
+                "cwe": [
+                  "CWE-1357: Reliance on Insufficiently Trustworthy Component",
+                  "CWE-353: Missing Support for Integrity Check"
+                ],
+                "owasp": [
+                  "A08:2021 - Software and Data Integrity Failures",
+                  "A08:2025 - Software and Data Integrity Failures"
+                ],
+                "references": [
+                  "https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-third-party-actions"
+                ],
+                "technology": [
+                  "github-actions"
+                ],
+                "subcategory": [
+                  "vuln"
+                ],
+                "likelihood": "MEDIUM",
+                "impact": "HIGH",
+                "confidence": "HIGH",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Cryptographic Issues",
+                  "Other"
+                ],
+                "source": "https://semgrep.dev/r/yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag",
+                "shortlink": "https://sg.run/2LgAL"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "package_managers.npm.npm-missing-minimum-release-age.npm-missing-minimum-release-age",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.npmrc",
+            "start": {
+              "line": 1,
+              "col": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "col": 43,
+              "offset": 78
+            },
+            "extra": {
+              "message": "This .npmrc does not set a minimum release age or sets it too low. Newly published packages can be malicious or unstable. Add `min-release-age = 7` to wait 7 days before resolving newly published package versions. Added in: v11.10 Reference: https://github.blog/changelog/2026-02-18-npm-bulk-trusted-publishing-config-and-script-security-now-generally-available/",
+              "metadata": {
+                "category": "security",
+                "technology": [
+                  "npm",
+                  "javascript"
+                ],
+                "cwe": [
+                  "CWE-829: Inclusion of Functionality from Untrusted Control Sphere"
+                ],
+                "owasp": [
+                  "A08:2021 - Software and Data Integrity Failures"
+                ],
+                "confidence": "HIGH",
+                "likelihood": "LOW",
+                "impact": "HIGH",
+                "subcategory": [
+                  "audit"
+                ],
+                "vulnerability_class": [
+                  "Insecure Configuration"
+                ],
+                "references": [
+                  "https://github.blog/changelog/2026-02-18-npm-bulk-trusted-publishing-config-and-script-security-now-generally-available/",
+                  "https://github.com/npm/cli/pull/8965"
+                ],
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "source": "https://semgrep.dev/r/package_managers.npm.npm-missing-minimum-release-age.npm-missing-minimum-release-age",
+                "shortlink": "https://sg.run/GRo1z"
+              },
+              "severity": "MEDIUM",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "javascript.chrome-remote-interface.security.audit.chrome-remote-interface-compilescript-injection.chrome-remote-interface-compilescript-injection",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/doc/examples/chrome-debugging-protocol/axe-cdp.js",
+            "start": {
+              "line": 23,
+              "col": 27,
+              "offset": 537
+            },
+            "end": {
+              "line": 23,
+              "col": 30,
+              "offset": 540
+            },
+            "extra": {
+              "message": "If unverified user data can reach the `compileScript` method it can result in Server-Side Request Forgery vulnerabilities",
+              "metadata": {
+                "owasp": [
+                  "A10:2021 - Server-Side Request Forgery (SSRF)",
+                  "A01:2025 - Broken Access Control"
+                ],
+                "cwe": [
+                  "CWE-918: Server-Side Request Forgery (SSRF)"
+                ],
+                "category": "security",
+                "technology": [
+                  "chrome-remote-interface"
+                ],
+                "references": [
+                  "https://github.com/cyrus-and/chrome-remote-interface"
+                ],
+                "cwe2022-top25": true,
+                "cwe2021-top25": true,
+                "subcategory": [
+                  "vuln"
+                ],
+                "likelihood": "MEDIUM",
+                "impact": "MEDIUM",
+                "confidence": "MEDIUM",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Server-Side Request Forgery (SSRF)"
+                ],
+                "source": "https://semgrep.dev/r/javascript.chrome-remote-interface.security.audit.chrome-remote-interface-compilescript-injection.chrome-remote-interface-compilescript-injection",
+                "shortlink": "https://sg.run/J9kj"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "javascript.puppeteer.security.audit.puppeteer-goto-injection.puppeteer-goto-injection",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/doc/examples/puppeteer/axe-puppeteer.js",
+            "start": {
+              "line": 36,
+              "col": 11,
+              "offset": 742
+            },
+            "end": {
+              "line": 36,
+              "col": 25,
+              "offset": 756
+            },
+            "extra": {
+              "message": "If unverified user data can reach the `goto` method it can result in Server-Side Request Forgery vulnerabilities",
+              "metadata": {
+                "owasp": [
+                  "A10:2021 - Server-Side Request Forgery (SSRF)",
+                  "A01:2025 - Broken Access Control"
+                ],
+                "cwe": [
+                  "CWE-918: Server-Side Request Forgery (SSRF)"
+                ],
+                "category": "security",
+                "technology": [
+                  "puppeteer"
+                ],
+                "cwe2022-top25": true,
+                "cwe2021-top25": true,
+                "subcategory": [
+                  "audit"
+                ],
+                "likelihood": "LOW",
+                "impact": "LOW",
+                "confidence": "LOW",
+                "references": [
+                  "https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29"
+                ],
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Server-Side Request Forgery (SSRF)"
+                ],
+                "source": "https://semgrep.dev/r/javascript.puppeteer.security.audit.puppeteer-goto-injection.puppeteer-goto-injection",
+                "shortlink": "https://sg.run/4xE9"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "javascript.puppeteer.security.audit.puppeteer-evaluate-code-injection.puppeteer-evaluate-code-injection",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/doc/examples/puppeteer/axe-puppeteer.js",
+            "start": {
+              "line": 39,
+              "col": 26,
+              "offset": 815
+            },
+            "end": {
+              "line": 44,
+              "col": 5,
+              "offset": 918
+            },
+            "extra": {
+              "message": "If unverified user data can reach the `evaluate` method it can result in Server-Side Request Forgery vulnerabilities",
+              "metadata": {
+                "owasp": [
+                  "A10:2021 - Server-Side Request Forgery (SSRF)",
+                  "A01:2025 - Broken Access Control"
+                ],
+                "cwe": [
+                  "CWE-918: Server-Side Request Forgery (SSRF)"
+                ],
+                "category": "security",
+                "technology": [
+                  "puppeteer"
+                ],
+                "cwe2022-top25": true,
+                "cwe2021-top25": true,
+                "subcategory": [
+                  "audit"
+                ],
+                "likelihood": "LOW",
+                "impact": "LOW",
+                "confidence": "LOW",
+                "references": [
+                  "https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29"
+                ],
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Server-Side Request Forgery (SSRF)"
+                ],
+                "source": "https://semgrep.dev/r/javascript.puppeteer.security.audit.puppeteer-evaluate-code-injection.puppeteer-evaluate-code-injection",
+                "shortlink": "https://sg.run/Q5Yq"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "javascript.puppeteer.security.audit.puppeteer-evaluate-code-injection.puppeteer-evaluate-code-injection",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/doc/examples/puppeteer/set-content.js",
+            "start": {
+              "line": 32,
+              "col": 9,
+              "offset": 707
+            },
+            "end": {
+              "line": 32,
+              "col": 34,
+              "offset": 732
+            },
+            "extra": {
+              "message": "If unverified user data can reach the `evaluate` method it can result in Server-Side Request Forgery vulnerabilities",
+              "metadata": {
+                "owasp": [
+                  "A10:2021 - Server-Side Request Forgery (SSRF)",
+                  "A01:2025 - Broken Access Control"
+                ],
+                "cwe": [
+                  "CWE-918: Server-Side Request Forgery (SSRF)"
+                ],
+                "category": "security",
+                "technology": [
+                  "puppeteer"
+                ],
+                "cwe2022-top25": true,
+                "cwe2021-top25": true,
+                "subcategory": [
+                  "audit"
+                ],
+                "likelihood": "LOW",
+                "impact": "LOW",
+                "confidence": "LOW",
+                "references": [
+                  "https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29"
+                ],
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Server-Side Request Forgery (SSRF)"
+                ],
+                "source": "https://semgrep.dev/r/javascript.puppeteer.security.audit.puppeteer-evaluate-code-injection.puppeteer-evaluate-code-injection",
+                "shortlink": "https://sg.run/Q5Yq"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "javascript.puppeteer.security.audit.puppeteer-evaluate-code-injection.puppeteer-evaluate-code-injection",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/doc/examples/puppeteer/set-content.js",
+            "start": {
+              "line": 35,
+              "col": 11,
+              "offset": 820
+            },
+            "end": {
+              "line": 35,
+              "col": 41,
+              "offset": 850
+            },
+            "extra": {
+              "message": "If unverified user data can reach the `evaluate` method it can result in Server-Side Request Forgery vulnerabilities",
+              "metadata": {
+                "owasp": [
+                  "A10:2021 - Server-Side Request Forgery (SSRF)",
+                  "A01:2025 - Broken Access Control"
+                ],
+                "cwe": [
+                  "CWE-918: Server-Side Request Forgery (SSRF)"
+                ],
+                "category": "security",
+                "technology": [
+                  "puppeteer"
+                ],
+                "cwe2022-top25": true,
+                "cwe2021-top25": true,
+                "subcategory": [
+                  "audit"
+                ],
+                "likelihood": "LOW",
+                "impact": "LOW",
+                "confidence": "LOW",
+                "references": [
+                  "https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29"
+                ],
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Server-Side Request Forgery (SSRF)"
+                ],
+                "source": "https://semgrep.dev/r/javascript.puppeteer.security.audit.puppeteer-evaluate-code-injection.puppeteer-evaluate-code-injection",
+                "shortlink": "https://sg.run/Q5Yq"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/doc/examples/test-examples.js",
+            "start": {
+              "line": 5,
+              "col": 31,
+              "offset": 188
+            },
+            "end": {
+              "line": 5,
+              "col": 34,
+              "offset": 191
+            },
+            "extra": {
+              "message": "Detected possible user input going into a `path.join` or `path.resolve` function. This could possibly lead to a path traversal vulnerability,  where the attacker can access arbitrary files stored in the file system. Instead, be sure to sanitize or validate user input first.",
+              "metadata": {
+                "owasp": [
+                  "A05:2017 - Broken Access Control",
+                  "A01:2021 - Broken Access Control",
+                  "A01:2025 - Broken Access Control"
+                ],
+                "cwe": [
+                  "CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')"
+                ],
+                "category": "security",
+                "references": [
+                  "https://owasp.org/www-community/attacks/Path_Traversal"
+                ],
+                "technology": [
+                  "javascript",
+                  "node.js"
+                ],
+                "cwe2022-top25": true,
+                "cwe2021-top25": true,
+                "subcategory": [
+                  "vuln"
+                ],
+                "likelihood": "HIGH",
+                "impact": "MEDIUM",
+                "confidence": "LOW",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Path Traversal"
+                ],
+                "source": "https://semgrep.dev/r/javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal",
+                "shortlink": "https://sg.run/OPqk"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/lib/commons/matches/from-primitive.js",
+            "start": {
+              "line": 37,
+              "col": 14,
+              "offset": 1327
+            },
+            "end": {
+              "line": 37,
+              "col": 33,
+              "offset": 1346
+            },
+            "extra": {
+              "message": "RegExp() called with a `matcher` function argument, this might allow an attacker to cause a Regular Expression Denial-of-Service (ReDoS) within your application as RegExP blocks the main thread. For this reason, it is recommended to use hardcoded regexes instead. If your regex is run on user-controlled input, consider performing input validation or use a regex checking/sanitization library such as https://www.npmjs.com/package/recheck to verify that the regex does not appear vulnerable to ReDoS.",
+              "metadata": {
+                "owasp": [
+                  "A05:2021 - Security Misconfiguration",
+                  "A06:2017 - Security Misconfiguration",
+                  "A02:2025 - Security Misconfiguration"
+                ],
+                "cwe": [
+                  "CWE-1333: Inefficient Regular Expression Complexity"
+                ],
+                "references": [
+                  "https://owasp.org/www-community/attacks/Regular_expression_Denial_of_Service_-_ReDoS"
+                ],
+                "source-rule-url": "https://github.com/nodesecurity/eslint-plugin-security/blob/master/rules/detect-non-literal-regexp.js",
+                "category": "security",
+                "technology": [
+                  "javascript"
+                ],
+                "subcategory": [
+                  "vuln"
+                ],
+                "likelihood": "MEDIUM",
+                "impact": "MEDIUM",
+                "confidence": "LOW",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Denial-of-Service (DoS)"
+                ],
+                "source": "https://semgrep.dev/r/javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp",
+                "shortlink": "https://sg.run/gr65"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "javascript.browser.security.insufficient-postmessage-origin-validation.insufficient-postmessage-origin-validation",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/lib/core/utils/frame-messenger.js",
+            "start": {
+              "line": 18,
+              "col": 5,
+              "offset": 538
+            },
+            "end": {
+              "line": 18,
+              "col": 55,
+              "offset": 588
+            },
+            "extra": {
+              "message": "No validation of origin is done by the addEventListener API. It may be possible to exploit this flaw to perform Cross Origin attacks such as Cross-Site Scripting(XSS).",
+              "metadata": {
+                "owasp": [
+                  "A08:2021 - Software and Data Integrity Failures",
+                  "A08:2025 - Software or Data Integrity Failures"
+                ],
+                "cwe": [
+                  "CWE-345: Insufficient Verification of Data Authenticity"
+                ],
+                "category": "security",
+                "technology": [
+                  "browser"
+                ],
+                "subcategory": [
+                  "audit"
+                ],
+                "likelihood": "LOW",
+                "impact": "LOW",
+                "confidence": "LOW",
+                "references": [
+                  "https://owasp.org/Top10/A08_2021-Software_and_Data_Integrity_Failures"
+                ],
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Improper Authentication"
+                ],
+                "source": "https://semgrep.dev/r/javascript.browser.security.insufficient-postmessage-origin-validation.insufficient-postmessage-origin-validation",
+                "shortlink": "https://sg.run/gL9x"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/lib/core/utils/matches.js",
+            "start": {
+              "line": 97,
+              "col": 18,
+              "offset": 2546
+            },
+            "end": {
+              "line": 97,
+              "col": 64,
+              "offset": 2592
+            },
+            "extra": {
+              "message": "RegExp() called with a `att` function argument, this might allow an attacker to cause a Regular Expression Denial-of-Service (ReDoS) within your application as RegExP blocks the main thread. For this reason, it is recommended to use hardcoded regexes instead. If your regex is run on user-controlled input, consider performing input validation or use a regex checking/sanitization library such as https://www.npmjs.com/package/recheck to verify that the regex does not appear vulnerable to ReDoS.",
+              "metadata": {
+                "owasp": [
+                  "A05:2021 - Security Misconfiguration",
+                  "A06:2017 - Security Misconfiguration",
+                  "A02:2025 - Security Misconfiguration"
+                ],
+                "cwe": [
+                  "CWE-1333: Inefficient Regular Expression Complexity"
+                ],
+                "references": [
+                  "https://owasp.org/www-community/attacks/Regular_expression_Denial_of_Service_-_ReDoS"
+                ],
+                "source-rule-url": "https://github.com/nodesecurity/eslint-plugin-security/blob/master/rules/detect-non-literal-regexp.js",
+                "category": "security",
+                "technology": [
+                  "javascript"
+                ],
+                "subcategory": [
+                  "vuln"
+                ],
+                "likelihood": "MEDIUM",
+                "impact": "MEDIUM",
+                "confidence": "LOW",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Denial-of-Service (DoS)"
+                ],
+                "source": "https://semgrep.dev/r/javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp",
+                "shortlink": "https://sg.run/gr65"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/lib/core/utils/matches.js",
+            "start": {
+              "line": 100,
+              "col": 18,
+              "offset": 2643
+            },
+            "end": {
+              "line": 100,
+              "col": 64,
+              "offset": 2689
+            },
+            "extra": {
+              "message": "RegExp() called with a `att` function argument, this might allow an attacker to cause a Regular Expression Denial-of-Service (ReDoS) within your application as RegExP blocks the main thread. For this reason, it is recommended to use hardcoded regexes instead. If your regex is run on user-controlled input, consider performing input validation or use a regex checking/sanitization library such as https://www.npmjs.com/package/recheck to verify that the regex does not appear vulnerable to ReDoS.",
+              "metadata": {
+                "owasp": [
+                  "A05:2021 - Security Misconfiguration",
+                  "A06:2017 - Security Misconfiguration",
+                  "A02:2025 - Security Misconfiguration"
+                ],
+                "cwe": [
+                  "CWE-1333: Inefficient Regular Expression Complexity"
+                ],
+                "references": [
+                  "https://owasp.org/www-community/attacks/Regular_expression_Denial_of_Service_-_ReDoS"
+                ],
+                "source-rule-url": "https://github.com/nodesecurity/eslint-plugin-security/blob/master/rules/detect-non-literal-regexp.js",
+                "category": "security",
+                "technology": [
+                  "javascript"
+                ],
+                "subcategory": [
+                  "vuln"
+                ],
+                "likelihood": "MEDIUM",
+                "impact": "MEDIUM",
+                "confidence": "LOW",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Denial-of-Service (DoS)"
+                ],
+                "source": "https://semgrep.dev/r/javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp",
+                "shortlink": "https://sg.run/gr65"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/lib/core/utils/matches.js",
+            "start": {
+              "line": 103,
+              "col": 18,
+              "offset": 2740
+            },
+            "end": {
+              "line": 105,
+              "col": 10,
+              "offset": 2824
+            },
+            "extra": {
+              "message": "RegExp() called with a `att` function argument, this might allow an attacker to cause a Regular Expression Denial-of-Service (ReDoS) within your application as RegExP blocks the main thread. For this reason, it is recommended to use hardcoded regexes instead. If your regex is run on user-controlled input, consider performing input validation or use a regex checking/sanitization library such as https://www.npmjs.com/package/recheck to verify that the regex does not appear vulnerable to ReDoS.",
+              "metadata": {
+                "owasp": [
+                  "A05:2021 - Security Misconfiguration",
+                  "A06:2017 - Security Misconfiguration",
+                  "A02:2025 - Security Misconfiguration"
+                ],
+                "cwe": [
+                  "CWE-1333: Inefficient Regular Expression Complexity"
+                ],
+                "references": [
+                  "https://owasp.org/www-community/attacks/Regular_expression_Denial_of_Service_-_ReDoS"
+                ],
+                "source-rule-url": "https://github.com/nodesecurity/eslint-plugin-security/blob/master/rules/detect-non-literal-regexp.js",
+                "category": "security",
+                "technology": [
+                  "javascript"
+                ],
+                "subcategory": [
+                  "vuln"
+                ],
+                "likelihood": "MEDIUM",
+                "impact": "MEDIUM",
+                "confidence": "LOW",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Denial-of-Service (DoS)"
+                ],
+                "source": "https://semgrep.dev/r/javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp",
+                "shortlink": "https://sg.run/gr65"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/lib/core/utils/matches.js",
+            "start": {
+              "line": 108,
+              "col": 18,
+              "offset": 2875
+            },
+            "end": {
+              "line": 108,
+              "col": 74,
+              "offset": 2931
+            },
+            "extra": {
+              "message": "RegExp() called with a `att` function argument, this might allow an attacker to cause a Regular Expression Denial-of-Service (ReDoS) within your application as RegExP blocks the main thread. For this reason, it is recommended to use hardcoded regexes instead. If your regex is run on user-controlled input, consider performing input validation or use a regex checking/sanitization library such as https://www.npmjs.com/package/recheck to verify that the regex does not appear vulnerable to ReDoS.",
+              "metadata": {
+                "owasp": [
+                  "A05:2021 - Security Misconfiguration",
+                  "A06:2017 - Security Misconfiguration",
+                  "A02:2025 - Security Misconfiguration"
+                ],
+                "cwe": [
+                  "CWE-1333: Inefficient Regular Expression Complexity"
+                ],
+                "references": [
+                  "https://owasp.org/www-community/attacks/Regular_expression_Denial_of_Service_-_ReDoS"
+                ],
+                "source-rule-url": "https://github.com/nodesecurity/eslint-plugin-security/blob/master/rules/detect-non-literal-regexp.js",
+                "category": "security",
+                "technology": [
+                  "javascript"
+                ],
+                "subcategory": [
+                  "vuln"
+                ],
+                "likelihood": "MEDIUM",
+                "impact": "MEDIUM",
+                "confidence": "LOW",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Denial-of-Service (DoS)"
+                ],
+                "source": "https://semgrep.dev/r/javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp",
+                "shortlink": "https://sg.run/gr65"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/lib/core/utils/matches.js",
+            "start": {
+              "line": 161,
+              "col": 15,
+              "offset": 4026
+            },
+            "end": {
+              "line": 161,
+              "col": 74,
+              "offset": 4085
+            },
+            "extra": {
+              "message": "RegExp() called with a `className` function argument, this might allow an attacker to cause a Regular Expression Denial-of-Service (ReDoS) within your application as RegExP blocks the main thread. For this reason, it is recommended to use hardcoded regexes instead. If your regex is run on user-controlled input, consider performing input validation or use a regex checking/sanitization library such as https://www.npmjs.com/package/recheck to verify that the regex does not appear vulnerable to ReDoS.",
+              "metadata": {
+                "owasp": [
+                  "A05:2021 - Security Misconfiguration",
+                  "A06:2017 - Security Misconfiguration",
+                  "A02:2025 - Security Misconfiguration"
+                ],
+                "cwe": [
+                  "CWE-1333: Inefficient Regular Expression Complexity"
+                ],
+                "references": [
+                  "https://owasp.org/www-community/attacks/Regular_expression_Denial_of_Service_-_ReDoS"
+                ],
+                "source-rule-url": "https://github.com/nodesecurity/eslint-plugin-security/blob/master/rules/detect-non-literal-regexp.js",
+                "category": "security",
+                "technology": [
+                  "javascript"
+                ],
+                "subcategory": [
+                  "vuln"
+                ],
+                "likelihood": "MEDIUM",
+                "impact": "MEDIUM",
+                "confidence": "LOW",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Denial-of-Service (DoS)"
+                ],
+                "source": "https://semgrep.dev/r/javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp",
+                "shortlink": "https://sg.run/gr65"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/lib/core/utils/process-message.js",
+            "start": {
+              "line": 19,
+              "col": 21,
+              "offset": 581
+            },
+            "end": {
+              "line": 19,
+              "col": 72,
+              "offset": 632
+            },
+            "extra": {
+              "message": "RegExp() called with a `data` function argument, this might allow an attacker to cause a Regular Expression Denial-of-Service (ReDoS) within your application as RegExP blocks the main thread. For this reason, it is recommended to use hardcoded regexes instead. If your regex is run on user-controlled input, consider performing input validation or use a regex checking/sanitization library such as https://www.npmjs.com/package/recheck to verify that the regex does not appear vulnerable to ReDoS.",
+              "metadata": {
+                "owasp": [
+                  "A05:2021 - Security Misconfiguration",
+                  "A06:2017 - Security Misconfiguration",
+                  "A02:2025 - Security Misconfiguration"
+                ],
+                "cwe": [
+                  "CWE-1333: Inefficient Regular Expression Complexity"
+                ],
+                "references": [
+                  "https://owasp.org/www-community/attacks/Regular_expression_Denial_of_Service_-_ReDoS"
+                ],
+                "source-rule-url": "https://github.com/nodesecurity/eslint-plugin-security/blob/master/rules/detect-non-literal-regexp.js",
+                "category": "security",
+                "technology": [
+                  "javascript"
+                ],
+                "subcategory": [
+                  "vuln"
+                ],
+                "likelihood": "MEDIUM",
+                "impact": "MEDIUM",
+                "confidence": "LOW",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Denial-of-Service (DoS)"
+                ],
+                "source": "https://semgrep.dev/r/javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp",
+                "shortlink": "https://sg.run/gr65"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "javascript.lang.security.audit.prototype-pollution.prototype-pollution-loop.prototype-pollution-loop",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/lib/core/utils/valid-langs.js",
+            "start": {
+              "line": 72,
+              "col": 5,
+              "offset": 26300
+            },
+            "end": {
+              "line": 72,
+              "col": 25,
+              "offset": 26320
+            },
+            "extra": {
+              "message": "Possibility of prototype polluting function detected. By adding or modifying attributes of an object prototype, it is possible to create attributes that exist on every object, or replace critical attributes with malicious ones. This can be problematic if the software depends on existence or non-existence of certain attributes, or uses pre-defined attributes of object prototype (such as hasOwnProperty, toString or valueOf). Possible mitigations might be: freezing the object prototype, using an object without prototypes (via Object.create(null) ), blocking modifications of attributes that resolve to object prototype, using Map instead of object.",
+              "metadata": {
+                "cwe": [
+                  "CWE-915: Improperly Controlled Modification of Dynamically-Determined Object Attributes"
+                ],
+                "category": "security",
+                "references": [
+                  "https://github.com/HoLyVieR/prototype-pollution-nsec18/blob/master/paper/JavaScript_prototype_pollution_attack_in_NodeJS.pdf"
+                ],
+                "technology": [
+                  "typescript"
+                ],
+                "owasp": [
+                  "A08:2021 - Software and Data Integrity Failures",
+                  "A08:2025 - Software or Data Integrity Failures"
+                ],
+                "subcategory": [
+                  "audit"
+                ],
+                "likelihood": "LOW",
+                "impact": "LOW",
+                "confidence": "LOW",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Mass Assignment"
+                ],
+                "source": "https://semgrep.dev/r/javascript.lang.security.audit.prototype-pollution.prototype-pollution-loop.prototype-pollution-loop",
+                "shortlink": "https://sg.run/w1DB"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "problem-based-packs.insecure-transport.js-node.using-http-server.using-http-server",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/perf/report.js",
+            "start": {
+              "line": 62,
+              "col": 18,
+              "offset": 1915
+            },
+            "end": {
+              "line": 62,
+              "col": 22,
+              "offset": 1919
+            },
+            "extra": {
+              "message": "Checks for any usage of http servers instead of https servers. Encourages the usage of https protocol instead of http, which does not have TLS and is therefore unencrypted. Using http can lead to man-in-the-middle attacks in which the attacker is able to read sensitive information.",
+              "metadata": {
+                "likelihood": "LOW",
+                "impact": "MEDIUM",
+                "confidence": "LOW",
+                "category": "security",
+                "cwe": "CWE-319: Cleartext Transmission of Sensitive Information",
+                "owasp": [
+                  "A02:2021 - Cryptographic Failures",
+                  "A03:2017 - Sensitive Data Exposure",
+                  "A04:2025 - Cryptographic Failures"
+                ],
+                "references": [
+                  "https://nodejs.org/api/http.html#http_class_http_agent",
+                  "https://groups.google.com/g/rubyonrails-security/c/NCCsca7TEtY"
+                ],
+                "subcategory": [
+                  "audit"
+                ],
+                "technology": [
+                  "node.js"
+                ],
+                "vulnerability": "Insecure Transport",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Mishandled Sensitive Information"
+                ],
+                "source": "https://semgrep.dev/r/problem-based-packs.insecure-transport.js-node.using-http-server.using-http-server",
+                "shortlink": "https://sg.run/x1zL"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/perf/report.js",
+            "start": {
+              "line": 66,
+              "col": 30,
+              "offset": 2087
+            },
+            "end": {
+              "line": 66,
+              "col": 37,
+              "offset": 2094
+            },
+            "extra": {
+              "message": "Detected possible user input going into a `path.join` or `path.resolve` function. This could possibly lead to a path traversal vulnerability,  where the attacker can access arbitrary files stored in the file system. Instead, be sure to sanitize or validate user input first.",
+              "metadata": {
+                "owasp": [
+                  "A05:2017 - Broken Access Control",
+                  "A01:2021 - Broken Access Control",
+                  "A01:2025 - Broken Access Control"
+                ],
+                "cwe": [
+                  "CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')"
+                ],
+                "category": "security",
+                "references": [
+                  "https://owasp.org/www-community/attacks/Path_Traversal"
+                ],
+                "technology": [
+                  "javascript",
+                  "node.js"
+                ],
+                "cwe2022-top25": true,
+                "cwe2021-top25": true,
+                "subcategory": [
+                  "vuln"
+                ],
+                "likelihood": "HIGH",
+                "impact": "MEDIUM",
+                "confidence": "LOW",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Path Traversal"
+                ],
+                "source": "https://semgrep.dev/r/javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal",
+                "shortlink": "https://sg.run/OPqk"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/perf/report.js",
+            "start": {
+              "line": 66,
+              "col": 39,
+              "offset": 2096
+            },
+            "end": {
+              "line": 66,
+              "col": 46,
+              "offset": 2103
+            },
+            "extra": {
+              "message": "Detected possible user input going into a `path.join` or `path.resolve` function. This could possibly lead to a path traversal vulnerability,  where the attacker can access arbitrary files stored in the file system. Instead, be sure to sanitize or validate user input first.",
+              "metadata": {
+                "owasp": [
+                  "A05:2017 - Broken Access Control",
+                  "A01:2021 - Broken Access Control",
+                  "A01:2025 - Broken Access Control"
+                ],
+                "cwe": [
+                  "CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')"
+                ],
+                "category": "security",
+                "references": [
+                  "https://owasp.org/www-community/attacks/Path_Traversal"
+                ],
+                "technology": [
+                  "javascript",
+                  "node.js"
+                ],
+                "cwe2022-top25": true,
+                "cwe2021-top25": true,
+                "subcategory": [
+                  "vuln"
+                ],
+                "likelihood": "HIGH",
+                "impact": "MEDIUM",
+                "confidence": "LOW",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Path Traversal"
+                ],
+                "source": "https://semgrep.dev/r/javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal",
+                "shortlink": "https://sg.run/OPqk"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/perf/report.js",
+            "start": {
+              "line": 76,
+              "col": 30,
+              "offset": 2372
+            },
+            "end": {
+              "line": 76,
+              "col": 38,
+              "offset": 2380
+            },
+            "extra": {
+              "message": "Detected possible user input going into a `path.join` or `path.resolve` function. This could possibly lead to a path traversal vulnerability,  where the attacker can access arbitrary files stored in the file system. Instead, be sure to sanitize or validate user input first.",
+              "metadata": {
+                "owasp": [
+                  "A05:2017 - Broken Access Control",
+                  "A01:2021 - Broken Access Control",
+                  "A01:2025 - Broken Access Control"
+                ],
+                "cwe": [
+                  "CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')"
+                ],
+                "category": "security",
+                "references": [
+                  "https://owasp.org/www-community/attacks/Path_Traversal"
+                ],
+                "technology": [
+                  "javascript",
+                  "node.js"
+                ],
+                "cwe2022-top25": true,
+                "cwe2021-top25": true,
+                "subcategory": [
+                  "vuln"
+                ],
+                "likelihood": "HIGH",
+                "impact": "MEDIUM",
+                "confidence": "LOW",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Path Traversal"
+                ],
+                "source": "https://semgrep.dev/r/javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal",
+                "shortlink": "https://sg.run/OPqk"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          }
+        ],
+        "errors": [
+          {
+            "code": 3,
+            "level": "warn",
+            "type": [
+              "PartialParsing",
+              [
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/bin/wait-for-workflow-success.sh",
+                  "start": {
+                    "line": 57,
+                    "col": 41,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 57,
+                    "col": 56,
+                    "offset": 15
+                  }
+                },
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/bin/wait-for-workflow-success.sh",
+                  "start": {
+                    "line": 152,
+                    "col": 19,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 153,
+                    "col": 61,
+                    "offset": 105
+                  }
+                }
+              ]
+            ],
+            "message": "Syntax error at line /home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/bin/wait-for-workflow-success.sh:57:\n `/ sleep_seconds` was unexpected",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/bin/wait-for-workflow-success.sh",
+            "spans": [
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/bin/wait-for-workflow-success.sh",
+                "start": {
+                  "line": 57,
+                  "col": 41,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 57,
+                  "col": 56,
+                  "offset": 15
+                }
+              },
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/bin/wait-for-workflow-success.sh",
+                "start": {
+                  "line": 152,
+                  "col": 19,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 153,
+                  "col": 61,
+                  "offset": 105
+                }
+              }
+            ]
+          },
+          {
+            "code": 3,
+            "level": "warn",
+            "type": [
+              "PartialParsing",
+              [
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/deploy.yml",
+                  "start": {
+                    "line": 182,
+                    "col": 12,
+                    "offset": 6157
+                  },
+                  "end": {
+                    "line": 182,
+                    "col": 15,
+                    "offset": 6160
+                  }
+                }
+              ]
+            ],
+            "message": "Syntax error at line /home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/deploy.yml:182:\n When parsing a snippet as Bash for metavariable-pattern in rule 'yaml.github-actions.security.curl-eval.curl-eval', `${{` was unexpected",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/deploy.yml",
+            "spans": [
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/deploy.yml",
+                "start": {
+                  "line": 182,
+                  "col": 12,
+                  "offset": 6157
+                },
+                "end": {
+                  "line": 182,
+                  "col": 15,
+                  "offset": 6160
+                }
+              }
+            ]
+          },
+          {
+            "code": 3,
+            "level": "warn",
+            "type": [
+              "PartialParsing",
+              [
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/deploy.yml",
+                  "start": {
+                    "line": 182,
+                    "col": 12,
+                    "offset": 6157
+                  },
+                  "end": {
+                    "line": 182,
+                    "col": 15,
+                    "offset": 6160
+                  }
+                }
+              ]
+            ],
+            "message": "Syntax error at line /home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/deploy.yml:182:\n When parsing a snippet as Bash for metavariable-pattern in rule 'yaml.github-actions.security.gha-curl-pipe-shell.gha-curl-pipe-shell', `${{` was unexpected",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/deploy.yml",
+            "spans": [
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/deploy.yml",
+                "start": {
+                  "line": 182,
+                  "col": 12,
+                  "offset": 6157
+                },
+                "end": {
+                  "line": 182,
+                  "col": 15,
+                  "offset": 6160
+                }
+              }
+            ]
+          },
+          {
+            "code": 3,
+            "level": "warn",
+            "type": [
+              "PartialParsing",
+              [
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/perf-compare.yml",
+                  "start": {
+                    "line": 100,
+                    "col": 119,
+                    "offset": 3532
+                  },
+                  "end": {
+                    "line": 100,
+                    "col": 155,
+                    "offset": 3568
+                  }
+                }
+              ]
+            ],
+            "message": "Syntax error at line /home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/perf-compare.yml:100:\n When parsing a snippet as Bash for metavariable-pattern in rule 'yaml.github-actions.security.curl-eval.curl-eval', `{ github.event.pull_request.head.sha` was unexpected",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/perf-compare.yml",
+            "spans": [
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/perf-compare.yml",
+                "start": {
+                  "line": 100,
+                  "col": 119,
+                  "offset": 3532
+                },
+                "end": {
+                  "line": 100,
+                  "col": 155,
+                  "offset": 3568
+                }
+              }
+            ]
+          },
+          {
+            "code": 3,
+            "level": "warn",
+            "type": [
+              "PartialParsing",
+              [
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/perf-compare.yml",
+                  "start": {
+                    "line": 100,
+                    "col": 119,
+                    "offset": 3532
+                  },
+                  "end": {
+                    "line": 100,
+                    "col": 155,
+                    "offset": 3568
+                  }
+                }
+              ]
+            ],
+            "message": "Syntax error at line /home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/perf-compare.yml:100:\n When parsing a snippet as Bash for metavariable-pattern in rule 'yaml.github-actions.security.gha-curl-pipe-shell.gha-curl-pipe-shell', `{ github.event.pull_request.head.sha` was unexpected",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/perf-compare.yml",
+            "spans": [
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/perf-compare.yml",
+                "start": {
+                  "line": 100,
+                  "col": 119,
+                  "offset": 3532
+                },
+                "end": {
+                  "line": 100,
+                  "col": 155,
+                  "offset": 3568
+                }
+              }
+            ]
+          },
+          {
+            "code": 3,
+            "level": "warn",
+            "type": [
+              "PartialParsing",
+              [
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/perf-compare.yml",
+                  "start": {
+                    "line": 102,
+                    "col": 114,
+                    "offset": 3822
+                  },
+                  "end": {
+                    "line": 102,
+                    "col": 150,
+                    "offset": 3858
+                  }
+                }
+              ]
+            ],
+            "message": "Syntax error at line /home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/perf-compare.yml:102:\n When parsing a snippet as Bash for metavariable-pattern in rule 'yaml.github-actions.security.curl-eval.curl-eval', `{ github.event.pull_request.head.sha` was unexpected",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/perf-compare.yml",
+            "spans": [
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/perf-compare.yml",
+                "start": {
+                  "line": 102,
+                  "col": 114,
+                  "offset": 3822
+                },
+                "end": {
+                  "line": 102,
+                  "col": 150,
+                  "offset": 3858
+                }
+              }
+            ]
+          },
+          {
+            "code": 3,
+            "level": "warn",
+            "type": [
+              "PartialParsing",
+              [
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/perf-compare.yml",
+                  "start": {
+                    "line": 102,
+                    "col": 114,
+                    "offset": 3822
+                  },
+                  "end": {
+                    "line": 102,
+                    "col": 150,
+                    "offset": 3858
+                  }
+                }
+              ]
+            ],
+            "message": "Syntax error at line /home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/perf-compare.yml:102:\n When parsing a snippet as Bash for metavariable-pattern in rule 'yaml.github-actions.security.gha-curl-pipe-shell.gha-curl-pipe-shell', `{ github.event.pull_request.head.sha` was unexpected",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/perf-compare.yml",
+            "spans": [
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-axe-core/.github/workflows/perf-compare.yml",
+                "start": {
+                  "line": 102,
+                  "col": 114,
+                  "offset": 3822
+                },
+                "end": {
+                  "line": 102,
+                  "col": 150,
+                  "offset": 3858
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

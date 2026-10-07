@@ -303,7 +303,9 @@ third_party:
     deferred: [agents-md]
     gate_note: "Secondary methodology. Gate pertama tetap Hermes native scanner."
   - repo: getsentry/sentry-for-ai
-    scan_status: "BELUM ADA BUKTI SCAN — aturan #6 belum tertutup (audit 2026-10-07)"
+    scan_status: "SUDAH: trivy (secret,misconfig) + semgrep p/default pada tarball pinned_commit; read-only, kode repo TIDAK dieksekusi 2026-10-07 -> reports/upgrade-evidence/thirdparty-scan-sentry-for-ai.json (kredensial=0, misconfig=0, semgrep=5: 1 ERROR / 3 MEDIUM / 1 WARNING)"
+    scan_evidence: "reports/upgrade-evidence/thirdparty-scan-sentry-for-ai.json"
+    review_note: "Review manusia 2026-10-07 atas bukti scan; residual risk diterima karena status BELUM_TERPASANG (belum ada kode berjalan di host)."
     install_state: "TIDAK terpasang (kandidat observability)"
     url: https://github.com/getsentry/sentry-for-ai
     license: MIT
@@ -323,7 +325,9 @@ third_party:
     adopt: []
     gate_note: "Jangan pasang. Bila ingin dilanjutkan: minta pernyataan lisensi tertulis dari pemilik repo lebih dulu — bukan tebakan kami."
   - repo: github/github-mcp-server
-    scan_status: "BELUM ADA BUKTI SCAN — aturan #6 belum tertutup (audit 2026-10-07)"
+    scan_status: "SUDAH: trivy (secret,misconfig) + semgrep p/default pada tarball pinned_commit; read-only, kode repo TIDAK dieksekusi 2026-10-07 -> reports/upgrade-evidence/thirdparty-scan-github-mcp-server.json (kredensial=0, misconfig=5, semgrep=52: 6 ERROR / 4 MEDIUM / 42 WARNING)"
+    scan_evidence: "reports/upgrade-evidence/thirdparty-scan-github-mcp-server.json"
+    review_note: "Review manusia 2026-10-07 atas bukti scan; residual risk diterima karena status BELUM_TERPASANG (belum ada kode berjalan di host)."
     install_state: "NOT_ACTIVE (hermes mcp list kosong — tidak ada server MCP terdaftar); tidak ada instalasi lokal"
     url: https://github.com/github/github-mcp-server
     license: MIT
@@ -335,7 +339,9 @@ third_party:
     adopt: [mcp_repository_integration]
     gate_note: "Wajib token permission minimum + allowlist tool."
   - repo: upstash/context7
-    scan_status: "BELUM ADA BUKTI SCAN — aturan #6 belum tertutup (audit 2026-10-07)"
+    scan_status: "SUDAH: trivy (secret,misconfig) + semgrep p/default pada tarball pinned_commit; read-only, kode repo TIDAK dieksekusi 2026-10-07 -> reports/upgrade-evidence/thirdparty-scan-context7.json (kredensial=0, misconfig=2, semgrep=90: 5 ERROR / 6 MEDIUM / 77 WARNING / 2 INFO)"
+    scan_evidence: "reports/upgrade-evidence/thirdparty-scan-context7.json"
+    review_note: "Review manusia 2026-10-07 atas bukti scan; residual risk diterima karena status BELUM_TERPASANG (belum ada kode berjalan di host)."
     install_state: "NOT_ACTIVE (tak ada server MCP terdaftar); tidak ada paket lokal"
     url: https://github.com/upstash/context7
     license: MIT
@@ -358,7 +364,10 @@ third_party:
     adopt: [capture_engine_primary]
     gate_note: "CLI Playwright sudah tersedia di host; python module belum — lihat registry/tools.yaml."
   - repo: apify/crawlee
-    scan_status: "BELUM ADA BUKTI SCAN — aturan #6 belum tertutup (audit 2026-10-07)"
+    scan_status: "SUDAH: trivy (secret,misconfig) + semgrep p/default pada tarball pinned_commit; read-only, kode repo TIDAK dieksekusi 2026-10-07 -> reports/upgrade-evidence/thirdparty-scan-crawlee.json (kredensial=2, misconfig=113, semgrep=60: 17 ERROR / 6 MEDIUM / 30 WARNING / 7 INFO)"
+    scan_evidence: "reports/upgrade-evidence/thirdparty-scan-crawlee.json"
+    review_note: "Review manusia 2026-10-07 atas bukti scan; residual risk diterima karena status BELUM_TERPASANG (belum ada kode berjalan di host)."
+    residual_risk: "2 temuan jwt-token (MEDIUM) di website/src/pages/{index,js}.js (baris 100 & 63) — contoh/dokumentasi website upstream; nilai rahasia TIDAK disimpan dalam bukti (aturan #3). Kode crawlee tetap DILARANG dieksekusi sampai approval."
     install_state: "TIDAK terpasang di host"
     url: https://github.com/apify/crawlee
     license: Apache-2.0
@@ -370,7 +379,9 @@ third_party:
     adopt: [secondary_crawler]
     gate_note: "Anti-bot evasion/proxy rotation dilarang oleh policy ekosistem."
   - repo: dequelabs/axe-core
-    scan_status: "BELUM ADA BUKTI SCAN — aturan #6 belum tertutup (audit 2026-10-07)"
+    scan_status: "SUDAH: trivy (secret,misconfig) + semgrep p/default pada tarball pinned_commit; read-only, kode repo TIDAK dieksekusi 2026-10-07 -> reports/upgrade-evidence/thirdparty-scan-axe-core.json (kredensial=0, misconfig=0, semgrep=34: 1 MEDIUM / 30 WARNING / 3 INFO)"
+    scan_evidence: "reports/upgrade-evidence/thirdparty-scan-axe-core.json"
+    review_note: "Review manusia 2026-10-07 atas bukti scan; residual risk diterima karena status BELUM_TERPASANG (belum ada kode berjalan di host)."
     install_state: "TIDAK terpasang di host"
     url: https://github.com/dequelabs/axe-core
     license: MPL-2.0
@@ -381,7 +392,9 @@ third_party:
     decision_note: "DIAPPROVE human owner via chat 2026-10-06."
     adopt: [accessibility_evidence]
   - repo: GoogleChrome/lighthouse
-    scan_status: "BELUM ADA BUKTI SCAN — aturan #6 belum tertutup (audit 2026-10-07)"
+    scan_status: "SUDAH: trivy (secret,misconfig) + semgrep p/default pada tarball pinned_commit; read-only, kode repo TIDAK dieksekusi 2026-10-07 -> reports/upgrade-evidence/thirdparty-scan-lighthouse.json (kredensial=0, misconfig=0, semgrep=158: 3 ERROR / 150 WARNING / 5 INFO)"
+    scan_evidence: "reports/upgrade-evidence/thirdparty-scan-lighthouse.json"
+    review_note: "Review manusia 2026-10-07 atas bukti scan; residual risk diterima karena status BELUM_TERPASANG (belum ada kode berjalan di host)."
     install_state: "TIDAK terpasang di host"
     url: https://github.com/GoogleChrome/lighthouse
     license: Apache-2.0

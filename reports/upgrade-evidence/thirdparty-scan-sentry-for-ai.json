@@ -1,0 +1,2067 @@
+{
+  "tool": "thirdparty-scan-sentry-for-ai.json",
+  "provenance": "codeload.github.com getsentry/sentry-for-ai@d8fd106782e6",
+  "captured_at": "2026-10-08T06:11:39+0700",
+  "redaction_status": "clean",
+  "status": "FACT",
+  "raw": {
+    "repo": "getsentry/sentry-for-ai",
+    "pinned_commit": "d8fd106782e609625704f5348b25c43b2f5dbeff",
+    "tools": "trivy 0.75.0 + semgrep 1.179.0",
+    "trivy": {
+      "hit_kredensial_terdeteksi": 0,
+      "misconfig": 0,
+      "misconfig_high_critical": 0
+    },
+    "semgrep": {
+      "ruleset": "p/default",
+      "findings": 5,
+      "by_severity": {
+        "ERROR": 1,
+        "MEDIUM": 3,
+        "WARNING": 1
+      }
+    },
+    "note": "Read-only scan atas tarball pinned_commit dari codeload.github.com; tidak ada kode dieksekusi. Isi rahasia TIDAK disimpan (aturan #3); hasil mentah penuh di kunci 'raw' dengan isi rahasia diredaksi.",
+    "raw": {
+      "trivy": {
+        "SchemaVersion": 2,
+        "Trivy": {
+          "Version": "0.75.0"
+        },
+        "ReportID": "01a1189f-442c-7ac1-9f66-171df273665d",
+        "CreatedAt": "2026-10-08T06:07:33.2927098+07:00",
+        "ArtifactName": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai",
+        "ArtifactType": "filesystem",
+        "Results": [
+          {
+            "Target": "pnpm-lock.yaml",
+            "Class": "lang-pkgs",
+            "Type": "pnpm",
+            "Packages": [
+              {
+                "ID": "@inquirer/prompts@8.5.2(@types/node@25.9.3)",
+                "Name": "@inquirer/prompts",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40inquirer/prompts@8.5.2",
+                  "UID": "bf93846ccd545bf5"
+                },
+                "Version": "8.5.2",
+                "Relationship": "direct",
+                "DependsOn": [
+                  "@inquirer/number@4.1.1(@types/node@25.9.3)",
+                  "@inquirer/select@5.2.1(@types/node@25.9.3)",
+                  "@inquirer/confirm@6.1.1(@types/node@25.9.3)",
+                  "@inquirer/checkbox@5.2.1(@types/node@25.9.3)",
+                  "@inquirer/editor@5.2.2(@types/node@25.9.3)",
+                  "@inquirer/input@5.1.2(@types/node@25.9.3)",
+                  "@inquirer/password@5.1.1(@types/node@25.9.3)",
+                  "@inquirer/rawlist@5.3.1(@types/node@25.9.3)",
+                  "@inquirer/search@4.2.1(@types/node@25.9.3)",
+                  "@types/node@25.9.3",
+                  "@inquirer/expand@5.1.1(@types/node@25.9.3)"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@listr2/prompt-adapter-inquirer@4.2.7(@inquirer/prompts@8.5.2(@types/node@25.9.3))(@types/node@25.9.3)(listr2@11.1.0)",
+                "Name": "@listr2/prompt-adapter-inquirer",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40listr2/prompt-adapter-inquirer@4.2.7",
+                  "UID": "a789cde7de99e75"
+                },
+                "Version": "4.2.7",
+                "Relationship": "direct",
+                "DependsOn": [
+                  "@inquirer/prompts@8.5.2(@types/node@25.9.3)",
+                  "@inquirer/type@4.0.7(@types/node@25.9.3)",
+                  "listr2@11.1.0"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@sentry/node@10.57.0",
+                "Name": "@sentry/node",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40sentry/node@10.57.0",
+                  "UID": "15d9940e8b0101bb"
+                },
+                "Version": "10.57.0",
+                "Relationship": "direct",
+                "DependsOn": [
+                  "@opentelemetry/semantic-conventions@1.41.1",
+                  "@sentry/node-core@10.57.0(@opentelemetry/api@1.9.1)(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/instrumentation@0.214.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/semantic-conventions@1.41.1)",
+                  "@sentry-internal/server-utils@10.57.0",
+                  "@sentry/opentelemetry@10.57.0(@opentelemetry/api@1.9.1)(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/semantic-conventions@1.41.1)",
+                  "@opentelemetry/api@1.9.1",
+                  "@opentelemetry/instrumentation@0.214.0(@opentelemetry/api@1.9.1)",
+                  "@sentry/core@10.57.0",
+                  "import-in-the-middle@3.0.2",
+                  "@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1)",
+                  "@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1)"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@types/node@25.9.3",
+                "Name": "@types/node",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40types/node@25.9.3",
+                  "UID": "4afa12f3789482a2"
+                },
+                "Version": "25.9.3",
+                "Relationship": "direct",
+                "DependsOn": [
+                  "undici-types@7.24.6"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "citty@0.1.6",
+                "Name": "citty",
+                "Identifier": {
+                  "PURL": "pkg:npm/citty@0.1.6",
+                  "UID": "dc14ad6d8a300588"
+                },
+                "Version": "0.1.6",
+                "Relationship": "direct",
+                "DependsOn": [
+                  "consola@3.4.2"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "listr2@11.1.0",
+                "Name": "listr2",
+                "Identifier": {
+                  "PURL": "pkg:npm/listr2@11.1.0",
+                  "UID": "57bb86133c54c3bb"
+                },
+                "Version": "11.1.0",
+                "Relationship": "direct",
+                "DependsOn": [
+                  "wrap-ansi@10.0.1",
+                  "cli-truncate@6.1.1",
+                  "log-update@8.0.0"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "node-pty@1.2.0-beta.14",
+                "Name": "node-pty",
+                "Identifier": {
+                  "PURL": "pkg:npm/node-pty@1.2.0-beta.14",
+                  "UID": "126d79680a576b7f"
+                },
+                "Version": "1.2.0-beta.14",
+                "Relationship": "direct",
+                "DependsOn": [
+                  "node-addon-api@7.1.1"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@inquirer/ansi@2.0.7",
+                "Name": "@inquirer/ansi",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40inquirer/ansi@2.0.7",
+                  "UID": "54c5851c09000c67"
+                },
+                "Version": "2.0.7",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@inquirer/checkbox@5.2.1(@types/node@25.9.3)",
+                "Name": "@inquirer/checkbox",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40inquirer/checkbox@5.2.1",
+                  "UID": "a516ff15ea01813f"
+                },
+                "Version": "5.2.1",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "@types/node@25.9.3",
+                  "@inquirer/ansi@2.0.7",
+                  "@inquirer/core@11.2.1(@types/node@25.9.3)",
+                  "@inquirer/figures@2.0.7",
+                  "@inquirer/type@4.0.7(@types/node@25.9.3)"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@inquirer/confirm@6.1.1(@types/node@25.9.3)",
+                "Name": "@inquirer/confirm",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40inquirer/confirm@6.1.1",
+                  "UID": "e52fc25dc2dd094b"
+                },
+                "Version": "6.1.1",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "@types/node@25.9.3",
+                  "@inquirer/core@11.2.1(@types/node@25.9.3)",
+                  "@inquirer/type@4.0.7(@types/node@25.9.3)"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@inquirer/core@11.2.1(@types/node@25.9.3)",
+                "Name": "@inquirer/core",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40inquirer/core@11.2.1",
+                  "UID": "15a03820a024b74c"
+                },
+                "Version": "11.2.1",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "fast-wrap-ansi@0.2.2",
+                  "mute-stream@3.0.0",
+                  "signal-exit@4.1.0",
+                  "@inquirer/ansi@2.0.7",
+                  "@inquirer/figures@2.0.7",
+                  "@inquirer/type@4.0.7(@types/node@25.9.3)",
+                  "@types/node@25.9.3",
+                  "cli-width@4.1.0"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@inquirer/editor@5.2.2(@types/node@25.9.3)",
+                "Name": "@inquirer/editor",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40inquirer/editor@5.2.2",
+                  "UID": "17e27350bc4f9f7f"
+                },
+                "Version": "5.2.2",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "@types/node@25.9.3",
+                  "@inquirer/core@11.2.1(@types/node@25.9.3)",
+                  "@inquirer/external-editor@3.0.3(@types/node@25.9.3)",
+                  "@inquirer/type@4.0.7(@types/node@25.9.3)"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@inquirer/expand@5.1.1(@types/node@25.9.3)",
+                "Name": "@inquirer/expand",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40inquirer/expand@5.1.1",
+                  "UID": "91b91305d83424b5"
+                },
+                "Version": "5.1.1",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "@types/node@25.9.3",
+                  "@inquirer/core@11.2.1(@types/node@25.9.3)",
+                  "@inquirer/type@4.0.7(@types/node@25.9.3)"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@inquirer/external-editor@3.0.3(@types/node@25.9.3)",
+                "Name": "@inquirer/external-editor",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40inquirer/external-editor@3.0.3",
+                  "UID": "e6d4aabad38040cd"
+                },
+                "Version": "3.0.3",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "@types/node@25.9.3",
+                  "chardet@2.1.1",
+                  "iconv-lite@0.7.2"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@inquirer/figures@2.0.7",
+                "Name": "@inquirer/figures",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40inquirer/figures@2.0.7",
+                  "UID": "4a2ceb2866ef55d2"
+                },
+                "Version": "2.0.7",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@inquirer/input@5.1.2(@types/node@25.9.3)",
+                "Name": "@inquirer/input",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40inquirer/input@5.1.2",
+                  "UID": "8509ebb1bf06cfaa"
+                },
+                "Version": "5.1.2",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "@types/node@25.9.3",
+                  "@inquirer/core@11.2.1(@types/node@25.9.3)",
+                  "@inquirer/type@4.0.7(@types/node@25.9.3)"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@inquirer/number@4.1.1(@types/node@25.9.3)",
+                "Name": "@inquirer/number",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40inquirer/number@4.1.1",
+                  "UID": "fbd4168e35e2750b"
+                },
+                "Version": "4.1.1",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "@types/node@25.9.3",
+                  "@inquirer/core@11.2.1(@types/node@25.9.3)",
+                  "@inquirer/type@4.0.7(@types/node@25.9.3)"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@inquirer/password@5.1.1(@types/node@25.9.3)",
+                "Name": "@inquirer/password",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40inquirer/password@5.1.1",
+                  "UID": "97b25667d77884a6"
+                },
+                "Version": "5.1.1",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "@types/node@25.9.3",
+                  "@inquirer/type@4.0.7(@types/node@25.9.3)",
+                  "@inquirer/ansi@2.0.7",
+                  "@inquirer/core@11.2.1(@types/node@25.9.3)"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@inquirer/rawlist@5.3.1(@types/node@25.9.3)",
+                "Name": "@inquirer/rawlist",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40inquirer/rawlist@5.3.1",
+                  "UID": "a89d1f2009c1823f"
+                },
+                "Version": "5.3.1",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "@types/node@25.9.3",
+                  "@inquirer/core@11.2.1(@types/node@25.9.3)",
+                  "@inquirer/type@4.0.7(@types/node@25.9.3)"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@inquirer/search@4.2.1(@types/node@25.9.3)",
+                "Name": "@inquirer/search",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40inquirer/search@4.2.1",
+                  "UID": "9a72952153c7e594"
+                },
+                "Version": "4.2.1",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "@types/node@25.9.3",
+                  "@inquirer/core@11.2.1(@types/node@25.9.3)",
+                  "@inquirer/figures@2.0.7",
+                  "@inquirer/type@4.0.7(@types/node@25.9.3)"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@inquirer/select@5.2.1(@types/node@25.9.3)",
+                "Name": "@inquirer/select",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40inquirer/select@5.2.1",
+                  "UID": "9d55b28091207172"
+                },
+                "Version": "5.2.1",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "@types/node@25.9.3",
+                  "@inquirer/ansi@2.0.7",
+                  "@inquirer/core@11.2.1(@types/node@25.9.3)",
+                  "@inquirer/figures@2.0.7",
+                  "@inquirer/type@4.0.7(@types/node@25.9.3)"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@inquirer/type@4.0.7(@types/node@25.9.3)",
+                "Name": "@inquirer/type",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40inquirer/type@4.0.7",
+                  "UID": "f814c22bb4ac0094"
+                },
+                "Version": "4.0.7",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "@types/node@25.9.3"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@opentelemetry/api@1.9.1",
+                "Name": "@opentelemetry/api",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40opentelemetry/api@1.9.1",
+                  "UID": "e1d9e1e1e95303a8"
+                },
+                "Version": "1.9.1",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@opentelemetry/api-logs@0.214.0",
+                "Name": "@opentelemetry/api-logs",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40opentelemetry/api-logs@0.214.0",
+                  "UID": "91f9c3519e3ef726"
+                },
+                "Version": "0.214.0",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "@opentelemetry/api@1.9.1"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1)",
+                "Name": "@opentelemetry/core",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40opentelemetry/core@2.8.0",
+                  "UID": "1502e6c8ee34f454"
+                },
+                "Version": "2.8.0",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "@opentelemetry/api@1.9.1",
+                  "@opentelemetry/semantic-conventions@1.41.1"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@opentelemetry/instrumentation@0.214.0(@opentelemetry/api@1.9.1)",
+                "Name": "@opentelemetry/instrumentation",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40opentelemetry/instrumentation@0.214.0",
+                  "UID": "1ef1c1816c8bf502"
+                },
+                "Version": "0.214.0",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "require-in-the-middle@8.0.1",
+                  "@opentelemetry/api@1.9.1",
+                  "@opentelemetry/api-logs@0.214.0",
+                  "import-in-the-middle@3.0.2"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@opentelemetry/resources@2.8.0(@opentelemetry/api@1.9.1)",
+                "Name": "@opentelemetry/resources",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40opentelemetry/resources@2.8.0",
+                  "UID": "9174e914af71e0e1"
+                },
+                "Version": "2.8.0",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "@opentelemetry/api@1.9.1",
+                  "@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1)",
+                  "@opentelemetry/semantic-conventions@1.41.1"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1)",
+                "Name": "@opentelemetry/sdk-trace-base",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40opentelemetry/sdk-trace-base@2.8.0",
+                  "UID": "cdd592efd43cb31f"
+                },
+                "Version": "2.8.0",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "@opentelemetry/resources@2.8.0(@opentelemetry/api@1.9.1)",
+                  "@opentelemetry/semantic-conventions@1.41.1",
+                  "@opentelemetry/api@1.9.1",
+                  "@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1)"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@opentelemetry/semantic-conventions@1.41.1",
+                "Name": "@opentelemetry/semantic-conventions",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40opentelemetry/semantic-conventions@1.41.1",
+                  "UID": "eb025ce10166ac97"
+                },
+                "Version": "1.41.1",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@sentry-internal/server-utils@10.57.0",
+                "Name": "@sentry-internal/server-utils",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40sentry-internal/server-utils@10.57.0",
+                  "UID": "6fa897b5a5cd1838"
+                },
+                "Version": "10.57.0",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "@sentry/core@10.57.0"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@sentry/core@10.57.0",
+                "Name": "@sentry/core",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40sentry/core@10.57.0",
+                  "UID": "28567c88ef28c08f"
+                },
+                "Version": "10.57.0",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@sentry/node-core@10.57.0(@opentelemetry/api@1.9.1)(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/instrumentation@0.214.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/semantic-conventions@1.41.1)",
+                "Name": "@sentry/node-core",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40sentry/node-core@10.57.0",
+                  "UID": "901f5c8d88a7d2ca"
+                },
+                "Version": "10.57.0",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1)",
+                  "@opentelemetry/instrumentation@0.214.0(@opentelemetry/api@1.9.1)",
+                  "@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1)",
+                  "@opentelemetry/semantic-conventions@1.41.1",
+                  "@sentry/opentelemetry@10.57.0(@opentelemetry/api@1.9.1)(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/semantic-conventions@1.41.1)",
+                  "import-in-the-middle@3.0.2",
+                  "@sentry/core@10.57.0",
+                  "@opentelemetry/api@1.9.1"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "@sentry/opentelemetry@10.57.0(@opentelemetry/api@1.9.1)(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/semantic-conventions@1.41.1)",
+                "Name": "@sentry/opentelemetry",
+                "Identifier": {
+                  "PURL": "pkg:npm/%40sentry/opentelemetry@10.57.0",
+                  "UID": "31fba9a1be1109"
+                },
+                "Version": "10.57.0",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "@opentelemetry/api@1.9.1",
+                  "@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1)",
+                  "@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1)",
+                  "@opentelemetry/semantic-conventions@1.41.1",
+                  "@sentry/core@10.57.0"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "acorn@8.17.0",
+                "Name": "acorn",
+                "Identifier": {
+                  "PURL": "pkg:npm/acorn@8.17.0",
+                  "UID": "f2d70530b9a46eaa"
+                },
+                "Version": "8.17.0",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "acorn-import-attributes@1.9.5(acorn@8.17.0)",
+                "Name": "acorn-import-attributes",
+                "Identifier": {
+                  "PURL": "pkg:npm/acorn-import-attributes@1.9.5",
+                  "UID": "f41fed14271e49ce"
+                },
+                "Version": "1.9.5",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "acorn@8.17.0"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "ansi-escapes@7.3.0",
+                "Name": "ansi-escapes",
+                "Identifier": {
+                  "PURL": "pkg:npm/ansi-escapes@7.3.0",
+                  "UID": "a925f5bea3151dc6"
+                },
+                "Version": "7.3.0",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "environment@1.1.0"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "ansi-regex@6.2.2",
+                "Name": "ansi-regex",
+                "Identifier": {
+                  "PURL": "pkg:npm/ansi-regex@6.2.2",
+                  "UID": "d9306df7560124cf"
+                },
+                "Version": "6.2.2",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "ansi-styles@6.2.3",
+                "Name": "ansi-styles",
+                "Identifier": {
+                  "PURL": "pkg:npm/ansi-styles@6.2.3",
+                  "UID": "e58c770cfd23e0c6"
+                },
+                "Version": "6.2.3",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "chardet@2.1.1",
+                "Name": "chardet",
+                "Identifier": {
+                  "PURL": "pkg:npm/chardet@2.1.1",
+                  "UID": "eac005bfe1ad537c"
+                },
+                "Version": "2.1.1",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "cjs-module-lexer@2.2.0",
+                "Name": "cjs-module-lexer",
+                "Identifier": {
+                  "PURL": "pkg:npm/cjs-module-lexer@2.2.0",
+                  "UID": "ae160ce906564207"
+                },
+                "Version": "2.2.0",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "cli-cursor@5.0.0",
+                "Name": "cli-cursor",
+                "Identifier": {
+                  "PURL": "pkg:npm/cli-cursor@5.0.0",
+                  "UID": "28d7a064db050830"
+                },
+                "Version": "5.0.0",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "restore-cursor@5.1.0"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "cli-truncate@6.1.1",
+                "Name": "cli-truncate",
+                "Identifier": {
+                  "PURL": "pkg:npm/cli-truncate@6.1.1",
+                  "UID": "967375d271e8d385"
+                },
+                "Version": "6.1.1",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "string-width@8.2.1",
+                  "slice-ansi@9.0.0"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "cli-width@4.1.0",
+                "Name": "cli-width",
+                "Identifier": {
+                  "PURL": "pkg:npm/cli-width@4.1.0",
+                  "UID": "6311dafd71002db3"
+                },
+                "Version": "4.1.0",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "consola@3.4.2",
+                "Name": "consola",
+                "Identifier": {
+                  "PURL": "pkg:npm/consola@3.4.2",
+                  "UID": "1196dd0f8cf32783"
+                },
+                "Version": "3.4.2",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "debug@4.4.3",
+                "Name": "debug",
+                "Identifier": {
+                  "PURL": "pkg:npm/debug@4.4.3",
+                  "UID": "c799ce6b30cccc05"
+                },
+                "Version": "4.4.3",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "ms@2.1.3"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "environment@1.1.0",
+                "Name": "environment",
+                "Identifier": {
+                  "PURL": "pkg:npm/environment@1.1.0",
+                  "UID": "bdf25c56fa8c9517"
+                },
+                "Version": "1.1.0",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "fast-string-truncated-width@3.0.3",
+                "Name": "fast-string-truncated-width",
+                "Identifier": {
+                  "PURL": "pkg:npm/fast-string-truncated-width@3.0.3",
+                  "UID": "171bbf645528432b"
+                },
+                "Version": "3.0.3",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "fast-string-width@3.0.2",
+                "Name": "fast-string-width",
+                "Identifier": {
+                  "PURL": "pkg:npm/fast-string-width@3.0.2",
+                  "UID": "6ff841714afba9db"
+                },
+                "Version": "3.0.2",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "fast-string-truncated-width@3.0.3"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "fast-wrap-ansi@0.2.2",
+                "Name": "fast-wrap-ansi",
+                "Identifier": {
+                  "PURL": "pkg:npm/fast-wrap-ansi@0.2.2",
+                  "UID": "a025d73e1a0a6bbf"
+                },
+                "Version": "0.2.2",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "fast-string-width@3.0.2"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "get-east-asian-width@1.6.0",
+                "Name": "get-east-asian-width",
+                "Identifier": {
+                  "PURL": "pkg:npm/get-east-asian-width@1.6.0",
+                  "UID": "195fb940961dc15e"
+                },
+                "Version": "1.6.0",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "iconv-lite@0.7.2",
+                "Name": "iconv-lite",
+                "Identifier": {
+                  "PURL": "pkg:npm/iconv-lite@0.7.2",
+                  "UID": "189f32f48d0b8343"
+                },
+                "Version": "0.7.2",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "safer-buffer@2.1.2"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "import-in-the-middle@3.0.2",
+                "Name": "import-in-the-middle",
+                "Identifier": {
+                  "PURL": "pkg:npm/import-in-the-middle@3.0.2",
+                  "UID": "a98c4bf357ec7a48"
+                },
+                "Version": "3.0.2",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "acorn@8.17.0",
+                  "acorn-import-attributes@1.9.5(acorn@8.17.0)",
+                  "cjs-module-lexer@2.2.0",
+                  "module-details-from-path@1.0.4"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "is-fullwidth-code-point@5.1.0",
+                "Name": "is-fullwidth-code-point",
+                "Identifier": {
+                  "PURL": "pkg:npm/is-fullwidth-code-point@5.1.0",
+                  "UID": "ef6fb046b09adbc5"
+                },
+                "Version": "5.1.0",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "get-east-asian-width@1.6.0"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "log-update@8.0.0",
+                "Name": "log-update",
+                "Identifier": {
+                  "PURL": "pkg:npm/log-update@8.0.0",
+                  "UID": "7f6431deb1e02859"
+                },
+                "Version": "8.0.0",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "string-width@8.2.1",
+                  "strip-ansi@7.2.0",
+                  "wrap-ansi@10.0.0",
+                  "ansi-escapes@7.3.0",
+                  "cli-cursor@5.0.0",
+                  "slice-ansi@9.0.0"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "mimic-function@5.0.1",
+                "Name": "mimic-function",
+                "Identifier": {
+                  "PURL": "pkg:npm/mimic-function@5.0.1",
+                  "UID": "357a97e1036a45dd"
+                },
+                "Version": "5.0.1",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "module-details-from-path@1.0.4",
+                "Name": "module-details-from-path",
+                "Identifier": {
+                  "PURL": "pkg:npm/module-details-from-path@1.0.4",
+                  "UID": "185600a305ad8529"
+                },
+                "Version": "1.0.4",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "ms@2.1.3",
+                "Name": "ms",
+                "Identifier": {
+                  "PURL": "pkg:npm/ms@2.1.3",
+                  "UID": "8633655ddfe0e952"
+                },
+                "Version": "2.1.3",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "mute-stream@3.0.0",
+                "Name": "mute-stream",
+                "Identifier": {
+                  "PURL": "pkg:npm/mute-stream@3.0.0",
+                  "UID": "b2cbef0f3b88a9bb"
+                },
+                "Version": "3.0.0",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "node-addon-api@7.1.1",
+                "Name": "node-addon-api",
+                "Identifier": {
+                  "PURL": "pkg:npm/node-addon-api@7.1.1",
+                  "UID": "a3df0fa90e1da9f5"
+                },
+                "Version": "7.1.1",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "onetime@7.0.0",
+                "Name": "onetime",
+                "Identifier": {
+                  "PURL": "pkg:npm/onetime@7.0.0",
+                  "UID": "9082b87195c3115c"
+                },
+                "Version": "7.0.0",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "mimic-function@5.0.1"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "require-in-the-middle@8.0.1",
+                "Name": "require-in-the-middle",
+                "Identifier": {
+                  "PURL": "pkg:npm/require-in-the-middle@8.0.1",
+                  "UID": "4ef75823f822da47"
+                },
+                "Version": "8.0.1",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "debug@4.4.3",
+                  "module-details-from-path@1.0.4"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "restore-cursor@5.1.0",
+                "Name": "restore-cursor",
+                "Identifier": {
+                  "PURL": "pkg:npm/restore-cursor@5.1.0",
+                  "UID": "c73f7e14ff2cbacc"
+                },
+                "Version": "5.1.0",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "onetime@7.0.0",
+                  "signal-exit@4.1.0"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "safer-buffer@2.1.2",
+                "Name": "safer-buffer",
+                "Identifier": {
+                  "PURL": "pkg:npm/safer-buffer@2.1.2",
+                  "UID": "2f06e2fead3f46bc"
+                },
+                "Version": "2.1.2",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "signal-exit@4.1.0",
+                "Name": "signal-exit",
+                "Identifier": {
+                  "PURL": "pkg:npm/signal-exit@4.1.0",
+                  "UID": "9a610a89da951e6d"
+                },
+                "Version": "4.1.0",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "slice-ansi@9.0.0",
+                "Name": "slice-ansi",
+                "Identifier": {
+                  "PURL": "pkg:npm/slice-ansi@9.0.0",
+                  "UID": "c5f7b69a46b65e03"
+                },
+                "Version": "9.0.0",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "ansi-styles@6.2.3",
+                  "is-fullwidth-code-point@5.1.0"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "string-width@8.2.1",
+                "Name": "string-width",
+                "Identifier": {
+                  "PURL": "pkg:npm/string-width@8.2.1",
+                  "UID": "46fccefd6503848d"
+                },
+                "Version": "8.2.1",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "get-east-asian-width@1.6.0",
+                  "strip-ansi@7.2.0"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "strip-ansi@7.2.0",
+                "Name": "strip-ansi",
+                "Identifier": {
+                  "PURL": "pkg:npm/strip-ansi@7.2.0",
+                  "UID": "429e9b8890c4a340"
+                },
+                "Version": "7.2.0",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "ansi-regex@6.2.2"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "undici-types@7.24.6",
+                "Name": "undici-types",
+                "Identifier": {
+                  "PURL": "pkg:npm/undici-types@7.24.6",
+                  "UID": "ce5f1b4566aff1be"
+                },
+                "Version": "7.24.6",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "wrap-ansi@10.0.0",
+                "Name": "wrap-ansi",
+                "Identifier": {
+                  "PURL": "pkg:npm/wrap-ansi@10.0.0",
+                  "UID": "6fa3bb9a56c9108c"
+                },
+                "Version": "10.0.0",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "ansi-styles@6.2.3",
+                  "string-width@8.2.1",
+                  "strip-ansi@7.2.0"
+                ],
+                "AnalyzedBy": "pnpm"
+              },
+              {
+                "ID": "wrap-ansi@10.0.1",
+                "Name": "wrap-ansi",
+                "Identifier": {
+                  "PURL": "pkg:npm/wrap-ansi@10.0.1",
+                  "UID": "bcfe364b6cfd9c2d"
+                },
+                "Version": "10.0.1",
+                "Indirect": true,
+                "Relationship": "indirect",
+                "DependsOn": [
+                  "ansi-styles@6.2.3",
+                  "string-width@8.2.1"
+                ],
+                "AnalyzedBy": "pnpm"
+              }
+            ]
+          }
+        ]
+      },
+      "semgrep": {
+        "results": [
+          {
+            "check_id": "javascript.lang.security.audit.spawn-shell-true.spawn-shell-true",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/packages/installer/src/system.ts",
+            "start": {
+              "line": 38,
+              "col": 19,
+              "offset": 1459
+            },
+            "end": {
+              "line": 38,
+              "col": 50,
+              "offset": 1490
+            },
+            "extra": {
+              "message": "Found '$SPAWN' with '{shell: true}'. This is dangerous because this call will spawn the command using a shell process. Doing so propagates current shell settings and variables, which makes it much easier for a malicious actor to execute commands. Use '{shell: false}' instead.",
+              "metadata": {
+                "owasp": [
+                  "A01:2017 - Injection",
+                  "A03:2021 - Injection",
+                  "A05:2025 - Injection"
+                ],
+                "cwe": [
+                  "CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')"
+                ],
+                "category": "security",
+                "technology": [
+                  "javascript"
+                ],
+                "cwe2022-top25": true,
+                "cwe2021-top25": true,
+                "subcategory": [
+                  "audit"
+                ],
+                "likelihood": "LOW",
+                "impact": "LOW",
+                "confidence": "LOW",
+                "references": [
+                  "https://owasp.org/Top10/A03_2021-Injection"
+                ],
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Command Injection"
+                ],
+                "source": "https://semgrep.dev/r/javascript.lang.security.audit.spawn-shell-true.spawn-shell-true",
+                "shortlink": "https://sg.run/Wgeo"
+              },
+              "severity": "ERROR",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "package_managers.pnpm.pnpm-block-exotic-sub-dependencies.pnpm-block-exotic-sub-dependencies",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/pnpm-workspace.yaml",
+            "start": {
+              "line": 1,
+              "col": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "col": 10,
+              "offset": 9
+            },
+            "extra": {
+              "message": "Missing or incorrect blockExoticSubdeps. Set `blockExoticSubdeps: true` to transitive dependencies from being installed from untrusted sources. Added in: v10.26.0 Reference: https://pnpm.io/settings#blockexoticsubdeps",
+              "metadata": {
+                "category": "security",
+                "technology": [
+                  "pnpm"
+                ],
+                "cwe": [
+                  "CWE-829: Inclusion of Functionality from Untrusted Control Sphere"
+                ],
+                "owasp": [
+                  "A08:2021 - Software and Data Integrity Failures"
+                ],
+                "confidence": "HIGH",
+                "likelihood": "LOW",
+                "impact": "HIGH",
+                "subcategory": [
+                  "audit"
+                ],
+                "vulnerability_class": [
+                  "Insecure Configuration"
+                ],
+                "references": [
+                  "https://pnpm.io/settings#blockexoticsubdeps"
+                ],
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "source": "https://semgrep.dev/r/package_managers.pnpm.pnpm-block-exotic-sub-dependencies.pnpm-block-exotic-sub-dependencies",
+                "shortlink": "https://sg.run/RrWRv"
+              },
+              "severity": "MEDIUM",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "package_managers.pnpm.pnpm-missing-minimum-release-age.pnpm-minimum-release-age",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/pnpm-workspace.yaml",
+            "start": {
+              "line": 1,
+              "col": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "col": 10,
+              "offset": 9
+            },
+            "extra": {
+              "message": "This pnpm workspace configuration does not set a minimum release age. Newly published packages can be malicious or unstable. Add `minimumReleaseAge: 10080` (minutes) to wait at least seven days before installing newly published package versions. Added in: v10.16.0 Reference: https://pnpm.io/settings#minimumreleaseage",
+              "metadata": {
+                "category": "security",
+                "technology": [
+                  "pnpm"
+                ],
+                "cwe": [
+                  "CWE-829: Inclusion of Functionality from Untrusted Control Sphere"
+                ],
+                "owasp": [
+                  "A08:2021 - Software and Data Integrity Failures"
+                ],
+                "confidence": "HIGH",
+                "likelihood": "LOW",
+                "impact": "HIGH",
+                "subcategory": [
+                  "audit"
+                ],
+                "vulnerability_class": [
+                  "Insecure Configuration"
+                ],
+                "references": [
+                  "https://pnpm.io/settings#minimumreleaseage"
+                ],
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "source": "https://semgrep.dev/r/package_managers.pnpm.pnpm-missing-minimum-release-age.pnpm-minimum-release-age",
+                "shortlink": "https://sg.run/Aj0o0"
+              },
+              "severity": "MEDIUM",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "package_managers.pnpm.pnpm-trust-policy.pnpm-trust-policy",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/pnpm-workspace.yaml",
+            "start": {
+              "line": 1,
+              "col": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "col": 10,
+              "offset": 9
+            },
+            "extra": {
+              "message": "Missing or incorrect trustPolicy. Set `trustPolicy: no-downgrade` to prevent malicious package updates from downgrading security settings. Added in: v10.21.0 Reference: https://pnpm.io/settings#trustpolicy",
+              "metadata": {
+                "category": "security",
+                "technology": [
+                  "pnpm"
+                ],
+                "cwe": [
+                  "CWE-829: Inclusion of Functionality from Untrusted Control Sphere"
+                ],
+                "owasp": [
+                  "A08:2021 - Software and Data Integrity Failures"
+                ],
+                "confidence": "HIGH",
+                "likelihood": "LOW",
+                "impact": "HIGH",
+                "subcategory": [
+                  "audit"
+                ],
+                "vulnerability_class": [
+                  "Insecure Configuration"
+                ],
+                "references": [
+                  "https://pnpm.io/settings#minimumreleaseage"
+                ],
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "source": "https://semgrep.dev/r/package_managers.pnpm.pnpm-trust-policy.pnpm-trust-policy",
+                "shortlink": "https://sg.run/B2Kz7"
+              },
+              "severity": "MEDIUM",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          },
+          {
+            "check_id": "python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/scripts/gen-semantics.py",
+            "start": {
+              "line": 85,
+              "col": 10,
+              "offset": 5056
+            },
+            "end": {
+              "line": 85,
+              "col": 56,
+              "offset": 5102
+            },
+            "extra": {
+              "message": "Detected a dynamic value being used with urllib. urllib supports 'file://' schemes, so a dynamic value controlled by a malicious actor may allow them to read arbitrary files. Audit uses of urllib calls to ensure user data cannot control the URLs, or consider using the 'requests' library instead.",
+              "metadata": {
+                "cwe": [
+                  "CWE-939: Improper Authorization in Handler for Custom URL Scheme"
+                ],
+                "owasp": "A01:2017 - Injection",
+                "source-rule-url": "https://github.com/PyCQA/bandit/blob/b1411bfb43795d3ffd268bef17a839dee954c2b1/bandit/blacklists/calls.py#L163",
+                "bandit-code": "B310",
+                "asvs": {
+                  "control_id": "5.2.4 Dynamic Code Execution Features",
+                  "control_url": "https://github.com/OWASP/ASVS/blob/master/4.0/en/0x13-V5-Validation-Sanitization-Encoding.md#v52-sanitization-and-sandboxing-requirements",
+                  "section": "V5: Validation, Sanitization and Encoding Verification Requirements",
+                  "version": "4"
+                },
+                "category": "security",
+                "technology": [
+                  "python"
+                ],
+                "references": [
+                  "https://cwe.mitre.org/data/definitions/939.html"
+                ],
+                "subcategory": [
+                  "audit"
+                ],
+                "likelihood": "LOW",
+                "impact": "LOW",
+                "confidence": "LOW",
+                "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+                "vulnerability_class": [
+                  "Improper Authorization"
+                ],
+                "source": "https://semgrep.dev/r/python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected",
+                "shortlink": "https://sg.run/dKZZ"
+              },
+              "severity": "WARNING",
+              "fingerprint": "requires login",
+              "lines": "requires login",
+              "validation_state": "NO_VALIDATOR",
+              "engine_kind": "OSS"
+            }
+          }
+        ],
+        "errors": [
+          {
+            "code": 3,
+            "level": "warn",
+            "type": [
+              "PartialParsing",
+              [
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/packages/installer/src/__tests__/system.test.ts",
+                  "start": {
+                    "line": 9,
+                    "col": 63,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 9,
+                    "col": 66,
+                    "offset": 3
+                  }
+                }
+              ]
+            ],
+            "message": "Syntax error at line /home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/packages/installer/src/__tests__/system.test.ts:9:\n `>()` was unexpected",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/packages/installer/src/__tests__/system.test.ts",
+            "spans": [
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/packages/installer/src/__tests__/system.test.ts",
+                "start": {
+                  "line": 9,
+                  "col": 63,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 9,
+                  "col": 66,
+                  "offset": 3
+                }
+              }
+            ]
+          },
+          {
+            "code": 3,
+            "level": "warn",
+            "type": [
+              "PartialParsing",
+              [
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/agent-plugin/build.sh",
+                  "start": {
+                    "line": 13,
+                    "col": 34,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 13,
+                    "col": 35,
+                    "offset": 1
+                  }
+                },
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/agent-plugin/build.sh",
+                  "start": {
+                    "line": 13,
+                    "col": 45,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 13,
+                    "col": 46,
+                    "offset": 1
+                  }
+                }
+              ]
+            ],
+            "message": "Syntax error at line /home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/agent-plugin/build.sh:13:\n `<` was unexpected",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/agent-plugin/build.sh",
+            "spans": [
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/agent-plugin/build.sh",
+                "start": {
+                  "line": 13,
+                  "col": 34,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 13,
+                  "col": 35,
+                  "offset": 1
+                }
+              },
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/agent-plugin/build.sh",
+                "start": {
+                  "line": 13,
+                  "col": 45,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 13,
+                  "col": 46,
+                  "offset": 1
+                }
+              }
+            ]
+          },
+          {
+            "code": 3,
+            "level": "warn",
+            "type": [
+              "PartialParsing",
+              [
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/agent-plugin/validate.sh",
+                  "start": {
+                    "line": 13,
+                    "col": 37,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 13,
+                    "col": 38,
+                    "offset": 1
+                  }
+                },
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/agent-plugin/validate.sh",
+                  "start": {
+                    "line": 13,
+                    "col": 48,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 13,
+                    "col": 49,
+                    "offset": 1
+                  }
+                }
+              ]
+            ],
+            "message": "Syntax error at line /home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/agent-plugin/validate.sh:13:\n `<` was unexpected",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/agent-plugin/validate.sh",
+            "spans": [
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/agent-plugin/validate.sh",
+                "start": {
+                  "line": 13,
+                  "col": 37,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 13,
+                  "col": 38,
+                  "offset": 1
+                }
+              },
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/agent-plugin/validate.sh",
+                "start": {
+                  "line": 13,
+                  "col": 48,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 13,
+                  "col": 49,
+                  "offset": 1
+                }
+              }
+            ]
+          },
+          {
+            "code": 3,
+            "level": "warn",
+            "type": [
+              "PartialParsing",
+              [
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/claude/build.sh",
+                  "start": {
+                    "line": 23,
+                    "col": 34,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 23,
+                    "col": 35,
+                    "offset": 1
+                  }
+                },
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/claude/build.sh",
+                  "start": {
+                    "line": 23,
+                    "col": 45,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 23,
+                    "col": 46,
+                    "offset": 1
+                  }
+                }
+              ]
+            ],
+            "message": "Syntax error at line /home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/claude/build.sh:23:\n `<` was unexpected",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/claude/build.sh",
+            "spans": [
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/claude/build.sh",
+                "start": {
+                  "line": 23,
+                  "col": 34,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 23,
+                  "col": 35,
+                  "offset": 1
+                }
+              },
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/claude/build.sh",
+                "start": {
+                  "line": 23,
+                  "col": 45,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 23,
+                  "col": 46,
+                  "offset": 1
+                }
+              }
+            ]
+          },
+          {
+            "code": 3,
+            "level": "warn",
+            "type": [
+              "PartialParsing",
+              [
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/claude/validate.sh",
+                  "start": {
+                    "line": 14,
+                    "col": 37,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 14,
+                    "col": 38,
+                    "offset": 1
+                  }
+                },
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/claude/validate.sh",
+                  "start": {
+                    "line": 14,
+                    "col": 48,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 14,
+                    "col": 49,
+                    "offset": 1
+                  }
+                }
+              ]
+            ],
+            "message": "Syntax error at line /home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/claude/validate.sh:14:\n `<` was unexpected",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/claude/validate.sh",
+            "spans": [
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/claude/validate.sh",
+                "start": {
+                  "line": 14,
+                  "col": 37,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 14,
+                  "col": 38,
+                  "offset": 1
+                }
+              },
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/claude/validate.sh",
+                "start": {
+                  "line": 14,
+                  "col": 48,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 14,
+                  "col": 49,
+                  "offset": 1
+                }
+              }
+            ]
+          },
+          {
+            "code": 3,
+            "level": "warn",
+            "type": [
+              "PartialParsing",
+              [
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/codex/build.sh",
+                  "start": {
+                    "line": 30,
+                    "col": 34,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 30,
+                    "col": 35,
+                    "offset": 1
+                  }
+                },
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/codex/build.sh",
+                  "start": {
+                    "line": 30,
+                    "col": 45,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 30,
+                    "col": 46,
+                    "offset": 1
+                  }
+                }
+              ]
+            ],
+            "message": "Syntax error at line /home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/codex/build.sh:30:\n `<` was unexpected",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/codex/build.sh",
+            "spans": [
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/codex/build.sh",
+                "start": {
+                  "line": 30,
+                  "col": 34,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 30,
+                  "col": 35,
+                  "offset": 1
+                }
+              },
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/codex/build.sh",
+                "start": {
+                  "line": 30,
+                  "col": 45,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 30,
+                  "col": 46,
+                  "offset": 1
+                }
+              }
+            ]
+          },
+          {
+            "code": 3,
+            "level": "warn",
+            "type": [
+              "PartialParsing",
+              [
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/codex/validate.sh",
+                  "start": {
+                    "line": 16,
+                    "col": 37,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 16,
+                    "col": 38,
+                    "offset": 1
+                  }
+                },
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/codex/validate.sh",
+                  "start": {
+                    "line": 16,
+                    "col": 48,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 16,
+                    "col": 49,
+                    "offset": 1
+                  }
+                }
+              ]
+            ],
+            "message": "Syntax error at line /home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/codex/validate.sh:16:\n `<` was unexpected",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/codex/validate.sh",
+            "spans": [
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/codex/validate.sh",
+                "start": {
+                  "line": 16,
+                  "col": 37,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 16,
+                  "col": 38,
+                  "offset": 1
+                }
+              },
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/codex/validate.sh",
+                "start": {
+                  "line": 16,
+                  "col": 48,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 16,
+                  "col": 49,
+                  "offset": 1
+                }
+              }
+            ]
+          },
+          {
+            "code": 3,
+            "level": "warn",
+            "type": [
+              "PartialParsing",
+              [
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/cursor/build.sh",
+                  "start": {
+                    "line": 24,
+                    "col": 34,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 24,
+                    "col": 35,
+                    "offset": 1
+                  }
+                },
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/cursor/build.sh",
+                  "start": {
+                    "line": 24,
+                    "col": 45,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 24,
+                    "col": 46,
+                    "offset": 1
+                  }
+                }
+              ]
+            ],
+            "message": "Syntax error at line /home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/cursor/build.sh:24:\n `<` was unexpected",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/cursor/build.sh",
+            "spans": [
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/cursor/build.sh",
+                "start": {
+                  "line": 24,
+                  "col": 34,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 24,
+                  "col": 35,
+                  "offset": 1
+                }
+              },
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/cursor/build.sh",
+                "start": {
+                  "line": 24,
+                  "col": 45,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 24,
+                  "col": 46,
+                  "offset": 1
+                }
+              }
+            ]
+          },
+          {
+            "code": 3,
+            "level": "warn",
+            "type": [
+              "PartialParsing",
+              [
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/cursor/validate.sh",
+                  "start": {
+                    "line": 14,
+                    "col": 37,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 14,
+                    "col": 38,
+                    "offset": 1
+                  }
+                },
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/cursor/validate.sh",
+                  "start": {
+                    "line": 14,
+                    "col": 48,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 14,
+                    "col": 49,
+                    "offset": 1
+                  }
+                }
+              ]
+            ],
+            "message": "Syntax error at line /home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/cursor/validate.sh:14:\n `<` was unexpected",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/cursor/validate.sh",
+            "spans": [
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/cursor/validate.sh",
+                "start": {
+                  "line": 14,
+                  "col": 37,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 14,
+                  "col": 38,
+                  "offset": 1
+                }
+              },
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/cursor/validate.sh",
+                "start": {
+                  "line": 14,
+                  "col": 48,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 14,
+                  "col": 49,
+                  "offset": 1
+                }
+              }
+            ]
+          },
+          {
+            "code": 3,
+            "level": "warn",
+            "type": [
+              "PartialParsing",
+              [
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/grok/build.sh",
+                  "start": {
+                    "line": 23,
+                    "col": 34,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 23,
+                    "col": 35,
+                    "offset": 1
+                  }
+                },
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/grok/build.sh",
+                  "start": {
+                    "line": 23,
+                    "col": 45,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 23,
+                    "col": 46,
+                    "offset": 1
+                  }
+                }
+              ]
+            ],
+            "message": "Syntax error at line /home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/grok/build.sh:23:\n `<` was unexpected",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/grok/build.sh",
+            "spans": [
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/grok/build.sh",
+                "start": {
+                  "line": 23,
+                  "col": 34,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 23,
+                  "col": 35,
+                  "offset": 1
+                }
+              },
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/grok/build.sh",
+                "start": {
+                  "line": 23,
+                  "col": 45,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 23,
+                  "col": 46,
+                  "offset": 1
+                }
+              }
+            ]
+          },
+          {
+            "code": 3,
+            "level": "warn",
+            "type": [
+              "PartialParsing",
+              [
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/grok/validate.sh",
+                  "start": {
+                    "line": 15,
+                    "col": 37,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 15,
+                    "col": 38,
+                    "offset": 1
+                  }
+                },
+                {
+                  "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/grok/validate.sh",
+                  "start": {
+                    "line": 15,
+                    "col": 48,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 15,
+                    "col": 49,
+                    "offset": 1
+                  }
+                }
+              ]
+            ],
+            "message": "Syntax error at line /home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/grok/validate.sh:15:\n `<` was unexpected",
+            "path": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/grok/validate.sh",
+            "spans": [
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/grok/validate.sh",
+                "start": {
+                  "line": 15,
+                  "col": 37,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 15,
+                  "col": 38,
+                  "offset": 1
+                }
+              },
+              {
+                "file": "/home/anashadi/.hermes/cache/scratch/tp-scan/x-sentry-for-ai/src/plugins/grok/validate.sh",
+                "start": {
+                  "line": 15,
+                  "col": 48,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 15,
+                  "col": 49,
+                  "offset": 1
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

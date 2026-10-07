@@ -1,8 +1,18 @@
 # Secrets — JANGAN pernah masuk git
 .env
+.env.*
+!.env.template
+!.env.example
 *.env
 *.pem
 *.key
+
+# Kredensial perkakas (gh CLI, git credential store, ssh)
+hosts.yml
+.git-credentials
+.netrc
+id_rsa*
+id_ed25519*
 
 # Python
 __pycache__/

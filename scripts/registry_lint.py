@@ -18,7 +18,6 @@ VALID_STATUS = {"KEEP", "UPDATE", "REPLACE", "ADD", "REMOVE", "QUARANTINE", "PEN
                 # 2026-10-05: hasil keputusan pihak ketiga (lihat registry bagian B)
                 "INSTALLED", "REJECTED_BLUEPRINT", "REJECTED_LICENSE", "REJECTED_COVERED"}
 
-
 def frontmatter(path):
     try:
         with open(path, "r", encoding="utf-8") as fh:
@@ -102,23 +101,69 @@ def main() -> int:
 
     # tools registry
     tools = load_yaml(repo_path("registry", "tools.yaml")) or {}
+    sections = {k: v for k, v in tools.items() if isinstance(v, list)}
     missing_sections = REQUIRED_TOOL_SECTIONS - set(tools.keys())
     if missing_sections:
         errors.append(f"tools.yaml kurang seksi: {sorted(missing_sections)}")
-    for section, items in tools.items():
-        if not isinstance(items, list):
-            continue
+    for section, items in sections.items():
         for item in items:
             if not isinstance(item, dict) or not item.get("id"):
                 errors.append(f"tools.yaml[{section}]: entri tanpa id")
-            elif section.startswith("third"):
-                pass
+
+    # Aturan #6 repo: tool pihak ketiga wajib punya revisi ter-pin, kecuali ia hanya
+    # dicatat sebagai kandidat yang belum masuk (quarantine/deferred = justru di-hold)
+    # atau hanya berperan sebagai sumber model (bukan tool yang dipasang).
+    NOTE_ONLY = {"quarantine", "deferred", "model_sources"}
+    for section, items in sections.items():
+        if section in NOTE_ONLY:
+            continue
+        for item in items:
+            if isinstance(item, dict) and item.get("id") and not item.get("version_pin"):
+                warnings.append(f"tools.yaml[{section}] {item.get('id')}: tanpa version_pin (aturan #6: pin dulu)")
+
     # status pihak ketiga harus dikenal
     for item in (reg.get("third_party") or []):
         if isinstance(item, dict) and item.get("status") not in VALID_STATUS:
             errors.append(f"third_party {item.get('repo')}: status tidak dikenal '{item.get('status')}'")
         if isinstance(item, dict) and not item.get("pinned_commit"):
             warnings.append(f"third_party {item.get('repo')}: tanpa pinned_commit")
+
+    # Aturan #6 menuntut JEJAK: asal (source), hasil scan, review, approval.
+    # Dulu tidak ada yang memeriksa ini; `elif section.startswith("third"): pass` adalah
+    # no-op sehingga semua bidang pihak ketiga lolos tanpa diperiksa (audit 2026-10-07).
+    #
+    # Bedakan kekuatan bukti menurut status (audit 2026-10-07, menghindari false positive):
+    # - ADOPTED (INSTALLED/IN_USE/OPTIONAL): sudah dipakai -> WAJIB punya bukti scan.
+    # - DITAHAN (QUARANTINE/DEFER) atau DITOLAK (REJECTED_*): tidak dipakai -> cukup punya
+    #   ALASAN; alasan boleh ada di entri ini atau di seksi quarantine/deferred tools.yaml.
+    ADOPTED = {"INSTALLED", "IN_USE", "OPTIONAL"}
+    SCAN_FIELDS = ("scan", "scanner", "scan_evidence", "security_scan", "audit", "audit_status")
+    NOTE_FIELDS = ("gate_note", "decision_note", "evidence", "caveats", "license_note",
+                   "codeql_owner_decision", "post_completion_audit_insight", "reason")
+    APPROVAL_FIELDS = ("approved_by", "approval", "approval_ref", "approved_at", "decided")
+    held_reasons = {it.get("id"): (it.get("reason") or it.get("note") or it.get("role"))
+                    for sec in ("quarantine", "deferred")
+                    for it in (tools.get(sec) or []) if isinstance(it, dict)}
+    for item in (reg.get("third_party") or []):
+        if not isinstance(item, dict):
+            continue
+        repo = item.get("repo")
+        status = item.get("status")
+        if not (item.get("source") or item.get("repo")):
+            errors.append(f"third_party tanpa source/repo: {item}")
+        has_note = any(item.get(f) for f in NOTE_FIELDS)
+        if status in ADOPTED:
+            if not any(item.get(f) for f in SCAN_FIELDS):
+                warnings.append(f"third_party {repo} ({status}): tanpa bukti scan (aturan #6)")
+            if not has_note:
+                warnings.append(f"third_party {repo}: tanpa jejak review manusia (aturan #6)")
+            if status == "INSTALLED" and not any(item.get(f) for f in APPROVAL_FIELDS):
+                warnings.append(f"third_party {repo}: status INSTALLED tanpa bukti approval manusia (aturan #6)")
+        else:
+            # nama pendek untuk mencocokkan seksi quarantine tools.yaml (mis. skylot/jadx -> jadx)
+            short = str(repo or "").split("/")[-1].lower()
+            if not has_note and not held_reasons.get(short):
+                warnings.append(f"third_party {repo} ({status}): tanpa alasan/keputusan tercatat (aturan #6)")
 
     print(f"registry_lint: {'PASS' if not errors else 'FAIL'}")
     print(f"  custom skills: {len(custom)} | profiles: {len(referenced_profiles)} | keep_local: {len(keep)}")

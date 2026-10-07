@@ -1,8 +1,19 @@
 # Super Dev Builders Ecosystem — task runner
-# Interpreter: hormati PY_SYS bila diset; jika tidak, pakai python3 dari PATH.
-# JANGAN hardcode /usr/bin/python3 — tidak portabel: di runner CI, setup-python
-# menaruh Python di path lain dan /usr/bin/python3 tidak punya pytest.
-PY_SYS ?= $(shell command -v python3 || command -v python)
+#
+# Interpreter: repo punya .venv lokal (di luar git, ter-ignore). Utamakan itu, lalu
+# python3 dari PATH (di runner CI = Python setup-python yang sudah dipasangi
+# dependensi uji). JANGAN hardcode /usr/bin/python3 — tidak portabel: di runner
+# setup-python menaruh Python di path lain dan /usr/bin/python3 tidak punya pytest.
+#
+# Catatan kejujuran: percobaan perbaikan pertama hanya memakai `command -v python3`.
+# Di workstation ini PATH menaruh Python Hermes lebih dulu dan Python itu TIDAK punya
+# pytest -> `make test` gagal lokal. Resolusi karena itu dibuat sadar-kapabilitas:
+# dipilih interpreter yang benar-benar bisa `import pytest`.
+PY_SYS ?= $(shell \
+  if [ -x .venv/bin/python ]; then echo .venv/bin/python; \
+  elif python3 -c "import pytest" 2>/dev/null; then echo python3; \
+  elif /usr/bin/python3 -c "import pytest" 2>/dev/null; then echo /usr/bin/python3; \
+  else echo python3; fi)
 
 .PHONY: help check lint drift doctor inventory test gate-init lint-registry release-check skills-list install-main clean-pyc
 
@@ -21,9 +32,12 @@ test:
 lint:
 	ruff check scripts tests skills
 
-# skill terpasang (main + profil) vs sumber repo; exit 1 bila MISSING/DIFF
+# skill terpasang (main + profil) vs sumber repo; exit 1 bila MISSING/DIFF.
+# Drift hanya bermakna bila Host punya Hermes. Di runner CI (~/.hermes tidak ada)
+# target ini DILEWATI dengan pesan eksplisit — bukan gagal, bukan lulus diam-diam.
 drift:
-	$(PY_SYS) scripts/doctor.py --drift-only
+	@if [ -d "$$HOME/.hermes/skills" ]; then $(PY_SYS) scripts/doctor.py --drift-only; \
+	else echo "SKIP drift — tanpa $$HOME/.hermes/skills (mis. runner CI)"; fi
 
 # gerbang lokal sebelum commit: lint + registry + test + drift
 check: lint lint-registry test drift

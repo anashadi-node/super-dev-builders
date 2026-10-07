@@ -2,6 +2,8 @@
 import os
 import sys
 
+import pytest
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
 from doctor import dep_check, skill_drift
 
@@ -38,5 +40,24 @@ def test_dep_check_flags_unpinned():
 
 
 def test_skill_drift_all_ok():
-    bad = [r for r in skill_drift() if r["status"] != "OK"]
+    """Paritas skill repo vs terpasang di host — hanya bermakna bila Host punya Hermes.
+
+    Di runner CI (mesin bersih tanpa ~/.hermes) semua skill wajar MISSING: itu bukan
+    cacat repo, itu ketiadaan Host. Karena itu:
+      * struktur keluaran SELALU diperiksa (hermetik, di mesin mana pun);
+      * assertion 'nol drift' hanya dijalankan bila direktori skill Host ADA.
+    Tanpa pemisahan ini suite lulus lokal tapi merah di CI (uji tak hermetik).
+    """
+    rows = skill_drift()
+    assert rows, "registry skill harus menghasilkan setidaknya satu baris drift"
+    allowed = {"OK", "MISSING", "DIFF", "COLLISION"}
+    for r in rows:
+        assert set(r) >= {"skill", "where", "status"}, f"baris drift cacat bentuk: {r}"
+        assert r["status"] in allowed, f"status tak dikenal: {r}"
+
+    skills_dir = os.path.expanduser("~/.hermes/skills")
+    if not os.path.isdir(skills_dir):
+        pytest.skip(f"tanpa {skills_dir} (mis. runner CI) — assertion nol-drift dilewati")
+
+    bad = [r for r in rows if r["status"] != "OK"]
     assert bad == [], f"skill drift/COLLISION tersisa: {bad}"

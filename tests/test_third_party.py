@@ -179,11 +179,31 @@ def test_local_install_refuses_skill_without_owner_approval(tmp_path, monkeypatc
 
 
 def test_owner_approved_local_installs_have_notice_on_disk():
-    """Skill yang lolos-lewat-gate (dipasang lokal) WAJIB punya NOTICE host-policy tertulis."""
+    """Skill lolos-lewat-gate (dipasang lokal) WAJIB punya NOTICE host-policy tertulis.
+
+    Hermetik vs state host — dipisah dengan sengaja:
+      * Bagian SPEC (approved_by/reason/notice/daftar hub_rules) adalah data repo:
+        selalu diperiksa, di mesin mana pun.
+      * Bagian DISK (~/.hermes/skills/<name>/HOST-POLICY-NOTICE.md) hanya bermakna
+        di host yang benar-benar memasang skill itu. Di runner CI direktori itu tidak
+        ada — pemeriksaannya DILEWATI dengan alasan eksplisit, bukan diloloskan diam-diam.
+        Dulu tidak ada pemisahan ini: suite lulus lokal tapi merah di CI, artinya uji
+        bergantung pada state mesin pengembang (tidak hermetik).
+    """
     for name, spec in sync.OWNER_APPROVED_LOCAL_INSTALL.items():
+        # --- bagian repo (hermetik, wajib di mana pun) ---
         assert spec.get("approved_by"), f"{name}: tanpa jejak persetujuan Owner"
         assert spec.get("reason") and spec.get("notice"), f"{name}: tanpa alasan/notice"
-        notice = os.path.expanduser(f"~/.hermes/skills/{name}/HOST-POLICY-NOTICE.md")
+        assert spec.get("hub_verdict"), f"{name}: tanpa vonis hub (jejak gerbang #6)"
+        assert spec.get("hub_rules"), f"{name}: tanpa daftar aturan hub yang dipicu"
+        assert isinstance(spec.get("notice"), list) and spec["notice"], f"{name}: notice kosong"
+
+    # --- bagian disk (hanya di host terpasang) ---
+    skills_dir = os.path.expanduser("~/.hermes/skills")
+    if not os.path.isdir(skills_dir):
+        pytest.skip(f"tanpa {skills_dir} (mis. runner CI) — pemeriksaan NOTICE disk dilewati")
+    for name in sync.OWNER_APPROVED_LOCAL_INSTALL:
+        notice = os.path.join(skills_dir, name, "HOST-POLICY-NOTICE.md")
         assert os.path.isfile(notice), f"NOTICE tidak ada di disk: {notice}"
 
 

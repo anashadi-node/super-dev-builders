@@ -1,5 +1,8 @@
 # Super Dev Builders Ecosystem — task runner
-PY_SYS := /usr/bin/python3
+# Interpreter: hormati PY_SYS bila diset; jika tidak, pakai python3 dari PATH.
+# JANGAN hardcode /usr/bin/python3 — tidak portabel: di runner CI, setup-python
+# menaruh Python di path lain dan /usr/bin/python3 tidak punya pytest.
+PY_SYS ?= $(shell command -v python3 || command -v python)
 
 .PHONY: help check lint drift doctor inventory test gate-init lint-registry release-check skills-list install-main clean-pyc
 

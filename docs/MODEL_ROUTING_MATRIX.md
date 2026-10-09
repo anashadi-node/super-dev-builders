@@ -49,44 +49,45 @@ Sumber: blueprint §8 (cheap model untuk rutin, strong model untuk arsitektur/de
 | D10 DevOps | build/deploy/rollback/observability | cheap/mid (strong untuk observability) | prosedural, wajib deterministik |
 | D11 Docs | README/runbook/handover | cheap | volume tulis, risiko rendah |
 
-## Status ketersediaan model & PENERAPAN FINAL (2026-10-09)
+## Status ketersediaan & PENERAPAN (revisi 3 — 2026-10-09)
 
-**Dasar fakta — uji hidup `hermes -z` (bukan asumsi dokumen):**
+**Pembaruan penting.** Setelah saldo TokenRouter diisi pemilik, `/v1/models` TokenRouter **kini menyajikan semua
+model yang dibutuhkan**: `anthropic/claude-sonnet-5.5`, `anthropic/claude-opus-5.5`, `openai/gpt-5.6-sol`,
+`z-ai/glm-5.3-flash`, `deepseek/deepseek-v4.1-flash`, `z-ai/glm-5.3`, `z-ai/glm-5.3-free`, `nvidia/nemotron-...:free`.
+Batas 5 model sebelumnya = efek **saldo kosong**, bukan batas tetap kunci.
 
-| Kelas | Model | Penyedia | Model ID | Bukti |
+### Kebijakan penyedia per-model (keputusan pemilik, 9 Okt 2026)
+> **Native dulu, TokenRouter kedua.** Tiap model memakai langganan aslinya lebih dulu; TokenRouter = jaring kedua.
+
+| Model | Penyedia utama (native) | Cadangan |
+|---|---|---|
+| DeepSeek V4.1 Flash | **DeepSeek API** — ID sah `deepseek-flash` (`deepseek-v4.1-flash` -> HTTP 400) | `tokenrouter` -> `deepseek/deepseek-v4.1-flash` |
+| Sonnet 5.5 | **Anthropic** — `claude-sonnet-5-5` | `tokenrouter` -> `anthropic/claude-sonnet-5.5` |
+| Opus 5.5 | **Anthropic** — `claude-opus-5-5` | `tokenrouter` -> `anthropic/claude-opus-5.5` |
+| GPT-5.6 Sol | **OpenAI (Codex OAuth)** — `gpt-5.6-sol` | `tokenrouter` -> `openai/gpt-5.6-sol` |
+| GLM 5.3 Flash | **TokenRouter** — `z-ai/glm-5.3-flash` | `tokenharbor` -> `glm-5.3-flash` |
+
+### Pemetaan peran -> profil (TERPASANG & TERVERIFIKASI — 10 profil PONG)
+| Peran | Profil | Model | Utama | Cadangan |
 |---|---|---|---|---|
-| murah | DeepSeek V4.1 Flash | tokenrouter | `deepseek/deepseek-v4.1-flash` | PONG |
-| murah | GLM 5.3 | tokenrouter | `z-ai/glm-5.3` | PONG |
-| **strong** | **Sonnet 5.5** | anthropic (OAuth) | `claude-sonnet-5-5` | PONG |
-| **strong** | **Opus 5.5** | anthropic (OAuth) | `claude-opus-5-5` | PONG |
+| Research/recon | cc-capture-forensics | **GLM 5.3 Flash** | tokenrouter `z-ai/glm-5.3-flash` | tokenharbor `glm-5.3-flash` |
+| Plan/intake/docs | cc-orchestrator | DeepSeek V4.1 Flash | deepseek `deepseek-flash` | tokenrouter `deepseek/deepseek-v4.1-flash` |
+| Backend + Frontend | cc-builder | **DeepSeek V4.1 Flash** | deepseek `deepseek-flash` | tokenrouter `deepseek/deepseek-v4.1-flash` |
+| DevOps deploy/docs | cc-devops-docs | DeepSeek V4.1 Flash | deepseek `deepseek-flash` | tokenrouter `deepseek/deepseek-v4.1-flash` |
+| Arsitektur/ADR | cc-architect | Sonnet 5.5 | anthropic `claude-sonnet-5-5` | tokenrouter `anthropic/claude-sonnet-5.5` |
+| Code review | cc-reviewer-qa | Sonnet 5.5 | anthropic `claude-sonnet-5-5` | tokenrouter `anthropic/claude-sonnet-5.5` |
+| **QA Assurance/Testing/E2E** | cc-reviewer-qa | **Sonnet 5.5** | anthropic `claude-sonnet-5-5` | tokenrouter `anthropic/claude-sonnet-5.5` |
+| Observability/smoke | cc-observability | Sonnet 5.5 | anthropic `claude-sonnet-5-5` | tokenrouter `anthropic/claude-sonnet-5.5` |
+| Security | cc-security-governor | Opus 5.5 | anthropic `claude-opus-5-5` | tokenrouter `anthropic/claude-opus-5.5` |
+| **Audit Assurance** | auditor | **Opus 5.5 (atau Sol)** | anthropic `claude-opus-5-5` | openai-codex `gpt-5.6-sol` -> tokenrouter `anthropic/claude-opus-5.5` |
+| Safety/Privasi | keamanan | Sonnet 5.5 | anthropic `claude-sonnet-5-5` | tokenrouter `anthropic/claude-sonnet-5.5` |
 
-**Dua koreksi fakta penting:**
-1. **Kunci TokenRouter = tier-terbatas.** `/v1/models` hanya menyajikan 5 model (deepseek-v4.1-flash,
-   z-ai/glm-5.3, kimi-k3, glm-5.3-free, nemotron:free) — **tanpa model strong**. Situs menampilkan
-   katalog penuh, tetapi kunci ini tidak berhak. Sonnet 5.5/Opus 5.5 **ADA via langganan Anthropic OAuth**.
-2. **Split-brain kredensial TokenRouter (DIPERBAIKI).** Ada DUA kunci: pool `api-key-1` (2 model)
-   menaungi kunci `.env` (5 model). Entri pool lama dihapus → kunci `.env` jadi tunggal & lebih luas;
-   `providers.tokenrouter.models` diselaraskan ke 5 model nyata.
+**Fallback config MAIN:** `tokenrouter/anthropic/claude-sonnet-5.5` -> `deepseek/deepseek-flash` -> `openai-codex/gpt-5.6-sol`.
 
-### Pemetaan terpasang (8 profil + audit + keamanan) — semua lolos uji hidup
-| Profil | Tahap | Penyedia | Model |
-|---|---|---|---|
-| cc-orchestrator | 01,02,03,06,16 | tokenrouter | `deepseek/deepseek-v4.1-flash` |
-| cc-capture-forensics | recon | tokenrouter | `z-ai/glm-5.3` |
-| cc-architect | 04 | anthropic | `claude-sonnet-5-5` (eskalasi `claude-opus-5-5`) |
-| cc-builder | 07 | tokenrouter | `deepseek/deepseek-v4.1-flash` |
-| cc-reviewer-qa | 08,09 | anthropic | `claude-sonnet-5-5` |
-| cc-security-governor | 10,11 | anthropic | `claude-opus-5-5` |
-| cc-devops-docs | 14,16 | tokenrouter | `deepseek/deepseek-v4.1-flash` |
-| **cc-observability (BARU)** | 15 | anthropic | `claude-sonnet-5-5` |
-| auditor | Audit Assurance | anthropic | `claude-opus-5-5` |
-| keamanan | Safety-Security-Privacy | anthropic | `claude-sonnet-5-5` |
-
-Fallback chain: `deepseek/deepseek-flash` -> `anthropic/claude-sonnet-5-5` -> `tokenrouter/deepseek/deepseek-v4.1-flash`.
-Backup: `~/.hermes/config.yaml.bak-routing-20261009`, `~/.hermes/auth.json.bak-routing-20261009`, dan `config.yaml.bak-routing-20261009` per profil.
-
-> **Belum terverifikasi:** GPT-5.6 Sol (token OpenAI/Codex kurang scope `api.model.read`). Bila langganan GPT aktif,
-> tambahkan sebagai eskalasi audit menggantikan/mendampingi Opus 5.5.
+**Catatan teknis (jebakan yang ditemukan & diperbaiki).** Saat pindah ke provider bawaan, field sisa
+`model.base_url`/`model.key_env` warisan scaffold `custom` **harus dihapus** — jika tidak, permintaan bisa
+salah alamat/kunci (contoh: `key_env: TOKENHARBOR_API_KEY` tersangkut di profil ber-`base_url` TokenRouter).
+Sudah dibersihkan di sepuluh profil di atas. Backup: `config.yaml.bak-routing2-20261009` per profil.
 
 ## Aturan biaya
 - Jangan pakai model kuat untuk transformasi mekanis berulang; jangan pakai model lemah untuk verdict keamanan/arsitektur.

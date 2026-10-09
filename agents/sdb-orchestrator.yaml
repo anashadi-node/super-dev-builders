@@ -16,7 +16,7 @@ bounds: {max_repair_cycles: 3, max_active_specialists: 2}
 model_routing:
   profile: cc-orchestrator
   primary: deepseek-v4.1-flash          # D0/D2 — tahap 01,02,03,06,16 (volume tinggi, penalaran rendah)
-  available_now: deepseek/deepseek-v4.1-flash   # ter-wire & terverifikasi 2026-10-09
+  available_now: deepseek-flash (deepseek)   # ter-wire & terverifikasi 2026-10-09 (revisi 3)
   escalation: null
   stages: ["01", "02", "03", "06", "16"]
   notes: "06 (implementation plan) boleh deepseek; eskalasi ke strong bila sistem besar."

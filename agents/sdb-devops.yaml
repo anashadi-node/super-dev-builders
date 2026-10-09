@@ -20,7 +20,7 @@ escalation: "rollback gagal -> hentikan, isolasi, lapor Owner"
 model_routing:
   profile: cc-devops-docs
   primary: deepseek-v4.1-flash          # D10/D11 — tahap 14 (deploy) & 16 (docs)
-  available_now: deepseek/deepseek-v4.1-flash   # ter-wire & terverifikasi 2026-10-09
+  available_now: deepseek-flash (deepseek)   # ter-wire & terverifikasi 2026-10-09 (revisi 3)
   observability: sonnet-5.5             # tahap 15 (observability/smoke) -> kelas strong
   escalation: sonnet-5.5
   stages: ["14", "15", "16"]

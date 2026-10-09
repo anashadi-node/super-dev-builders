@@ -19,7 +19,7 @@ escalation: "critical -> blokir rilis, lapor Owner, jangan override"
 model_routing:
   profile: cc-security-governor
   primary: sonnet-5.5                   # D8 — tahap 10 (security)
-  available_now: gpt-5.6-terra   # ter-wire & terverifikasi 2026-10-09
+  available_now: claude-opus-5-5   # ter-wire & terverifikasi 2026-10-09
   mandatory_strong: opus-5.5|gpt-5.6-sol  # D9 — tahap 11 (AUDIT) WAJIB tier tertinggi
   escalation: [opus-5.5, gpt-5.6-sol]
   stages: ["10", "11"]

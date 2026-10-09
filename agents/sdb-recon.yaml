@@ -20,3 +20,10 @@ evidence_rules:
   forbid_guessing_unknown: true
   redact_before_llm_context: true
 escalation: "out-of-scope access needed -> BLOCKED -> minta otorisasi Owner"
+
+model_routing:
+  profile: cc-capture-forensics
+  primary: glm-5.3-flash                # D1 — RE & recon (multimodal, klasifikasi FACT/INFERRED)
+  escalation: sonnet-5.5                # klasifikasi sulit / bukti ambigu
+  stages: ["recon"]
+  notes: "Kualitas evidence menentukan segalanya; eskalasi bila klasifikasi tidak yakin."

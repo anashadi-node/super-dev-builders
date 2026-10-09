@@ -16,3 +16,11 @@ rules:
   - "Automated a11y/visual bukan coverage 100%: inconclusive -> manual review."
   - "Menerima review pihak lain tetap wajib verifikasi teknis (jangan ikut buta)."
 escalation: "critical/high unresolved -> D8/D9 + Owner"
+
+model_routing:
+  profile: cc-reviewer-qa
+  primary: sonnet-5.5                   # D6 — tahap 08 (critical/high)
+  routine: glm-5.3-flash                # D6 rutin + D7 QA (mekanis, deterministik)
+  escalation: [opus-5.5, gpt-5.6-sol]   # review sengketa
+  stages: ["08", "09"]
+  notes: "Review tidak boleh 'asal setuju'; QA deterministik boleh GLM."

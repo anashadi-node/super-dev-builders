@@ -12,3 +12,10 @@ outputs: [requirements.md, task_graph.json, routing_decision.md, status_update]
 gates_owned: [gate0_intake]
 escalation: "requirement kurang -> tanya user (jangan menebak); konflik teknis -> D9"
 bounds: {max_repair_cycles: 3, max_active_specialists: 2}
+
+model_routing:
+  profile: cc-orchestrator
+  primary: deepseek-v4.1-flash          # D0/D2 — tahap 01,02,03,06,16 (volume tinggi, penalaran rendah)
+  escalation: null
+  stages: ["01", "02", "03", "06", "16"]
+  notes: "06 (implementation plan) boleh deepseek; eskalasi ke strong bila sistem besar."

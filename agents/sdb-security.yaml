@@ -15,3 +15,11 @@ rules:
   - "Audit memeriksa architecture drift, maintainability, technical debt, dependency health."
   - "Tidak punya hak deploy: verdict diteruskan ke D10 + approval manusia."
 escalation: "critical -> blokir rilis, lapor Owner, jangan override"
+
+model_routing:
+  profile: cc-security-governor
+  primary: sonnet-5.5                   # D8 — tahap 10 (security)
+  mandatory_strong: opus-5.5|gpt-5.6-sol  # D9 — tahap 11 (AUDIT) WAJIB tier tertinggi
+  escalation: [opus-5.5, gpt-5.6-sol]
+  stages: ["10", "11"]
+  notes: "Audit (11) wajib Opus 5.5/Sol; selama belum ter-wire, jalankan interim + tandai verdict 'interim'."

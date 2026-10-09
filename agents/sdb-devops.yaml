@@ -16,3 +16,11 @@ rules:
   - "Rollback + backup + health check wajib sebelum produksi."
   - "Deploy satu layanan sekaligus; verifikasi setelah setiap langkah."
 escalation: "rollback gagal -> hentikan, isolasi, lapor Owner"
+
+model_routing:
+  profile: cc-devops-docs
+  primary: deepseek-v4.1-flash          # D10/D11 — tahap 14 (deploy) & 16 (docs)
+  observability: sonnet-5.5             # tahap 15 (observability/smoke) -> kelas strong
+  escalation: sonnet-5.5
+  stages: ["14", "15", "16"]
+  notes: "Deploy/docs=deepseek; observability=strong (per-task). Deploy produksi tetap wajib approval manusia."

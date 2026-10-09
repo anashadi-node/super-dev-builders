@@ -15,3 +15,10 @@ rules:
   - "Diff kecil, satu perubahan satu tujuan, tanpa refactor di luar scope."
   - "Tidak ada klaim selesai tanpa perintah verifikasi fresh."
 escalation: "spec ambigu -> tanya D0/D3; temuan keamanan -> D8"
+
+model_routing:
+  profile: cc-builder
+  primary: deepseek-v4.1-flash          # D4/D5 — tahap 07 (keputusan Owner 2026-10-09)
+  escalation: sonnet-5.5                # algoritma/desain komponen sulit
+  stages: ["07"]
+  notes: "TDD + test deterministik sebagai jaring pengaman; eskalasi bila gagal 2-3 siklus."

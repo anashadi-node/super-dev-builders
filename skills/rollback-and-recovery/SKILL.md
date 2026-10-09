@@ -1,6 +1,6 @@
 ---
 name: rollback-and-recovery
-description: "Use when planning deploy or after failure. Backup-verify, rollback, restore, health."
+description: "Backup-verify-recover plans for deploys"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

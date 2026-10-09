@@ -1,6 +1,6 @@
 ---
 name: html-to-video-render
-description: "Use to render HTML/CSS animations to MP4/WebM. Playwright chromium + ffmpeg, tanpa sudo."
+description: "Render HTML/CSS animations to MP4/WebM"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

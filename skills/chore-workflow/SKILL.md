@@ -1,6 +1,6 @@
 ---
 name: chore-workflow
-description: "Perawatan ter-scope yang mempertahankan perilaku (behavior-preserving): refactor kecil, bump dependency, hygiene build. Panggil eksplisit; bukan fitur, bukan bug."
+description: "Scoped maintenance that preserves behavior"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

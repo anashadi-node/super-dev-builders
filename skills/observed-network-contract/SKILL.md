@@ -1,6 +1,6 @@
 ---
 name: observed-network-contract
-description: "Use to record and redact network/API behavior truly observed on a target."
+description: "Record observed network/API behavior"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

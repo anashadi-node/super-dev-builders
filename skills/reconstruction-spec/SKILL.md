@@ -1,6 +1,6 @@
 ---
 name: reconstruction-spec
-description: "Use to turn normalized evidence into a feature matrix and rebuild specification."
+description: "Turn evidence into feature matrix and spec"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

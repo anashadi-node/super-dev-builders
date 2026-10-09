@@ -1,6 +1,6 @@
 ---
 name: release-handover-docs
-description: "Use at delivery. Produces README, runbook, release notes, known limitations."
+description: "README, runbook, release notes at delivery"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

@@ -1,6 +1,6 @@
 ---
 name: product-execution
-description: "Eksekusi SATU item berikutnya dari .planora/EXECUTION/TODO.md dengan workflow yang tercantum (feature/bug/chore) + laporan bukti. Panggil eksplisit saat Owner minta 'lanjutkan satu tugas berikutnya'."
+description: "Execute next .planora TODO item with proof"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

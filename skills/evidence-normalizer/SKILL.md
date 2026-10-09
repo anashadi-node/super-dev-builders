@@ -1,6 +1,6 @@
 ---
 name: evidence-normalizer
-description: "Use to normalize raw capture into validated JSON evidence with status and confidence."
+description: "Normalize raw captures into validated JSON evidence"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

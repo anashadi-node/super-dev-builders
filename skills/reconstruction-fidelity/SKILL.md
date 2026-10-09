@@ -1,6 +1,6 @@
 ---
 name: reconstruction-fidelity
-description: "Use to measure rebuilt result vs target evidence per dimension, with coverage."
+description: "Measure rebuild vs target per dimension"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

@@ -1,6 +1,6 @@
 ---
 name: product-status
-description: "Inspeksi read-only paket .planora: status eksekusi, blocker, dan tugas berikutnya yang siap-dependensi. Panggil eksplisit saat Owner tanya 'status proyek ini?' pada repo ber-.planora."
+description: "Inspect .planora status read-only"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

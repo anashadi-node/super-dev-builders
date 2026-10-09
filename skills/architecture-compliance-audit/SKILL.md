@@ -1,6 +1,6 @@
 ---
 name: architecture-compliance-audit
-description: "Use to detect architecture drift between ADRs/specs and the real repository."
+description: "Detect architecture drift vs ADRs and specs"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

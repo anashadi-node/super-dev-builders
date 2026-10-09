@@ -1,6 +1,6 @@
 ---
 name: bug-workflow
-description: "Diagnosis → perbaikan → verifikasi satu defect aplikasi: reproduksi dulu, lalu fix, lalu bukti lulus. Panggil eksplisit saat Owner laporkan bug."
+description: "One defect: diagnose, fix, verify with evidence"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

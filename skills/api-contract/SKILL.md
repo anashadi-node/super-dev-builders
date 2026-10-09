@@ -1,6 +1,6 @@
 ---
 name: api-contract
-description: "Use when designing or reviewing HTTP/API contracts. Schema-first, errors, idempotency."
+description: "Design and review HTTP API contracts and schemas"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

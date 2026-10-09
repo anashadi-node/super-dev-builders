@@ -1,6 +1,6 @@
 ---
 name: reconstruction-scope-gate
-description: "Use before any recon capture. Gate #0 authorization/scope PASS required."
+description: "Gate #0: authorization before recon capture"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

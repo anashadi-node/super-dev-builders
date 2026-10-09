@@ -1,6 +1,6 @@
 ---
 name: accessibility-audit
-description: "Use to verify WCAG-level accessibility with axe plus manual checks."
+description: "Verify WCAG accessibility with axe plus manual checks"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

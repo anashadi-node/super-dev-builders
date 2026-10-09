@@ -1,6 +1,6 @@
 ---
 name: ci-cd-release-gate
-description: "Use to wire build-test-scan-staging-approval-production with exit criteria."
+description: "Pipeline build, test, scan, staging, prod, approval"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

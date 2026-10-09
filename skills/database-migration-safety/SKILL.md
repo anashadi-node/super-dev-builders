@@ -1,6 +1,6 @@
 ---
 name: database-migration-safety
-description: "Use before any schema change or data migration. Backup, expand-contract, rollback."
+description: "Backup and rollback plan before schema changes"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

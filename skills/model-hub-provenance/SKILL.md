@@ -1,6 +1,6 @@
 ---
 name: model-hub-provenance
-description: "Use when downloading models/datasets. Pin revision + verify hash + license before use."
+description: "Pin and verify model/dataset revisions"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

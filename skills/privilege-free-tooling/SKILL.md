@@ -1,6 +1,6 @@
 ---
 name: privilege-free-tooling
-description: "Use when a task needs a CLI/lib. Install user-local (uv/npm), never sudo, never curl|sh."
+description: "Install CLI tools user-local via uv/npm"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

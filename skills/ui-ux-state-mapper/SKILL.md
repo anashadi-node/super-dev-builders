@@ -1,6 +1,6 @@
 ---
 name: ui-ux-state-mapper
-description: "Use to map screens, navigation graph, components, states, and responsive behavior."
+description: "Map screens, navigation, components, states"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

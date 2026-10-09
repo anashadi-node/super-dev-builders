@@ -1,6 +1,6 @@
 ---
 name: product-kit
-description: "Membuat/merevisi paket perencanaan produk terlacak (.planora): PRD + panduan UI/DX + rencana eksekusi ber-requirement-ID. Panggil eksplisit saat Owner minta paket PRD produk baru atau revisi."
+description: "Create tracked product planning packages"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

@@ -1,6 +1,6 @@
 ---
 name: test-pyramid-and-risk
-description: "Use to choose the right test level per risk instead of E2E for everything."
+description: "Choose test level by risk, not habit"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

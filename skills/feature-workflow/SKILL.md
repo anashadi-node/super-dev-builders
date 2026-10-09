@@ -1,6 +1,6 @@
 ---
 name: feature-workflow
-description: "Rencanakan + implementasikan satu fitur ter-scope dengan rencana implementasi dan verifikasi. Untuk fitur produk yang diminta eksplisit; bukan bug/perawatan. Panggil eksplisit."
+description: "Scoped feature: plan, implement, verify"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

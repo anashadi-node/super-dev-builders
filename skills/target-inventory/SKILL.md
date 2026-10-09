@@ -1,6 +1,6 @@
 ---
 name: target-inventory
-description: "Use to enumerate a target's pages, routes, roles, forms, and features."
+description: "Enumerate pages, routes, roles, forms"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

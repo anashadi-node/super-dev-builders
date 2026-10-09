@@ -1,6 +1,6 @@
 ---
 name: public-feed-reader
-description: "Use to read public forums/news (Reddit dll) read-only: RSS/Atom + UA benar, tanpa auth."
+description: "Read public forums and news read-only"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

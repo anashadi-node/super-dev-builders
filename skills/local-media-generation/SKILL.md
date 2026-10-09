@@ -1,6 +1,6 @@
 ---
 name: local-media-generation
-description: "Use when needing image/video generation locally. Native tools first; ComfyUI hanya via Docker terisolasi."
+description: "Local media generation: install and serve models"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

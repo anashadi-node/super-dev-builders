@@ -1,6 +1,6 @@
 ---
 name: authz-authn-review
-description: "Use when implementing or reviewing authentication and authorization."
+description: "Review authentication and authorization code"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

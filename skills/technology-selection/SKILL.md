@@ -1,6 +1,6 @@
 ---
 name: technology-selection
-description: "Use when picking a stack or dependency. Enforces technology governance tiers."
+description: "Pick stack or dependency by tradeoff"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

@@ -1,6 +1,6 @@
 ---
 name: product-change
-description: "Merevisi paket .planora dari perubahan produk yang diminta eksplisit: update PRD/panduan/TODO + bump versi + tandai artefak hilir stale. Tidak mengimplementasikan kode. Panggil eksplisit."
+description: "Revise .planora packages from product changes"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

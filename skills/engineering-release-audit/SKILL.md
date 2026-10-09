@@ -1,6 +1,6 @@
 ---
 name: engineering-release-audit
-description: "Use before release. Final whole-system engineering gate with fresh evidence."
+description: "Whole-system final engineering release gate"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

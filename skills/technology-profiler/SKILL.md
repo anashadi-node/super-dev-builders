@@ -1,6 +1,6 @@
 ---
 name: technology-profiler
-description: "Use to infer a target's technology stack with explicit confidence scores."
+description: "Infer target tech stack with confidence"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

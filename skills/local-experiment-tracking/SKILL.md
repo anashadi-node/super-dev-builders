@@ -1,6 +1,6 @@
 ---
 name: local-experiment-tracking
-description: "Use to log ML experiments locally (MLflow/TensorBoard/JSONL). No SaaS exfiltration."
+description: "Log ML experiments locally (MLflow, JSON)"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

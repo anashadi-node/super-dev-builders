@@ -1,6 +1,6 @@
 ---
 name: realtime-visual-engine
-description: "Use for realtime generative visuals when no licensed desktop app exists."
+description: "Realtime generative visuals, no licensed suite"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

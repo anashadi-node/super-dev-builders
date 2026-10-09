@@ -1,6 +1,6 @@
 ---
 name: geo-audit
-description: Audit & implementasi Generative Engine Optimization (GEO) untuk website/Next.js — blokir/izinkan AI crawler, llms.txt, JSON-LD schema, extractability check.
+description: "Audit and implement GEO for generative engines"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

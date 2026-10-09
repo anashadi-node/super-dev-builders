@@ -1,6 +1,6 @@
 ---
 name: architecture-docs
-description: "Use to document architecture: C4-style views, data flow, deployment topology."
+description: "Document architecture: C4 views and data flow"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

@@ -1,6 +1,6 @@
 ---
 name: local-llm-serving
-description: "Use when serving/running LLMs locally: no GPU, no SaaS, no sudo."
+description: "Serve LLMs locally; no GPU, no SaaS"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

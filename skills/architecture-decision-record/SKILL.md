@@ -1,6 +1,6 @@
 ---
 name: architecture-decision-record
-description: "Use for any material architecture/stack decision. Records ADR with trade-offs."
+description: "Record architecture decisions with context (ADR)"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
 license: MIT

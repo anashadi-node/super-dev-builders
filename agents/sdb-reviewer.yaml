@@ -20,6 +20,7 @@ escalation: "critical/high unresolved -> D8/D9 + Owner"
 model_routing:
   profile: cc-reviewer-qa
   primary: sonnet-5.5                   # D6 — tahap 08 (critical/high)
+  available_now: gpt-5.6-terra   # ter-wire & terverifikasi 2026-10-09
   routine: glm-5.3-flash                # D6 rutin + D7 QA (mekanis, deterministik)
   escalation: [opus-5.5, gpt-5.6-sol]   # review sengketa
   stages: ["08", "09"]

@@ -18,6 +18,7 @@ escalation: "butuh keputusan bisnis/biaya -> Owner; risiko keamanan desain -> D8
 model_routing:
   profile: cc-architect
   primary: sonnet-5.5                   # D3/D2 — tahap 04 (ADR) paling mahal bila salah
+  available_now: gpt-5.6-terra   # ter-wire & terverifikasi 2026-10-09
   escalation: [opus-5.5, gpt-5.6-sol]   # ADR berisiko tinggi / keputusan stack ireversibel
   stages: ["03", "04"]
   notes: "Salah di arsitektur menular ke seluruh proyek; jangan turunkan kelas."

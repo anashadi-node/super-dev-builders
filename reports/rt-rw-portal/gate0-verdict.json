@@ -1,0 +1,11 @@
+{
+  "gate": "gate0",
+  "verdict": "PASS",
+  "checked_at": "2026-10-10T23:25:56+0700",
+  "manifest": "/home/anashadi/super-dev-builders/evidence/rt-rw-portal/authorization.yaml",
+  "target": "rt-rw-portal",
+  "mode": "A",
+  "fail": [],
+  "blocked": [],
+  "warn": []
+}

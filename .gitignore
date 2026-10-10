@@ -18,6 +18,10 @@ id_ed25519*
 __pycache__/
 *.pyc
 .pytest_cache/
+
+# Bukti run Super Dev Builders — memuat PETA identitas pelanggan pilot.
+# Jangan pernah masuk git: isinya memetakan token identitas ↔ berkas asal.
+evidence/rt-rw-portal/identity-scan.json
 .venv/
 
 # Artefak lingkungan sementara (uv run --with)

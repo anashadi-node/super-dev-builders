@@ -39,7 +39,7 @@ PROFILE_META = [
     ("Security Governor", "cc-security-governor", "Security (Opus)", "D8"),
     ("Auditor", "auditor", "Audit (Opus/Sol)", "D9"),
     ("DevOps - Docs", "cc-devops-docs", "DevOps (DeepSeek)", "D10 D11"),
-    ("Keamanan", "keamanan", "Safety / Privacy (Sonnet)", "D12"),
+    ("Keamanan", "keamanan", "Safety / Privacy (Sonnet)", "Guard"),
 ]
 HEALTH_MAX_AGE_S = 14 * 3600
 

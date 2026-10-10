@@ -12,7 +12,7 @@ Usage:
 """
 import argparse
 import datetime
-import json
+import json, re
 import os
 import subprocess
 import time
@@ -20,6 +20,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 import yaml
+
+import ws_api
 
 REPO = Path("/home/anashadi/super-dev-builders")
 DASH = REPO / "dashboard"
@@ -99,17 +101,12 @@ def read_head():
 
 
 def probe_profile(dirname):
-    """One-shot live PONG via the profile's wrapper binary (falls back to HERMES_HOME)."""
+    """One-shot live PONG lewat `hermes -p <profil> -z` (path absolut, env termuat)."""
     prompt = "Balas HANYA satu kata: PONG"
-    wrapper = BIN / dirname
+    hermes = str(Path.home() / ".local/bin/hermes")
     try:
-        if wrapper.exists():
-            r = subprocess.run([str(wrapper), "-z", prompt],
-                               capture_output=True, text=True, timeout=90)
-        else:
-            env = dict(os.environ, HERMES_HOME=str(PROFILES / dirname))
-            r = subprocess.run(["hermes", "-z", prompt],
-                               capture_output=True, text=True, timeout=90, env=env)
+        r = subprocess.run([hermes, "-p", dirname, "-z", prompt],
+                           capture_output=True, text=True, timeout=90, env=ws_api.hermes_env())
         return r.returncode == 0 and "PONG" in (r.stdout or "")
     except Exception:
         return False
@@ -178,41 +175,71 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):  # quiet
         pass
 
-    def do_GET(self):
+    def _send_json(self, code, obj):
+        body = json.dumps(obj, ensure_ascii=False).encode("utf-8")
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(body)
+
+    def do_POST(self):
+        if not ws_api.handle(self, "POST", self._send_json):
+            self.send_error(404)
+
+    def do_HEAD(self):
+        self.do_GET(head=True)
+
+    def do_GET(self, head=False):
         path = self.path.split("?")[0]
+        if not head and path.startswith("/api/ws/"):
+            if ws_api.handle(self, "GET", self._send_json):
+                return
+        if path == "/monitor":
+            path = "/monitor.html"
         if path == "/api/state":
             body = json.dumps(build_state(), ensure_ascii=False).encode("utf-8")
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Cache-Control", "no-store")
             self.end_headers()
-            self.wfile.write(body)
+            if not head:
+                self.wfile.write(body)
             return
         rel = Path(path.lstrip("/") or "index.html")
         if ".." in rel.parts:
             self.send_error(403)
             return
         fp = DASH / rel
-        if not fp.is_file():
+        if not fp.is_file() or "state" in rel.parts:
             self.send_error(404)
             return
+        data = fp.read_bytes()
         self.send_response(200)
         self.send_header("Content-Type", CTYPE.get(fp.suffix.lstrip("."), "text/plain"))
+        self.send_header("Content-Length", str(len(data)))
+        self.send_header("Cache-Control", "no-store")  # perubahan UI langsung terlihat
         self.end_headers()
-        self.wfile.write(fp.read_bytes())
+        if not head:
+            self.wfile.write(data)
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--port", type=int, default=8484)
+    ap.add_argument("--show-token", action="store_true")
     ap.add_argument("--health-check", action="store_true")
     args = ap.parse_args()
+    if args.show_token:
+        print(ws_api.get_token())
+        return
     if args.health_check:
         cmd_health_check()
         return
     httpd = ThreadingHTTPServer((args.host, args.port), Handler)
-    print(f"SDB Command Deck on http://{args.host}:{args.port} (ctrl-c to stop)")
+    print(f"SDB Workspace on http://{args.host}:{args.port} (ctrl-c to stop)")
     httpd.serve_forever()
 
 

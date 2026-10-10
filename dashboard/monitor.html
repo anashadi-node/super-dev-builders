@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>SDB Command Deck — Super Dev Builders</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E⬡%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <span class="hex">⬡</span>
+    <div>
+      <h1>SDB <em>Command Deck</em></h1>
+      <p class="sub">Super Dev Builders — 12 Divisi · 10 Profil · 4 Model</p>
+    </div>
+  </div>
+  <div class="top-right">
+    <div class="clock" id="clock">—</div>
+    <div class="net-hint" id="lan"></div>
+  </div>
+</header>
+
+<main>
+  <section class="kpis" id="kpis"></section>
+
+  <section class="toolbar">
+    <div class="tabs" id="tabs">
+      <button class="tab on" data-f="all">Semua</button>
+      <button class="tab" data-f="glm">GLM 5.3 Flash</button>
+      <button class="tab" data-f="ds">DeepSeek V4.1</button>
+      <button class="tab" data-f="ant">Sonnet 5.5</button>
+      <button class="tab" data-f="opu">Opus 5.5</button>
+      <button class="tab" data-f="gpt">GPT-5.6 Sol</button>
+    </div>
+    <label class="switch"><input type="checkbox" id="lanmode"><span>Mode HP (kartu ringkas)</span></label>
+  </section>
+
+  <section class="grid" id="grid"></section>
+
+  <section class="panel">
+    <h2>Alur 16 Tahap — Pipa Riset → Produksi</h2>
+    <div class="flow" id="flow"></div>
+  </section>
+
+  <section class="panel two">
+    <div>
+      <h2>Kebijakan Routing (native dulu)</h2>
+      <ul class="pol">
+        <li><b>GLM 5.3 Flash</b> → TokenRouter → TokenHarbor → OpenCode (cc-frontend, cc-capture-forensics)</li>
+        <li><b>DeepSeek V4.1 Flash</b> → API resmi → TokenRouter (cc-builder, cc-orchestrator, cc-devops-docs)</li>
+        <li><b>Sonnet 5.5</b> → Anthropic (OAuth) → TokenRouter (cc-architect, cc-reviewer-qa, keamanan)</li>
+        <li><b>Opus 5.5</b> → Anthropic → TokenRouter (cc-security-governor, auditor)</li>
+        <li><b>GPT-5.6 Sol</b> → OpenAI/Codex (OAuth) → TokenRouter (auditor cadangan)</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Divisi D0–D11</h2>
+      <div class="divs" id="divs"></div>
+    </div>
+  </section>
+
+  <footer>
+    <span id="gen">—</span> · repo <span id="head">—</span> ·
+    sumber data: config.yaml profil (hanya id model, tanpa kunci)
+  </footer>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

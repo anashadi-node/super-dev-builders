@@ -108,6 +108,11 @@ custom:
     divisions: [D10, D8]
     profiles: [sdb-devops, sdb-security]
     path: skills/ci-cd-release-gate
+  - id: sdb-command-deck
+    status: ADD
+    divisions: [D10, D4]
+    profiles: [sdb-devops, sdb-frontend]
+    path: skills/sdb-command-deck
   - id: rollback-and-recovery
     status: ADD
     divisions: [D10]

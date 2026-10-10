@@ -1,0 +1,14 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Galeri Karakter SDB</title>
+<style>html,body{margin:0;height:100%;background:linear-gradient(180deg,#ffe9d4,#cfe6f6);font-family:system-ui,sans-serif;overflow:hidden}#c{position:fixed;inset:0}a{position:fixed;left:12px;top:12px;background:#fffaf4;padding:8px 14px;border-radius:12px;text-decoration:none;color:#3a2f3d;font-weight:800;box-shadow:0 6px 16px rgba(0,0,0,.15);z-index:2}</style>
+<script type="importmap">{"imports":{"three":"/vendor/three.module.min.js"}}</script></head><body><a href="/">← Kembali ke kantor</a><div id="c"></div>
+<script type="module">
+import * as THREE from 'three';import {OrbitControls} from '/vendor/OrbitControls.js';import {CAST,BARISTA,buildCharacter,animate} from '/ws/chars.js';import {sprite,texLabel} from '/ws/toon.js';
+const host=document.getElementById('c'),r=new THREE.WebGLRenderer({antialias:true,alpha:true});r.setSize(innerWidth,innerHeight);r.setPixelRatio(Math.min(devicePixelRatio,2));host.appendChild(r.domElement);
+const sc=new THREE.Scene();sc.add(new THREE.HemisphereLight(0xfff0dc,0xb7c3e6,1.3));const d=new THREE.DirectionalLight(0xffe0b4,2.2);d.position.set(6,12,10);sc.add(d);
+const list=[...CAST,BARISTA];const per=6,cols=Math.min(per,list.length);const cam=new THREE.PerspectiveCamera(32,innerWidth/innerHeight,.1,100);cam.position.set(0,3.2,21);
+const ch=[];list.forEach((c,i)=>{const g=buildCharacter(c,11+i*17);const row=Math.floor(i/per),col=i%per;g.position.set((col-(cols-1)/2)*3.3,-row*4.4+1.4,0);g.rotation.y=-0.25;g.scale.setScalar(1.15);sc.add(g);
+const l=sprite(texLabel(c.name,{w:512,h:128,sub:c.title.split('·')[0].trim()}),2.6,.65,{depthTest:false});l.position.set(g.position.x,g.position.y-.55,1.2);sc.add(l);ch.push(g)});
+const ctl=new OrbitControls(cam,r.domElement);ctl.target.set(0,-0.7,0);ctl.update();const cl=new THREE.Clock();let t=0;
+(function f(){requestAnimationFrame(f);const dt=cl.getDelta();t+=dt;ch.forEach((g,i)=>animate(g,{mode:'idle'},t+i,dt));r.render(sc,cam);document.documentElement.dataset.n=ch.length})();
+addEventListener('resize',()=>{r.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()});
+</script></body></html>

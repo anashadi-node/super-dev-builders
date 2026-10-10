@@ -2,71 +2,148 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="dark">
-<title>SDB Command Deck — Super Dev Builders</title>
-<link rel="stylesheet" href="style.css">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E⬡%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f7e8da">
+<title>SDB Workspace</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23e8786a'/%3E%3Ctext x='32' y='43' font-size='30' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='800'%3ESDB%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#fbefe3; --card:#fffaf4; --card2:#fff3e6; --ink:#3a2f3d; --mute:#8a7a85; --line:#ecd9c6;
+  --accent:#e8786a; --accent2:#f2b84a; --ok:#3fbf73; --bad:#e0534a; --warn:#e0a22a; --violet:#8a74e8; --sky:#5aa8e0;
+  --r:18px; --sh:0 10px 30px rgba(120,80,60,.16);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:15px/1.45 "Nunito","Segoe UI",system-ui,sans-serif;overflow:hidden}
+#stage{position:fixed;inset:0;background:linear-gradient(180deg,#ffe9d4 0%,#fbd9c7 38%,#cfe6f6 100%)}
+#stage canvas{display:block;width:100%;height:100%;touch-action:none}
+button{font:inherit;color:inherit;cursor:pointer}
+.btn{border:0;border-radius:14px;padding:9px 14px;background:var(--card);box-shadow:0 2px 0 var(--line),0 6px 14px rgba(120,80,60,.12);font-weight:700;transition:transform .08s,box-shadow .08s}
+.btn:active{transform:translateY(2px);box-shadow:0 0 0 var(--line)}
+.btn.pri{background:var(--accent);color:#fff;box-shadow:0 2px 0 #c75a4c,0 6px 14px rgba(232,120,106,.4)}
+.btn.ok{background:var(--ok);color:#fff;box-shadow:0 2px 0 #2c9a58}
+.btn.sm{padding:5px 10px;font-size:13px;border-radius:10px}
+.btn[disabled]{opacity:.5;pointer-events:none}
+/* top bar */
+#top{position:fixed;left:12px;right:12px;top:calc(10px + env(safe-area-inset-top));display:flex;gap:8px;align-items:center;pointer-events:none;z-index:5;flex-wrap:wrap}
+#top>*{pointer-events:auto}
+.logo{display:flex;align-items:center;gap:10px;background:var(--card);padding:7px 14px 7px 8px;border-radius:18px;box-shadow:var(--sh);margin-right:auto}
+.logo i{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;color:#fff;font-style:normal;font-weight:900;font-size:13px}
+.logo b{font-size:16px;letter-spacing:.2px}.logo small{display:block;color:var(--mute);font-size:11px;margin-top:-2px}
+.tools{display:flex;gap:6px;flex-wrap:wrap;background:var(--card);padding:6px;border-radius:18px;box-shadow:var(--sh)}
+.tools .btn{box-shadow:none;background:transparent;padding:8px 11px}
+.tools .btn:hover{background:var(--card2)}.tools .btn.on{background:var(--accent);color:#fff}
+/* panel */
+#panel{position:fixed;top:calc(70px + env(safe-area-inset-top));right:12px;bottom:12px;width:min(430px,calc(100vw - 24px));background:var(--card);border-radius:24px;box-shadow:var(--sh);display:flex;flex-direction:column;overflow:hidden;z-index:6;transition:transform .25s}
+#panel.hide{transform:translateX(calc(100% + 24px))}
+.tabs{display:flex;gap:4px;padding:10px 10px 0}
+.tabs button{flex:1;border:0;background:transparent;padding:9px 6px;border-radius:12px 12px 0 0;font-weight:800;color:var(--mute);border-bottom:3px solid transparent}
+.tabs button.on{color:var(--accent);border-color:var(--accent);background:var(--card2)}
+.pane{display:none;flex:1;min-height:0;flex-direction:column;background:var(--card2);padding:12px;gap:10px;overflow:auto}
+.pane.on{display:flex}
+.pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:800;background:#fff;border:1px solid var(--line);color:var(--mute)}
+.pill.ok{background:#e4f8ec;color:#1f8a4c;border-color:#bfe9cf}.pill.bad{background:#fde7e4;color:#b63a30;border-color:#f3c3be}.pill.sample{background:#eee9fb;color:#6a55c4;border-color:#d7ccf5}.pill.deco{background:#fff2d6;color:#a8741a;border-color:#f5dfa8}
+/* chat */
+#log{flex:1;min-height:120px;overflow:auto;display:flex;flex-direction:column;gap:9px;padding:2px}
+.msg{max-width:92%;padding:9px 12px;border-radius:16px;white-space:pre-wrap;word-wrap:anywhere;font-size:14.5px;box-shadow:0 1px 0 var(--line)}
+.msg.u{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:5px}
+.msg.k{align-self:flex-start;background:#fff;border-bottom-left-radius:5px}
+.msg.sys{align-self:center;background:transparent;color:var(--mute);font-size:12.5px;box-shadow:none;text-align:center}
+.typing:after{content:"…";animation:bl 1s infinite}@keyframes bl{50%{opacity:.2}}
+.draft{background:#fff;border:2px dashed var(--accent2);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.draft h4{margin:0;font-size:16px}.draft ul{margin:2px 0 4px;padding-left:18px}.draft .row{display:flex;gap:8px;flex-wrap:wrap}
+.compose{display:flex;flex-direction:column;gap:7px}
+.compose select,.compose textarea,.pin input{width:100%;border:2px solid var(--line);border-radius:14px;background:#fff;padding:10px 12px;font:inherit;color:var(--ink);outline:none}
+.compose textarea{min-height:70px;max-height:160px;resize:vertical}
+.compose textarea:focus,.compose select:focus,.pin input:focus{border-color:var(--accent)}
+/* proyek */
+.proj{background:#fff;border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 1px 0 var(--line)}
+.proj h4{margin:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.stages{display:grid;grid-template-columns:repeat(8,1fr);gap:5px}
+.st{aspect-ratio:1;border-radius:9px;border:0;background:#e6e0d2;font-size:11px;font-weight:800;color:#6a6258;position:relative;padding:0}
+.st.done{background:var(--ok);color:#fff}.st.brief{background:var(--warn);color:#fff}.st.next{outline:3px solid var(--accent);outline-offset:1px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:13px;color:var(--mute)}.kv b{color:var(--ink);font-weight:700;word-break:break-all}
+/* tim */
+.mem{display:flex;gap:10px;background:#fff;border-radius:16px;padding:9px 11px;align-items:center;cursor:pointer;box-shadow:0 1px 0 var(--line);border:2px solid transparent}
+.mem:hover,.mem.on{border-color:var(--accent)}
+.av{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-weight:900;color:#fff;font-size:15px;flex:none}
+.dot{width:10px;height:10px;border-radius:50%;background:#bbb;display:inline-block;margin-right:5px}.dot.ok{background:var(--ok)}.dot.bad{background:var(--bad)}
+/* kartu info */
+#card{position:fixed;left:12px;bottom:12px;width:min(390px,calc(100vw - 24px));max-height:60vh;overflow:auto;background:var(--card);border-radius:24px;box-shadow:var(--sh);padding:16px;z-index:7;display:none}
+#card.on{display:block}
+#card h3{margin:0 0 2px;font-size:20px}#card .sub{color:var(--mute);font-size:13px;margin-bottom:8px}
+#card .sec{margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);font-size:13.5px}
+#card .sec h5{margin:0 0 4px;font-size:12px;letter-spacing:.6px;text-transform:uppercase;color:var(--mute)}
+#card .x{position:absolute;right:12px;top:10px;border:0;background:var(--card2);width:30px;height:30px;border-radius:50%;font-weight:900}
+#card ul{margin:0;padding-left:18px}
+/* modal */
+#modal{position:fixed;inset:0;background:rgba(58,47,61,.5);display:none;place-items:center;z-index:20;padding:16px}
+#modal.on{display:grid}
+#modal .box{background:var(--card);border-radius:22px;max-width:760px;width:100%;max-height:86vh;display:flex;flex-direction:column;box-shadow:var(--sh)}
+#modal header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line);font-weight:800}
+#modal pre{margin:0;padding:16px 18px;overflow:auto;white-space:pre-wrap;word-wrap:anywhere;font:13.5px/1.55 ui-monospace,Menlo,monospace}
+/* pin */
+#gate{position:fixed;inset:0;background:rgba(251,239,227,.94);display:none;place-items:center;z-index:30;padding:20px}
+#gate.on{display:grid}.pin{background:var(--card);padding:22px;border-radius:24px;box-shadow:var(--sh);max-width:360px;width:100%;display:flex;flex-direction:column;gap:10px}
+/* loading */
+#load{position:fixed;inset:0;background:linear-gradient(180deg,#ffe9d4,#cfe6f6);display:grid;place-items:center;z-index:25;transition:opacity .6s}
+#load.off{opacity:0;pointer-events:none}.ld{text-align:center}.ld b{font-size:22px}.bar{width:220px;height:10px;border-radius:9px;background:#fff;margin:14px auto 0;overflow:hidden}.bar i{display:block;height:100%;width:40%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:9px;animation:ld 1.1s infinite ease-in-out}@keyframes ld{0%{margin-left:-40%}100%{margin-left:100%}}
+/* dpad */
+#dpad{position:fixed;left:16px;bottom:calc(16px + env(safe-area-inset-bottom));display:none;grid-template-columns:repeat(3,54px);grid-template-rows:repeat(2,54px);gap:6px;z-index:8}
+#dpad.on{display:grid}#dpad button{border:0;border-radius:16px;background:rgba(255,250,244,.92);font-size:20px;font-weight:900;box-shadow:var(--sh)}
+#hint{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom));background:rgba(58,47,61,.82);color:#fff;padding:7px 14px;border-radius:99px;font-size:12.5px;z-index:4;display:none;text-align:center;max-width:94vw}
+#legend{position:fixed;left:12px;top:calc(70px + env(safe-area-inset-top));background:var(--card);border-radius:16px;padding:8px 12px;font-size:12px;box-shadow:var(--sh);z-index:4;display:flex;gap:10px;flex-wrap:wrap;max-width:min(560px,calc(100vw - 460px))}
+#toast{position:fixed;left:50%;top:80px;transform:translate(-50%,-20px);background:var(--ink);color:#fff;padding:9px 16px;border-radius:14px;opacity:0;transition:.25s;z-index:40;pointer-events:none;max-width:90vw;text-align:center}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+@media (max-width:820px){
+  #panel{top:auto;height:62vh;bottom:0;right:0;left:0;width:auto;border-radius:24px 24px 0 0}
+  #panel.hide{transform:translateY(105%)}
+  #legend{display:none}#card{bottom:auto;top:calc(120px + env(safe-area-inset-top));max-height:42vh}
+  .tools .btn span{display:none}.logo small{display:none}
+}
+</style>
 </head>
 <body>
-<header class="top">
-  <div class="brand">
-    <span class="hex">⬡</span>
-    <div>
-      <h1>SDB <em>Command Deck</em></h1>
-      <p class="sub">Super Dev Builders — 12 Divisi · 10 Profil · 4 Model</p>
-    </div>
+<div id="stage"></div>
+<div id="load"><div class="ld"><b>Menyiapkan kantor SDB…</b><div class="bar"><i></i></div><div style="color:#8a7a85;margin-top:10px;font-size:13px">memuat dunia 3D lokal (tanpa internet)</div></div></div>
+
+<div id="top">
+  <div class="logo"><i>SDB</i><div><b>SDB Workspace</b><small>Super Dev Builders · ruang kerja ide</small></div></div>
+  <div class="tools">
+    <button class="btn" id="bPanel" title="Tampilkan/sembunyikan panel">💬<span> Panel</span></button>
+    <button class="btn" id="bIn" title="Masuk ke Dalam">🚶<span> Masuk</span></button>
+    <button class="btn" id="bDen" title="Ruang Koordinasi (basement)">🕳️<span> Basement</span></button>
+    <button class="btn" id="bMusic" title="Musik lo-fi">🎵<span> Lo-fi</span></button>
+    <button class="btn" id="bMute" title="Bisukan semua suara">🔊<span> Suara</span></button>
+    <button class="btn" id="bReset" title="Kembali ke tampilan awal">⟲<span> Reset</span></button>
+    <a class="btn" href="/monitor" style="text-decoration:none" title="Monitoring LLM (Command Deck lama)">📊<span> Monitor</span></a>
   </div>
-  <div class="top-right">
-    <div class="clock" id="clock">—</div>
-    <div class="net-hint" id="lan"></div>
-  </div>
-</header>
+</div>
 
-<main>
-  <section class="kpis" id="kpis"></section>
+<div id="legend"><span><span class="dot ok"></span>terverifikasi (probe nyata)</span><span><span class="pill deco">dekoratif</span> animasi jalan-jalan</span><span><span class="pill sample">CONTOH</span> bukan data nyata</span></div>
 
-  <section class="toolbar">
-    <div class="tabs" id="tabs">
-      <button class="tab on" data-f="all">Semua</button>
-      <button class="tab" data-f="glm">GLM 5.3 Flash</button>
-      <button class="tab" data-f="ds">DeepSeek V4.1</button>
-      <button class="tab" data-f="ant">Sonnet 5.5</button>
-      <button class="tab" data-f="opu">Opus 5.5</button>
-      <button class="tab" data-f="gpt">GPT-5.6 Sol</button>
-    </div>
-    <label class="switch"><input type="checkbox" id="lanmode"><span>Mode HP (kartu ringkas)</span></label>
-  </section>
-
-  <section class="grid" id="grid"></section>
-
-  <section class="panel">
-    <h2>Alur 16 Tahap — Pipa Riset → Produksi</h2>
-    <div class="flow" id="flow"></div>
-  </section>
-
-  <section class="panel two">
-    <div>
-      <h2>Kebijakan Routing (native dulu)</h2>
-      <ul class="pol">
-        <li><b>GLM 5.3 Flash</b> → TokenRouter → TokenHarbor → OpenCode (cc-frontend, cc-capture-forensics)</li>
-        <li><b>DeepSeek V4.1 Flash</b> → API resmi → TokenRouter (cc-builder, cc-orchestrator, cc-devops-docs)</li>
-        <li><b>Sonnet 5.5</b> → Anthropic (OAuth) → TokenRouter (cc-architect, cc-reviewer-qa, keamanan)</li>
-        <li><b>Opus 5.5</b> → Anthropic → TokenRouter (cc-security-governor, auditor)</li>
-        <li><b>GPT-5.6 Sol</b> → OpenAI/Codex (OAuth) → TokenRouter (auditor cadangan)</li>
-      </ul>
-    </div>
-    <div>
-      <h2>Divisi D0–D11</h2>
-      <div class="divs" id="divs"></div>
+<aside id="panel">
+  <div class="tabs"><button data-t="chat" class="on">💡 Diskusi</button><button data-t="proj">🗂️ Proyek</button><button data-t="team">👥 Tim</button></div>
+  <section class="pane on" id="p-chat">
+    <div id="log"><div class="msg sys">Ceritakan ide web, aplikasi Android, atau SaaS. Kapten Orka akan merangkum jadi <b>draft intake</b>. Tidak ada yang dibangun sebelum kamu menekan <b>Approve</b>.</div></div>
+    <div class="compose">
+      <select id="scope"></select>
+      <textarea id="msg" placeholder="Mis. Aplikasi kasir warung offline-first untuk Android…"></textarea>
+      <div style="display:flex;gap:8px;align-items:center"><button class="btn pri" id="send">Kirim</button><span id="chatst" style="color:var(--mute);font-size:12.5px"></span></div>
     </div>
   </section>
+  <section class="pane" id="p-proj"></section>
+  <section class="pane" id="p-team"></section>
+</aside>
 
-  <footer>
-    <span id="gen">—</span> · repo <span id="head">—</span> ·
-    sumber data: config.yaml profil (hanya id model, tanpa kunci)
-  </footer>
-</main>
-<script src="app.js"></script>
+<div id="card"></div>
+<div id="dpad"><span></span><button data-d="f">▲</button><span></span><button data-d="l">◀</button><button data-d="b">▼</button><button data-d="r">▶</button></div>
+<div id="hint"></div>
+<div id="toast"></div>
+<div id="modal"><div class="box"><header><span id="mt"></span><button class="btn sm" id="mx">Tutup</button></header><pre id="mb"></pre></div></div>
+<div id="gate"><div class="pin"><b style="font-size:18px">Masukkan PIN Workspace</b><span style="color:var(--mute);font-size:13px">Perangkat ini bukan PC server. Lihat PIN dengan membuka <b>http://127.0.0.1:8484</b> di PC Ubuntu (tampil di panel “Tim”), lalu ketik di sini.</span><input id="pinin" placeholder="PIN" autocomplete="off"><button class="btn pri" id="pinok">Masuk</button></div></div>
+
+<script>window.__errs=[];addEventListener("error",e=>{__errs.push((e.message||"")+" @"+(e.filename||"").split("/").pop()+":"+e.lineno);document.documentElement.setAttribute("data-err",__errs.join(" | "))});addEventListener("unhandledrejection",e=>{__errs.push("rej:"+(e.reason&&e.reason.message||e.reason));document.documentElement.setAttribute("data-err",__errs.join(" | "))});</script>
+<script type="importmap">{"imports":{"three":"/vendor/three.module.min.js"}}</script>
+<script type="module" src="/ws/app.js"></script>
 </body>
 </html>

@@ -70,9 +70,10 @@ Batas 5 model sebelumnya = efek **saldo kosong**, bukan batas tetap kunci.
 ### Pemetaan peran -> profil (TERPASANG & TERVERIFIKASI — 10 profil PONG)
 | Peran | Profil | Model | Utama | Cadangan |
 |---|---|---|---|---|
-| Research/recon | cc-capture-forensics | **GLM 5.3 Flash** | tokenrouter `z-ai/glm-5.3-flash` | tokenharbor `glm-5.3-flash` |
+| Research/recon | cc-capture-forensics | **GLM 5.3 Flash** | tokenrouter `z-ai/glm-5.3-flash` | tokenharbor `glm-5.3-flash` -> opencode-go `glm-5.3-flash` |
+| Frontend | cc-frontend | **GLM 5.3 Flash** | tokenrouter `z-ai/glm-5.3-flash` | tokenharbor `glm-5.3-flash` -> opencode-go `glm-5.3-flash` |
 | Plan/intake/docs | cc-orchestrator | DeepSeek V4.1 Flash | deepseek `deepseek-flash` | tokenrouter `deepseek/deepseek-v4.1-flash` |
-| Backend + Frontend | cc-builder | **DeepSeek V4.1 Flash** | deepseek `deepseek-flash` | tokenrouter `deepseek/deepseek-v4.1-flash` |
+| Backend | cc-builder | **DeepSeek V4.1 Flash** | deepseek `deepseek-flash` | tokenrouter `deepseek/deepseek-v4.1-flash` |
 | DevOps deploy/docs | cc-devops-docs | DeepSeek V4.1 Flash | deepseek `deepseek-flash` | tokenrouter `deepseek/deepseek-v4.1-flash` |
 | Arsitektur/ADR | cc-architect | Sonnet 5.5 | anthropic `claude-sonnet-5-5` | tokenrouter `anthropic/claude-sonnet-5.5` |
 | Code review | cc-reviewer-qa | Sonnet 5.5 | anthropic `claude-sonnet-5-5` | tokenrouter `anthropic/claude-sonnet-5.5` |

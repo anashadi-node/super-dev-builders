@@ -69,8 +69,8 @@ custom:
     path: skills/technology-selection
   - id: api-contract
     status: ADD
-    divisions: [D5, D3, D7]
-    profiles: [sdb-builder, sdb-architect, sdb-reviewer]
+    divisions: [D4, D5, D3, D7]
+    profiles: [sdb-frontend, sdb-builder, sdb-architect, sdb-reviewer]
     path: skills/api-contract
   - id: database-migration-safety
     status: ADD
@@ -254,6 +254,7 @@ third_party:
       cc-security-governor: [semgrep, codeql, sarif-parsing, differential-review, variant-analysis, fp-check, audit-context-building, post-patch-validation]
       cc-reviewer-qa: [differential-review, variant-analysis, fp-check, post-patch-validation]
       cc-builder: [modern-python, post-patch-validation]
+      cc-frontend: [modern-python, post-patch-validation]   # klon cc-builder 2026-10-10 (skill ikut)
       cc-architect: [differential-review, audit-context-building]
       cc-devops-docs: [semgrep, modern-python]
     verdict_flip:

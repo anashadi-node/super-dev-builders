@@ -1,0 +1,196 @@
+{
+ "sdb-architect": {
+  "profile": "cc-architect",
+  "divisions": [
+   "D3",
+   "D2"
+  ],
+  "mission": "Desain arsitektur, pilih stack per governance, buat ADR, dan rencanakan implementasi.",
+  "primary": "sonnet-5.5",
+  "available_now": "claude-sonnet-5-5 (anthropic)",
+  "escalation": [
+   "opus-5.5",
+   "gpt-5.6-sol"
+  ],
+  "stages": [
+   "03",
+   "04"
+  ],
+  "notes": "Salah di arsitektur menular ke seluruh proyek; jangan turunkan kelas.",
+  "gates": [],
+  "permissions": [
+   "research_retrieval",
+   "scripts/gate_check.py"
+  ]
+ },
+ "sdb-builder": {
+  "profile": "cc-builder",
+  "divisions": [
+   "D5"
+  ],
+  "mission": "Implementasi backend clean-room dari spec, dengan test dan bukti build.",
+  "primary": "deepseek-v4.1-flash",
+  "available_now": "deepseek-flash (deepseek)",
+  "escalation": "sonnet-5.5",
+  "stages": [
+   "07"
+  ],
+  "notes": "TDD + test deterministik sebagai jaring pengaman; eskalasi bila gagal 2-3 siklus.",
+  "gates": [],
+  "permissions": [
+   "build_tools",
+   "test_runners",
+   "local_linters",
+   "container_build"
+  ]
+ },
+ "sdb-devops": {
+  "profile": "cc-devops-docs",
+  "divisions": [
+   "D10",
+   "D11"
+  ],
+  "mission": "Release, deploy, reliability, dan dokumentasi/handover.",
+  "primary": "deepseek-v4.1-flash",
+  "available_now": "deepseek-flash (deepseek)",
+  "escalation": "sonnet-5.5",
+  "stages": [
+   "14",
+   "15",
+   "16"
+  ],
+  "notes": "Deploy/docs=deepseek; observability=strong (per-task). Deploy produksi tetap wajib approval manusia.",
+  "gates": [],
+  "permissions": [
+   "docker_compose",
+   "build_pipelines",
+   "deploy_to_staging",
+   "smoke_tests",
+   "backup_tools"
+  ]
+ },
+ "sdb-orchestrator": {
+  "profile": "cc-orchestrator",
+  "divisions": [
+   "D0",
+   "D2"
+  ],
+  "mission": "Mengubah permintaan user menjadi requirements, task graph, routing divisi, dan status ringkas.",
+  "primary": "deepseek-v4.1-flash",
+  "available_now": "deepseek-flash (deepseek)",
+  "escalation": null,
+  "stages": [
+   "01",
+   "02",
+   "03",
+   "06",
+   "16"
+  ],
+  "notes": "06 (implementation plan) boleh deepseek; eskalasi ke strong bila sistem besar.",
+  "gates": [
+   "gate0_intake"
+  ],
+  "permissions": [
+   "scripts/gate_check.py",
+   "scripts/init_target.py",
+   "scripts/doctor.py"
+  ]
+ },
+ "sdb-recon": {
+  "profile": "cc-capture-forensics",
+  "divisions": [
+   "D1"
+  ],
+  "mission": "Observasi sah target, bangun evidence package, normalisasi, dan spesifikasi ulang tanpa menembus proteksi.",
+  "primary": "glm-5.3-flash",
+  "available_now": "z-ai/glm-5.3-flash (tokenrouter)",
+  "escalation": "sonnet-5.5",
+  "stages": [
+   "recon"
+  ],
+  "notes": "Kualitas evidence menentukan segalanya; eskalasi bila klasifikasi tidak yakin.",
+  "gates": [],
+  "permissions": [
+   "playwright",
+   "crawlee(rate_limited)",
+   "evidence_lint",
+   "redact_network",
+   "mobsf|jadx|apktool|ghidra (mode_B_isolated_only)"
+  ]
+ },
+ "sdb-reviewer": {
+  "profile": "cc-reviewer-qa",
+  "divisions": [
+   "D6",
+   "D7"
+  ],
+  "mission": "Review independent dan pembuktian mutu (unit/integration/contract/E2E/a11y/visual).",
+  "primary": "sonnet-5.5",
+  "available_now": "claude-sonnet-5-5 (anthropic)",
+  "escalation": [
+   "opus-5.5",
+   "gpt-5.6-sol"
+  ],
+  "stages": [
+   "08",
+   "09"
+  ],
+  "notes": "Review tidak boleh 'asal setuju'; QA deterministik boleh GLM.",
+  "gates": [],
+  "permissions": [
+   "test_runners",
+   "playwright_assertions",
+   "axe_core",
+   "lighthouse"
+  ]
+ },
+ "sdb-security": {
+  "profile": "cc-security-governor",
+  "divisions": [
+   "D8",
+   "D9"
+  ],
+  "mission": "Security gate dan audit engineering independent: temukan risiko, ukur, dan beri verdict berbasis bukti.",
+  "primary": "sonnet-5.5",
+  "available_now": "claude-opus-5-5 (anthropic)",
+  "escalation": [
+   "opus-5.5",
+   "gpt-5.6-sol"
+  ],
+  "stages": [
+   "10",
+   "11"
+  ],
+  "notes": "Audit (11) wajib Opus 5.5/Sol; selama belum ter-wire, jalankan interim + tandai verdict 'interim'.",
+  "gates": [],
+  "permissions": [
+   "semgrep",
+   "codeql",
+   "trivy",
+   "syft",
+   "dependency_audit",
+   "secret_scan",
+   "read_only_queries"
+  ]
+ },
+ "sdb-frontend": {
+  "profile": "cc-frontend",
+  "divisions": [
+   "D4"
+  ],
+  "mission": "Implementasi frontend clean-room dari spec/component contract, dengan test dan bukti build.",
+  "primary": "glm-5.3-flash",
+  "available_now": "z-ai/glm-5.3-flash (tokenrouter)",
+  "escalation": "sonnet-5.5",
+  "stages": [
+   "07"
+  ],
+  "notes": "Rantai GLM Owner: TokenRouter -> TokenHarbor -> OpenCode; kuota OpenCode-go habis s/d 25 Okt (429).",
+  "gates": [],
+  "permissions": [
+   "build_tools",
+   "test_runners",
+   "local_linters"
+  ]
+ }
+}

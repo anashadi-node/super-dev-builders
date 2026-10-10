@@ -42,3 +42,6 @@ runs/e2e-*/
 targets/e2e-*/
 **/_selftest*/
 **/zz-*/
+
+# SDB deck runtime state
+dashboard/state/

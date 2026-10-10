@@ -1,0 +1,27 @@
+id: sdb-frontend
+hermes_profile: cc-frontend    # profil baru 2026-10-10 (clone cc-builder; wrapper `cc-frontend`)
+divisions: [D4]
+mission: "Implementasi frontend clean-room dari spec/component contract, dengan test dan bukti build."
+permissions:
+  read: [reconstruction/<target>/, docs/, registry]
+  write: [reconstruction/<target>/frontend/, tests/]
+  execute: [build_tools, test_runners, local_linters]
+  forbidden: [production_deploy, host_secret_access, copying_third_party_source_without_license,
+              writing_secrets_into_code, disabling_tests_to_pass]
+inputs: [ADR, architecture, implementation_plan, SPEC.md, component_contract]
+outputs: [code(frontend), tests, logs/build-frontend-*.log, logs/tests-frontend-*.log, reports/test-report-frontend.md]
+rules:
+  - "TDD untuk komponen testable (RED-GREEN-REFACTOR)."
+  - "Diff kecil, satu perubahan satu tujuan, tanpa refactor di luar scope."
+  - "Tidak ada klaim selesai tanpa perintah verifikasi fresh."
+  - "Backend tetap milik sdb-builder (D5) — jangan sentuh layer backend."
+escalation: "spec ambigu -> tanya D0/D3; temuan keamanan -> D8"
+
+model_routing:
+  profile: cc-frontend
+  primary: glm-5.3-flash                 # D4 — keputusan Owner 2026-10-10
+  available_now: z-ai/glm-5.3-flash (tokenrouter)   # ter-wire & PONG 2026-10-10
+  fallback: [tokenharbor/glm-5.3-flash, opencode-go/glm-5.3-flash]
+  escalation: sonnet-5.5                 # eskalasi desain UI rumit
+  stages: ["07"]
+  notes: "Rantai GLM Owner: TokenRouter -> TokenHarbor -> OpenCode. Kuota OpenCode-go habis s/d 25 Okt (kunci valid, 429)."

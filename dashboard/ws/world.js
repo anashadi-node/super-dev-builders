@@ -38,7 +38,7 @@ export function createWorld(host, opts = {}) {
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   host.appendChild(renderer.domElement);
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0xf4e4d8, 90, 200);
+  scene.fog = new THREE.Fog(0xf6e7d4, 90, 200);
 
   // kamera
   let aspect = 1, frustum = 30;
@@ -51,7 +51,7 @@ export function createWorld(host, opts = {}) {
   controls.minZoom = 0.55; controls.maxZoom = 3.6; controls.maxPolarAngle = Math.PI * 0.49; controls.minPolarAngle = 0.25;
   controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
   controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
-  ortho.zoom = innerWidth < 800 && innerHeight > innerWidth ? 1.02 : 1.16; controls.screenSpacePanning = true; controls.update();
+  ortho.zoom = innerWidth < 800 && innerHeight > innerWidth ? 0.78 : 1.16; controls.screenSpacePanning = true; controls.update();
   let shiftPx = 0;
   function applyFrame() {
     const half = frustum * aspect, w = host.clientWidth || 1, sh = (shiftPx / w) * 2 * half;
@@ -80,7 +80,7 @@ export function createWorld(host, opts = {}) {
   const lawn = mesh(new THREE.CircleGeometry(40, 48), '#cfe6b4', { mat: new THREE.MeshBasicMaterial({ color: 0xcfe8b6, transparent: true, alphaMap: fadeTex, depthWrite: false }), parent: scene, cast: false });
   lawn.rotation.x = -Math.PI / 2; lawn.position.set(0, -1.52, -2); lawn.renderOrder = -1;
   const slab = box(46, 1.5, 31, '#e3c9a4', { parent: groundG }); slab.position.set(0, -0.75, -4);
-  const plaza = box(45.6, 0.04, 30.6, '#f1dcc0', { parent: groundG, mat: toon('#ffffff', { map: (() => { const t = texWood('#ecd3b0', '#e2c59e'); t.repeat.set(7, 5); return t; })() }) }); plaza.position.set(0, 0.02, -4);
+  const plaza = box(45.6, 0.04, 30.6, '#f1dcc0', { parent: groundG, mat: toon('#ffffff', { map: (() => { const t = texWood('#ecd3b0', '#e2c59e'); t.repeat.set(7, 5); return t; })() }) }); plaza.position.set(0, 0.02, -4); plaza.receiveShadow = true;
   const slabEdge = box(46.6, 0.4, 31.6, '#c8a67a', { parent: groundG }); slabEdge.position.set(0, -1.1, -4);
 
   // ---------------- helper
@@ -88,7 +88,7 @@ export function createWorld(host, opts = {}) {
   const spinners = [], rockers = [], steams = [], lanterns = [], swayers = [], denTiles = [];
   let projectsData = [];
   const add = (m, p) => { (p || scene).add(m); return m; };
-  const P = (parent, geo, c, pos, o = {}) => { const m = mesh(geo, c, { parent, ...o }); m.position.set(...pos); return m; };
+  const P = (parent, geo, c, pos, o = {}) => { const m = mesh(geo, c, { parent, ...o }); m.position.set(...pos); m.castShadow = o.cast !== false; m.receiveShadow = true; return m; };
   function deskAt(g, x, z, col = '#c89a68', w = 2.8, d = 1.2) {
     P(g, new THREE.BoxGeometry(w, 0.14, d), col, [x, 0.95, z], { out: 1.0 });
     [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([a, b]) => P(g, new THREE.BoxGeometry(0.12, 0.9, 0.12), '#a67a4a', [x + a * (w / 2 - 0.15), 0.47, z + b * (d / 2 - 0.15)]));
@@ -124,6 +124,32 @@ export function createWorld(host, opts = {}) {
     }
     return s;
   }
+  function phoneBooth(g, x, z, rot = 0, col = '#c98d5e') { // booth kayu (airbnb style)
+    const b = new THREE.Group(); g.add(b); b.position.set(x, 0, z); b.rotation.y = rot;
+    P(b, new THREE.BoxGeometry(1.3, 2.6, 1.3), col, [0, 1.3, 0]);
+    P(b, new THREE.BoxGeometry(1.5, 0.18, 1.5), '#8a6238', [0, 2.66, 0]);
+    P(b, new THREE.BoxGeometry(0.8, 1.7, 0.05), '#bfe3e8', [0, 1.35, 0.66], { mat: toon('#ffffff', { transparent: true, opacity: 0.55 }) });
+    P(b, new THREE.BoxGeometry(0.9, 0.1, 0.5), '#7a5a3a', [0, 1.0, 0.35]);
+    const gl = glowSprite('#ffe0b0', 1.8, 0.5); gl.position.set(0, 2.2, 0); b.add(gl); steams.push(gl); b.userData.prop='booth'; return b; }
+  function commTable(g, x, z, rot = 0) { // meja komunal panjang (timber)
+    const t = new THREE.Group(); t.userData.prop='commtable'; g.add(t); t.position.set(x, 0, z); t.rotation.y = rot;
+    P(t, new THREE.BoxGeometry(7.2, 0.16, 1.7), '#c89a68', [0, 0.95, 0]);
+    [-2.9, 2.9].forEach((px) => P(t, new THREE.BoxGeometry(0.3, 0.9, 1.4), '#9a7a52', [px, 0.45, 0]));
+    [-2.4, -0.8, 0.8, 2.4].forEach((px) => { const c = new THREE.Group(); c.userData.prop='chair'; t.add(c); c.position.set(px, 0, 1.35); c.rotation.y = Math.PI; chair(c, 0, 0, '#e0b090'); });
+    [-2.4, 0.8].forEach((px) => { const c = new THREE.Group(); c.userData.prop='chair'; t.add(c); c.position.set(px, 0, -1.35); chair(c, 0, 0, '#a8c8e0'); });
+    return t; }
+  function bigTree(g, x, z, s = 1) { // tanaman indoor besar (Google biophilic)
+    const t = new THREE.Group(); g.add(t); t.position.set(x, 0, z); t.scale.setScalar(s);
+    P(t, new THREE.CylinderGeometry(0.42, 0.52, 0.6, 12), '#b98a5e', [0, 0.3, 0]);
+    P(t, new THREE.CylinderGeometry(0.09, 0.13, 2.6, 8), '#8a6a48', [0, 1.7, 0]);
+    for (let i = 0; i < 7; i++) { const leaf = sphere(0.55, i % 2 ? '#4f9e5e' : '#63b573', { parent: t, cast: false, scl: [1, 0.55, 1] });
+      leaf.position.set(Math.sin(i * 2.4) * 0.75, 2.6 + Math.cos(i * 1.7) * 0.7, Math.cos(i * 2.1) * 0.75); }
+    t.userData.prop='tree'; return t; }
+  function pendantLamp(g, x, z, y = 2.9, col = '#ffd9a0') { // lampu gantung warm
+    const t = new THREE.Group(); g.add(t); t.position.set(x, 0, z);
+    P(t, new THREE.CylinderGeometry(0.015, 0.015, 1.3, 6), '#5a5048', [0, y + 0.65, 0]);
+    t.userData.prop='pendant'; const shade = P(t, new THREE.ConeGeometry(0.55, 0.5, 14, 1, true), '#e8b06a', [0, y, 0], { cast: false, out: 1.02 });
+    shade.rotation.x = Math.PI; const gl = glowSprite(col, 1.9, 0.55); gl.position.set(0, y - 0.25, 0); t.add(gl); steams.push(gl); return t; }
   function rug(g, x, z, w, d, col, line) { const r = P(g, new THREE.BoxGeometry(w, 0.05, d), col, [x, 0.07, z], { mat: toon('#ffffff', { map: texRugPattern(col, line) }), cast: false }); return r; }
   function banner(g, x, z, col, rot = 0) { const b = P(g, new THREE.BoxGeometry(1.2, 1.8, 0.06), col, [x, 2.5, z], { out: 1.0 }); b.rotation.y = rot; P(g, new THREE.BoxGeometry(1.5, 0.08, 0.1), '#8a6a3a', [x, 3.45, z]); return b; }
   function board16(g, x, y, z, states) { // papan keputusan 16 tahap
@@ -306,6 +332,14 @@ export function createWorld(host, opts = {}) {
 
   // objek yang beranimasi (dekoratif)
 
+  // ---------------- paket biophilic koridor (Google/Airbnb vibe)
+  { const g = new THREE.Group(); scene.add(g);
+    phoneBooth(g, -16, -9, 0); phoneBooth(g, 16, -9, Math.PI); phoneBooth(g, -16, 1, 0); phoneBooth(g, 16, 1, Math.PI);
+    bigTree(g, -20, 11.6, 1.15); bigTree(g, -13, 12.6, 1.05); bigTree(g, -2.5, 12.2, 1.0); bigTree(g, 3, 11.4, 1.2); bigTree(g, 14.5, 12.8, 1.1); bigTree(g, 20, 11.6, 1.0);
+    pendantLamp(g, -8, -9); pendantLamp(g, 0, -9, 3.1); pendantLamp(g, 8, -9); pendantLamp(g, -8, 1); pendantLamp(g, 8, 1);
+    [[-24, -9, 0], [24, -9, 0], [-24, 1, 0], [24, 1, 0]].forEach(([x, z]) => { const la = lamp(g, x, z); la.position.y = 0; });
+  }
+
   // ---------------- garis tengah: plaza, taman, air mancur
   { const g = new THREE.Group(); scene.add(g);
     // taman depan
@@ -319,6 +353,8 @@ export function createWorld(host, opts = {}) {
     for (let i = 0; i < 36; i++) { const fx = -21 + Math.random() * 42, fz = 11.4 + Math.random() * 6; P(g, new THREE.SphereGeometry(0.1, 6, 6), ['#f4b6c8', '#f2c14e', '#ffffff', '#b58ae0'][i % 4], [fx, 0.2, fz]); }
     P(g, new THREE.BoxGeometry(2.4, 0.15, 0.7), '#c89a68', [6, 0.7, 14.2], { out: 1.03 }); P(g, new THREE.BoxGeometry(2.4, 0.6, 0.1), '#c89a68', [6, 1.1, 13.9]);
     [-1, 1].forEach((s) => P(g, new THREE.BoxGeometry(0.12, 0.65, 0.5), '#a67a4a', [6 + s * 1.1, 0.35, 14.2]));
+    commTable(g, 8, 12.6, 0); pendantLamp(g, 8, 12.6, 3.0);
+    bigTree(g, -16, 12.6, 1.2); bigTree(g, 0, 12.9, 1.15); bigTree(g, 18, 12.2, 1.1);
     // jalur lampion sepanjang taman
     for (let i = 0; i < 7; i++) { const lx = -18 + i * 6; P(g, new THREE.CylinderGeometry(0.05, 0.05, 1.4, 6), '#6a5a4a', [lx, 0.7, 11.4]); const lb = P(g, new THREE.SphereGeometry(0.2, 10, 8), '#ffe3a8', [lx, 1.5, 11.4], { mat: glow('#ffe3a8', 1) }); const gs = glowSprite('#ffe3a8', 1.8, 0.45); gs.position.set(lx, 1.5, 11.4); g.add(gs); }
   }
@@ -568,9 +604,10 @@ export function createWorld(host, opts = {}) {
     snap: () => { if (fly) { applyFly(1); fly = null; } fadeOp = denOn ? 0.14 : 1; applyFade(); if (denLabel) denLabel.visible = denOn; if (A.orch) A.orch.lab.visible = denOn; denLight.intensity = denOn ? 3.2 : 0.8; controls.update(); },
     setPanelShift: (px) => { shiftPx = px; applyFrame(); },
     focusOn: (x, y, z, zoom) => { const off = ortho.position.clone().sub(controls.target); controls.target.set(x, y, z); ortho.position.set(x, y, z).add(off); ortho.zoom = zoom; ortho.updateProjectionMatrix(); controls.update(); },
-    reset: () => { setDen(false); setInside(false); ortho.zoom = innerWidth < 800 && innerHeight > innerWidth ? 1.02 : 1.16; ortho.position.set(30, 37, 30); controls.target.set(0, 0, -2); ortho.updateProjectionMatrix(); controls.update(); selected = null; actors.forEach((a) => (a.ring.material.opacity = 0)); },
+    reset: () => { setDen(false); setInside(false); ortho.zoom = innerWidth < 800 && innerHeight > innerWidth ? 0.78 : 1.16; ortho.position.set(30, 37, 30); controls.target.set(0, 0, -2); ortho.updateProjectionMatrix(); controls.update(); selected = null; actors.forEach((a) => (a.ring.material.opacity = 0)); },
     get selected() { return selected; }, get inside() { return inside; }, get denOn() { return denOn; },
     get projects() { return projectsData; },
+    fitProbe: () => { const b = new THREE.Box3(); Object.values(roomGroups).forEach((g) => b.expandByObject(g)); const v = new THREE.Vector3(); const c = [{x:b.min.x,y:0,z:b.min.z},{x:b.max.x,y:0,z:b.min.z},{x:b.min.x,y:0,z:b.max.z},{x:b.max.x,y:0,z:b.max.z},{x:b.min.x,y:4,z:b.min.z},{x:b.max.x,y:4,z:b.min.z},{x:b.min.x,y:4,z:b.max.z},{x:b.max.x,y:4,z:b.max.z}]; let mnx=1e9,mxx=-1e9,mny=1e9,mxy=-1e9; c.forEach(p => { v.set(p.x,p.y,p.z).project(ortho); mnx=Math.min(mnx,v.x); mxx=Math.max(mxx,v.x); mny=Math.min(mny,v.y); mxy=Math.max(mxy,v.y); }); return { ndc:[mnx.toFixed(2),mxx.toFixed(2),mny.toFixed(2),mxy.toFixed(2)], zoom:ortho.zoom, port:innerWidth<800 }; },
     stats: () => { let m = 0; scene.traverse((o) => { if (o.isMesh) m++; }); return { meshes: m, actors: actors.length, rooms: ROOMS.length }; },
   };
 }

@@ -222,20 +222,23 @@ function ensureAudio() {
 }
 const N = (m) => 440 * Math.pow(2, (m - 69) / 12);
 function tone(freq, t, dur, type, vol, dest) { const o = AC.createOscillator(), g = AC.createGain(); o.type = type; o.frequency.value = freq; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + 0.03); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); o.connect(g); g.connect(dest || master); o.start(t); o.stop(t + dur + 0.05); }
-const CH = [[57, 60, 64, 67], [53, 57, 60, 64], [55, 59, 62, 65], [52, 55, 59, 62]], MEL = [76, 79, 81, 79, 76, 72, 74, 76];
+const CH = [[45, 52, 57, 60], [43, 50, 55, 59], [48, 55, 60, 64], [41, 48, 53, 57]]; // A-F-C-G major
+const RIFF = [57, 57, 64, 57, 62, 60, 57, 55], MEL = [69, 72, 76, 72, 74, 72, 69, 67];
 function startMusic() {
-  ensureAudio(); if (AC.state === 'suspended') AC.resume(); let step = 0, next = AC.currentTime + 0.1;
+  ensureAudio(); document.documentElement.dataset.music = '1'; if (AC.state === 'suspended') AC.resume(); let step = 0, next = AC.currentTime + 0.1;
   seq = setInterval(() => {
     while (next < AC.currentTime + 0.6) {
-      const bar = Math.floor(step / 8) % 4, beat = step % 8, sw = beat % 2 ? 0.05 : 0;
-      if (beat === 0) CH[bar].forEach((m, i) => tone(N(m), next + i * 0.012, 3.2, 'triangle', 0.045));
-      if (beat % 4 === 0) tone(N(CH[bar][0] - 24), next, 0.7, 'sine', 0.12);
-      if (Math.random() < 0.72) tone(N(MEL[(step + bar * 3) % 8] - (beat % 3 ? 0 : 12) + (bar % 2 ? 2 : 0)), next + sw, 0.5, 'sine', 0.05);
-      step++; next += 0.42;
+      const bar = Math.floor(step / 16) % 4, beat = Math.floor(step / 2) % 8;
+      if (step % 2 === 0) tone(N(CH[bar][0] - 12), next, 0.16, 'sawtooth', 0.10); // driving bass
+      if (beat === 0) CH[bar].forEach((m, i) => tone(N(m), next + i * 0.012, 1.6, 'square', 0.03)); // stab
+      if (beat % 2 === 1) tone(80 + Math.random() * 30, next, 0.05, 'square', 0.05); // snare-ish
+      if (beat % 4 === 2) { const n = RIFF[beat % 8] + (bar % 2 ? 2 : 0); tone(N(n), next, 0.14, 'sawtooth', 0.05); tone(N(n + 12), next + 0.08, 0.12, 'sawtooth', 0.04); } // riff gitar
+      if (beat % 4 === 0 && Math.random() < 0.8) tone(N(MEL[(step / 2 + bar * 3) % 8 | 0]), next, 0.3, 'triangle', 0.045); // melodi
+      step++; next += 0.1875; // 160 BPM
     }
-  }, 150);
+  }, 120);
 }
-function stopMusic() { clearInterval(seq); seq = null; }
+function stopMusic() { clearInterval(seq); seq = null; delete document.documentElement.dataset.music; }
 function sfx() { if (!AC || muted) return; const t = AC.currentTime, k = Math.random(); if (k < 0.4) { tone(1318, t, 0.25, 'sine', 0.05); tone(1760, t + 0.12, 0.3, 'sine', 0.04); } else if (k < 0.7) { for (let i = 0; i < 3; i++) tone(180 + Math.random() * 60, t + i * 0.09, 0.05, 'square', 0.025); } else { tone(660, t, 0.18, 'triangle', 0.05); } }
 $('#bMusic').onclick = () => { musicOn = !musicOn; $('#bMusic').classList.toggle('on', musicOn); if (musicOn) { startMusic(); clearInterval(sfxT); sfxT = setInterval(sfx, 9000 + Math.random() * 6000); } else { stopMusic(); clearInterval(sfxT); } if (musicOn && muted) $('#bMute').click(); };
 $('#bMute').onclick = () => { muted = !muted; $('#bMute').classList.toggle('on', muted); $('#bMute').firstChild.textContent = muted ? '🔇' : '🔊'; if (master) master.gain.value = muted ? 0 : 0.5; };

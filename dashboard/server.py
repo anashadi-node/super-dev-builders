@@ -15,6 +15,7 @@ import datetime
 import json, re
 import os
 import subprocess
+import sys
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -27,7 +28,7 @@ REPO = Path(__file__).resolve().parent.parent  # portabel: bukan path hard-coded
 DASH = REPO / "dashboard"
 STATE = DASH / "state"
 HEALTH_FILE = STATE / "health.json"
-PROFILES = Path("/home/anashadi/.hermes/profiles")
+PROFILES = Path.home() / ".hermes" / "profiles"
 BIN = Path.home() / ".local" / "bin"
 
 # (label, dir-name, role, divisions)
@@ -69,7 +70,8 @@ def read_profile_cfg(dirname):
         cfg = yaml.safe_load(p.read_text(encoding="utf-8"))
     except Exception:
         return None
-    m = cfg.get("model") or {}
+    m = cfg.get("model") if isinstance(cfg, dict) else None
+    m = m if isinstance(m, dict) else {}
     model = m.get("default")
     if not model:
         return None
@@ -249,6 +251,9 @@ def main():
         cmd_health_check()
         return
     httpd = ThreadingHTTPServer((args.host, args.port), Handler)
+    if args.host not in ("127.0.0.1", "localhost", "::1"):
+        print("PERINGATAN: bind non-loopback — HTTP tanpa TLS; PIN & /api/state terlihat di jaringan. "
+              "Pakai hanya di WiFi tepercaya.", file=sys.stderr)
     print(f"SDB Workspace on http://{args.host}:{args.port} (ctrl-c to stop)")
     httpd.serve_forever()
 

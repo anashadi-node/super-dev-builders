@@ -60,6 +60,30 @@ def gate0_or_die(target: str, quiet: bool = False) -> int:
     return 0
 
 
+def _origin(url: str):
+    """(skema, host, port) dari URL; None bila bukan http(s) valid."""
+    try:
+        u = urlparse(url)
+        if u.scheme not in ("http", "https") or not u.hostname or u.username or u.password:
+            return None
+        return u.scheme, u.hostname.lower(), u.port or (443 if u.scheme == "https" else 80)
+    except ValueError:
+        return None
+
+
+def origin_allowed(base: str, allowed: list[str]) -> bool:
+    """Cocokkan origin EKSAK (skema+host+port). Prefiks string tidak aman:
+    https://example.com.evil.test lolos startswith('https://example.com')."""
+    o = _origin(base)
+    return o is not None and any(_origin(a) == o for a in allowed)
+
+
+def safe_page_path(p: str) -> bool:
+    """--pages: path relatif-situs saja. '@', '//', skema, backslash, spasi/kontrol ditolak."""
+    return (p.startswith("/") and not p.startswith("//") and "@" not in p and "\\" not in p
+            and "://" not in p and all(c.isprintable() and c != " " for c in p))
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Capture web terkendali")
     ap.add_argument("--target", required=True)
@@ -87,8 +111,12 @@ def main(argv=None) -> int:
     if not allowed:
         print("TOLAK: allowed_targets kosong di manifest", file=sys.stderr)
         return 2
-    if not any(base.startswith(a.rstrip("/")) or a.rstrip("/").startswith(base) for a in allowed):
+    if not origin_allowed(base, allowed):
         print(f"TOLAK: {base} tidak ada di allowed_targets manifest", file=sys.stderr)
+        return 2
+    bad = [p for p in args.pages.split(",") if p and not safe_page_path(p)]
+    if bad:
+        print(f"TOLAK: --pages harus path relatif diawali '/' tanpa '@', '//', atau skema: {bad}", file=sys.stderr)
         return 2
 
     from playwright.sync_api import sync_playwright  # import di dalam agar pesan rapi
@@ -111,6 +139,9 @@ def main(argv=None) -> int:
             url = base + pth
             t0 = time.time()
             resp = page.goto(url, wait_until="load", timeout=args.timeout_ms)
+            if not origin_allowed(page.url, allowed):  # redirect keluar scope Gate #0
+                print(f"TOLAK: redirect ke {page.url.split('?')[0]} di luar allowed_targets", file=sys.stderr)
+                return 2
             page.wait_for_timeout(args.settle_ms)
             shot = out / f"shot{i}.png"
             page.screenshot(path=str(shot), full_page=True)
@@ -144,7 +175,8 @@ def main(argv=None) -> int:
                             .filter(e => { const r = e.getBoundingClientRect();
                                            return r.width > 0 && r.height > 0 && getComputedStyle(e).display !== 'none'; }).length""")
                         status_txt = page.eval_on_selector("#status", "e => e.textContent") if page.query_selector("#status") else None
-                        api = [e for e in net[net_len:] if e["phase"] == "response" and "/api/" in e["url"]]
+                        api = [e for e in net[net_len:] if e["phase"] == "response" and "/api/" in e["url"]
+                               and origin_allowed(e["url"], allowed)]
                         bodies = []
                         for a in api:
                             try:
@@ -172,6 +204,7 @@ def main(argv=None) -> int:
 
     write_json(out / "network.json", {"target": args.target, "captured_at": result["captured_at"],
                                       "base": base, "items": net})
+    os.chmod(out / "network.json", 0o600)  # header mentah (Cookie/Authorization) sebelum redaksi
     write_json(out / "capture.json", result)
     write_json(out / "totals.json", {"pages": len(result["pages"]),
                                      "requests": sum(1 for e in net if e["phase"] == "request"),

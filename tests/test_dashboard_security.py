@@ -103,3 +103,34 @@ def test_static_ui_served_with_security_headers(live):
     assert code == 200
     assert h["X-Content-Type-Options"] == "nosniff" and h["X-Frame-Options"] == "DENY"
     assert json.loads(_get(base + "/api/ws/whoami")[1])["local"] is True
+
+
+def test_empty_token_file_fails_closed(live):
+    ws_api.TOKEN_FILE.write_text("")
+    with pytest.raises(RuntimeError):
+        ws_api.get_token()
+
+
+def test_get_token_concurrent_first_use_single_value(tmp_path, monkeypatch):
+    monkeypatch.setattr(ws_api, "DATA", tmp_path)
+    monkeypatch.setattr(ws_api, "TOKEN_FILE", tmp_path / ".token")
+    out = []
+    ts = [threading.Thread(target=lambda: out.append(ws_api.get_token())) for _ in range(12)]
+    [t.start() for t in ts]
+    [t.join() for t in ts]
+    assert len(out) == 12 and len(set(out)) == 1 and out[0]
+    assert [p.name for p in tmp_path.iterdir()] == [".token"]  # tanpa sisa berkas temp
+
+
+def test_stage_01_cannot_be_rerun(live, monkeypatch):
+    monkeypatch.setattr(ws_api, "find_project", lambda pid: {"id": pid, "name": "x", "kind": "baru"})
+    with pytest.raises(ValueError, match="Gate #0"):
+        ws_api.do_stage_run({"project": "p1", "stage": "01"})
+
+
+def test_profile_cfg_non_dict_does_not_crash(tmp_path, monkeypatch):
+    monkeypatch.setattr(server, "PROFILES", tmp_path)
+    for body in ("", "model: gpt\n", "- a\n- b\n"):
+        (tmp_path / "p").mkdir(exist_ok=True)
+        (tmp_path / "p" / "config.yaml").write_text(body)
+        assert server.read_profile_cfg("p") is None

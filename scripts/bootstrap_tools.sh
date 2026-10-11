@@ -34,6 +34,8 @@ for arg in "$@"; do
   esac
 done
 
+TMPS=()
+trap 'if [ "${#TMPS[@]}" -gt 0 ]; then rm -rf "${TMPS[@]}"; fi' EXIT  # bersihkan temp walau langkah gagal
 echo "== Bootstrap tools (pin versi) =="
 echo "ruff=$RUFF_PIN semgrep=$SEMGREP_PIN trivy=$TRIVY_VERSION syft=$SYFT_VERSION codeql=$CODEQL_VERSION"
 echo "target bin: $BIN_DIR"
@@ -76,7 +78,7 @@ install_pypi_tool() {
 install_gh_binary() {
   local owner="$1" repo="$2" tag="$3" asset="$4" checksums="$5" member="$6" binname="$7"
   local base="https://github.com/$owner/$repo/releases/download/$tag"
-  local tmp; tmp="$(mktemp -d)"
+  local tmp; tmp="$(mktemp -d)"; TMPS+=("$tmp")
   echo "+ unduh $base/$asset"
   echo "+ unduh $base/$checksums  (verifikasi SHA256 wajib)"
   echo "+ tar -xzf -> ambil '$member' -> pasang ke $BIN_DIR/$binname"
@@ -96,7 +98,7 @@ install_gh_zip() {
   local owner="$1" repo="$2" tag="$3" asset="$4" checksums="$5" binname="$6"
   local base="https://github.com/$owner/$repo/releases/download/$tag"
   local dest="$HOME/.local/share/$binname-$tag"
-  local tmp; tmp="$(mktemp -d)"
+  local tmp; tmp="$(mktemp -d)"; TMPS+=("$tmp")
   echo "+ unduh $base/$asset (~400 MB)"
   echo "+ verifikasi SHA256 dari $checksums"
   echo "+ unzip -> $dest ; symlink $BIN_DIR/$binname"

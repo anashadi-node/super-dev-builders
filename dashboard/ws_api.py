@@ -85,12 +85,24 @@ def slugify(text):
 
 def get_token():
     DATA.mkdir(parents=True, exist_ok=True)
+    tmp = None
     if not TOKEN_FILE.exists():
-        # Dibuat langsung 0600 (tanpa jeda umask 0664 sebelum chmod).
-        fd = os.open(TOKEN_FILE, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        # Tulis ke berkas sementara 0600 lalu os.link (atomik, gagal bila sudah ada):
+        # pembaca tidak pernah melihat berkas kosong; dua thread tidak bertabrakan.
+        tmp = TOKEN_FILE.with_name(f".token.{os.getpid()}.{threading.get_ident()}")
+        fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
         with os.fdopen(fd, "w") as f:
             f.write(secrets.token_urlsafe(9))
-    return TOKEN_FILE.read_text().strip()
+        try:
+            os.link(tmp, TOKEN_FILE)
+        except FileExistsError:
+            pass
+        finally:
+            os.unlink(tmp)
+    tok = TOKEN_FILE.read_text().strip()
+    if not tok:  # fail-closed: token kosong tidak boleh membuat auth lolos
+        raise RuntimeError("berkas token kosong — hapus lalu restart layanan")
+    return tok
 
 
 def read_json(path, default):
@@ -316,6 +328,13 @@ def intake_md(d, scope):
 
 
 def do_approve(body):
+    # Seluruh baca-periksa-tulis di bawah satu kunci (RLock): dua approve paralel
+    # tidak bisa membuat proyek ganda atau menimpa chat dengan snapshot basi.
+    with _lock:
+        return _do_approve(body)
+
+
+def _do_approve(body):
     cid, did = body.get("cid", ""), body.get("draft_id", "")
     cf = chat_file(cid)
     h = read_json(cf, None)
@@ -389,12 +408,15 @@ def do_stage_run(body):
     st = next((s for s in STAGES if s[0] == num), None)
     if not p or not st:
         raise ValueError("proyek/tahap tidak valid")
+    if num == "01":
+        raise ValueError("tahap 01 = intake Gate #0: dibuat lewat approve draft, bukan dijalankan ulang")
     status = {s["n"]: s for s in stage_status(pid)}
     if status["01"]["state"] != "done":
         raise ValueError("Gate #0 belum: approve draft intake dulu")
     prev = f"{int(num) - 1:02d}"
-    if num != "01" and status.get(prev, {}).get("state") not in ("done",):
-        raise ValueError(f"tahap {prev} belum selesai")
+    if status.get(prev, {}).get("state") not in ("done",):
+        extra = " (tahap eksekusi hanya membuat brief dari web; selesaikan di terminal dengan bukti)" if status.get(prev, {}).get("kind") == "exec" else ""
+        raise ValueError(f"tahap {prev} belum selesai{extra}")
     _, name, prof, kind = st
     sdir = pdir(pid) / "stages"
     slug = slugify(name)
@@ -424,7 +446,10 @@ def do_stage_run(body):
         text = clean_doc(run_llm(prof, prompt, toolsets=tools, timeout=420))
         head = f"<!-- tahap {num} {name} · profil {prof} · {now()} · draft LLM, butuh review Owner -->\n\n"
         with _lock:
-            (sdir / f"{num}-{slug}.md").write_text(head + text)
+            out = sdir / f"{num}-{slug}.md"
+            if out.exists():  # jalankan ulang tidak boleh menghapus versi lama diam-diam
+                out.replace(sdir / f"{num}-{slug}.md.prev")
+            out.write_text(head + text)
         return {"file": f"{num}-{slug}.md", "chars": len(text)}
 
     return start_job("stage", prof, pid, fn), None

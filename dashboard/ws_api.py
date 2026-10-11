@@ -86,8 +86,10 @@ def slugify(text):
 def get_token():
     DATA.mkdir(parents=True, exist_ok=True)
     if not TOKEN_FILE.exists():
-        TOKEN_FILE.write_text(secrets.token_urlsafe(9))
-        TOKEN_FILE.chmod(0o600)
+        # Dibuat langsung 0600 (tanpa jeda umask 0664 sebelum chmod).
+        fd = os.open(TOKEN_FILE, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        with os.fdopen(fd, "w") as f:
+            f.write(secrets.token_urlsafe(9))
     return TOKEN_FILE.read_text().strip()
 
 
@@ -121,7 +123,13 @@ def find_project(pid):
     return None
 
 
+_PID_RE = re.compile(r"[a-z0-9][a-z0-9_-]{0,59}")
+
+
 def pdir(pid):
+    # Tolak "../" dan path absolut: pid datang dari klien (scope/project/artifact).
+    if not isinstance(pid, str) or not _PID_RE.fullmatch(pid):
+        raise ValueError("id proyek tidak valid")
     return DATA / "projects" / pid
 
 
@@ -240,6 +248,8 @@ def do_chat(body):
         raise ValueError("pesan kosong")
     cid = body.get("cid") or uuid.uuid4().hex[:10]
     scope = body.get("scope") or "baru"
+    if scope != "baru" and not find_project(scope):
+        raise ValueError("proyek tidak dikenal")
     cf = chat_file(cid)
     hist = read_json(cf, {"cid": cid, "scope": scope, "messages": [], "drafts": []})
     hist["scope"] = scope
@@ -436,21 +446,26 @@ def handle(h, method, send):
     if not path.startswith("/api/ws/"):
         return False
     route = path[len("/api/ws/"):].strip("/")
-    local = h.client_address[0] in ("127.0.0.1", "::1")
+    host = (h.headers.get("Host") or "").strip().lower()
+    host = host[1:host.find("]")] if host.startswith("[") else host.rsplit(":", 1)[0] if host.count(":") == 1 else host
+    # PIN hanya untuk klien loopback DAN Host loopback: DNS-rebinding (Host: evil.test
+    # dari browser di PC ini) tidak boleh bisa membaca PIN.
+    local = h.client_address[0] in ("127.0.0.1", "::1") and host in ("127.0.0.1", "localhost", "::1")
     token = get_token()
 
     if route == "whoami" and method == "GET":
         send(200, {"local": local, "token": token if local else None, "lan_hint": not local})
         return True
     given = h.headers.get("X-SDB-Token", "")
-    if not hmac.compare_digest(given, token):
+    # bytes: compare_digest(str) melempar TypeError untuk header non-ASCII.
+    if not hmac.compare_digest(given.encode("utf-8", "replace"), token.encode("utf-8")):
         send(401, {"error": "token salah/kosong — buka dari PC lokal untuk melihat PIN"})
         return True
     try:
         body = {}
         if method == "POST":
             n = int(h.headers.get("Content-Length") or 0)
-            if n > MAX_BODY:
+            if n < 0 or n > MAX_BODY:
                 send(413, {"error": "terlalu besar"})
                 return True
             body = json.loads(h.rfile.read(n) or b"{}")

@@ -212,7 +212,14 @@ class Handler(BaseHTTPRequestHandler):
             self.send_error(403)
             return
         fp = DASH / rel
-        if not fp.is_file() or "state" in rel.parts:
+        # Allowlist ekstensi (CTYPE): kode .py/.pyc/dll tidak pernah disajikan.
+        # resolve()+is_relative_to: symlink tidak boleh keluar dari dashboard/.
+        try:
+            inside = fp.resolve().is_relative_to(DASH.resolve())
+        except (OSError, ValueError):
+            inside = False
+        if (not inside or not fp.is_file() or "state" in rel.parts
+                or fp.suffix.lstrip(".") not in CTYPE):
             self.send_error(404)
             return
         data = fp.read_bytes()
@@ -220,6 +227,9 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", CTYPE.get(fp.suffix.lstrip("."), "text/plain"))
         self.send_header("Content-Length", str(len(data)))
         self.send_header("Cache-Control", "no-store")  # perubahan UI langsung terlihat
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("Referrer-Policy", "no-referrer")
+        self.send_header("X-Frame-Options", "DENY")
         self.end_headers()
         if not head:
             self.wfile.write(data)

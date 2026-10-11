@@ -516,8 +516,11 @@ def handle(h, method, send):
             send(202 if job else 200, {"job": job["id"]} if job else extra)
         elif route == "artifact" and method == "GET":
             pid, f = (q.get("project") or [""])[0], (q.get("file") or [""])[0]
-            fp = pdir(pid) / "stages" / Path(f).name
-            if not fp.is_file():
+            base = pdir(pid).resolve()
+            # resolve() dulu: symlink di dalam stages/ tidak boleh membaca berkas di
+            # luar direktori proyek (T11-3, CWE-59). Bukan pengganti pdir() (CWE-22).
+            fp = (base / "stages" / Path(f).name).resolve()
+            if not (fp.is_relative_to(base) and fp.is_file()):
                 send(404, {"error": "tidak ada"})
             else:
                 send(200, {"file": fp.name, "text": fp.read_text()[:60000]})

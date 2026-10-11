@@ -29,6 +29,12 @@ DASH = REPO / "dashboard"
 STATE = DASH / "state"
 HEALTH_FILE = STATE / "health.json"
 PORT = 8484
+# CSP: 'unsafe-inline' masih perlu (index.html & cast.html punya <script> inline dan
+# banyak atribut style=). Jadi ini menutup pemuatan sumber DAYA ASING, framing, dan
+# base-tag hijack — BUKAN XSS inline (itu ditutup esc() di front-end). Nonce = kerja lanjutan.
+CSP = ("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; "
+       "img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; media-src 'self' blob: data:; "
+       "worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'")
 BIND_LAN = False  # diisi main(): hint LAN hanya bermakna bila bind non-loopback
 PROFILES = Path.home() / ".hermes" / "profiles"
 BIN = Path.home() / ".local" / "bin"
@@ -202,6 +208,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Content-Type-Options", "nosniff")
         self.end_headers()
         self.wfile.write(body)
 
@@ -224,6 +231,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Cache-Control", "no-store")
+            self.send_header("X-Content-Type-Options", "nosniff")
             self.end_headers()
             if not head:
                 self.wfile.write(body)
@@ -251,6 +259,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Referrer-Policy", "no-referrer")
         self.send_header("X-Frame-Options", "DENY")
+        self.send_header("Content-Security-Policy", CSP)
         self.end_headers()
         if not head:
             self.wfile.write(data)

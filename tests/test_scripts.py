@@ -239,9 +239,37 @@ def test_release_gate_passes_with_fresh_artifacts(tmp_path):
         p = tmp_path / rel
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text("artifact", encoding="utf-8")
+    (tmp_path / "reports/security-verdict.json").write_text(
+        json.dumps({"verdict": "PASS"}), encoding="utf-8")
     (tmp_path / "docs").mkdir(exist_ok=True)
     (tmp_path / "docs" / "README-x.md").write_text("readme", encoding="utf-8")
     assert release.main(["--project", str(tmp_path), "--out", str(tmp_path / "verdict.json")]) == 0
+
+
+def _fresh_release_artifacts(tmp_path, security_verdict):
+    for rel in ["requirements.md", "logs/build-1.log", "logs/tests-1.log", "reports/review-1.md",
+                "reports/security-gate.md", "reports/assurance-audit.md", "reports/handover-1.md"]:
+        p = tmp_path / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text("artifact", encoding="utf-8")
+    (tmp_path / "docs").mkdir(exist_ok=True)
+    (tmp_path / "docs/README-x.md").write_text("readme", encoding="utf-8")
+    (tmp_path / "reports/security-verdict.json").write_text(
+        security_verdict, encoding="utf-8")
+
+
+def test_release_gate_rejects_fresh_security_fail(tmp_path):
+    _fresh_release_artifacts(tmp_path, json.dumps({"verdict": "FAIL"}))
+    assert release.main(["--project", str(tmp_path), "--out", str(tmp_path / "verdict.json")]) == 1
+    verdict = json.loads((tmp_path / "verdict.json").read_text())
+    assert any(item["gate"] == "security-verdict" for item in verdict["failures"])
+
+
+def test_release_gate_rejects_malformed_security_verdict(tmp_path):
+    _fresh_release_artifacts(tmp_path, "not-json")
+    assert release.main(["--project", str(tmp_path), "--out", str(tmp_path / "verdict.json")]) == 1
+    verdict = json.loads((tmp_path / "verdict.json").read_text())
+    assert any("JSON tidak sah" in item["reason"] for item in verdict["failures"])
 
 
 # ------------------------------------------------------------- registry lint
@@ -428,6 +456,22 @@ def test_install_skills_list_and_dry_run(capsys):
     out = capsys.readouterr().out
     assert "dry-run" in out
     assert "api-contract" in out or "database-migration-safety" in out
+
+
+def test_install_skills_rejects_unsafe_skill_id():
+    """T11-7: id skill tidak sah ditolak sebelum menyentuh jalur berkas (fail-closed)."""
+    import importlib.util as ilu
+    spec = ilu.spec_from_file_location("installer_guard", os.path.join(SCRIPTS, "install_skills.py"))
+    mod = ilu.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    log = []
+    for bad in ("..", "../..", "a/b", "", "-x", "x" * 65, "/etc"):
+        mod.install_one(bad, None, False, False, log)
+    assert len(log) == 7 and all(x["action"] == "skip" for x in log), log
+    assert "id tidak sah" in log[0]["reason"]
+    ok = []
+    mod.install_one("sdb-command-deck", None, True, False, ok)  # dry-run, id sah
+    assert len(ok) == 1 and ok[0]["action"] == "install", ok
 
 
 def test_init_target_creates_workspace_and_is_idempotent():

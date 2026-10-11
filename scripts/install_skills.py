@@ -19,7 +19,8 @@ import shutil
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from sdb_common import HERMES_HOME, PROFILES_DIR, SKILL_NAMESPACE, load_yaml, now_iso, repo_path, write_json
+from sdb_common import (HERMES_HOME, PROFILES_DIR, SKILL_NAMESPACE, load_yaml, now_iso,
+                        repo_path, validate_slug, write_json)
 
 
 def load_registry():
@@ -63,6 +64,15 @@ def dest_root(profile: str | None) -> str:
 
 
 def install_one(skill_id: str, profile, dry_run: bool, uninstall: bool, log):
+    # skill_id dari registry (tepercaya) TETAP divalidasi: id seperti '..' membuat
+    # os.path.join + shutil.rmtree menulis/menghapus di luar namespace skills (T11-7).
+    # Fail-closed: tolak, jangan jalankan.
+    try:
+        skill_id = validate_slug(skill_id)
+    except ValueError as e:
+        log.append({"action": "skip", "skill": str(skill_id)[:40], "profile": profile or "main",
+                    "reason": f"id tidak sah: {e}"})
+        return
     src = repo_path("skills", skill_id)
     dst = os.path.join(dest_root(profile), skill_id)
     if uninstall:

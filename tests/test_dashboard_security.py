@@ -166,3 +166,44 @@ def test_frontend_escapes_all_five_html_metachars():
 def test_build_state_survives_non_dict_health(monkeypatch):
     monkeypatch.setattr(server, "load_health", lambda: ({"x": "bukan-dict"}, 1))
     assert isinstance(server.build_state(), dict)
+
+
+# ---- Regresi ronde-3 Tahap 11 (T11-3, T11-4) ----
+def test_artifact_symlink_escape_blocked(live, tmp_path):
+    """T11-3: symlink di stages/ tidak boleh membaca berkas di luar direktori proyek."""
+    base, tok = live
+    stages = tmp_path / "projects" / "p1" / "stages"
+    stages.mkdir(parents=True)
+    rahasia = tmp_path / "rahasia.txt"
+    rahasia.write_text("RAHASIA-JANGAN-KELUAR")
+    (stages / "link.md").symlink_to(rahasia)
+    code, _, _ = _get(base + "/api/ws/artifact?project=p1&file=link.md", {"X-SDB-Token": tok})
+    assert code == 404
+
+
+def test_artifact_normal_file_still_served(live, tmp_path):
+    """Kontrol negatif T11-3: berkas biasa di stages/ TETAP terbaca (tambalan tidak over-block)."""
+    base, tok = live
+    stages = tmp_path / "projects" / "p1" / "stages"
+    stages.mkdir(parents=True)
+    (stages / "ok.md").write_text("halo dunia")
+    code, body, _ = _get(base + "/api/ws/artifact?project=p1&file=ok.md", {"X-SDB-Token": tok})
+    assert code == 200 and b"halo dunia" in body
+
+
+def test_json_responses_are_nosniff(live, monkeypatch):
+    """T11-4: jalur JSON (ws_api dan /api/state) wajib X-Content-Type-Options: nosniff."""
+    base, _ = live
+    assert _get(base + "/api/ws/whoami")[2]["X-Content-Type-Options"] == "nosniff"
+    monkeypatch.setattr(server, "build_state", lambda: {"ok": True})
+    r = _get(base + "/api/state")
+    assert r[0] == 200 and r[2]["X-Content-Type-Options"] == "nosniff"
+
+
+def test_static_ui_carries_csp(live):
+    """T11-4: UI statis wajib membawa Content-Security-Policy yang membatasi sumber asing."""
+    base, _ = live
+    csp = _get(base + "/")[2]["Content-Security-Policy"]
+    assert "default-src 'self'" in csp
+    assert "object-src 'none'" in csp and "frame-ancestors 'none'" in csp and "base-uri 'none'" in csp
+    assert "script-src 'self'" in csp

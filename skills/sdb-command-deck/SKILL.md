@@ -1,6 +1,15 @@
 ---
 name: sdb-command-deck
 description: Use when operating the SDB Workspace web (port 8484) — restart, PIN, health, add project.
+version: 1.0.0
+author: Super Dev Builders Ecosystem
+license: MIT
+platforms: [linux]
+metadata:
+  hermes:
+    tags: [sdb, dashboard, ops, monitoring, security]
+    divisions: [D10, D4]
+    related_skills: [rollback-and-recovery]
 ---
 
 # SDB Workspace (web lokal :8484)

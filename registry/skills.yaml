@@ -2,11 +2,20 @@
 # Status: KEEP | UPDATE | REPLACE | ADD | REMOVE | QUARANTINE | PENDING_APPROVAL | INSTALLED | REJECTED_BLUEPRINT | REJECTED_LICENSE | REJECTED_COVERED
 # Aturan: tidak ada skill pihak ketiga yang diaktifkan tanpa pipeline supply-chain + approval manusia.
 version: 2.2.0
-updated: 2026-10-06
+updated: 2026-10-11
 pipeline_required: [source_trust_check, pin_revision, hermes_native_scan, manual_source_review, sandbox_test, allowlist_tools, human_approval]
 # Jumlah custom skill yang disetujui Owner (21 blueprint + 6 pengganti security + 2 hasil riset lanjutan).
 # Dipakai registry_lint agar drift terdeteksi, bukan sekadar WARN dari angka blueprint.
-approved_custom_count: 37
+# 2026-10-11 — Owner via chat (ronde-3 audit T11-1, Opsi A): 37 -> 38.
+#   Sebab: skills/sdb-command-deck sudah ada di disk DAN di registry (status ADD, divisi D10/D4,
+#   profil sdb-devops/sdb-frontend) tetapi belum pernah masuk hitungan persetujuan -> registry_lint
+#   terus WARN "jumlah custom skill = 38 (disetujui Owner: 37)" dan `make check` tetap exit 0.
+#   Keputusan Owner: naikkan angka resmi ke 38 (bukan mencopot skill) + lengkapi metadata
+#   frontmatter yang hilang (lihat skills/sdb-command-deck/SKILL.md, commit yang sama).
+# CATATAN AKURASI (ditemukan saat audit T11-1): komentar di baris atas berjumlah
+#   (21 + 6 + 2) = 29, BUKAN 37 -> rincian angka lama TIDAK dapat diverifikasi dari komentar itu
+#   sendiri. Rincian rinci 38 belum dikonfirmasi Owner; yang dikonfirmasi hanya TOTAL = 38.
+approved_custom_count: 38
 # 2026-10-06: +7 adopsi PLANORA (kit perencanaan produk) — audit keamanan 65 file LULUS
 # (nol network/eval/symlink/secret; test upstream 39/39 PASS; laporan: reports/planora_audit_20261006.md).
 # Sumber: /home/anashadi/Documents/starter-clean-v1.4/starter-clean (.agents/skills, lisensi MIT).

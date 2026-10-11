@@ -19,8 +19,7 @@ import shutil
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from sdb_common import (HERMES_HOME, PROFILES_DIR, SKILL_NAMESPACE, load_yaml, now_iso,
-                        repo_path, validate_slug, write_json)
+from sdb_common import HERMES_HOME, PROFILES_DIR, SKILL_NAMESPACE, load_yaml, now_iso, repo_path, validate_slug, write_json
 
 
 def load_registry():

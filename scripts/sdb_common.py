@@ -183,6 +183,9 @@ def _parse_block(lines, i, indent):
         items = []
         while i < len(lines):
             raw = lines[i]
+            if not raw.strip():
+                i += 1
+                continue
             if _indent_of(raw) < indent or not raw.lstrip().startswith("- "):
                 break
             content = raw.lstrip()[2:]
@@ -207,6 +210,9 @@ def _parse_block(lines, i, indent):
     mapping = {}
     while i < len(lines):
         raw = lines[i]
+        if not raw.strip():
+            i += 1
+            continue
         if _indent_of(raw) != indent:
             break
         key, sep, value = raw.strip().partition(":")
@@ -221,11 +227,42 @@ def _parse_block(lines, i, indent):
                 mapping[key] = None
                 i += 1
         else:
-            while not _balanced(value) and i + 1 < len(lines):
+            if value in (">", ">-", ">+", "|", "|-", "|+"):
+                # Block scalar YAML (>- , |-): kumpulkan baris child dengan indentasi
+                # relatif terjaga; folded (>) melipat newline jadi spasi, literal (|)
+                # mempertahankan newline. Chomping default = satu "\n" di akhir.
                 i += 1
-                value = value + " " + lines[i].strip()
-            mapping[key] = _scalar(value)
-            i += 1
+                chunks = []
+                base = None
+                while i < len(lines) and (_indent_of(lines[i]) > indent or not lines[i].strip()):
+                    # Indentasi dasar diambil dari baris NON-KOSONG pertama (per PyYAML).
+                    if base is None and lines[i].strip():
+                        base = _indent_of(lines[i])
+                    chunks.append(lines[i][base:] if base is not None and len(lines[i]) > base else "")
+                    i += 1
+                joined = "\n".join(chunks)
+                if value.startswith(">"):
+                    # Folded: pemisah baris jadi spasi; baris kosong = newline (batas paragraf).
+                    body = ""
+                    brk = 0
+                    for part in joined.split("\n"):
+                        if part == "":
+                            brk += 1
+                            continue
+                        if body:
+                            body += ("\n" * brk) if brk else " "
+                        brk = 0
+                        body += part
+                else:
+                    body = joined
+                # Chomping: "-" = tanpa newline akhir; default = satu newline.
+                mapping[key] = body if value.endswith("-") else body + "\n"
+            else:
+                while not _balanced(value) and i + 1 < len(lines):
+                    i += 1
+                    value = value + " " + lines[i].strip()
+                mapping[key] = _scalar(value)
+                i += 1
     return mapping, i
 
 
@@ -233,12 +270,11 @@ def fallback_yaml_load(text: str):
     """Parser YAML-subset (mapping/sequence/scalar/inline). Bukan YAML penuh."""
     lines = []
     for raw in text.splitlines():
-        if not raw.strip() or raw.strip().startswith("#"):
+        if raw.strip().startswith("#"):
             continue
-        cleaned = _strip_comment(raw)
-        if not cleaned.strip():
-            continue
-        lines.append(cleaned.replace("\t", "    "))
+        cleaned = _strip_comment(raw).replace("\t", "    ")
+        # Baris kosong DIPERTAHANKAN: batas paragraf block scalar folded (>-).
+        lines.append("" if not cleaned.strip() else cleaned)
     obj, _ = _parse_block(lines, 0, _indent_of(lines[0]) if lines else 0)
     return obj
 

@@ -64,6 +64,17 @@ def test_fallback_yaml_matches_pyyaml_on_repo_files():
     assert workflows >= 1, "harus ada minimal satu workflow yang diperiksa validitasnya"
 
 
+def test_fallback_yaml_block_scalar_matches_pyyaml():
+    """Regresi 11 Okt: block scalar (>- , |) dulu menghasilkan '| Mentah' → parser
+    fallback berbeda dari PyYAML pada evidence/rt-rw-portal/authorization.yaml."""
+    yaml = pytest.importorskip("yaml")
+    folded = "notes: >-\n  paragraf satu baris satu\n  lanjutan satu\n\n  paragraf dua\nkey: nilai\n"
+    literal = "notes: |\n  satu\n  dua\nkey: nilai\n"
+    chomped = "notes: |-\n  satu\n  dua\nkey: nilai\n"
+    for text in (folded, literal, chomped):
+        assert common.fallback_yaml_load(text) == yaml.safe_load(text)
+
+
 def test_redaction_removes_secret_keys_and_values():
     payload = {
         "headers": {"Authorization": "Bearer abcdef1234567890", "Cookie": "session=xyz",

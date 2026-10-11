@@ -33,7 +33,7 @@ test:
 	$(PY_SYS) -m pytest tests skills -q
 
 lint:
-	ruff check scripts tests skills
+	ruff check scripts tests skills dashboard
 
 # skill terpasang (main + profil) vs sumber repo; exit 1 bila MISSING/DIFF.
 # Drift hanya bermakna bila Host punya Hermes. Di runner CI (~/.hermes tidak ada)

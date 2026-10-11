@@ -210,7 +210,7 @@ def start_job(kind, profile, project, fn):
             job["status"] = "done"
         except subprocess.TimeoutExpired:
             job["status"], job["error"] = "error", "timeout"
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:
             job["status"], job["error"] = "error", str(e)[:300]
         job["ended"] = now()
         job["secs"] = round(time.time() - job["t0"], 1)
@@ -528,6 +528,6 @@ def handle(h, method, send):
             send(404, {"error": "rute tidak dikenal"})
     except (ValueError, RuntimeError) as e:
         send(400, {"error": str(e)})
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         send(500, {"error": "kesalahan server: " + str(e)[:160]})
     return True

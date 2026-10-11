@@ -23,7 +23,7 @@ import yaml
 
 import ws_api
 
-REPO = Path("/home/anashadi/super-dev-builders")
+REPO = Path(__file__).resolve().parent.parent  # portabel: bukan path hard-coded mesin ini
 DASH = REPO / "dashboard"
 STATE = DASH / "state"
 HEALTH_FILE = STATE / "health.json"

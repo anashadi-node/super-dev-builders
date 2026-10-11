@@ -1,0 +1,80 @@
+# =============================================================================
+# Konfigurasi gitleaks — Super Dev Builders Ecosystem
+# Bukti audit: reports/ronde-3-audit-sdb-20261011.md (T11-2), ronde-3 2026-10-11.
+# Diuji pada gitleaks 8.28.0.
+#
+# PRINSIP: allowlist hanya untuk FALSE POSITIVE yang sudah DIBUKTIKAN dengan
+# membaca nilai + konteks barisnya. Tidak ada kredensial asli yang dikutip di
+# berkas ini.
+#
+# FAKTA EMPIRIS YANG DIUKUR (jangan diubah tanpa mengulang uji ini)
+# -----------------------------------------------------------------------------
+# 1) `paths` pada [[allowlists]] = PENYARING SEBELUM PEMINDAIAN, bukan penyaring
+#    hasil. Bukti: memindai direktori yang isinya hanya berkas dikecualikan
+#    menghasilkan "scanned ~0 bytes / no leaks found". Konsekuensinya berkas
+#    yang dikecualikan TIDAK DIBACA SAMA SEKALI.
+#
+# 2) `targetRules = [...]` membuat allowlist TIDAK PERNAH cocok (temuan tetap
+#    2/2 pada uji pohon) baik dengan condition "AND" maupun "OR". Karena itu
+#    berkas ini tidak memakainya. Pola yang bekerja: paths / paths+regexes
+#    dengan `condition = "AND"`.
+#
+# 3) Akar 37 temuan `sourcegraph-access-token` adalah regex bawaan aturannya
+#    sendiri (diambil dari biner, 8.28.0):
+#      (?i)\b(\b(sgp_(?:[a-fA-F0-9]{16}|local)_[a-fA-F0-9]{40}|sgp_[a-fA-F0-9]{40}
+#            |[a-fA-F0-9]{40})\b)(?:[\x60'"\s;]|\\[nr]|$)
+#    Alternatif ketiga `[a-fA-F0-9]{40}` polos membuat SETIAP string SHA-1 git
+#    40-hex cocok — itu yang terjadi pada 37 SHA di artefak bukti.
+#    OPSI LEBIH BERSIH (BELUM DIAMBIL, butuh keputusan Owner): menimpa aturan itu
+#    lewat [[rules]] agar alternatif 40-hex polos dibuang, sehingga tidak perlu
+#    ada pengecualian berkas sama sekali. Belum diambil karena itu MENGUBAH
+#    kemampuan deteksi aturan bawaan (format token Sourcegraph lama ikut hilang)
+#    dan tidak dapat diverifikasi dari sini.
+#
+# RISIKO YANG DITERIMA (dicatat, bukan disembunyikan)
+# -----------------------------------------------------------------------------
+# Berkas di allowlist TIDAK diperiksa sama sekali. Celah ini dikompensasi oleh
+# `make secrets-raw` (memindai TANPA konfigurasi ini) sehingga isinya tetap
+# dapat diaudit kapan saja. Tinjau ulang bila berkas berubah fungsi.
+# =============================================================================
+title = "Super Dev Builders Ecosystem"
+
+# Pertahankan seluruh aturan bawaan; berkas ini hanya menambah pengecualian.
+[extend]
+useDefault = true
+
+# -----------------------------------------------------------------------------
+# 1) Artefak laporan pemindai pihak ketiga
+#    reports/upgrade-evidence/thirdparty-scan-github-mcp-server.json
+#    Terbukti: 37 temuan aturan `sourcegraph-access-token` semuanya berupa
+#    string 40-karakter heksadesimal (SHA-1 git, entropy 3,63) — daftar commit
+#    yang dipin oleh alat pihak ketiga, bukan token. Tidak ada temuan lain di
+#    berkas ini. Dipersempit ke SATU berkas (bukan seluruh direktori).
+# -----------------------------------------------------------------------------
+[[allowlists]]
+description = "Laporan pemindai pihak ketiga: hanya berisi SHA-1 git (bukan token)"
+condition = "AND"
+paths = ['''reports/upgrade-evidence/thirdparty-scan-github-mcp-server\.json$''']
+
+# -----------------------------------------------------------------------------
+# 2) Fixture uji sintetis yang memang sengaja ditanam
+#    Dibuktikan dengan membaca barisnya (nilai TIDAK dikutip):
+#      a) tests/test_scripts.py:71
+#         hits = list(common.scan_for_secrets({"token": "<48 char>"}))
+#         -> umpan untuk menguji pemindai rahasia repo ini sendiri.
+#      b) runs/rt-rw-portal/ulang2-clean/tests/test_phase3.py:23
+#         FERNET_KEY = "<44 char urlsafe-b64>" -> kunci Fernet uji.
+#      c) runs/rt-rw-portal/ulang2-clean/tests/test_landing_accounts.py:177
+#         "password": "<19 char>", "confirm": "<19 char>" -> payload uji.
+#    Tidak ada batasan `regexes` di sini: menuliskan nilai fixture ke berkas ini
+#    justru MEMINDAHKAN nilai uji itu ke tempat baru — berkas ujilah tempat yang
+#    benar untuk nilai semacam itu.
+# -----------------------------------------------------------------------------
+[[allowlists]]
+description = "Fixture uji sintetis pada 3 berkas uji (token/fernet/password palsu)"
+condition = "AND"
+paths = [
+  '''tests/test_scripts\.py$''',
+  '''runs/rt-rw-portal/ulang2-clean/tests/test_phase3\.py$''',
+  '''runs/rt-rw-portal/ulang2-clean/tests/test_landing_accounts\.py$''',
+]

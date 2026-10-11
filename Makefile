@@ -51,6 +51,23 @@ gate-init:
 lint-registry:
 	$(PY_SYS) scripts/registry_lint.py
 
+# Pindai rahasia dengan allowlist berjustifikasi (.gitleaks.toml).
+# Gitleaks opsional: target ini di-skip bila biner tidak ada (mis. runner CI).
+secrets:
+	@command -v gitleaks >/dev/null 2>&1 || { echo "SKIP secrets - gitleaks tidak terpasang"; exit 0; }
+	gitleaks detect --config .gitleaks.toml --no-banner --redact --log-opts="--all"
+
+# Kontrol kompensasi: pindai ULANG TANPA allowlist untuk mengaudit berkas yang
+# dikecualikan .gitleaks.toml. Memakai konfigurasi netral di state/ karena
+# gitleaks otomatis memuat .gitleaks.toml dari akar repo.
+# Keluaran normal = 40 temuan lama (37 SHA-1 + 3 fixture). Yang dicari: temuan BARU.
+secrets-raw:
+	@command -v gitleaks >/dev/null 2>&1 || { echo "SKIP secrets-raw - gitleaks tidak terpasang"; exit 0; }
+	@mkdir -p state
+	@printf '%s\n' '[extend]' 'useDefault = true' > state/gitleaks-nofilter.toml
+	@gitleaks detect --config state/gitleaks-nofilter.toml --no-banner --redact --log-opts="--all" --report-format json --report-path state/gitleaks-raw.json >/dev/null 2>&1 || true
+	@$(PY_SYS) -c "import json;d=json.load(open('state/gitleaks-raw.json'));print('temuan tanpa allowlist:',len(d));[print('  ',x['RuleID'],x['File']) for x in d]"
+
 release-check:
 	@slug="$${TARGET:-}"; \
 	if [ -z "$$slug" ]; then slug=$$($(PY_SYS) -c "import os;runs='runs';c=[(os.path.getmtime(os.path.join(runs,d)),d) for d in (os.listdir(runs) if os.path.isdir(runs) else [])];print(max(c)[1] if c else '')" 2>/dev/null); fi; \

@@ -52,3 +52,7 @@ dashboard/state/
 
 # salinan audit (regenerable via git archive) — jangan di-commit
 runs/rt-rw-portal/ulang2-clean/
+
+# Keluaran pindai rahasia (regenerable via `make secrets` / `make secrets-raw`)
+state/gitleaks-raw.json
+state/gitleaks-nofilter.toml

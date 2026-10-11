@@ -75,7 +75,7 @@ else
     mkdir -p "$BACKUP"
     for ns in "$HERMES_HOME/skills/super-dev-builders" "$HERMES_HOME"/profiles/*/skills/super-dev-builders; do
       [ -d "$ns" ] || continue
-      rel="${ns#$HERMES_HOME/}"
+      rel="${ns#"$HERMES_HOME"/}"
       mkdir -p "$BACKUP/$(dirname "$rel")"
       cp -a "$ns" "$BACKUP/$rel"
     done
@@ -112,12 +112,12 @@ if [ "$DO_CLI" = 1 ]; then
         mkdir -p "$BACKUP/bin"; cp -a "$SHIM" "$BACKUP/bin/sdb"
         say "back-up shim lama: $BACKUP/bin/sdb"
       fi
-      cat > "$SHIM" <<SHIMEOF
-#!/usr/bin/env bash
-# Dibuat otomatis oleh super-dev-builders/install.sh ($STAMP).
-# Satu pintu masuk ekosistem Super Dev Builders.
-exec "$PY" "$ROOT/scripts/sdb.py" "\$@"
-SHIMEOF
+      # %q: path berisi $ ` " spasi tidak dieksekusi/pecah saat shim jalan. rm dulu: `>` akan
+      # mengikuti symlink dan menimpa berkas lain bila $SHIM ternyata symlink.
+      rm -f -- "$SHIM"
+      umask 022
+      printf '#!/usr/bin/env bash\n# Dibuat otomatis oleh super-dev-builders/install.sh (%s).\n# Satu pintu masuk ekosistem Super Dev Builders.\nexec %q %q "$@"\n' \
+        "$STAMP" "$PY" "$ROOT/scripts/sdb.py" > "$SHIM"
       chmod +x "$SHIM"
     fi
     case ":$PATH:" in

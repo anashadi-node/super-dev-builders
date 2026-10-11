@@ -111,11 +111,11 @@ def _validate_markdown(root: Path, path: Path, errors: list[str]) -> None:
         target = raw_target.split("#", 1)[0].strip("<>")
         if not target:
             continue
-        resolved = (path.parent / unquote(target)).resolve()
         try:
+            resolved = (path.parent / unquote(target)).resolve()
             resolved.relative_to(root)
-        except ValueError:
-            errors.append(f"relative link escapes package in {relative}: {raw_target}")
+        except ValueError:  # termasuk "embedded null byte" dari %00
+            errors.append(f"relative link escapes package or is invalid in {relative}: {raw_target}")
             continue
         if not resolved.exists():
             errors.append(f"broken relative link in {relative}: {raw_target}")
@@ -258,10 +258,11 @@ def validate_package(package: Path) -> list[str]:
         return ["manifest must be a JSON object"]
 
     guide_type = manifest.get("guideType")
-    if guide_type not in ALLOWED_GUIDE_TYPES:
+    # isinstance(str): nilai list/dict dari manifest tak tepercaya membuat `in set` melempar TypeError (unhashable).
+    if not isinstance(guide_type, str) or guide_type not in ALLOWED_GUIDE_TYPES:
         errors.append("manifest guideType must be ui, dx, or hybrid")
         guide_type = "ui"
-    if manifest.get("status") not in ALLOWED_STATUSES:
+    if not isinstance(manifest.get("status"), str) or manifest.get("status") not in ALLOWED_STATUSES:
         errors.append("manifest status must be draft, ready, blocked, or stale")
     if manifest.get("formatVersion") != "1.0":
         errors.append("manifest formatVersion must be 1.0")
@@ -273,7 +274,7 @@ def validate_package(package: Path) -> list[str]:
     else:
         if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", str(project["id"])):
             errors.append("manifest project id must be lowercase kebab-case")
-        if project["locale"] not in ALLOWED_LOCALES:
+        if not isinstance(project["locale"], str) or project["locale"] not in ALLOWED_LOCALES:
             errors.append(f"manifest project locale must be one of: {', '.join(sorted(ALLOWED_LOCALES))}")
     try:
         date.fromisoformat(manifest.get("generatedDate", ""))
@@ -312,7 +313,7 @@ def validate_package(package: Path) -> list[str]:
         if not all(artifact.get(key) for key in ("directory", "entry", "sourceVersion", "status")):
             errors.append(f"manifest artifact {name} lacks directory, entry, sourceVersion, or status")
             continue
-        if artifact["status"] not in ALLOWED_STATUSES:
+        if not isinstance(artifact["status"], str) or artifact["status"] not in ALLOWED_STATUSES:
             errors.append(f"manifest artifact {name} has invalid status")
         entry = artifact["entry"]
         if artifact["directory"] != expected_directories[name]:
@@ -341,7 +342,7 @@ def validate_package(package: Path) -> list[str]:
             ):
                 errors.append(f"revisionHistory[{index}] is incomplete")
                 continue
-            if revision["changed"] not in {"prd", "ui", "dx", "execution"}:
+            if not isinstance(revision["changed"], str) or revision["changed"] not in {"prd", "ui", "dx", "execution"}:
                 errors.append(f"revisionHistory[{index}] has invalid changed value")
             try:
                 date.fromisoformat(revision["date"])

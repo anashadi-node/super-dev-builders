@@ -7,6 +7,8 @@ const FAM = {
   gpt: {name: "GPT-5.6 Sol", color: "var(--gpt)"},
   x: {name: "?", color: "var(--dim)"}
 };
+// Semua data /api/state berasal dari config.yaml/health.json profil -> perlakukan sebagai tak tepercaya.
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
 function famOf(id) {
   if (/glm/i.test(id)) return "glm";
   if (/deepseek|ds-flash/i.test(id)) return "ds";
@@ -60,31 +62,31 @@ function render() {
   document.getElementById("head").textContent = STATE.head || "—";
   document.getElementById("gen").textContent = "update " + (STATE.generated || "—");
   document.getElementById("lan").innerHTML =
-    `LAN: <b>192.168.1.9:8484</b> — buka di HP (WiFi sama)`;
+    STATE.lan ? `LAN: <b>${esc(STATE.lan)}</b> — buka di HP (WiFi sama)` : "";
 
   // cards
   const list = P.filter(p => FILTER === "all" || famOf(p.model_id) === FILTER);
   document.getElementById("grid").innerHTML = list.map(p => {
     const fam = famOf(p.model_id);
     const chain = (p.chain || []).map((c, i) =>
-      `<span class="fstep${i === 0 ? " on" : ""}"><b>${c.provider}</b>${c.model ? " · " + c.model : ""}</span>`
+      `<span class="fstep${i === 0 ? " on" : ""}"><b>${esc(c.provider)}</b>${c.model ? " · " + esc(c.model) : ""}</span>`
     ).join(`<span class="arrow">→</span>`) || `<span class="fstep">tanpa fallback</span>`;
     return `<article class="card ${p.health === "fail" ? "fail" : ""}" style="--fc:${FAM[fam].color}">
       <div class="chip-row">
         <div class="div-chips">${(p.divisions || "").split(" ").map(d =>
-          `<span class="chip">${d}</span>`).join("")}</div>
-        <span class="dot ${p.health}" title="health: ${p.health}"></span>
+          `<span class="chip">${esc(d)}</span>`).join("")}</div>
+        <span class="dot ${esc(p.health)}" title="health: ${esc(p.health)}"></span>
       </div>
-      <h3>${p.label}</h3>
-      <div class="role">${p.role} · <code>${p.id}</code></div>
+      <h3>${esc(p.label)}</h3>
+      <div class="role">${esc(p.role)} · <code>${esc(p.id)}</code></div>
       <div class="model-line">
         <span class="fam" style="background:${FAM[fam].color}"></span>
-        <b>${p.model}</b>
-        <span class="prov">${p.provider}${p.provider_url ? ` · ${p.provider_url}` : ""}</span>
+        <b>${esc(p.model)}</b>
+        <span class="prov">${esc(p.provider)}${p.provider_url ? ` · ${esc(p.provider_url)}` : ""}</span>
       </div>
       <div class="chain"><div class="lbl">Fallback chain</div>
         <div class="flowline">${chain}</div></div>
-      <div class="meta">${p.checked ? `PONG ${p.checked.slice(11, 16)} · ${p.ms} ms` :
+      <div class="meta">${p.checked ? `PONG ${esc(String(p.checked).slice(11, 16))} · ${esc(p.ms)} ms` :
         "health: belum diukur"}</div>
     </article>`;
   }).join("");

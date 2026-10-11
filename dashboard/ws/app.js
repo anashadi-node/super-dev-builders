@@ -4,7 +4,7 @@ import { CAST } from './chars.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const el = (t, c, h) => { const e = document.createElement(t); if (c) e.className = c; if (h !== undefined) e.innerHTML = h; return e; };
-const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const API = '/api/ws';
 let TOKEN = localStorage.getItem('sdb_token') || '';
 let state = { profiles: [], agents: {} }, projects = [], STAGEDEF = [];
@@ -40,7 +40,7 @@ function healthBadge(pid) {
   const p = profState(pid);
   if (!p) return '<span class="pill">belum ada data probe</span>';
   const age = state.health_age_h != null ? ` · probe ${state.health_age_h < 1 ? '<1' : Math.round(state.health_age_h)} jam lalu` : '';
-  return p.health === 'ok' ? `<span class="pill ok">✔ PONG ${p.ms ?? '?'} ms</span><span style="color:var(--mute);font-size:12px">${age}</span>` : `<span class="pill bad">✖ probe gagal</span><span style="color:var(--mute);font-size:12px">${age}</span>`;
+  return p.health === 'ok' ? `<span class="pill ok">✔ PONG ${esc(p.ms ?? '?')} ms</span><span style="color:var(--mute);font-size:12px">${age}</span>` : `<span class="pill bad">✖ probe gagal</span><span style="color:var(--mute);font-size:12px">${age}</span>`;
 }
 
 // ------------------------------------------------------------------ kartu info
@@ -74,7 +74,7 @@ function showCard(sel) {
       c.innerHTML = `<button class="x" id="cx">×</button><h3>${esc(r.name)}</h3><div class="sub">${r.project ? 'ruang proyek' : (r.ghost ? 'contoh' : 'ruang tim')}</div>${body}`;
     }
   }
-  $('#cx').onclick = () => { c.classList.remove('on'); world.reset && 0; };
+  $('#cx').onclick = () => { c.classList.remove('on'); };
   const gc = $('#goChat'); if (gc) gc.onclick = () => { panelOpen(true); tab('chat'); $('#msg').focus(); };
   const gp = $('#goProj'); if (gp) gp.onclick = () => { panelOpen(true); tab('proj'); };
 }
@@ -96,7 +96,7 @@ if (innerWidth < 820) panelOpen(false); else world.setPanelShift(215);
 function renderTeam() {
   const p = $('#p-team'); p.innerHTML = '';
   const pinBox = el('div', 'proj', `<b>PIN perangkat lain</b><span id="pinshow" style="color:var(--mute);font-size:13px">…</span>`); p.appendChild(pinBox);
-  fetch(API + '/whoami').then((r) => r.json()).then((d) => { $('#pinshow').innerHTML = d.local ? `Buka <b>http://192.168.1.9:8484</b> di HP, lalu masukkan PIN: <b style="font-size:18px;letter-spacing:2px">${esc(d.token)}</b>` : 'PIN hanya terlihat dari PC server.'; });
+  fetch(API + '/whoami').then((r) => r.json()).then((d) => { $('#pinshow').innerHTML = d.local ? `Buka <b>http://${esc(state.lan || location.host)}</b> di HP, lalu masukkan PIN: <b style="font-size:18px;letter-spacing:2px">${esc(d.token)}</b>` : 'PIN hanya terlihat dari PC server.'; });
   CAST.forEach((c) => {
     const m = el('div', 'mem', `<div class="av" style="background:${COLORS[c.id]}">${esc(initials(c.name))}</div><div style="flex:1;min-width:0"><b>${esc(c.name)}</b><div style="color:var(--mute);font-size:12.5px">${esc(c.title)}</div></div><div style="text-align:right;font-size:12px">${c.profile ? (profState(c.profile)?.health === 'ok' ? '<span class="dot ok"></span>PONG' : '<span class="dot"></span>—') : 'manusia'}</div>`);
     m.onclick = () => world.select('actor', c.id); p.appendChild(m);
@@ -245,7 +245,7 @@ $('#bMute').onclick = () => { muted = !muted; $('#bMute').classList.toggle('on',
 
 // parameter QA/tautan: ?focus=<id karakter>&z=<zoom>&panel=0
 (() => { const q = new URLSearchParams(location.search), f = q.get('focus'); if (q.get('panel') === '0') panelOpen(false);
-  if (f) setTimeout(() => { const a = world.A[f]; if (a) { world.focusOn(a.g.position.x, a.g.position.y + 1.2, a.g.position.z, +(q.get('z') || 3.2)); world.select('actor', f); if (q.get('snap')) setTimeout(() => world.snap(), 150); } }, 800); })();
+  if (f) setTimeout(() => { const a = Object.hasOwn(world.A, f) ? world.A[f] : null; const z = Number(q.get('z') || 3.2); if (a) { world.focusOn(a.g.position.x, a.g.position.y + 1.2, a.g.position.z, Number.isFinite(z) && z > 0.5 && z < 60 ? z : 3.2); world.select('actor', f); if (q.get('snap')) setTimeout(() => world.snap(), 150); } }, 800); })();
 
 // ------------------------------------------------------------------ boot
 async function refreshState() { try { const r = await fetch('/api/state', { cache: 'no-store' }); state = await r.json(); world.setState(state); } catch { /* offline */ } }

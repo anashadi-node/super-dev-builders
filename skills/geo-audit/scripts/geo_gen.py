@@ -15,9 +15,11 @@ def gen_robots(domain, sitemap_url, allow_training=True):
         "User-agent: *", "Allow: /",
         "Disallow: /admin/", "Disallow: /account/", "Disallow: /api/",
         "",
-        f"User-agent: {AI_SEARCH_UA[0]}", "Allow: /",
+        *[f"User-agent: {ua}" for ua in AI_SEARCH_UA], "Allow: /",
         "",
-        f"User-agent: {AI_TRAIN_UA[0]}", "",
+        # SEMUA bot training satu grup (RFC 9309). Dulu hanya GPTBot -> --no-training
+        # membiarkan ClaudeBot/Google-Extended/CCBot/dll tetap boleh.
+        *[f"User-agent: {ua}" for ua in AI_TRAIN_UA],
     ]
     if allow_training:
         lines.append("Allow: /")
@@ -46,7 +48,8 @@ def gen_jsonld_org(name, url, description):
         "url": url,
         "description": description,
     }
-    return json.dumps(obj, indent=2)
+    # "</" -> "<\/": aman bila JSON-LD ditanam di <script>; tetap JSON valid.
+    return json.dumps(obj, indent=2).replace("</", "<\\/")
 
 def main():
     ap = argparse.ArgumentParser()
@@ -65,7 +68,8 @@ def main():
     with open(os.path.join(args.output, "robots.txt"), "w") as f:
         f.write(gen_robots(base, base + "/sitemap.xml", args.allow_training))
 
-    pages = [(p, p.strip("/").capitalize() or "Home", base + p) for p in args.pages.split(",") if p]
+    pages = [(p, p.strip("/").capitalize() or "Home", base + p)
+             for p in ("/" + q.strip().lstrip("/") for q in args.pages.split(",") if q.strip())]
     with open(os.path.join(args.output, "llms.txt"), "w") as f:
         f.write(gen_llmstxt(args.site_name, args.description, pages))
 

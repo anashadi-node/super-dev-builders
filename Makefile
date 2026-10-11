@@ -15,6 +15,9 @@ PY_SYS ?= $(shell \
   elif /usr/bin/python3 -c "import pytest" 2>/dev/null; then echo /usr/bin/python3; \
   else echo python3; fi)
 
+# TARGET lewat lingkungan (bukan interpolasi make ke shell): nilai ber-kutip/`;`/`$(...)` tetap data.
+export TARGET
+
 .PHONY: help check lint drift doctor inventory test gate-init lint-registry release-check skills-list install-main workflow install-dry-run clean-pyc
 
 help:
@@ -49,7 +52,7 @@ lint-registry:
 	$(PY_SYS) scripts/registry_lint.py
 
 release-check:
-	@slug="$(TARGET)"; \
+	@slug="$${TARGET:-}"; \
 	if [ -z "$$slug" ]; then slug=$$($(PY_SYS) -c "import os;runs='runs';c=[(os.path.getmtime(os.path.join(runs,d)),d) for d in (os.listdir(runs) if os.path.isdir(runs) else [])];print(max(c)[1] if c else '')" 2>/dev/null); fi; \
 	if [ -z "$$slug" ]; then echo "Tidak ada run di runs/ — pakai: make release-check TARGET=<slug>"; exit 1; fi; \
 	echo "release gate untuk: runs/$$slug"; \
@@ -60,7 +63,7 @@ skills-list:
 
 # runner 16 tahap (TARGET=<slug>); tanpa TARGET pakai run terbaru di runs/
 workflow:
-	@slug="$(TARGET)"; \
+	@slug="$${TARGET:-}"; \
 	if [ -z "$$slug" ]; then slug=$$($(PY_SYS) -c "import os;r='runs';c=[(os.path.getmtime(os.path.join(r,d)),d) for d in (os.listdir(r) if os.path.isdir(r) else [])];print(max(c)[1] if c else '')" 2>/dev/null); fi; \
 	if [ -z "$$slug" ]; then echo "Tidak ada run di runs/ — pakai: make workflow TARGET=<slug>"; exit 1; fi; \
 	$(PY_SYS) scripts/workflow_run.py "$$slug"
@@ -74,4 +77,4 @@ install-main:
 	$(PY_SYS) scripts/install_skills.py --main --dry-run
 
 clean-pyc:
-	find . -name "__pycache__" -type d -prune -exec rm -rf {} +
+	find . -path ./.venv -prune -o -path ./node_modules -prune -o -name "__pycache__" -type d -prune -exec rm -r -- {} +

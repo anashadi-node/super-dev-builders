@@ -8,6 +8,7 @@ import importlib.util
 import json
 import os
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -450,3 +451,59 @@ def test_init_target_creates_workspace_and_is_idempotent():
         for tree in ("evidence", "normalized", "reconstruction", "verification",
                      "reports", "runs", "targets"):
             shutil.rmtree(os.path.join(REPO, tree, slug), ignore_errors=True)
+
+
+# ---- Regresi ronde-3 (skills): temuan dibuktikan dengan eksekusi nyata sebelum diperbaiki ----
+def _skill_mod(rel):
+    import importlib.util
+    path = Path(__file__).resolve().parents[1] / rel
+    spec = importlib.util.spec_from_file_location(path.stem, path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def test_validate_product_kit_never_crashes_on_hostile_manifest(tmp_path):
+    sc = _skill_mod("skills/product-kit/scripts/scaffold_product_kit.py")
+    val = _skill_mod("skills/product-kit/scripts/validate_product_kit.py")
+    pk = sc.scaffold("Demo", tmp_path, "ui")
+    base = json.loads((pk / "manifest.json").read_text())
+    for field in ("status", "guideType"):
+        m = {**base, field: ["x"]}
+        (pk / "manifest.json").write_text(json.dumps(m))
+        assert val.validate_package(pk)  # galat terlapor, tanpa TypeError
+    m = {**base, "project": {"id": "demo", "name": "n", "locale": {"a": 1}}}
+    (pk / "manifest.json").write_text(json.dumps(m))
+    assert val.validate_package(pk)
+    (pk / "manifest.json").write_text(json.dumps(base))
+    (pk / "README.md").write_text("# T\n[x](a%00b)\n")
+    assert any("invalid" in e or "escapes" in e for e in val.validate_package(pk))
+
+
+def test_geo_gen_no_training_blocks_every_training_bot():
+    gen = _skill_mod("skills/geo-audit/scripts/geo_gen.py")
+    robots = gen.gen_robots("https://x.test", "https://x.test/sitemap.xml", allow_training=False)
+    _head, tail = robots.split("User-agent: GPTBot", 1)
+    group = "User-agent: GPTBot" + tail.split("\n\n")[0]
+    for ua in gen.AI_TRAIN_UA:
+        assert f"User-agent: {ua}" in group, ua
+    assert "Disallow: /" in group and "Allow: /" not in group
+
+
+def test_geo_gen_jsonld_safe_inside_script_tag():
+    gen = _skill_mod("skills/geo-audit/scripts/geo_gen.py")
+    out = gen.gen_jsonld_org("</script><script>alert(1)</script>", "https://x.test", "d")
+    assert "</" not in out and json.loads(out)["name"] == "</script><script>alert(1)</script>"
+
+
+def test_render_shader_udp_input_is_sanitised():
+    rs = _skill_mod("skills/realtime-visual-engine/scripts/render_shader.py")
+    assert rs.parse_udp("hue=abc zoom=nan", 0.2, 1.0) == (0.2, 1.0)
+    assert rs.parse_udp("hue=inf zoom=1e999", 0.2, 1.0) == (0.2, 1.0)
+    assert rs.parse_udp("hue=5 zoom=0", 0.2, 1.0) == (0.2, 1.0)
+    assert rs.parse_udp("hue=0.95,zoom=1.35", 0.2, 1.0) == (0.95, 1.35)
+
+
+def test_fetch_gguf_curl_refuses_non_https_redirect():
+    src = (Path(__file__).resolve().parents[1] / "skills/model-hub-provenance/scripts/fetch_gguf.py").read_text()
+    assert '"--proto", "=https"' in src and '"--proto-redir", "=https"' in src

@@ -40,7 +40,7 @@ POLL_SEC="${VACUUM_POLL_SEC:-30}"
 mkdir -p "$LOGDIR"
 
 log()  { echo "[$(date '+%F %T')] $*"; }
-hsize(){ du -h "$1" 2>/dev/null | cut -f1 || echo "n/a"; }
+hsize(){ local s; s=$(du -h "$1" 2>/dev/null | cut -f1); echo "${s:-n/a}"; }
 holders_now() { /usr/bin/fuser "$DB" 2>/dev/null; }
 gw_pid() { /usr/bin/systemctl --user show -p MainPID --value "$GW" 2>/dev/null; }
 others_count() {
@@ -74,6 +74,12 @@ while :; do
 done
 
 log "stop $GW"
+# Jaring pengaman: apa pun yang terjadi setelah gateway dimatikan (exit, error, SIGTERM dari
+# `systemctl stop hermes-vacuum-offline`, Ctrl-C), gateway HARUS dinyalakan lagi. Tanpa ini,
+# membatalkan watcher di tengah jendela membiarkan semua agent tanpa gateway.
+trap 'log "keluar — memastikan $GW menyala"; /usr/bin/systemctl --user start "$GW"' EXIT
+trap 'exit 143' TERM
+trap 'exit 130' INT
 /usr/bin/systemctl --user stop "$GW" || { log "GAGAL stop gateway — batal, tanpa perubahan"; exit 1; }
 sleep 2
 

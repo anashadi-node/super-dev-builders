@@ -134,3 +134,35 @@ def test_profile_cfg_non_dict_does_not_crash(tmp_path, monkeypatch):
         (tmp_path / "p").mkdir(exist_ok=True)
         (tmp_path / "p" / "config.yaml").write_text(body)
         assert server.read_profile_cfg("p") is None
+
+
+def test_lan_addr_picks_physical_iface_not_vpn(monkeypatch):
+    """Rute default bisa lewat VPN (nordlynx); hanya en*/eth*/wl* boleh dipilih."""
+    out = ("3: nordlynx    inet 10.5.0.2/32 scope global nordlynx\n"
+           "2: wlp2s0    inet 192.168.1.7/24 brd 192.168.1.255 scope global dynamic wlp2s0\n")
+
+    class R:
+        stdout = out
+    monkeypatch.setattr(server.subprocess, "run", lambda *a, **k: R())
+    assert server.lan_addr(8484) == "192.168.1.7:8484"
+    R.stdout = "3: nordlynx    inet 10.5.0.2/32 scope global nordlynx\n"
+    assert server.lan_addr(8484) is None
+
+    def boom(*a, **k):
+        raise OSError("no ip")
+    monkeypatch.setattr(server.subprocess, "run", boom)
+    assert server.lan_addr(8484) is None
+
+
+def test_frontend_escapes_all_five_html_metachars():
+    """esc() di kedua front-end wajib menangani & < > \" ' (XSS lewat nilai profil/config)."""
+    for rel in ("app.js", "ws/app.js"):
+        src = (DASH / rel).read_text()
+        assert "esc=" in src.replace(" ", "") or "function esc" in src, rel
+        for ent in ("&amp;", "&lt;", "&gt;", "&quot;", "&#39;"):
+            assert ent in src, f"{rel} tidak meng-escape {ent}"
+
+
+def test_build_state_survives_non_dict_health(monkeypatch):
+    monkeypatch.setattr(server, "load_health", lambda: ({"x": "bukan-dict"}, 1))
+    assert isinstance(server.build_state(), dict)

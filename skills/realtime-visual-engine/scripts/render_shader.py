@@ -95,11 +95,21 @@ def udp_send(port: int, msg: bytes, delay: float) -> None:
 
 
 def parse_udp(msg: str, hue: float, zoom: float) -> tuple[float, float]:
+    # Paket UDP = input tak tepercaya: nilai non-angka / nan / inf / di luar rentang DIABAIKAN,
+    # bukan membuat render crash atau memasukkan nan/inf ke f-string yang dieval di browser.
+    import math
     for kv in msg.replace(",", " ").split():
-        if kv.startswith("hue="):
-            hue = float(kv.split("=", 1)[1])
-        elif kv.startswith("zoom="):
-            zoom = float(kv.split("=", 1)[1])
+        key, _, raw = kv.partition("=")
+        try:
+            val = float(raw)
+        except ValueError:
+            continue
+        if not math.isfinite(val):
+            continue
+        if key == "hue" and 0.0 <= val <= 1.0:
+            hue = val
+        elif key == "zoom" and 0.1 <= val <= 10.0:
+            zoom = val
     return hue, zoom
 
 

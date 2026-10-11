@@ -50,7 +50,9 @@ def main() -> int:
         print(f"sha256 salah pada file final ({got[:16]}...) -> unduh ulang")
 
     t0 = time.time()
-    cmd = ["curl", "-L", "--fail", "--retry", "3", "--max-time", "3600", "-o", part, URL]
+    # --proto/--proto-redir: redirect tak boleh turun ke http/ftp/file (sha256 tetap gerbang akhir)
+    cmd = ["curl", "-L", "--proto", "=https", "--proto-redir", "=https", "--fail", "--retry", "3",
+           "--max-time", "3600", "-o", part, URL]
     print("unduh:", URL)
     rc = subprocess.run(cmd, timeout=3700).returncode
     if rc != 0:

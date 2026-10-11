@@ -28,6 +28,8 @@ REPO = Path(__file__).resolve().parent.parent  # portabel: bukan path hard-coded
 DASH = REPO / "dashboard"
 STATE = DASH / "state"
 HEALTH_FILE = STATE / "health.json"
+PORT = 8484
+BIND_LAN = False  # diisi main(): hint LAN hanya bermakna bila bind non-loopback
 PROFILES = Path.home() / ".hermes" / "profiles"
 BIN = Path.home() / ".local" / "bin"
 
@@ -131,6 +133,21 @@ def cmd_health_check():
     print(f"health.json written: {n_ok}/{len(PROFILE_META)} OK")
 
 
+def lan_addr(port):
+    """IP LAN fisik (enp*/eth*/wl*/eno*) untuk dibuka dari HP. Rute default bisa lewat VPN
+    (mis. nordlynx) sehingga connect-trick salah; daftar antarmuka lebih akurat. None bila tak ada."""
+    try:
+        out = subprocess.run(["ip", "-4", "-o", "addr", "show", "scope", "global"],
+                             capture_output=True, text=True, timeout=3).stdout
+    except (OSError, subprocess.SubprocessError):
+        return None
+    for line in out.splitlines():
+        f = line.split()
+        if len(f) >= 4 and re.match(r"(en|eth|wl)", f[1]):
+            return f"{f[3].split('/')[0]}:{port}"
+    return None
+
+
 def build_state():
     health, age = load_health()
     profiles = []
@@ -140,6 +157,7 @@ def build_state():
         chain = [{"provider": f["provider"], "model": MODEL_SHORT.get(f["model"], f["model"]),
                   "url": PROVIDER_URLS.get(f["provider"], "")} for f in c.get("chain", [])]
         h = (health or {}).get(dirname, {})
+        h = h if isinstance(h, dict) else {}
         if health is None:
             hstate = "unknown"
         else:
@@ -163,6 +181,7 @@ def build_state():
         "profiles": profiles,
         "agents": agents,
         "health_age_h": None if age is None else round(age / 3600, 1),
+        "lan": lan_addr(PORT) if BIND_LAN else None,
     }
 
 
@@ -244,6 +263,8 @@ def main():
     ap.add_argument("--show-token", action="store_true")
     ap.add_argument("--health-check", action="store_true")
     args = ap.parse_args()
+    global PORT, BIND_LAN
+    PORT, BIND_LAN = args.port, args.host not in ("127.0.0.1", "localhost", "::1")
     if args.show_token:
         print(ws_api.get_token())
         return

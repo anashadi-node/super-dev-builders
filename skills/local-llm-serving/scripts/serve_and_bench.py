@@ -15,6 +15,7 @@ import os
 import statistics
 import subprocess
 import sys
+import tempfile
 import time
 import urllib.error
 import urllib.parse
@@ -100,26 +101,33 @@ def main() -> int:
 
     base = f"http://127.0.0.1:{a.port}"
     ver = subprocess.run([a.server, "--version"], capture_output=True, text=True, timeout=60)
+    # llama-server menulis versi ke STDERR; stdout saja membuat provenance "build=?".
+    ver_lines = ((ver.stdout or "") + (ver.stderr or "")).strip().splitlines()
+    build = ver_lines[1] if len(ver_lines) > 1 else (ver_lines[0] if ver_lines else "?")
     cmd = [a.server, "-m", os.path.expanduser(a.model), "-c", str(a.ctx), "-np", str(a.parallel),
            "-t", str(a.threads), "--host", "127.0.0.1", "--port", str(a.port), "--metrics"]
     t_start = time.time()
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    # Log server ke berkas sementara, BUKAN PIPE: pipe yang tak dibaca penuh di 64 KB lalu
+    # memblokir server (deadlock) pada --repeats besar.
+    server_log = tempfile.TemporaryFile("w+", encoding="utf-8", errors="replace")
+    proc = subprocess.Popen(cmd, stdout=server_log, stderr=subprocess.STDOUT, text=True)
     result: dict = {
         # metadata wajib kontrak bukti (docs/EVIDENCE_SCHEMA.md)
-        "provenance": f"scripts/serve_and_bench.py; server={a.server}; build={ver.stdout.strip().splitlines()[1] if ver.stdout.strip().splitlines() else '?'}",
+        "provenance": f"scripts/serve_and_bench.py; server={a.server}; build={build}",
         "captured_at": time.strftime("%Y-%m-%dT%H:%M:%S%z", time.localtime()),
         "redaction_status": "clean",
         "status": "OBSERVED",
         "server": a.server, "model": os.path.expanduser(a.model),
         "parallel": a.parallel, "ctx": a.ctx, "threads": a.threads,
-        "version_head": ver.stdout.strip().splitlines()[:3], "cmd": cmd,
+        "version_head": ver_lines[:3], "cmd": cmd,
     }
     try:
         deadline = time.time() + 180
         health = None
         while time.time() < deadline:
             if proc.poll() is not None:
-                out = proc.stdout.read() if proc.stdout else ""
+                server_log.seek(0)
+                out = server_log.read()
                 result["error"] = "server mati sebelum siap"
                 result["server_log_tail"] = out[-1200:]
                 print(json.dumps(result, indent=2))
@@ -172,36 +180,45 @@ def main() -> int:
 
         ones = [r["single"]["tok_per_s"] for r in runs]
         aggs = [r["parallel"]["aggregate_tok_per_s"] for r in runs]
+        valid_runs = [r for r in runs if r["parallel"]["aggregate_tok_per_s"]]
+        if not valid_runs:  # server tak melaporkan usage -> laporan jujur, bukan crash
+            result["error"] = "tidak ada run dengan throughput valid (completion_tokens=0)"
+            raise RuntimeError(result["error"])
+        ones_v = [v for v in ones if v] or [0.0]
+        benefits = [r["benefit_x"] for r in runs if r["benefit_x"] is not None] or [0.0]
         # representasi = run dengan throughput agregat terdekat ke median (bukan run terbaik)
         med_agg = statistics.median([v for v in aggs if v])
-        rep = min([r for r in runs if r["parallel"]["aggregate_tok_per_s"]],
+        rep = min(valid_runs,
                   key=lambda r: abs(r["parallel"]["aggregate_tok_per_s"] - med_agg))
         result["single"] = rep["single"]
         result["parallel_run"] = rep["parallel"]
         result["representative_run"] = rep["run"]
-        result["single_tok_per_s"] = {"median": _med(ones), "min": min(ones), "max": max(ones)}
+        result["single_tok_per_s"] = {"median": _med(ones), "min": min(ones_v), "max": max(ones_v)}
         result["aggregate_tok_per_s"] = {"median": _med(aggs), "min": min(aggs), "max": max(aggs)}
         result["batching_benefit_x"] = {"median": _med([r["benefit_x"] for r in runs]),
-                                        "min": min(r["benefit_x"] for r in runs),
-                                        "max": max(r["benefit_x"] for r in runs)}
+                                        "min": min(benefits),
+                                        "max": max(benefits)}
         # klaim kuat: di SETIAP run, throughput agregat paralel > single (bukan hanya di run terbaik)
         result["continuous_batching_proven"] = all(
             r["parallel"]["aggregate_tok_per_s"] and r["single"]["tok_per_s"] and
             r["parallel"]["aggregate_tok_per_s"] > r["single"]["tok_per_s"] for r in runs)
         result["rss_mb_after_parallel"] = max(v for k, v in result.items()
                                              if k.startswith("rss_mb_after_run") and v)
+    except RuntimeError:
+        pass  # pesan sudah ada di result["error"]; laporan tetap ditulis di bawah
     finally:
         proc.terminate()
         try:
             proc.wait(timeout=20)
         except subprocess.TimeoutExpired:
             proc.kill()
+        server_log.close()
     result["total_seconds"] = round(time.time() - t_start, 2)
     with open(a.out, "w", encoding="utf-8") as fh:
         json.dump(result, fh, indent=2)
     print(json.dumps(result, indent=2))
     print("report:", a.out)
-    return 0
+    return 5 if result.get("error") else 0
 
 
 if __name__ == "__main__":

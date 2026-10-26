@@ -25,6 +25,8 @@ Semua item di bawah **tidak dieksekusi** sampai Owner setuju. Status upgrade saa
 | 17 | ~~`urllib3==2.7.0` rentan (5 advisory) di `~/anantara-sakti`~~ **SELESAI 2026-10-05** | MEDIUM | — | `requirements-research-venv.txt` → `urllib3==2.8.0` (murni file spec venv riset; venv tak ada di disk → sistem trading live tak tersentuh). Bukti: §7.5 |
 | 18 | VACUUM/optimize `state.db` (2,0 GB + WAL 64 MB) | LOW | butuh **jendela offline**: gateway + Desktop app + cron berhenti | **DITUNDA**: `hermes sessions optimize` menolak dengan aman dari dalam sesi Desktop. Prosedur siap-jalan ada di §7.6. `auto_prune` sudah default True (90 hari) → soal ukuran, bukan kebijakan; `auto_archive` tidak diaktifkan |
 
+| 19 | Integrasi **REA** (`rea-agents@6.8.0`) sebagai tool CLI Divisi SDB | MEDIUM | kapabilitas RE sangat kuat (debugger/frida/PTY) + MCP 229 tool | **DISETUJUI & TERPASANG 2026-10-26** atas order Owner ("integrasikan Repo GitHub REA ke dalam Divisi SDB, audit scan analisa mendalam terlebih dahulu"). Audit dulu, baru pasang: `reports/REA_AUDIT_20261026.md` (IOC 0 temuan; 29 temuan scanner = 100% FP; sha512 cocok + provenance SLSA; uji fixture 1,83 s). Terpasang `--ignore-scripts` di `~/.hermes/tools/rea-6.8.0` + wrapper `scripts/rea` + skill `rea-reverse-engineering` (5 profil divisi). **MCP TIDAK didaftarkan** (3,79 MB skema ≈950K token) — prosedur opt-in: `docs/INTEGRASI_REA.md` §5. Rollback: `rm -rf ~/.hermes/tools/rea-6.8.0` + revert commit. |
+
 ## Cara memberi approval
 ```text
 approve: 1,4      (skill Trail of Bits + install semgrep/trivy)

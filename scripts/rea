@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Wrapper REA terpin untuk Super Dev Builders.
+# Kenapa wrapper: satu titik versi + satu titik kegagalan. Tidak ada `npx` (selalu "latest"),
+# tidak ada shebang `env node` (node host bisa berubah), tidak ada akses ke REA global.
+set -euo pipefail
+
+REA_VERSION="6.8.0"
+REA_PREFIX="${REA_PREFIX:-$HOME/.hermes/tools/rea-$REA_VERSION}"
+REA_NODE="${REA_NODE_BIN:-$HOME/.hermes/tools/node-26.7.0-linux-x64/bin/node}"
+REA_ENTRY="$REA_PREFIX/node_modules/rea-agents/scripts/rea.mjs"
+
+if [ ! -x "$REA_NODE" ]; then
+  echo "REA: node tidak ditemukan di $REA_NODE (set REA_NODE_BIN)" >&2
+  exit 127
+fi
+if [ ! -f "$REA_ENTRY" ]; then
+  echo "REA: paket $REA_VERSION tidak terpasang di $REA_PREFIX" >&2
+  echo "     pasang: npm install --prefix $REA_PREFIX --ignore-scripts rea-agents@$REA_VERSION" >&2
+  exit 127
+fi
+
+exec "$REA_NODE" "$REA_ENTRY" "$@"

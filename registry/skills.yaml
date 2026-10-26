@@ -15,7 +15,11 @@ pipeline_required: [source_trust_check, pin_revision, hermes_native_scan, manual
 # CATATAN AKURASI (ditemukan saat audit T11-1): komentar di baris atas berjumlah
 #   (21 + 6 + 2) = 29, BUKAN 37 -> rincian angka lama TIDAK dapat diverifikasi dari komentar itu
 #   sendiri. Rincian rinci 38 belum dikonfirmasi Owner; yang dikonfirmasi hanya TOTAL = 38.
-approved_custom_count: 38
+approved_custom_count: 39
+# 2026-10-26 — Owner via chat: 38 -> 39.
+#   Sebab: integrasi REA (order: "integrasikan Repo GitHub REA ke dalam Divisi SDB, audit scan
+#   analisa mendalam terlebih dahulu") menambah 1 custom skill `rea-reverse-engineering` yang
+#   ditulis sendiri (MIT SDB) — bukan salinan skill upstream. Audit: reports/REA_AUDIT_20261026.md.
 # 2026-10-06: +7 adopsi PLANORA (kit perencanaan produk) — audit keamanan 65 file LULUS
 # (nol network/eval/symlink/secret; test upstream 39/39 PASS; laporan: reports/planora_audit_20261006.md).
 # Sumber: /home/anashadi/Documents/starter-clean-v1.4/starter-clean (.agents/skills, lisensi MIT).
@@ -242,6 +246,16 @@ custom:
     replaces: touchdesigner-mcp
     parity: ">= (berjalan di host ini, gratis, lintas platform, dapat dikendalikan agent; TD tidak ada di host)"
     evidence: reports/upgrade-evidence/realtime-visual-report.json
+  - id: rea-reverse-engineering
+    status: ADD
+    divisions: [D1, D3, D7, D8]
+    profiles: [sdb-orchestrator, sdb-recon, sdb-architect, sdb-reviewer, sdb-security]
+    path: skills/rea-reverse-engineering
+    scripts: [scripts/rea]
+    tool: rea_agents
+    upstream: "morluto/rea — rea-agents@6.8.0 (MIT), audit reports/REA_AUDIT_20261026.md"
+    gate: "Gate #0 PASS wajib untuk setiap target; tier T0-T3, T2/T3 butuh approval per aksi; MCP 229 tool TIDAK didaftarkan (3,79 MB skema)"
+    evidence: reports/REA_AUDIT_20261026.md
 third_party:
   - repo: obra/superpowers
     url: https://github.com/obra/superpowers
@@ -457,6 +471,36 @@ third_party:
     status: DEFER
     adopt: [visual_regression_optional]
     gate_note: "Mencari maintainer baru; prioritaskan Playwright-native screenshot assertion."
+
+
+  - repo: morluto/rea
+    url: https://github.com/morluto/rea
+    license: MIT
+    pinned_commit: 160d821ac9a0310afcb8d1fc427862dd6508add5   # tag rea-agents-6.8.0
+    pinned_version: "rea-agents@6.8.0"
+    pinned_date: 2026-10-25
+    integrity: "sha512-9QDeRnGqEDzABZyr04eLnBXBv/c6I9/TWu/6M0MD4pEfkySI/BIgwTODIbAReX3C1x6hjw9+Jlx4A2yUSPZ9ww== (dihitung ulang dari tarball, COCOK)"
+    provenance: "SLSA v1 (npm attestation), publisher GitHub Actions OIDC"
+    status: INSTALLED
+    decided: 2026-10-26
+    approved_by: "Owner — order 2026-10-26: 'integrasikan Repo GitHub REA ke dalam Divisi SDB, audit scan analisa mendalam terlebih dahulu'"
+    installed_at: 2026-10-26
+    install_method: "npm install --prefix ~/.hermes/tools/rea-6.8.0 --ignore-scripts --no-audit --no-fund rea-agents@6.8.0 (paket terbit TIDAK punya preinstall/install/postinstall; host ignore-scripts=true; tanpa sudo; tanpa npx)"
+    adopt: [cli_tool, methodology_reference]
+    distribution:
+      sdb-recon: [rea-reverse-engineering]
+      sdb-architect: [rea-reverse-engineering]
+      sdb-reviewer: [rea-reverse-engineering]
+      sdb-security: [rea-reverse-engineering]
+    security_scan: "IOC statis: 0 PUA/Glassworm, 0 secret hardcoded, 0 endpoint telemetri, 0 lifecycle script, 0 eval nyata; 30 berkas child_process = spawn/execFile engine, tanpa shell:true. SkillSpector atas SKILL.md bawaan: 29 MEDIUM, 100% false positive (8 token 'plist' = Apple property list; 20 spasi/tabel markdown; 1 frasa 'no approval' di dokumentasi)."
+    runtime_evidence: "rea --version 6.8.0; MCP initialize 0,25 s / 229 tool; analyze-javascript-application pada fixture milik SDB 1,83 s -> evidence_id ev_e414efa6… digest sha256:cdf88981…"
+    audit_status: "LULUS — reports/REA_AUDIT_20261026.md (pipeline §8: source trust, pin, scan, review manual, second opinion, sandbox test, allowlist, approval semuanya PASS)"
+    caveats:
+      - "MCP 229 tool = 3.790.552 byte skema (~950K token) -> TIDAK didaftarkan; integrasi CLI-first"
+      - "engine native (ghidra/ida/jadx/hopper) belum terpasang -> decompile native/APK belum tersedia"
+      - "host node 26.7.0 di luar `engines` paket (^22.23.4 || ^24.22.1 || >=26.12.1); terbukti berjalan, perbaikan terdokumentasi di docs/INTEGRASI_REA.md §4"
+      - "maintainer tunggal; 1.093 issue terbuka -> risiko keberlanjutan, bukan keamanan; upgrade wajib audit ulang"
+    evidence: "reports/REA_AUDIT_20261026.md + docs/INTEGRASI_REA.md"
 
 # ---------- C. Skill Hermes yang sudah ada & dipakai ulang (KEEP) ----------
 keep_local:

@@ -2,9 +2,9 @@
 # Aturan: pin versi, verifikasi checksum untuk binary, install user-local (tanpa sudo) bila memungkinkan.
 # Pemasangan nyata: `bash scripts/bootstrap_tools.sh --install <tool> --yes` (butuh approval manusia dulu).
 version: 2.2.0
-updated: 2026-10-04
-host_checked: 2026-10-04
-tools_installed: "ruff 0.16.10, semgrep 1.179.0, trivy 0.75.0 (approval #4), syft 1.54.0, codeql 2.27.1, playwright 1.63.0 (approval #2, 2026-10-04)"
+updated: 2026-10-26
+host_checked: 2026-10-26
+tools_installed: "ruff 0.16.10, semgrep 1.179.0, trivy 0.75.0 (approval #4), syft 1.54.0, codeql 2.27.1, playwright 1.63.0 (approval #2, 2026-10-04), rea-agents 6.8.0 (approval #19, 2026-10-26)"
 
 present:
   - id: git
@@ -112,6 +112,21 @@ present:
     evidence: reports/upgrade-evidence/realtime-visual-report.json
     policy: "shader offline (tanpa CDN); kontrol eksternal loopback saja"
     replaces: touchdesigner-mcp
+  # --- dipasang 2026-10-26 setelah audit + order Owner (reports/REA_AUDIT_20261026.md) ---
+  - id: rea_agents
+    version_pin: "rea-agents@6.8.0"
+    path: /home/anashadi/.hermes/tools/rea-6.8.0/node_modules/rea-agents/scripts/rea.mjs
+    wrapper: /home/anashadi/super-dev-builders/scripts/rea
+    role: reverse_engineering_shipped_artifacts
+    install_method: "npm install --prefix ~/.hermes/tools/rea-6.8.0 --ignore-scripts --no-audit --no-fund rea-agents@6.8.0 (tanpa lifecycle script; host ignore-scripts=true)"
+    integrity: "sha512-9QDeRnGqEDzABZyr04eLnBXBv/c6I9/TWu/6M0MD4pEfkySI/BIgwTODIbAReX3C1x6hjw9+Jlx4A2yUSPZ9ww== (registry dist.integrity, dihitung ulang COCOK)"
+    provenance: "SLSA v1 attestation, publisher GitHub Actions OIDC"
+    evidence: "reports/REA_AUDIT_20261026.md (scan IOC 0 temuan, 29 temuan scanner = 100% FP, uji fixture 1,83 s)"
+    policy: "Gate #0 PASS wajib; tier T0 statis default, T1 capture, T2 debug/frida, T3 perangkat = approval per aksi; MCP (229 tool / 3,79 MB) TIDAK didaftarkan"
+    note: "engine native (ghidra/ida/jadx/hopper) belum terpasang -> hanya JS/Electron, web, artefak statis, EVM yang tersedia; node host 26.7.0 di luar `engines` namun terbukti berjalan"
+    license: MIT
+    approved_by: mas anas
+    approved_at: 2026-10-26
 
 # Sumber model (provenance) — catat karena HuggingFace langsung DIBLOKIR dari host ini.
 model_sources:

@@ -1,0 +1,12 @@
+{
+  "artifact_id": "a_01JA8Z5N7Q9S1V3W5Y7A9C1E3G",
+  "tenant_id": "t_01JA8Z3K5N7Q9R2T4V6W8X0Y2Z",
+  "job_id": "j_01JA8Z4M6P8R0T2V4X6Z8B0D2F",
+  "kind": "evidence",
+  "sha256": "3b03e4b2d4b1dfa4d1a48e02052c1db1b5b696f3b2711fe32eb35c49b525d94c",
+  "size": 230400,
+  "redaction_status": "redacted",
+  "retention_until": "2027-01-24T00:00:00Z",
+  "uri": "s3://sdb-artifacts/t_01JA8Z3K5N7Q9R2T4V6W8X0Y2Z/j_01JA8Z4M6P8R0T2V4X6Z8B0D2F/app-graph.json",
+  "media_type": "application/json"
+}

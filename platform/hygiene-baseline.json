@@ -1,0 +1,41 @@
+{
+ "version": 1,
+ "max_size_kb": 512,
+ "allowed_large": [
+  "verification/oss-sb-agency/diffs/visual-index.png",
+  "evidence/oss-sb-agency/capture/shot0.png",
+  "reports/upgrade-evidence/thirdparty-scan-crawlee.json",
+  "verification/oss-sb-agency/diffs/visual-mobile.png",
+  "runs/rt-rw-portal/reports/panduan-tiga-gerbang-persetujuan-20261010.pdf",
+  "runs/rt-rw-portal/reports/raw/sbom-railway23-20261018-164808.json",
+  "runs/rt-rw-portal/reports/raw/sbom-railway22-20261018-163931.json",
+  "evidence/oss-sb-agency/capture-mobile/shot0.png",
+  "dashboard/vendor/three.module.min.js",
+  "reports/upgrade-evidence/thirdparty-scan-lighthouse.json"
+ ],
+ "allowed_pii": [
+  {
+   "path": "runs/rt-rw-portal/logs/railway-fungsional-20261011-150719.log",
+   "reason": "artefak uji 2026-10-11 (akun uji), keluar dari git pada Fase 1"
+  },
+  {
+   "path": "runs/rt-rw-portal/logs/railway-fungsional2-20261011-150952.log",
+   "reason": "artefak uji 2026-10-11 (akun uji), keluar dari git pada Fase 1"
+  },
+  {
+   "path": "reports/upgrade-evidence/trivy-oss-agency.json",
+   "reason": "email maintainer paket pihak ketiga di laporan scanner, bukan PII pelanggan"
+  },
+  {
+   "path": "runs/rt-rw-portal/reports/raw/sbom-railway22-20261018-163931.json",
+   "reason": "email maintainer paket pihak ketiga di SBOM, bukan PII pelanggan"
+  }
+ ],
+ "structure_dirs": [
+  "runs",
+  "evidence",
+  "verification",
+  "normalized"
+ ],
+ "note": "Baseline ini adalah utang teknis yang diakui, bukan izin. Setiap entri baru = FAIL sampai diarsipkan ke object store."
+}

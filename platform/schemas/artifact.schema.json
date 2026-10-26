@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.sdb.dev/artifact.schema.json",
+  "title": "SDB Artifact",
+  "description": "Setiap artefak wajib ber-hash, berstatus redaksi, dan punya retensi. Artefak tanpa redaction_status tidak boleh dipublikasikan ke pelanggan.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["artifact_id", "tenant_id", "job_id", "kind", "sha256", "size", "redaction_status", "retention_until", "uri"],
+  "properties": {
+    "artifact_id": { "type": "string", "pattern": "^a_[0-9A-HJKMNP-TV-Z]{26}$" },
+    "tenant_id": { "type": "string", "pattern": "^t_[0-9A-HJKMNP-TV-Z]{26}$" },
+    "job_id": { "type": "string", "pattern": "^j_[0-9A-HJKMNP-TV-Z]{26}$" },
+    "kind": { "enum": ["evidence", "capture", "report", "log", "sarif", "sbom", "diff", "dataset"] },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "size": { "type": "integer", "minimum": 0 },
+    "redaction_status": { "enum": ["clean", "redacted", "blocked"] },
+    "retention_until": { "type": "string", "format": "date-time" },
+    "uri": { "type": "string", "pattern": "^(s3|artifact)://" },
+    "media_type": { "type": "string", "maxLength": 100 }
+  }
+}

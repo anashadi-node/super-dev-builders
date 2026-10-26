@@ -1,0 +1,18 @@
+{
+  "tenant_id": "t_01JA8Z3K5N7Q9R2T4V6W8X0Y2Z",
+  "name": "PT Contoh Klien",
+  "plan": "pro",
+  "status": "active",
+  "created_at": "2026-10-26T09:00:00Z",
+  "isolation": "pool",
+  "limits": {
+    "jobs_per_month": 250,
+    "tokens_per_month": 12000000,
+    "storage_gb": 50
+  },
+  "billing": {
+    "customer_ref": "cus_contoh_001",
+    "currency": "USD"
+  },
+  "contact": "ops@contoh.example"
+}

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.sdb.dev/tenant.schema.json",
+  "title": "SDB Tenant",
+  "description": "Kontrak minimum satu tenant berlangganan. Tanpa limits tidak ada penegakan kuota; tanpa isolation tidak ada janji privasi.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["tenant_id", "plan", "status", "created_at", "isolation", "limits"],
+  "properties": {
+    "tenant_id": { "type": "string", "pattern": "^t_[0-9A-HJKMNP-TV-Z]{26}$" },
+    "name": { "type": "string", "maxLength": 80 },
+    "plan": { "enum": ["starter", "pro", "team", "enterprise"] },
+    "status": { "enum": ["active", "suspended", "deleted"] },
+    "created_at": { "type": "string", "format": "date-time" },
+    "isolation": { "enum": ["pool", "bridge", "silo"] },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jobs_per_month", "tokens_per_month", "storage_gb"],
+      "properties": {
+        "jobs_per_month": { "type": "integer", "minimum": 1 },
+        "tokens_per_month": { "type": "integer", "minimum": 1000 },
+        "storage_gb": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "billing": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "customer_ref": { "type": "string", "maxLength": 120 },
+        "currency": { "type": "string", "pattern": "^[A-Z]{3}$" }
+      }
+    },
+    "contact": { "type": "string", "maxLength": 200 }
+  }
+}

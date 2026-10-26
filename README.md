@@ -21,21 +21,27 @@ link, dependency, skill, MCP, dan artefak capture diperlakukan **untrusted** sam
 
 ## Struktur
 ```text
-docs/            blueprint + architecture, divisi, workflow/gate, policy, rollback
+platform/        kontrak produk: skema tenant/job/artifact, baseline higiene, manifest paket (Fase 1)
+docs/            blueprint, arsitektur, ADR, runbook, kebijakan, indeks dokumen (docs/INDEX.md)
 registry/        skill registry + tool registry (sumber, revisi terpin, status)
-skills/          sumber kanonik custom skill ekosistem ini (jumlah = registry/skills.yaml, kini 37; cek `make drift`) (dipasang ke profil, bukan disalin liar)
+skills/          sumber kanonik custom skill ekosistem ini (jumlah = registry/skills.yaml, kini 39; cek `make drift`) (dipasang ke profil, bukan disalin liar)
 agents/          charter mesin-terbaca per divisi (permission, input/output, batas)
 workflows/       definisi gate + tahap workflow (machine-readable)
 templates/       manifest otorisasi, target manifest, ADR, laporan akhir, handover
 scripts/         deterministik: doctor, inventory, init-target, install-skills, gate-check,
-                 release-check, workflow-run, sdb (CLI satu pintu), evidence-lint, redact-network
-evidence/        evidence mentah (wajib redacted)  -> per target
-normalized/      evidence ternormalisasi -> per target
+                 release-check, workflow-run, sdb (CLI satu pintu), evidence-lint, redact-network,
+                 repo-hygiene (gerbang artefak)
+evidence/        evidence mentah (wajib redacted)  -> per target  [transisi: keluar ke object store]
+normalized/      evidence ternormalisasi -> per target             [transisi: keluar ke object store]
 reconstruction/  hasil rebuild clean-room -> per target
-verification/    hasil verifikasi visual/behavioral/a11y/security -> per target
+verification/    hasil verifikasi visual/behavioral/a11y/security -> per target [transisi]
 reports/         laporan gate, audit, upgrade, fidelity, handover
 tests/           test untuk scripts/ (dijalankan sebelum commit)
 ```
+
+> **Arah struktur (ADR-0002)**: kode, kontrak, dan dokumen tetap di git; **hasil pekerjaan** (capture, evidence,
+> log, laporan generate) pindah ke object store per tenant. Repo tidak boleh tumbuh karena data pelanggan —
+> dijaga oleh `make hygiene`. Peta lengkap: `docs/PETA_STRUKTUR.md`; indeks dokumen: `docs/INDEX.md`.
 
 ## Mulai dari sini
 Baru pertama kali? Ikuti **`docs/GETTING_STARTED.md`** — panduan Bahasa Indonesia dari nol

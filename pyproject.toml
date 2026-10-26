@@ -38,4 +38,4 @@ addopts = "-q -rs"
 # pluggy, pygments). Inilah yang membuat `trivy fs` punya sasaran nyata: sebelumnya uv.lock
 # hanya metadata sehingga "0 vuln" berarti "belum teruji", bukan "bersih".
 # Bila pin berubah: jalankan `uv lock` lagi, lalu `trivy fs --scanners vuln .`
-# (kontrol positif ada di docs/AUDIT_20261007_R2.md: canary requests==2.31.0 -> 3 CVE).
+# (kontrol positif ada di docs/archive/AUDIT_20261007_R2.md: canary requests==2.31.0 -> 3 CVE).

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.sdb.dev/job.schema.json",
+  "title": "SDB Job",
+  "description": "Satu unit pekerjaan divisi. budget dan idempotency_key wajib: keduanya mencegah dua kegagalan termahal di SaaS ini (biaya tak terbatas dan job ganda).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["job_id", "tenant_id", "type", "pack", "target_ref", "budget", "idempotency_key", "status", "created_at"],
+  "properties": {
+    "job_id": { "type": "string", "pattern": "^j_[0-9A-HJKMNP-TV-Z]{26}$" },
+    "tenant_id": { "type": "string", "pattern": "^t_[0-9A-HJKMNP-TV-Z]{26}$" },
+    "type": { "enum": ["recon", "build", "review", "qa", "security", "docs", "release"] },
+    "pack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,40}$" },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" }
+      }
+    },
+    "target_ref": { "type": "string", "pattern": "^(artifact|git|upload)://" },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tokens", "seconds"],
+      "properties": {
+        "tokens": { "type": "integer", "minimum": 1000, "maximum": 2000000 },
+        "seconds": { "type": "integer", "minimum": 60, "maximum": 14400 }
+      }
+    },
+    "idempotency_key": { "type": "string", "minLength": 8, "maxLength": 128 },
+    "status": { "enum": ["queued", "running", "succeeded", "failed", "blocked", "budget_exceeded", "cancelled"] },
+    "created_at": { "type": "string", "format": "date-time" },
+    "gate_verdict": { "enum": ["PASS", "FAIL", "BLOCKED"] },
+    "tokens_used": { "type": "integer", "minimum": 0 }
+  }
+}

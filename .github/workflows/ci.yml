@@ -62,3 +62,6 @@ jobs:
 
       - name: Drift skill (repo vs terpasang)
         run: if [ -d "$HOME/.hermes/skills" ]; then make drift; else echo SKIP_drift_tanpa_direktori_skill; fi
+
+      - name: Higiene artefak (ukuran, PII, jenis berkas)
+        run: make hygiene

@@ -75,7 +75,9 @@ class Store:
         self.path = path
         if path != ":memory:":
             os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
-        self.db = sqlite3.connect(path, check_same_thread=False)
+        # timeout=15: beberapa worker/proses boleh mengantre pada lock penulis (BEGIN IMMEDIATE),
+        # bukan langsung gagal "database is locked" saat antrean sedang padat.
+        self.db = sqlite3.connect(path, check_same_thread=False, timeout=15)
         self.db.row_factory = sqlite3.Row
         self.db.isolation_level = None  # transaksi eksplisit: BEGIN IMMEDIATE di jalur uang/kuota
         self.db.execute("PRAGMA foreign_keys = ON")

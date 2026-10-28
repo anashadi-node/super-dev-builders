@@ -427,3 +427,45 @@ def test_api_menolak_worker_key_pendek():
 def test_harga_semua_plan_positif_dan_urut():
     assert all(v > 0 for v in PLAN_PRICE_PER_MTOK.values())
     assert PLAN_PRICE_PER_MTOK["starter"] > PLAN_PRICE_PER_MTOK["pro"] > PLAN_PRICE_PER_MTOK["team"] >= 1_000_000
+
+def test_banyak_worker_menyelesaikan_banyak_job_tepat_sekali(tmp_path):
+    """Uji tekanan: 4 worker x 12 job. Setiap job harus sukses tepat sekali dan tagihan konsisten."""
+    path = str(tmp_path / "stress.db")
+    setup = Store(path)
+    t = setup.create_tenant(plan="team")
+    start = setup.billing.balance(t["tenant_id"])["credit_microusd"]
+    jobs = [setup.create_job(t["tenant_id"], "recon", {"id": "sdb-recon", "version": "1.0.0"},
+                             f"artifact://stress/{i}", {"tokens": 4000, "seconds": 600},
+                             f"stress-{i:04d}")[0]["job_id"] for i in range(12)]
+    barriers = threading.Barrier(4)
+    hasil: list[dict] = []
+    lock = threading.Lock()
+
+    def kerja(nama):
+        store = Store(path)
+        worker = Worker(store, echo_executor, nama, lease_seconds=60)
+        barriers.wait()
+        while True:
+            ringkas = worker.run_once()
+            if not ringkas.get("claimed"):
+                break
+            with lock:
+                hasil.append(ringkas)
+
+    threads = [threading.Thread(target=kerja, args=(f"w-stress-{i}",)) for i in range(4)]
+    for th in threads:
+        th.start()
+    for th in threads:
+        th.join(timeout=120)
+
+    selesai = Store(path)
+    assert len(hasil) == 12, hasil
+    assert all(h["status"] == "succeeded" for h in hasil)
+    assert {h["claimed"] for h in hasil} == set(jobs)  # tidak ada job dikerjakan dua kali
+    for jid in jobs:
+        row = selesai.db.execute("SELECT COUNT(*) n FROM job_charges WHERE job_id = ?", (jid,)).fetchone()
+        assert row["n"] == 1
+    total = selesai.db.execute("SELECT SUM(micro_usd) s FROM job_charges WHERE tenant_id = ?",
+                               (t["tenant_id"],)).fetchone()["s"]
+    assert start - selesai.billing.balance(t["tenant_id"])["credit_microusd"] == total
+    assert selesai.billing.verify_chain(t["tenant_id"])["ok"] is True

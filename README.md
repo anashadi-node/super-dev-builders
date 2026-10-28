@@ -22,6 +22,7 @@ link, dependency, skill, MCP, dan artefak capture diperlakukan **untrusted** sam
 ## Struktur
 ```text
 platform/        kontrak produk: skema tenant/job/artifact, baseline higiene, manifest paket (Fase 1)
+sdb_platform/    kode produk Python — control plane: tenant, kuota, job, artefak (Fase 2a)
 docs/            blueprint, arsitektur, ADR, runbook, kebijakan, indeks dokumen (docs/INDEX.md)
 registry/        skill registry + tool registry (sumber, revisi terpin, status)
 skills/          sumber kanonik custom skill ekosistem ini (jumlah = registry/skills.yaml, kini 39; cek `make drift`) (dipasang ke profil, bukan disalin liar)

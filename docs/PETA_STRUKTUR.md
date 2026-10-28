@@ -52,6 +52,29 @@ flowchart LR
 
 ---
 
+
+## 1b. Perubahan 2026-10-29 (setelah fondasi Fase 1-2a)
+
+```text
+super-dev-builders/            327 berkas terlacak · artefak 33,5 MB keluar git
+├── sdb_platform/             KODE PRODUK (paket Python) — control_plane/ (Fase 2a)
+├── platform/                 KONTRAK & DATA MESIN — schemas/, packs/, hygiene-baseline.json
+├── scripts/                  24 skrip; pack_build.py, archive_artifacts.py, privasi/portal-rt-rw/
+├── tests/                    16 berkas · 310 tes
+├── LICENSE / NOTICE          BUSL-1.1 + kewajiban pihak ketiga
+├── CHANGELOG.md              riwayat versi (v0.4.0 ditandai)
+└── ~/sdb-archive/2026-10-26/ arsip artefak + manifest sha256 (di luar repo)
+```
+
+Aturan penempatan yang berlaku sekarang:
+
+| Jenis isi | Tempat | Alasan |
+|---|---|---|
+| kode yang dieksekusi | `sdb_platform/` (paket) atau `scripts/` (skrip) | `platform` nama modul stdlib, `sdb` ditutupi `scripts/sdb.py` (ADR-0004) |
+| kontrak yang dibaca mesin | `platform/schemas/`, `platform/packs/` | satu sumber kebenaran, bisa di-hash |
+| data pelanggan / hasil kerja | object store per tenant, **bukan git** | retensi + isolasi + repo tidak membengkak (ADR-0002) |
+| dokumen manusia | `docs/`, `reports/` | indeks tunggal di `docs/INDEX.md` |
+
 ## 2. Struktur target
 
 ```text

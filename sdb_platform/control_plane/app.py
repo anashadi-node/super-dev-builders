@@ -20,17 +20,23 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from .store import ControlPlaneError, Store
 
 JOB_ARTIFACTS_RE = re.compile(r"^/v1/jobs/([A-Za-z0-9_]+)/artifacts$")
+JOB_HEARTBEAT_RE = re.compile(r"^/v1/jobs/([A-Za-z0-9_]+)/heartbeat$")
+JOB_COMPLETE_RE = re.compile(r"^/v1/jobs/([A-Za-z0-9_]+)/complete$")
+JOB_CANCEL_RE = re.compile(r"^/v1/jobs/([A-Za-z0-9_]+)/cancel$")
 JOB_FINISH_RE = re.compile(r"^/v1/jobs/([A-Za-z0-9_]+)/finish$")
 JOB_RE = re.compile(r"^/v1/jobs/([A-Za-z0-9_]+)$")
 MAX_BODY = 256 * 1024
 
 
 class Api:
-    def __init__(self, store: Store, admin_key: str):
+    def __init__(self, store: Store, admin_key: str, worker_key: str | None = None):
         if len(admin_key) < 24:
             raise SystemExit("admin key minimal 24 karakter")
+        if worker_key is not None and len(worker_key) < 24:
+            raise SystemExit("worker key minimal 24 karakter")
         self.store = store
         self.admin_key = admin_key
+        self.worker_key = worker_key
         # MVP satu proses: serialisasi semua mutasi supaya cek-kuota + INSERT tidak balapan.
         # Skala horizontal nanti = Postgres dengan transaksi/row lock, bukan mengandalkan lock ini.
         self.lock = threading.Lock()
@@ -38,6 +44,12 @@ class Api:
     def _admin(self, headers: dict) -> None:
         if not secrets.compare_digest(headers.get("x-admin-key", ""), self.admin_key):
             raise ControlPlaneError(401, "unauthorized", "X-Admin-Key tidak sah")
+
+    def _worker(self, headers: dict) -> None:
+        if not self.worker_key:
+            raise ControlPlaneError(503, "worker_disabled", "endpoint worker tidak diaktifkan")
+        if not secrets.compare_digest(headers.get("x-worker-key", ""), self.worker_key):
+            raise ControlPlaneError(401, "unauthorized", "X-Worker-Key tidak sah")
 
     def _tenant(self, headers: dict) -> str:
         key = headers.get("x-api-key", "")
@@ -94,7 +106,69 @@ class Api:
         if method == "GET" and path == "/v1/usage":
             return 200, {"usage": self.store.usage(self._tenant(h))}
 
+        # ---------------------------------------------------------- worker
+        if method == "POST" and path == "/v1/worker/claim":
+            self._worker(h)
+            job = self.store.claim_next_job(body.get("worker_id", ""), int(body.get("lease_seconds", 120)))
+            return 200, {"job": job}
+
+        m = JOB_HEARTBEAT_RE.match(path)
+        if method == "POST" and m:
+            self._worker(h)
+            job = self.store.heartbeat(body.get("worker_id", ""), m.group(1),
+                                       int(body.get("lease_seconds", 120)))
+            return 200, {"job": job}
+
+        m = JOB_COMPLETE_RE.match(path)
+        if method == "POST" and m:
+            self._worker(h)
+            return 200, {"job": self._complete(m.group(1), body)}
+
+        m = JOB_CANCEL_RE.match(path)
+        if method == "POST" and m:
+            tid = self._tenant(h)
+            return 200, {"job": self.store.request_cancel(tid, m.group(1))}
+
+        # --------------------------------------------------------- billing
+        if method == "GET" and path == "/v1/billing":
+            tid = self._tenant(h)
+            return 200, {"billing": self.store.billing.balance(tid),
+                         "invoices": self.store.billing.invoices(tid)}
+
+        if method == "GET" and path == "/v1/ledger":
+            tid = self._tenant(h)
+            return 200, {"ledger": self.store.billing.ledger(tid)}
+
+        if path == "/v1/invoices":
+            tid = self._tenant(h)
+            if method == "GET":
+                return 200, {"invoices": self.store.billing.invoices(tid)}
+            if method == "POST":
+                return 201, {"invoice": self.store.billing.issue_invoice(
+                    tid, body.get("period_start", ""), body.get("period_end", ""))}
+
+        if method == "POST" and path == "/v1/credits/topup":
+            self._admin(h)
+            return 201, {"entry": self.store.billing.topup(
+                body.get("tenant_id", ""), body.get("amount_microusd", 0), body.get("memo", "topup"))}
+
+        if method == "GET" and path == "/v1/admin/revenue":
+            self._admin(h)
+            return 200, {"revenue": self.store.billing.revenue()}
+
         raise ControlPlaneError(404, "not_found", f"rute tidak ada: {method} {path}")
+
+    def _complete(self, job_id: str, body: dict) -> dict:
+        worker_id = body.get("worker_id", "")
+        row = self.store.db.execute("SELECT tenant_id, lease_owner FROM jobs WHERE job_id = ?",
+                                    (job_id,)).fetchone()
+        if row is None:
+            raise ControlPlaneError(404, "job_not_found", "job tidak ditemukan")
+        if row["lease_owner"] != worker_id:
+            raise ControlPlaneError(409, "lease_lost", "job tidak sedang dipegang worker ini")
+        return self.store.finish_job(row["tenant_id"], job_id, body.get("status", ""),
+                                     int(body.get("tokens_used", -1)), body.get("gate_verdict"),
+                                     body.get("error"))
 
 
 def make_handler(api: Api):
@@ -128,11 +202,13 @@ def make_handler(api: Api):
                 with api.lock:
                     status, payload = api.handle(
                         method, self.path.split("?")[0], dict(self.headers.items()), body)
-            except ControlPlaneError as exc:
-                status, payload = exc.status, exc.as_dict()
-            except Exception as exc:  # fail-closed: jangan bocorkan stack trace ke klien
-                status, payload = 500, {"error": {"code": "internal_error",
-                                                  "message": type(exc).__name__}}
+            except Exception as exc:  # ControlPlaneError & BillingError berbagi bentuk status/code/message
+                if hasattr(exc, "status") and hasattr(exc, "code"):
+                    status = exc.status
+                    payload = {"error": {"code": exc.code, "message": exc.message}}
+                else:  # fail-closed: jangan bocorkan stack trace ke klien
+                    status, payload = 500, {"error": {"code": "internal_error",
+                                                      "message": type(exc).__name__}}
             self._send(status, payload)
 
         def do_GET(self) -> None:
@@ -147,8 +223,9 @@ def make_handler(api: Api):
     return Handler
 
 
-def serve(store: Store, admin_key: str, host: str = "127.0.0.1", port: int = 8088) -> ThreadingHTTPServer:
-    return ThreadingHTTPServer((host, port), make_handler(Api(store, admin_key)))
+def serve(store: Store, admin_key: str, host: str = "127.0.0.1", port: int = 8088,
+          worker_key: str | None = None) -> ThreadingHTTPServer:
+    return ThreadingHTTPServer((host, port), make_handler(Api(store, admin_key, worker_key)))
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -163,7 +240,11 @@ def main(argv: list[str] | None = None) -> int:
               "export SDB_ADMIN_KEY=$(python3 -c 'import secrets;print(secrets.token_urlsafe(32))')",
               file=sys.stderr)
         return 2
-    httpd = serve(Store(args.db), admin_key, args.host, args.port)
+    worker_key = os.environ.get("SDB_WORKER_KEY") or None
+    if worker_key and len(worker_key) < 24:
+        print("SDB_WORKER_KEY minimal 24 karakter", file=sys.stderr)
+        return 2
+    httpd = serve(Store(args.db), admin_key, args.host, args.port, worker_key)
     print(f"control plane: http://{args.host}:{args.port} (db {args.db})")
     try:
         httpd.serve_forever()

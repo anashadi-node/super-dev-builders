@@ -24,6 +24,15 @@ higiene). Aturan penempatan ada di `docs/PETA_STRUKTUR.md`, keputusannya di `doc
 | POST | `/v1/jobs/{id}/finish` | `X-API-Key` | tutup job + catat token terpakai |
 | GET/POST | `/v1/jobs/{id}/artifacts` | `X-API-Key` | daftar/baca artefak |
 | GET | `/v1/usage` | `X-API-Key` | pemakaian vs kuota bulan ini |
+| POST | `/v1/jobs/{id}/cancel` | `X-API-Key` | batal; antrean → langsung ditutup, berjalan → ditandai |
+| GET | `/v1/billing` | `X-API-Key` | saldo kredit, kredit tertahan, daftar invoice |
+| GET | `/v1/ledger` | `X-API-Key` | 100 entri ledger terakhir (ber-rantai hash) |
+| GET/POST | `/v1/invoices` | `X-API-Key` | daftar / terbitkan tagihan periode |
+| POST | `/v1/worker/claim` | `X-Worker-Key` | worker mengambil satu job (atomik) |
+| POST | `/v1/jobs/{id}/heartbeat` | `X-Worker-Key` | perpanjang lease |
+| POST | `/v1/jobs/{id}/complete` | `X-Worker-Key` | tutup job + tagih pemakaian |
+| POST | `/v1/credits/topup` | `X-Admin-Key` | tambah kredit tenant (μUSD) |
+| GET | `/v1/admin/revenue` | `X-Admin-Key` | total tagihan & jumlah job |
 
 Semua respons JSON. Galat selalu `{"error": {"code", "message"}}` dengan kode HTTP yang benar
 (401/402/403/404/409/413/422/500) — tidak pernah 200 untuk kegagalan.
@@ -41,12 +50,17 @@ Semua respons JSON. Galat selalu `{"error": {"code", "message"}}` dengan kode HT
 | Artefak wajib status redaksi | tanpa status → 400; `blocked` → 422 |
 | URI artefak wajib object store | `s3://` atau `artifact://`; path lokal ditolak |
 | Kuota penyimpanan | total byte artefak > plafon → **402 quota_storage_exceeded** |
+| Kredit prabayar | harga budget job di-hold saat dibuat; kredit kurang → **402 insufficient_credit** |
+| Penagihan | hanya `succeeded`/`budget_exceeded` yang ditagih; gagal/batal → hold dilepas |
+| Tagih ganda | `job_charges` unik per job; settle ulang tidak menambah biaya |
+| Ledger | append-only ber-rantai hash; `verify_chain()` mendeteksi suntingan |
 
 ## Yang sengaja BELUM ada (jangan diklaim ada)
 
 - autentikasi manusia/OAuth, RBAC per peran, SSO — sekarang hanya API key per tenant;
 - billing/pembayaran (kuota sudah ditegakkan, penagihan belum);
-- antrean worker dan eksekusi job — job dicatat, tidak dijalankan service ini;
+- eksekusi job di dalam service ini — worker adalah proses terpisah (`sdb_platform/runtime/`);
+- gateway pembayaran, pajak, proration upgrade, dunning;
 - Postgres, replikasi, rate limit per IP, audit log kriptografis;
 - isolasi eksekusi (sandbox kontainer) — baru *model* `pool|bridge|silo`.
 

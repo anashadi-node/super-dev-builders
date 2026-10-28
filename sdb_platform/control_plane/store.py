@@ -77,8 +77,11 @@ class Store:
             os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
         self.db = sqlite3.connect(path, check_same_thread=False)
         self.db.row_factory = sqlite3.Row
+        self.db.isolation_level = None  # transaksi eksplisit: BEGIN IMMEDIATE di jalur uang/kuota
         self.db.execute("PRAGMA foreign_keys = ON")
         self.migrate()
+        from .billing import Billing  # impor lokal: hindari siklus modul
+        self.billing = Billing(self.db)
 
     # ------------------------------------------------------------------ skema
     def migrate(self) -> None:
@@ -113,6 +116,7 @@ class Store:
               status TEXT NOT NULL,
               tokens_used INTEGER NOT NULL DEFAULT 0,
               gate_verdict TEXT,
+              hold_microusd INTEGER NOT NULL DEFAULT 0,
               created_at TEXT NOT NULL,
               finished_at TEXT,
               UNIQUE (tenant_id, idempotency_key)
@@ -149,12 +153,17 @@ class Store:
                 if k in limits:
                     _require(isinstance(limits[k], int) and limits[k] > 0, 400, "invalid_limits", f"{k} harus int > 0")
                     base[k] = limits[k]
+        from .billing import TRIAL_CREDIT
         self.db.execute(
-            "INSERT INTO tenants VALUES (?,?,?,?,?,?,?,?,?)",
+            "INSERT INTO tenants (tenant_id, name, plan, status, isolation, jobs_per_month,"
+            " tokens_per_month, storage_gb, created_at, credit_microusd, credit_held_microusd)"
+            " VALUES (?,?,?,?,?,?,?,?,?,0,0)",
             (tid, name, plan, "active", isolation, base["jobs_per_month"],
              base["tokens_per_month"], base["storage_gb"], utcnow()),
         )
         self.db.commit()
+        if TRIAL_CREDIT[plan]:
+            self.billing.grant_trial(tid, TRIAL_CREDIT[plan], f"kredit uji paket {plan}")
         return self.get_tenant(tid)
 
     def get_tenant(self, tenant_id: str) -> dict:
@@ -249,15 +258,24 @@ class Store:
         _require(use["tokens_remaining"] >= tokens, 402, "quota_tokens_exceeded",
                  f"sisa token {use['tokens_remaining']} < budget {tokens}")
 
+        from .billing import price_tokens
+        hold = price_tokens(tokens, tenant["plan"])
         jid = new_id("j")
-        self.db.execute(
-            "INSERT INTO jobs (job_id, tenant_id, type, pack_id, pack_version, target_ref, budget_tokens,"
-            " budget_seconds, idempotency_key, status, tokens_used, created_at)"
-            " VALUES (?,?,?,?,?,?,?,?,?,?,0,?)",
-            (jid, tenant_id, type, pack["id"], pack["version"], target_ref, tokens, seconds,
-             idempotency_key, "queued", utcnow()),
-        )
-        self.db.commit()
+        # Satu transaksi: batas kuota, baris job, dan pesanan kredit harus terlihat bersama atau tidak sama sekali.
+        self.db.execute("BEGIN IMMEDIATE")
+        try:
+            self.db.execute(
+                "INSERT INTO jobs (job_id, tenant_id, type, pack_id, pack_version, target_ref, budget_tokens,"
+                " budget_seconds, idempotency_key, status, tokens_used, hold_microusd, created_at)"
+                " VALUES (?,?,?,?,?,?,?,?,?,?,0,?,?)",
+                (jid, tenant_id, type, pack["id"], pack["version"], target_ref, tokens, seconds,
+                 idempotency_key, "queued", hold, utcnow()),
+            )
+            self.billing.reserve(tenant_id, jid, hold, f"hold {tokens} token @ {tenant['plan']}")
+            self.db.commit()
+        except Exception:
+            self.db.rollback()
+            raise
         return self.get_job(tenant_id, jid), False
 
     def _job_dict(self, row) -> dict:
@@ -269,6 +287,9 @@ class Store:
             "idempotency_key": row["idempotency_key"], "status": row["status"],
             "tokens_used": row["tokens_used"], "gate_verdict": row["gate_verdict"],
             "created_at": row["created_at"], "finished_at": row["finished_at"],
+            "attempts": row["attempts"] if "attempts" in row.keys() else 0,
+            "lease_owner": row["lease_owner"] if "lease_owner" in row.keys() else None,
+            "cancel_requested": bool(row["cancel_requested"]) if "cancel_requested" in row.keys() else False,
         }
 
     def get_job(self, tenant_id: str, job_id: str) -> dict:
@@ -279,19 +300,32 @@ class Store:
         return self._job_dict(row)
 
     def finish_job(self, tenant_id: str, job_id: str, status: str, tokens_used: int,
-                   gate_verdict: str | None = None) -> dict:
+                   gate_verdict: str | None = None, error: str | None = None) -> dict:
         _require(status in JOB_STATUS, 400, "invalid_status", "status tidak sah")
         _require(isinstance(tokens_used, int) and tokens_used >= 0, 400, "invalid_tokens",
                  "tokens_used harus int >= 0")
         job = self.get_job(tenant_id, job_id)
         _require(job["status"] in ("queued", "running"), 409, "job_closed", "job sudah selesai")
         final = "budget_exceeded" if tokens_used > job["budget"]["tokens"] else status
-        self.db.execute(
-            "UPDATE jobs SET status = ?, tokens_used = ?, gate_verdict = ?, finished_at = ?"
-            " WHERE job_id = ? AND tenant_id = ?",
-            (final, tokens_used, gate_verdict, utcnow(), job_id, tenant_id),
-        )
-        self.db.commit()
+        row = self.db.execute("SELECT hold_microusd FROM jobs WHERE job_id = ?", (job_id,)).fetchone()
+        hold = row["hold_microusd"] if row else 0
+        self.db.execute("BEGIN IMMEDIATE")
+        try:
+            self.db.execute(
+                "UPDATE jobs SET status = ?, tokens_used = ?, gate_verdict = ?, finished_at = ?,"
+                " lease_owner = NULL, lease_until = NULL, last_error = ?"
+                " WHERE job_id = ? AND tenant_id = ?",
+                (final, tokens_used, gate_verdict, utcnow(), error, job_id, tenant_id),
+            )
+            tenant = self.get_tenant(tenant_id)
+            if final in ("succeeded", "budget_exceeded"):
+                self.billing.settle(tenant_id, job_id, tokens_used, tenant["plan"], hold)
+            else:
+                self.billing.release(tenant_id, job_id, hold, f"job {final}")
+            self.db.commit()
+        except Exception:
+            self.db.rollback()
+            raise
         return self.get_job(tenant_id, job_id)
 
     # --------------------------------------------------------------- artefak
@@ -327,6 +361,81 @@ class Store:
         rows = self.db.execute("SELECT * FROM artifacts WHERE tenant_id = ? AND job_id = ?"
                               " ORDER BY created_at", (tenant_id, job_id)).fetchall()
         return [dict(r) for r in rows]
+
+    # ------------------------------------------------------- lease & antrean
+    def _lease_until(self, seconds: int) -> str:
+        return (dt.datetime.now(dt.timezone.utc) + dt.timedelta(seconds=seconds)).isoformat(timespec="seconds")
+
+    def claim_next_job(self, worker_id: str, lease_seconds: int = 120) -> dict | None:
+        """Ambil satu job antrean secara atomik. Dua worker tidak mungkin mendapat job yang sama."""
+        _require(isinstance(worker_id, str) and len(worker_id) >= 4, 400, "invalid_worker", "worker_id tidak sah")
+        self.db.execute("BEGIN IMMEDIATE")
+        try:
+            row = self.db.execute(
+                "SELECT tenant_id, job_id FROM jobs WHERE status = 'queued' AND cancel_requested = 0"
+                " ORDER BY created_at, job_id LIMIT 1").fetchone()
+            if row is None:
+                self.db.commit()
+                return None
+            cur = self.db.execute(
+                "UPDATE jobs SET status = 'running', lease_owner = ?, lease_until = ?, attempts = attempts + 1"
+                " WHERE job_id = ? AND status = 'queued'",
+                (worker_id, self._lease_until(lease_seconds), row["job_id"]))
+            if cur.rowcount != 1:  # kalah balapan: biarkan worker lain memilikinya
+                self.db.rollback()
+                return None
+            self.db.commit()
+        except Exception:
+            self.db.rollback()
+            raise
+        return self.get_job(row["tenant_id"], row["job_id"])
+
+    def heartbeat(self, worker_id: str, job_id: str, lease_seconds: int = 120) -> dict:
+        cur = self.db.execute(
+            "UPDATE jobs SET lease_until = ? WHERE job_id = ? AND lease_owner = ? AND status = 'running'",
+            (self._lease_until(lease_seconds), job_id, worker_id))
+        self.db.commit()
+        _require(cur.rowcount == 1, 409, "lease_lost", "lease bukan milik worker ini atau job sudah selesai")
+        row = self.db.execute("SELECT tenant_id FROM jobs WHERE job_id = ?", (job_id,)).fetchone()
+        return self.get_job(row["tenant_id"], job_id)
+
+    def reap_expired_leases(self, max_attempts: int = 3) -> list[dict]:
+        """Worker mati -> job dikembalikan ke antrean; setelah max_attempts -> failed + kredit dilepas."""
+        now = utcnow()
+        self.db.execute("BEGIN IMMEDIATE")
+        out: list[dict] = []
+        try:
+            rows = self.db.execute(
+                "SELECT job_id, tenant_id, attempts, hold_microusd FROM jobs"
+                " WHERE status = 'running' AND lease_until IS NOT NULL AND lease_until < ?", (now,)).fetchall()
+            for r in rows:
+                if r["attempts"] >= max_attempts:
+                    self.db.execute(
+                        "UPDATE jobs SET status = 'failed', last_error = 'lease_expired', finished_at = ?,"
+                        " lease_owner = NULL, lease_until = NULL WHERE job_id = ?", (now, r["job_id"]))
+                    self.billing.release(r["tenant_id"], r["job_id"], r["hold_microusd"], "lease_expired")
+                    out.append({"job_id": r["job_id"], "result": "failed"})
+                else:
+                    self.db.execute(
+                        "UPDATE jobs SET status = 'queued', lease_owner = NULL, lease_until = NULL,"
+                        " last_error = 'lease_expired_requeue' WHERE job_id = ?", (r["job_id"],))
+                    out.append({"job_id": r["job_id"], "result": "requeued"})
+            self.db.commit()
+        except Exception:
+            self.db.rollback()
+            raise
+        return out
+
+    def request_cancel(self, tenant_id: str, job_id: str) -> dict:
+        """Batal: job antrean langsung ditutup; job berjalan ditandai agar worker menutup sebagai cancelled."""
+        job = self.get_job(tenant_id, job_id)
+        if job["status"] == "queued":
+            return self.finish_job(tenant_id, job_id, "cancelled", 0, None, "cancelled_by_tenant")
+        _require(job["status"] == "running", 409, "job_closed", "job sudah selesai")
+        self.db.execute("UPDATE jobs SET cancel_requested = 1 WHERE job_id = ? AND tenant_id = ?",
+                        (job_id, tenant_id))
+        self.db.commit()
+        return self.get_job(tenant_id, job_id)
 
     def dump_tenant(self, tenant_id: str) -> str:
         """Ekspor penuh satu tenant (untuk uji isolasi & migrasi pool->silo)."""

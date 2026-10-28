@@ -49,6 +49,10 @@ check: lint lint-registry test drift hygiene packs
 packs:
 	$(PY_SYS) scripts/pack_build.py verify
 
+# Worker Fase 2b: kerjakan satu job dari antrean lokal.
+worker:
+	$(PY_SYS) -m sdb_platform.runtime.worker --db data/control.db --once
+
 # Control plane lokal (Fase 2). Butuh SDB_ADMIN_KEY >= 24 karakter.
 control-plane:
 	@test -n "$$SDB_ADMIN_KEY" || (echo "set SDB_ADMIN_KEY dulu (>=24 char)"; exit 2)

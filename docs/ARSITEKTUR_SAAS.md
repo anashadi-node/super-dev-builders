@@ -263,7 +263,8 @@ diaktifkan pelanggan sendiri, dengan `NOTICE` dan atribusi lengkap — atau gant
 | 0 | kontrak schema, peta struktur, gerbang higiene, ADR | **selesai** (`29a941d`) |
 | 1 | lisensi BUSL-1.1, NOTICE, pack manifest, arsip artefak keluar git | **selesai** (`e5db5ac`, `ea2792d`) |
 | 2a | control plane inti: tenant, kuota job/token/storage, job idempoten, artefak ber-redaksi | **selesai, teruji** (`sdb_platform/control_plane/`) |
-| 2b | worker/queue, eksekusi job, penagihan, RBAC, rate limit | belum |
+| 2b | worker ber-lease, penagihan prabayar (ledger ber-rantai hash), invoice | **selesai, teruji** |
+| 2c | gateway pembayaran, RBAC/SSO, rate limit, sandbox eksekusi, metrik | belum |
 | 3 | isolasi silo, multi-region, SLO produksi | belum |
 
 Yang sudah bisa dibuktikan sekarang: dua tenant tidak bisa saling membaca data, kuota menolak job ke-(limit+1),

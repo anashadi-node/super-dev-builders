@@ -29,6 +29,8 @@ tanggalnya menang — dan yang kalah **harus** dipindahkan ke `docs/archive/`, b
 | `adr/0002-artefak-di-object-store.md` | artefak keluar dari git |
 | `adr/0003-distribusi-skill-lewat-pack.md` | pack manifest, bukan salin-per-profil |
 | `adr/0004-kode-produk-di-sdb-platform.md` | kode produk di `sdb_platform/`, kontrak di `platform/` |
+| `adr/0005-billing-prabayar-ber-rantai-hash.md` | uang integer μUSD, hold/charge/release, ledger ber-rantai |
+| `adr/0006-worker-lease-dan-idempotensi.md` | klaim atomik, lease, penyelesaian tepat sekali |
 
 ## Kebijakan & keamanan
 

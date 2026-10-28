@@ -2,6 +2,49 @@
 
 Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/) dan [SemVer](https://semver.org/lang/id/).
 
+## [0.5.0] — 2026-10-29
+
+Fase 2b: produk bisa menagih dan pekerjaan benar-benar dijalankan. Masih **belum** ada gateway
+pembayaran, RBAC/SSO, sandbox eksekusi, dan antrean terdistribusi.
+
+### Added — billing (`sdb_platform/control_plane/billing.py`)
+
+- Uang integer **micro-USD** (1e-6 USD); harga per 1 juta token: starter $2,00 · pro $1,60 ·
+  team $1,20 · enterprise $1,00; pembulatan ke atas (tidak ada token gratis).
+- Prabayar: hold sebesar harga budget saat job dibuat; kredit kurang → `402 insufficient_credit`,
+  job tidak tercipta. Sukses → `charge` pemakaian nyata + sisa pesanan kembali; gagal/batal → `release`.
+- **Ledger append-only ber-rantai hash**; kredit uji dicatat entri `adjust` sehingga
+  `sum(amount) == saldo` dapat diuji; `verify_chain()` mendeteksi suntingan langsung di DB.
+- `settle` idempoten (`job_charges` PK `job_id`): retry tidak menagih dua kali.
+- Invoice periode: snapshot JSON kanonik + hash ber-rantai, idempoten per (tenant, periode),
+  `verify_invoice()` mendeteksi perubahan total di luar aplikasi.
+
+### Added — worker (`sdb_platform/runtime/worker.py`)
+
+- Klaim atomik (`BEGIN IMMEDIATE` + `UPDATE … WHERE status='queued'` + cek `rowcount`) — dua worker
+  paralel diuji: tepat satu yang menang.
+- Lease + heartbeat; lease kedaluwarsa → antre ulang; setelah `max_attempts` → `failed` + kredit dilepas.
+- Budget dua arah: token dipotong ke budget (`budget_exceeded`) dan wall-clock (`time.monotonic`).
+- Executor berupa fungsi murni `job -> ExecutionResult`; `echo_executor` untuk uji alur penuh.
+
+### Added — API
+
+`/v1/worker/claim` · `/v1/jobs/{id}/heartbeat` · `/v1/jobs/{id}/complete` (X-Worker-Key) ·
+`/v1/jobs/{id}/cancel` · `/v1/billing` · `/v1/ledger` · `/v1/invoices` · `/v1/credits/topup` (admin) ·
+`/v1/admin/revenue`.
+
+### Changed
+
+- `Store` memakai autocommit + transaksi eksplisit; pembuatan job kini satu transaksi bersama hold kredit.
+- Paket `runtime/` tanpa impor di `__init__` agar `python -m …worker` tidak memuat modul dua kali.
+
+### Catatan
+
+- Smoke end-to-end: hold 6.400 μUSD → 1.814 token → charge 2.903 μUSD → saldo 24.997.097/25.000.000
+  → invoice 2.903 μUSD (1 job).
+- Belum ada: pembayaran (kartu/VA), pajak, proration upgrade, dunning, prioritas antrean,
+  dead-letter queue, sandbox eksekusi, metrik Prometheus.
+
 ## [0.4.0] — 2026-10-29
 
 Rilis pertama yang **layak ditawarkan**: lisensi jelas, batas tenant ditegakkan mesin, artefak tidak lagi

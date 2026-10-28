@@ -494,6 +494,8 @@ def handle(h, method, send):
                 send(413, {"error": "terlalu besar"})
                 return True
             body = json.loads(h.rfile.read(n) or b"{}")
+            if not isinstance(body, dict):  # array/teks JSON -> body.get() akan AttributeError (500)
+                raise ValueError("body harus objek JSON")
 
         if route == "projects" and method == "GET":
             send(200, {"projects": [project_view(p) for p in registry()], "stages": [
@@ -529,5 +531,10 @@ def handle(h, method, send):
     except (ValueError, RuntimeError) as e:
         send(400, {"error": str(e)})
     except Exception as e:
-        send(500, {"error": "kesalahan server: " + str(e)[:160]})
+        # Jangan kirim str(e) ke klien (bisa memuat path/isi internal); catat lengkap di stderr.
+        import sys
+        import traceback
+        print(f"[ws_api] 500 {method} {route}: {type(e).__name__}", file=sys.stderr)
+        traceback.print_exc(file=sys.stderr)
+        send(500, {"error": f"kesalahan server ({type(e).__name__})"})
     return True

@@ -197,6 +197,7 @@ CTYPE = {"html": "text/html; charset=utf-8", "css": "text/css", "js": "text/java
 
 class Handler(BaseHTTPRequestHandler):
     server_version = "SDBDeck/1.0"
+    timeout = 30  # detik; tanpa ini satu klien lambat (slowloris) menahan thread selamanya
 
     def log_message(self, fmt, *args):  # quiet
         pass

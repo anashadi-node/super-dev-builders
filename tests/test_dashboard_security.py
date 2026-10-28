@@ -207,3 +207,19 @@ def test_static_ui_carries_csp(live):
     assert "default-src 'self'" in csp
     assert "object-src 'none'" in csp and "frame-ancestors 'none'" in csp and "base-uri 'none'" in csp
     assert "script-src 'self'" in csp
+
+
+# --- audit fundamental 29 Okt: D1-D3 ------------------------------------------------------
+@pytest.mark.parametrize("route", ["chat", "draft/approve", "stage/run"])
+def test_body_json_bukan_objek_400_tanpa_bocor_internal(live, route):
+    base, tok = live
+    req = urllib.request.Request(f"{base}/api/ws/{route}", data=b"[1,2]", method="POST",
+                                 headers={"X-SDB-Token": tok, "Content-Type": "application/json"})
+    with pytest.raises(urllib.error.HTTPError) as exc:
+        urllib.request.urlopen(req, timeout=5)
+    assert exc.value.code == 400
+    assert b"attribute" not in exc.value.read()
+
+
+def test_handler_punya_socket_timeout():
+    assert 0 < (server.Handler.timeout or 0) <= 60

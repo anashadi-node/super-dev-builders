@@ -15,6 +15,7 @@ import re
 import secrets
 import sys
 import threading
+import traceback
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from .store import ControlPlaneError, Store
@@ -26,6 +27,28 @@ JOB_CANCEL_RE = re.compile(r"^/v1/jobs/([A-Za-z0-9_]+)/cancel$")
 JOB_FINISH_RE = re.compile(r"^/v1/jobs/([A-Za-z0-9_]+)/finish$")
 JOB_RE = re.compile(r"^/v1/jobs/([A-Za-z0-9_]+)$")
 MAX_BODY = 256 * 1024
+SOCKET_TIMEOUT = 30  # detik; klien lambat (slowloris) tidak boleh menahan thread selamanya
+
+
+def _same(given: str, expected: str) -> bool:
+    """compare_digest pada bytes: dengan str, header non-ASCII melempar TypeError (=500)."""
+    return secrets.compare_digest(given.encode("utf-8", "surrogateescape"), expected.encode("utf-8"))
+
+
+def _obj(body: dict, key: str) -> dict:
+    value = body.get(key)
+    if value is None:
+        return {}
+    if not isinstance(value, dict):
+        raise ControlPlaneError(400, f"invalid_{key}", f"{key} harus objek JSON")
+    return value
+
+
+def _int(body: dict, key: str, default: int) -> int:
+    value = body.get(key, default)
+    if not isinstance(value, int) or isinstance(value, bool):
+        raise ControlPlaneError(400, f"invalid_{key}", f"{key} harus bilangan bulat")
+    return value
 
 
 class Api:
@@ -42,13 +65,13 @@ class Api:
         self.lock = threading.Lock()
 
     def _admin(self, headers: dict) -> None:
-        if not secrets.compare_digest(headers.get("x-admin-key", ""), self.admin_key):
+        if not _same(headers.get("x-admin-key", ""), self.admin_key):
             raise ControlPlaneError(401, "unauthorized", "X-Admin-Key tidak sah")
 
     def _worker(self, headers: dict) -> None:
         if not self.worker_key:
             raise ControlPlaneError(503, "worker_disabled", "endpoint worker tidak diaktifkan")
-        if not secrets.compare_digest(headers.get("x-worker-key", ""), self.worker_key):
+        if not _same(headers.get("x-worker-key", ""), self.worker_key):
             raise ControlPlaneError(401, "unauthorized", "X-Worker-Key tidak sah")
 
     def _tenant(self, headers: dict) -> str:
@@ -69,22 +92,23 @@ class Api:
             tenant = self.store.create_tenant(
                 plan=body.get("plan", ""), name=body.get("name"),
                 isolation=body.get("isolation", "pool"), limits=body.get("limits"))
+            # Kunci dibuat setelah tenant; kalau gagal, tenant tanpa kunci tidak berbahaya (admin bisa buat ulang).
             key = self.store.add_api_key(tenant["tenant_id"])
             return 201, {"tenant": tenant, "api_key": key}
 
         if method == "POST" and path == "/v1/jobs":
             tid = self._tenant(h)
             job, replayed = self.store.create_job(
-                tid, body.get("type", ""), body.get("pack") or {}, body.get("target_ref", ""),
-                body.get("budget") or {}, body.get("idempotency_key", ""))
+                tid, body.get("type", ""), _obj(body, "pack"), body.get("target_ref", ""),
+                _obj(body, "budget"), body.get("idempotency_key", ""))
             return (200 if replayed else 201), {"job": job, "replayed": replayed}
 
         m = JOB_FINISH_RE.match(path)
         if method == "POST" and m:
-            tid = self._tenant(h)
-            return 200, {"job": self.store.finish_job(
-                tid, m.group(1), body.get("status", ""), body.get("tokens_used", -1),
-                body.get("gate_verdict"))}
+            # Dicabut (v0.5.1): tenant yang menutup job sendiri bisa membatalkan tagihan atas kerja
+            # yang sedang dibayar worker. Penutupan hanya lewat worker (/complete) atau /cancel.
+            raise ControlPlaneError(410, "endpoint_removed",
+                                    "gunakan POST /v1/jobs/{id}/cancel; penyelesaian job dilakukan worker")
 
         m = JOB_ARTIFACTS_RE.match(path)
         if m:
@@ -109,14 +133,14 @@ class Api:
         # ---------------------------------------------------------- worker
         if method == "POST" and path == "/v1/worker/claim":
             self._worker(h)
-            job = self.store.claim_next_job(body.get("worker_id", ""), int(body.get("lease_seconds", 120)))
+            job = self.store.claim_next_job(body.get("worker_id", ""), _int(body, "lease_seconds", 120))
             return 200, {"job": job}
 
         m = JOB_HEARTBEAT_RE.match(path)
         if method == "POST" and m:
             self._worker(h)
             job = self.store.heartbeat(body.get("worker_id", ""), m.group(1),
-                                       int(body.get("lease_seconds", 120)))
+                                       _int(body, "lease_seconds", 120))
             return 200, {"job": job}
 
         m = JOB_COMPLETE_RE.match(path)
@@ -139,13 +163,18 @@ class Api:
             tid = self._tenant(h)
             return 200, {"ledger": self.store.billing.ledger(tid)}
 
-        if path == "/v1/invoices":
-            tid = self._tenant(h)
-            if method == "GET":
-                return 200, {"invoices": self.store.billing.invoices(tid)}
-            if method == "POST":
-                return 201, {"invoice": self.store.billing.issue_invoice(
-                    tid, body.get("period_start", ""), body.get("period_end", ""))}
+        if method == "GET" and path == "/v1/invoices":
+            return 200, {"invoices": self.store.billing.invoices(self._tenant(h))}
+
+        if method == "POST" and path == "/v1/admin/invoices":
+            # Penerbitan invoice = peran admin. Kalau tenant boleh menerbitkan, ia bisa memesan periode
+            # aneh lebih dulu sehingga invoice bulanan resmi tertolak karena tumpang-tindih.
+            self._admin(h)
+            tid = body.get("tenant_id", "")
+            if not isinstance(tid, str):
+                raise ControlPlaneError(400, "invalid_tenant_id", "tenant_id harus teks")
+            inv = self.store.billing.issue_invoice(tid, body.get("period_start", ""), body.get("period_end", ""))
+            return (200 if inv.get("replayed") else 201), {"invoice": inv}
 
         if method == "POST" and path == "/v1/credits/topup":
             self._admin(h)
@@ -160,44 +189,60 @@ class Api:
 
     def _complete(self, job_id: str, body: dict) -> dict:
         worker_id = body.get("worker_id", "")
-        row = self.store.db.execute("SELECT tenant_id, lease_owner FROM jobs WHERE job_id = ?",
-                                    (job_id,)).fetchone()
+        if not isinstance(worker_id, str) or not worker_id:
+            raise ControlPlaneError(400, "invalid_worker", "worker_id wajib")
+        row = self.store.db.execute("SELECT tenant_id FROM jobs WHERE job_id = ?", (job_id,)).fetchone()
         if row is None:
             raise ControlPlaneError(404, "job_not_found", "job tidak ditemukan")
-        if row["lease_owner"] != worker_id:
-            raise ControlPlaneError(409, "lease_lost", "job tidak sedang dipegang worker ini")
+        # Pemeriksaan pemilik lease dilakukan DI DALAM transaksi finish_job (bukan di sini) agar
+        # tidak ada celah antara cek dan tulis.
         return self.store.finish_job(row["tenant_id"], job_id, body.get("status", ""),
-                                     int(body.get("tokens_used", -1)), body.get("gate_verdict"),
-                                     body.get("error"))
+                                     _int(body, "tokens_used", -1), body.get("gate_verdict"),
+                                     body.get("error"), worker_id=worker_id)
 
 
 def make_handler(api: Api):
     class Handler(BaseHTTPRequestHandler):
         protocol_version = "HTTP/1.1"
-        server_version = "sdb-control-plane/0.1"
+        server_version = "sdb-control-plane/0.5"
+        timeout = SOCKET_TIMEOUT
 
         def _read_body(self) -> dict | None:
-            length = int(self.headers.get("Content-Length") or 0)
-            if length <= 0:
+            raw_len = self.headers.get("Content-Length") or "0"
+            if not raw_len.isdigit():
+                self.close_connection = True  # panjang tak dikenal: sisa body tidak bisa dibuang dengan aman
+                raise ControlPlaneError(400, "invalid_content_length", "Content-Length tidak sah")
+            length = int(raw_len)
+            if length == 0:
                 return None
             if length > MAX_BODY:
+                self.close_connection = True
                 raise ControlPlaneError(413, "body_too_large", "body melebihi 256 KB")
             raw = self.rfile.read(length)
             try:
-                return json.loads(raw.decode("utf-8"))
+                data = json.loads(raw.decode("utf-8"))
             except (UnicodeDecodeError, json.JSONDecodeError):
-                raise ControlPlaneError(400, "invalid_json", "body bukan JSON yang sah")
+                raise ControlPlaneError(400, "invalid_json", "body bukan JSON yang sah") from None
+            if not isinstance(data, dict):
+                raise ControlPlaneError(400, "invalid_json", "body harus objek JSON")
+            return data
 
         def _send(self, status: int, payload: dict) -> None:
             data = json.dumps(payload, ensure_ascii=False).encode()
             self.send_response(status)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Content-Length", str(len(data)))
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("X-Content-Type-Options", "nosniff")
+            if self.close_connection:
+                self.send_header("Connection", "close")
             self.end_headers()
             self.wfile.write(data)
 
         def _handle(self, method: str) -> None:
             try:
+                if method != "POST" and (self.headers.get("Content-Length") or "0") != "0":
+                    self.close_connection = True  # body GET tidak dibaca: jangan pakai ulang koneksi
                 body = self._read_body() if method == "POST" else None
                 with api.lock:
                     status, payload = api.handle(
@@ -206,9 +251,12 @@ def make_handler(api: Api):
                 if hasattr(exc, "status") and hasattr(exc, "code"):
                     status = exc.status
                     payload = {"error": {"code": exc.code, "message": exc.message}}
-                else:  # fail-closed: jangan bocorkan stack trace ke klien
+                else:  # fail-closed: jangan bocorkan stack trace ke klien, tapi catat untuk operator
                     status, payload = 500, {"error": {"code": "internal_error",
                                                       "message": type(exc).__name__}}
+                    # Hanya method + path + traceback; header/body tidak dicatat (bisa memuat kunci).
+                    print(f"[control-plane] 500 {method} {self.path.split('?')[0]}", file=sys.stderr)
+                    traceback.print_exc(file=sys.stderr)
             self._send(status, payload)
 
         def do_GET(self) -> None:
@@ -225,7 +273,9 @@ def make_handler(api: Api):
 
 def serve(store: Store, admin_key: str, host: str = "127.0.0.1", port: int = 8088,
           worker_key: str | None = None) -> ThreadingHTTPServer:
-    return ThreadingHTTPServer((host, port), make_handler(Api(store, admin_key, worker_key)))
+    httpd = ThreadingHTTPServer((host, port), make_handler(Api(store, admin_key, worker_key)))
+    httpd.daemon_threads = True  # thread koneksi tidak menahan proses saat shutdown
+    return httpd
 
 
 def main(argv: list[str] | None = None) -> int:

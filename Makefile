@@ -51,7 +51,7 @@ packs:
 
 # Worker Fase 2b: kerjakan satu job dari antrean lokal.
 worker:
-	$(PY_SYS) -m sdb_platform.runtime.worker --db data/control.db --once
+	SDB_ALLOW_ECHO_EXECUTOR=1 $(PY_SYS) -m sdb_platform.runtime.worker --db data/control.db --once --executor echo
 
 # Control plane lokal (Fase 2). Butuh SDB_ADMIN_KEY >= 24 karakter.
 control-plane:

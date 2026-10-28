@@ -29,6 +29,10 @@ ARTIFACT_KINDS = ("evidence", "capture", "report", "log", "sarif", "sbom", "diff
 REDACTION = ("clean", "redacted", "blocked")
 MAX_TOKENS = 2_000_000
 MAX_SECONDS = 14_400
+LEASE_MIN, LEASE_MAX = 10, 3600
+# Status penutup. 'queued'/'running' sengaja tidak termasuk: menutup job ke status antrean
+# membuat job_charges terisi lalu worker mengerjakannya lagi tanpa tagihan.
+FINAL_STATUS = ("succeeded", "failed", "blocked", "budget_exceeded", "cancelled")
 ULID_RE = re.compile(r"^[0-9A-HJKMNP-TV-Z]{26}$")
 SHA_RE = re.compile(r"^[a-f0-9]{64}$")
 
@@ -68,6 +72,24 @@ def utcnow() -> str:
 def _require(cond: bool, status: int, code: str, msg: str) -> None:
     if not cond:
         raise ControlPlaneError(status, code, msg)
+
+
+def _is_int(value) -> bool:
+    """bool adalah subclass int di Python; True tidak boleh lolos sebagai angka 1."""
+    return isinstance(value, int) and not isinstance(value, bool)
+
+
+def parse_ts(value, field: str) -> dt.datetime:
+    """ISO-8601 -> datetime UTC. Tanggal saja = 00:00 UTC; tanpa zona = UTC; 'Z' diterima."""
+    _require(isinstance(value, str) and 10 <= len(value) <= 40, 400, f"invalid_{field}",
+             f"{field} wajib ISO-8601")
+    try:
+        parsed = dt.datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        raise ControlPlaneError(400, f"invalid_{field}", f"{field} bukan tanggal ISO-8601") from None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=dt.timezone.utc)
+    return parsed.astimezone(dt.timezone.utc)
 
 
 class Store:
@@ -137,6 +159,7 @@ class Store:
               created_at TEXT NOT NULL
             );
             CREATE INDEX IF NOT EXISTS idx_jobs_tenant ON jobs(tenant_id, created_at);
+            CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(status, tenant_id);
             CREATE INDEX IF NOT EXISTS idx_artifacts_tenant ON artifacts(tenant_id, job_id);
             """
         )
@@ -147,13 +170,17 @@ class Store:
                       limits: dict | None = None, tenant_id: str | None = None) -> dict:
         _require(plan in PLANS, 400, "invalid_plan", f"plan harus salah satu {PLANS}")
         _require(isolation in ISOLATION, 400, "invalid_isolation", f"isolation harus salah satu {ISOLATION}")
+        _require(name is None or (isinstance(name, str) and len(name) <= 200), 400, "invalid_name",
+                 "name harus teks <= 200 karakter")
+        _require(limits is None or isinstance(limits, dict), 400, "invalid_limits", "limits harus objek")
         tid = tenant_id or new_id("t")
-        _require(bool(ULID_RE.match(tid.split("_", 1)[-1])), 400, "invalid_tenant_id", "tenant_id harus ULID")
+        _require(isinstance(tid, str) and tid.startswith("t_") and bool(ULID_RE.match(tid[2:])), 400,
+                 "invalid_tenant_id", "tenant_id harus t_<ULID>")
         base = dict(PLAN_LIMITS[plan])
         if limits:
             for k in ("jobs_per_month", "tokens_per_month", "storage_gb"):
                 if k in limits:
-                    _require(isinstance(limits[k], int) and limits[k] > 0, 400, "invalid_limits", f"{k} harus int > 0")
+                    _require(_is_int(limits[k]) and limits[k] > 0, 400, "invalid_limits", f"{k} harus int > 0")
                     base[k] = limits[k]
         from .billing import TRIAL_CREDIT
         self.db.execute(
@@ -178,18 +205,32 @@ class Store:
         self.get_tenant(tenant_id)
         self.db.execute("UPDATE tenants SET status = ? WHERE tenant_id = ?", (status, tenant_id))
         self.db.commit()
+        if status == "deleted":
+            # Tenant dihapus: job antrean ditutup + kredit dilepas; job berjalan diminta berhenti.
+            for row in self.db.execute("SELECT job_id FROM jobs WHERE tenant_id = ? AND status = 'queued'",
+                                       (tenant_id,)).fetchall():
+                self.finish_job(tenant_id, row["job_id"], "cancelled", 0, None, "tenant_deleted",
+                                expect=("queued",))
+            self.db.execute("UPDATE jobs SET cancel_requested = 1 WHERE tenant_id = ? AND status = 'running'",
+                            (tenant_id,))
+            self.db.commit()
         return self.get_tenant(tenant_id)
 
     def add_api_key(self, tenant_id: str, key: str | None = None) -> str:
         self.get_tenant(tenant_id)
         raw = key or secrets.token_urlsafe(32)
-        _require(len(raw) >= 24, 400, "weak_key", "API key minimal 24 karakter")
-        self.db.execute("INSERT OR REPLACE INTO api_keys VALUES (?,?,?)",
-                        (hashlib.sha256(raw.encode()).hexdigest(), tenant_id, utcnow()))
-        self.db.commit()
+        _require(isinstance(raw, str) and len(raw) >= 24, 400, "weak_key", "API key minimal 24 karakter")
+        try:
+            # INSERT biasa, bukan OR REPLACE: kunci yang sama tidak boleh berpindah ke tenant lain.
+            self.db.execute("INSERT INTO api_keys VALUES (?,?,?)",
+                            (hashlib.sha256(raw.encode()).hexdigest(), tenant_id, utcnow()))
+            self.db.commit()
+        except sqlite3.IntegrityError:
+            raise ControlPlaneError(409, "key_exists", "API key sudah terdaftar") from None
         return raw
 
     def tenant_for_key(self, key: str) -> str:
+        _require(isinstance(key, str) and 0 < len(key) <= 256, 401, "unauthorized", "API key tidak dikenal")
         row = self.db.execute("SELECT tenant_id FROM api_keys WHERE key_hash = ?",
                               (hashlib.sha256(key.encode()).hexdigest(),)).fetchone()
         _require(row is not None, 401, "unauthorized", "API key tidak dikenal")
@@ -232,40 +273,51 @@ class Store:
                    budget: dict, idempotency_key: str) -> tuple[dict, bool]:
         tenant = self.get_tenant(tenant_id)
         _require(tenant["status"] == "active", 403, "tenant_inactive", "tenant tidak aktif")
-        _require(type in JOB_TYPES, 400, "invalid_type", f"type harus salah satu {JOB_TYPES}")
-        _require(bool(re.match(r"^[a-z][a-z0-9-]{1,40}$", str(pack.get("id", "")))), 400,
-                 "invalid_pack", "pack.id tidak sah")
-        _require(bool(re.match(r"^\d+\.\d+\.\d+$", str(pack.get("version", "")))), 400,
-                 "invalid_pack", "pack.version harus semver")
-        _require(bool(re.match(r"^(artifact|git|upload)://", target_ref or "")), 400,
-                 "invalid_target", "target_ref harus artifact:// git:// atau upload://")
-        _require(isinstance(idempotency_key, str) and len(idempotency_key) >= 8, 400,
-                 "invalid_idempotency_key", "idempotency_key minimal 8 karakter")
+        _require(isinstance(type, str) and type in JOB_TYPES, 400, "invalid_type",
+                 f"type harus salah satu {JOB_TYPES}")
+        _require(isinstance(pack, dict), 400, "invalid_pack", "pack harus objek {id, version}")
+        _require(isinstance(budget, dict), 400, "invalid_budget", "budget harus objek {tokens, seconds}")
+        _require(isinstance(pack.get("id"), str) and bool(re.fullmatch(r"[a-z][a-z0-9-]{1,40}", pack["id"])),
+                 400, "invalid_pack", "pack.id tidak sah")
+        _require(isinstance(pack.get("version"), str) and bool(re.fullmatch(r"\d+\.\d+\.\d+", pack["version"])),
+                 400, "invalid_pack", "pack.version harus semver")
+        _require(isinstance(target_ref, str) and len(target_ref) <= 2048
+                 and bool(re.match(r"^(artifact|git|upload)://\S+$", target_ref)), 400,
+                 "invalid_target", "target_ref harus artifact:// git:// atau upload:// (tanpa spasi, <= 2048)")
+        _require(isinstance(idempotency_key, str) and 8 <= len(idempotency_key) <= 128, 400,
+                 "invalid_idempotency_key", "idempotency_key 8..128 karakter")
         tokens = budget.get("tokens")
         seconds = budget.get("seconds")
-        _require(isinstance(tokens, int) and 1000 <= tokens <= MAX_TOKENS, 400, "invalid_budget",
+        _require(_is_int(tokens) and 1000 <= tokens <= MAX_TOKENS, 400, "invalid_budget",
                  f"budget.tokens harus 1000..{MAX_TOKENS}")
-        _require(isinstance(seconds, int) and 60 <= seconds <= MAX_SECONDS, 400, "invalid_budget",
+        _require(_is_int(seconds) and 60 <= seconds <= MAX_SECONDS, 400, "invalid_budget",
                  f"budget.seconds harus 60..{MAX_SECONDS}")
-
-        existing = self.db.execute(
-            "SELECT * FROM jobs WHERE tenant_id = ? AND idempotency_key = ?",
-            (tenant_id, idempotency_key)).fetchone()
-        if existing:
-            return self._job_dict(existing), True
-
-        use = self.usage(tenant_id)
-        _require(use["jobs_used"] < use["jobs_limit"], 402, "quota_jobs_exceeded",
-                 f"kuota job bulan ini habis ({use['jobs_used']}/{use['jobs_limit']})")
-        _require(use["tokens_remaining"] >= tokens, 402, "quota_tokens_exceeded",
-                 f"sisa token {use['tokens_remaining']} < budget {tokens}")
 
         from .billing import price_tokens
         hold = price_tokens(tokens, tenant["plan"])
-        jid = new_id("j")
-        # Satu transaksi: batas kuota, baris job, dan pesanan kredit harus terlihat bersama atau tidak sama sekali.
+        # SATU transaksi untuk cek idempotensi, cek kuota, INSERT job, dan hold kredit.
+        # Kalau cek dilakukan di luar transaksi, dua proses bisa sama-sama lolos kuota
+        # atau sama-sama menyisipkan kunci yang sama (IntegrityError -> 500).
         self.db.execute("BEGIN IMMEDIATE")
         try:
+            existing = self.db.execute(
+                "SELECT * FROM jobs WHERE tenant_id = ? AND idempotency_key = ?",
+                (tenant_id, idempotency_key)).fetchone()
+            if existing:
+                self.db.commit()
+                same = (existing["type"], existing["pack_id"], existing["pack_version"], existing["target_ref"],
+                        existing["budget_tokens"], existing["budget_seconds"]) == (
+                        type, pack["id"], pack["version"], target_ref, tokens, seconds)
+                # Kunci sama + isi beda = bug klien; diam-diam mengembalikan job lama menyesatkan.
+                _require(same, 409, "idempotency_conflict",
+                         "idempotency_key sudah dipakai untuk permintaan dengan isi berbeda")
+                return self._job_dict(existing), True
+            use = self.usage(tenant_id)
+            _require(use["jobs_used"] < use["jobs_limit"], 402, "quota_jobs_exceeded",
+                     f"kuota job bulan ini habis ({use['jobs_used']}/{use['jobs_limit']})")
+            _require(use["tokens_remaining"] >= tokens, 402, "quota_tokens_exceeded",
+                     f"sisa token {use['tokens_remaining']} < budget {tokens}")
+            jid = new_id("j")
             self.db.execute(
                 "INSERT INTO jobs (job_id, tenant_id, type, pack_id, pack_version, target_ref, budget_tokens,"
                 " budget_seconds, idempotency_key, status, tokens_used, hold_microusd, created_at)"
@@ -276,7 +328,8 @@ class Store:
             self.billing.reserve(tenant_id, jid, hold, f"hold {tokens} token @ {tenant['plan']}")
             self.db.commit()
         except Exception:
-            self.db.rollback()
+            if self.db.in_transaction:
+                self.db.rollback()
             raise
         return self.get_job(tenant_id, jid), False
 
@@ -302,31 +355,49 @@ class Store:
         return self._job_dict(row)
 
     def finish_job(self, tenant_id: str, job_id: str, status: str, tokens_used: int,
-                   gate_verdict: str | None = None, error: str | None = None) -> dict:
-        _require(status in JOB_STATUS, 400, "invalid_status", "status tidak sah")
-        _require(isinstance(tokens_used, int) and tokens_used >= 0, 400, "invalid_tokens",
-                 "tokens_used harus int >= 0")
-        job = self.get_job(tenant_id, job_id)
-        _require(job["status"] in ("queued", "running"), 409, "job_closed", "job sudah selesai")
-        final = "budget_exceeded" if tokens_used > job["budget"]["tokens"] else status
-        row = self.db.execute("SELECT hold_microusd FROM jobs WHERE job_id = ?", (job_id,)).fetchone()
-        hold = row["hold_microusd"] if row else 0
+                   gate_verdict: str | None = None, error: str | None = None, *,
+                   worker_id: str | None = None, expect: tuple = ("queued", "running")) -> dict:
+        """Tutup job + selesaikan uangnya, atomik.
+
+        - `status` wajib status penutup (FINAL_STATUS).
+        - `worker_id` diisi -> hanya pemegang lease yang boleh menutup (worker lambat yang lease-nya
+          sudah diambil worker lain ditolak 409 `lease_lost`).
+        - `expect` membatasi status asal; cek dan UPDATE terjadi di dalam satu `BEGIN IMMEDIATE`
+          sehingga dua penutup bersamaan tidak bisa sama-sama lolos.
+        - Uang: succeeded/budget_exceeded -> tagih pemakaian; cancelled dengan token terpakai ->
+          tagih pemakaian (pembatalan pilihan tenant, biaya sudah terjadi); selain itu -> lepas pesanan.
+        """
+        _require(status in FINAL_STATUS, 400, "invalid_status", f"status penutup harus salah satu {FINAL_STATUS}")
+        _require(_is_int(tokens_used) and tokens_used >= 0, 400, "invalid_tokens", "tokens_used harus int >= 0")
+        _require(gate_verdict is None or (isinstance(gate_verdict, str) and len(gate_verdict) <= 64), 400,
+                 "invalid_gate_verdict", "gate_verdict maksimal 64 karakter")
+        error = None if error is None else str(error)[:500]
         self.db.execute("BEGIN IMMEDIATE")
         try:
+            row = self.db.execute("SELECT * FROM jobs WHERE job_id = ? AND tenant_id = ?",
+                                  (job_id, tenant_id)).fetchone()
+            _require(row is not None, 404, "job_not_found", "job tidak ditemukan")
+            if worker_id is not None:
+                _require(row["status"] == "running" and row["lease_owner"] == worker_id, 409, "lease_lost",
+                         "job tidak sedang dipegang worker ini")
+            _require(row["status"] in expect, 409, "job_closed",
+                     f"job berstatus {row['status']}, tidak bisa ditutup dari sini")
+            final = "budget_exceeded" if tokens_used > row["budget_tokens"] else status
             self.db.execute(
                 "UPDATE jobs SET status = ?, tokens_used = ?, gate_verdict = ?, finished_at = ?,"
                 " lease_owner = NULL, lease_until = NULL, last_error = ?"
                 " WHERE job_id = ? AND tenant_id = ?",
                 (final, tokens_used, gate_verdict, utcnow(), error, job_id, tenant_id),
             )
-            tenant = self.get_tenant(tenant_id)
-            if final in ("succeeded", "budget_exceeded"):
-                self.billing.settle(tenant_id, job_id, tokens_used, tenant["plan"], hold)
+            plan = self.get_tenant(tenant_id)["plan"]
+            if final in ("succeeded", "budget_exceeded") or (final == "cancelled" and tokens_used > 0):
+                self.billing.settle(tenant_id, job_id, tokens_used, plan, row["hold_microusd"])
             else:
-                self.billing.release(tenant_id, job_id, hold, f"job {final}")
+                self.billing.release(tenant_id, job_id, row["hold_microusd"], f"job {final}")
             self.db.commit()
         except Exception:
-            self.db.rollback()
+            if self.db.in_transaction:
+                self.db.rollback()
             raise
         return self.get_job(tenant_id, job_id)
 
@@ -335,28 +406,46 @@ class Store:
                           redaction_status: str, retention_until: str, uri: str,
                           media_type: str | None = None) -> dict:
         self.get_job(tenant_id, job_id)
-        _require(kind in ARTIFACT_KINDS, 400, "invalid_kind", f"kind harus salah satu {ARTIFACT_KINDS}")
-        _require(bool(SHA_RE.match(sha256 or "")), 400, "invalid_sha256", "sha256 harus 64 hex huruf kecil")
-        _require(isinstance(size, int) and size >= 0, 400, "invalid_size", "size harus int >= 0")
-        _require(redaction_status in REDACTION, 400, "invalid_redaction",
+        _require(isinstance(kind, str) and kind in ARTIFACT_KINDS, 400, "invalid_kind",
+                 f"kind harus salah satu {ARTIFACT_KINDS}")
+        _require(isinstance(sha256, str) and bool(SHA_RE.match(sha256)), 400, "invalid_sha256",
+                 "sha256 harus 64 hex huruf kecil")
+        _require(_is_int(size) and size >= 0, 400, "invalid_size", "size harus int >= 0")
+        _require(isinstance(redaction_status, str) and redaction_status in REDACTION, 400, "invalid_redaction",
                  "redaction_status wajib clean|redacted|blocked")
         _require(redaction_status != "blocked", 422, "artifact_blocked",
                  "artefak berstatus blocked tidak boleh didaftarkan")
-        _require(isinstance(retention_until, str) and len(retention_until) >= 10, 400,
-                 "invalid_retention", "retention_until wajib ISO-8601")
-        _require(bool(re.match(r"^(s3|artifact)://", uri or "")), 400, "invalid_uri",
-                 "uri harus s3:// atau artifact://")
-        use = self.usage(tenant_id)
-        _require(use["storage_bytes"] + size <= use["storage_limit_bytes"], 402,
-                 "quota_storage_exceeded", "kuota penyimpanan habis")
+        retention = parse_ts(retention_until, "retention")
+        _require(retention > dt.datetime.now(dt.timezone.utc), 400, "invalid_retention",
+                 "retention_until harus di masa depan")
+        # URI wajib berada di ruang tenant ini: s3://<bucket>/<tenant_id>/... atau artifact://<tenant_id>/...
+        # Tanpa ini tenant A bisa mencatat objek milik tenant B sebagai artefaknya; begitu unduhan/presign
+        # (ADR-0002) dibangun, catatan itu menjadi jalur baca lintas tenant.
+        tid = re.escape(tenant_id)
+        _require(isinstance(uri, str) and len(uri) <= 1024 and ".." not in uri.split("/")
+                 and bool(re.fullmatch(rf"(s3://[a-z0-9][a-z0-9.-]{{1,61}}[a-z0-9]/{tid}|artifact://{tid})/[^\s]+",
+                                       uri)), 400, "invalid_uri",
+                 "uri harus s3://<bucket>/<tenant_id>/... atau artifact://<tenant_id>/...")
+        _require(media_type is None or (isinstance(media_type, str) and len(media_type) <= 100), 400,
+                 "invalid_media_type", "media_type maksimal 100 karakter")
+        retention_iso = retention.isoformat(timespec="seconds")
         aid = new_id("a")
-        self.db.execute("INSERT INTO artifacts VALUES (?,?,?,?,?,?,?,?,?,?,?)",
-                        (aid, tenant_id, job_id, kind, sha256, size, redaction_status,
-                         retention_until, uri, media_type, utcnow()))
-        self.db.commit()
+        self.db.execute("BEGIN IMMEDIATE")  # cek kuota + INSERT harus atomik (dua unggahan bersamaan)
+        try:
+            use = self.usage(tenant_id)
+            _require(use["storage_bytes"] + size <= use["storage_limit_bytes"], 402,
+                     "quota_storage_exceeded", "kuota penyimpanan habis")
+            self.db.execute("INSERT INTO artifacts VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+                            (aid, tenant_id, job_id, kind, sha256, size, redaction_status,
+                             retention_iso, uri, media_type, utcnow()))
+            self.db.commit()
+        except Exception:
+            if self.db.in_transaction:
+                self.db.rollback()
+            raise
         return {"artifact_id": aid, "tenant_id": tenant_id, "job_id": job_id, "kind": kind,
                 "sha256": sha256, "size": size, "redaction_status": redaction_status,
-                "retention_until": retention_until, "uri": uri, "media_type": media_type}
+                "retention_until": retention_iso, "uri": uri, "media_type": media_type}
 
     def list_artifacts(self, tenant_id: str, job_id: str) -> list[dict]:
         self.get_job(tenant_id, job_id)
@@ -366,23 +455,33 @@ class Store:
 
     # ------------------------------------------------------- lease & antrean
     def _lease_until(self, seconds: int) -> str:
+        _require(_is_int(seconds) and LEASE_MIN <= seconds <= LEASE_MAX, 400, "invalid_lease",
+                 f"lease_seconds harus int {LEASE_MIN}..{LEASE_MAX}")
         return (dt.datetime.now(dt.timezone.utc) + dt.timedelta(seconds=seconds)).isoformat(timespec="seconds")
 
     def claim_next_job(self, worker_id: str, lease_seconds: int = 120) -> dict | None:
         """Ambil satu job antrean secara atomik. Dua worker tidak mungkin mendapat job yang sama."""
-        _require(isinstance(worker_id, str) and len(worker_id) >= 4, 400, "invalid_worker", "worker_id tidak sah")
+        _require(isinstance(worker_id, str) and 4 <= len(worker_id) <= 128, 400, "invalid_worker",
+                 "worker_id 4..128 karakter")
+        lease_until = self._lease_until(lease_seconds)
         self.db.execute("BEGIN IMMEDIATE")
         try:
             row = self.db.execute(
-                "SELECT tenant_id, job_id FROM jobs WHERE status = 'queued' AND cancel_requested = 0"
-                " ORDER BY created_at, job_id LIMIT 1").fetchone()
+                # Hanya tenant aktif: tenant suspended tidak boleh terus membakar biaya LLM.
+                # Fair-share: tenant dengan job berjalan paling sedikit didahulukan, baru FIFO.
+                # Tanpa ini satu tenant yang mengantre 1.000 job membuat semua tenant lain menunggu.
+                # Tiebreak rowid (urutan sisip), bukan job_id (acak) -> FIFO deterministik.
+                "SELECT j.tenant_id, j.job_id FROM jobs j JOIN tenants t ON t.tenant_id = j.tenant_id"
+                " WHERE j.status = 'queued' AND j.cancel_requested = 0 AND t.status = 'active'"
+                " ORDER BY (SELECT COUNT(*) FROM jobs r WHERE r.tenant_id = j.tenant_id"
+                "           AND r.status = 'running'), j.created_at, j.rowid LIMIT 1").fetchone()
             if row is None:
                 self.db.commit()
                 return None
             cur = self.db.execute(
                 "UPDATE jobs SET status = 'running', lease_owner = ?, lease_until = ?, attempts = attempts + 1"
                 " WHERE job_id = ? AND status = 'queued'",
-                (worker_id, self._lease_until(lease_seconds), row["job_id"]))
+                (worker_id, lease_until, row["job_id"]))
             if cur.rowcount != 1:  # kalah balapan: biarkan worker lain memilikinya
                 self.db.rollback()
                 return None
@@ -393,6 +492,7 @@ class Store:
         return self.get_job(row["tenant_id"], row["job_id"])
 
     def heartbeat(self, worker_id: str, job_id: str, lease_seconds: int = 120) -> dict:
+        _require(isinstance(worker_id, str) and isinstance(job_id, str), 400, "invalid_worker", "worker_id tidak sah")
         cur = self.db.execute(
             "UPDATE jobs SET lease_until = ? WHERE job_id = ? AND lease_owner = ? AND status = 'running'",
             (self._lease_until(lease_seconds), job_id, worker_id))
@@ -408,10 +508,19 @@ class Store:
         out: list[dict] = []
         try:
             rows = self.db.execute(
-                "SELECT job_id, tenant_id, attempts, hold_microusd FROM jobs"
+                "SELECT job_id, tenant_id, attempts, hold_microusd, cancel_requested FROM jobs"
                 " WHERE status = 'running' AND lease_until IS NOT NULL AND lease_until < ?", (now,)).fetchall()
             for r in rows:
-                if r["attempts"] >= max_attempts:
+                if r["cancel_requested"]:
+                    # Diminta batal lalu worker mati: jangan diantre ulang (claim melewati job batal,
+                    # sehingga job akan macet 'queued' selamanya dengan kredit tertahan).
+                    self.db.execute(
+                        "UPDATE jobs SET status = 'cancelled', last_error = 'cancelled_lease_expired',"
+                        " finished_at = ?, lease_owner = NULL, lease_until = NULL WHERE job_id = ?",
+                        (now, r["job_id"]))
+                    self.billing.release(r["tenant_id"], r["job_id"], r["hold_microusd"], "cancelled")
+                    out.append({"job_id": r["job_id"], "result": "cancelled"})
+                elif r["attempts"] >= max_attempts:
                     self.db.execute(
                         "UPDATE jobs SET status = 'failed', last_error = 'lease_expired', finished_at = ?,"
                         " lease_owner = NULL, lease_until = NULL WHERE job_id = ?", (now, r["job_id"]))
@@ -432,11 +541,16 @@ class Store:
         """Batal: job antrean langsung ditutup; job berjalan ditandai agar worker menutup sebagai cancelled."""
         job = self.get_job(tenant_id, job_id)
         if job["status"] == "queued":
-            return self.finish_job(tenant_id, job_id, "cancelled", 0, None, "cancelled_by_tenant")
-        _require(job["status"] == "running", 409, "job_closed", "job sudah selesai")
-        self.db.execute("UPDATE jobs SET cancel_requested = 1 WHERE job_id = ? AND tenant_id = ?",
-                        (job_id, tenant_id))
+            try:
+                return self.finish_job(tenant_id, job_id, "cancelled", 0, None, "cancelled_by_tenant",
+                                       expect=("queued",))
+            except ControlPlaneError as exc:
+                if exc.code != "job_closed":  # diklaim worker di sela cek -> jatuh ke jalur 'running'
+                    raise
+        cur = self.db.execute("UPDATE jobs SET cancel_requested = 1 WHERE job_id = ? AND tenant_id = ?"
+                              " AND status = 'running'", (job_id, tenant_id))
         self.db.commit()
+        _require(cur.rowcount == 1, 409, "job_closed", "job sudah selesai")
         return self.get_job(tenant_id, job_id)
 
     def dump_tenant(self, tenant_id: str) -> str:

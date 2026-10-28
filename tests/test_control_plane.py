@@ -186,7 +186,7 @@ def test_artefak_uri_lokal_ditolak(store):
 def test_artefak_sah_tercatat_dan_kuota_storage_dihitung(store):
     t, job = _job(store)
     art = store.register_artifact(t["tenant_id"], job["job_id"], "evidence", SHA, 1024, "redacted",
-                                  "2027-01-01", "s3://sdb-artifacts/x", "application/json")
+                                  "2027-01-01", f"s3://sdb-artifacts/{t['tenant_id']}/x", "application/json")
     assert art["artifact_id"].startswith("a_")
     assert store.usage(t["tenant_id"])["storage_bytes"] == 1024
     assert len(store.list_artifacts(t["tenant_id"], job["job_id"])) == 1
@@ -198,7 +198,7 @@ def test_kuota_storage_ditegakkan(store):
                               "artifact://a/1", {"tokens": 5000, "seconds": 600}, "kunci-aa01")
     with pytest.raises(ControlPlaneError) as exc:
         store.register_artifact(t["tenant_id"], job["job_id"], "capture", SHA, 2 * 1024 ** 3, "clean",
-                                "2027-01-01", "s3://b/x")
+                                "2027-01-01", f"s3://sdb-artifacts/{t['tenant_id']}/x")
     assert exc.value.code == "quota_storage_exceeded"
 
 
@@ -245,7 +245,7 @@ def test_http_alur_lengkap(server):
 
     status, payload = _http(base, "POST", "/v1/tenants", {"plan": "pro", "name": "PT Uji"}, admin=ADMIN)
     assert status == 201
-    key = payload["api_key"]
+    key, payload_tenant = payload["api_key"], payload["tenant"]
 
     status, payload = _http(base, "POST", "/v1/jobs", _job_body(), api_key=key)
     assert status == 201
@@ -258,13 +258,15 @@ def test_http_alur_lengkap(server):
     status, usage = _http(base, "GET", "/v1/usage", api_key=key)
     assert status == 200 and usage["usage"]["jobs_used"] == 1
 
+    # Tenant tidak boleh menutup job sendiri (bisa menghapus tagihan atas kerja worker).
     status, done = _http(base, "POST", f"/v1/jobs/{job_id}/finish",
                          {"status": "succeeded", "tokens_used": 1234, "gate_verdict": "PASS"}, api_key=key)
-    assert status == 200 and done["job"]["status"] == "succeeded"
+    assert status == 410 and done["error"]["code"] == "endpoint_removed"
 
+    tid = payload_tenant["tenant_id"]
     status, art = _http(base, "POST", f"/v1/jobs/{job_id}/artifacts",
                         {"kind": "evidence", "sha256": SHA, "size": 10, "redaction_status": "redacted",
-                         "retention_until": "2027-01-01", "uri": "s3://sdb-artifacts/x"}, api_key=key)
+                         "retention_until": "2027-01-01", "uri": f"s3://sdb-artifacts/{tid}/x"}, api_key=key)
     assert status == 201 and art["artifact"]["kind"] == "evidence"
 
 

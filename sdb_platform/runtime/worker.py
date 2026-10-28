@@ -6,7 +6,11 @@ Prinsip yang dipegang:
 - **Lease, bukan lock selamanya**: worker mati -> lease kedaluwarsa -> job diantre ulang sampai
   `max_attempts`, lalu `failed` dan pesanan kredit dilepas.
 - **Budget ditegakkan dua arah**: token (dipotong ke budget) dan waktu (diukur `monotonic`).
-- **Kegagalan tidak menagih**: status failed/cancelled -> `release`, bukan `charge`.
+- **Kegagalan tidak menagih**: status failed -> `release`, bukan `charge`. Batal setelah token
+  terpakai tetap ditagih sebesar pemakaian (biaya LLM sudah terjadi atas permintaan tenant).
+- **Heartbeat otomatis**: lease diperpanjang di thread terpisah selama executor berjalan, sehingga
+  job panjang (budget s/d 4 jam) tidak diklaim ulang worker lain di tengah jalan.
+- **Hanya pemegang lease yang menutup job**: `finish_job(..., worker_id=...)`.
 
 Worker berjalan lintas tenant (peran sistem) — berbeda dari API tenant yang selalu ber-`tenant_id`.
 """
@@ -16,6 +20,7 @@ import argparse
 import os
 import socket
 import sys
+import threading
 import time
 import traceback
 from dataclasses import dataclass, field
@@ -46,6 +51,9 @@ def echo_executor(job: dict) -> ExecutionResult:
     )
 
 
+EXECUTORS = {"echo": echo_executor}
+
+
 def failing_executor(job: dict) -> ExecutionResult:
     raise RuntimeError("executor sengaja gagal (uji pemulihan)")
 
@@ -53,8 +61,8 @@ def failing_executor(job: dict) -> ExecutionResult:
 class Worker:
     def __init__(self, store: Store, executor: Callable[[dict], ExecutionResult],
                  worker_id: str | None = None, lease_seconds: int = 120, max_attempts: int = 3):
-        if lease_seconds < 10:
-            raise ValueError("lease_seconds minimal 10")
+        if not 10 <= lease_seconds <= 3600:
+            raise ValueError("lease_seconds harus 10..3600")
         if max_attempts < 1:
             raise ValueError("max_attempts minimal 1")
         self.store = store
@@ -67,11 +75,28 @@ class Worker:
     def reap_expired(self) -> list[dict]:
         return self.store.reap_expired_leases(self.max_attempts)
 
+    def _heartbeat_loop(self, job_id: str, stop: threading.Event) -> None:
+        # Koneksi sendiri: objek sqlite3 tidak aman dipakai dua thread bersamaan.
+        store = Store(self.store.path) if self.store.path != ":memory:" else None
+        interval = max(1.0, self.lease_seconds / 3)
+        while not stop.wait(interval):
+            try:
+                (store or self.store).heartbeat(self.worker_id, job_id, self.lease_seconds)
+            except ControlPlaneError:
+                return  # lease hilang / job ditutup — finish_job nanti akan menolak dengan lease_lost
+        if store is not None:
+            store.db.close()
+
     def run_once(self) -> dict:
         job = self.store.claim_next_job(self.worker_id, self.lease_seconds)
         if job is None:
             return {"claimed": None, "worker_id": self.worker_id}
         started = time.monotonic()
+        stop = threading.Event()
+        beat = None
+        if self.store.path != ":memory:":
+            beat = threading.Thread(target=self._heartbeat_loop, args=(job["job_id"], stop), daemon=True)
+            beat.start()
         try:
             result = self.executor(job)
             if not isinstance(result, ExecutionResult):
@@ -81,14 +106,16 @@ class Worker:
             tokens = max(0, int(result.tokens_used))
             if tokens > job["budget"]["tokens"]:
                 status, tokens = "budget_exceeded", job["budget"]["tokens"]
+            stop.set()
             fresh = self.store.get_job(job["tenant_id"], job["job_id"])
             if fresh["cancel_requested"]:
-                status, tokens = "cancelled", 0
+                # Token tetap dicatat: pemakaian nyata ditagih (lihat finish_job), sisa pesanan dilepas.
+                status = "cancelled"
             if elapsed > job["budget"]["seconds"]:
                 status, tokens = "budget_exceeded", min(tokens, job["budget"]["tokens"])
                 result.error = f"wall-clock {elapsed:.1f}s > budget {job['budget']['seconds']}s"
             done = self.store.finish_job(job["tenant_id"], job["job_id"], status, tokens,
-                                         result.gate_verdict, result.error)
+                                         result.gate_verdict, result.error, worker_id=self.worker_id)
             artifacts = 0
             for art in result.artifacts:
                 self.store.register_artifact(
@@ -104,9 +131,15 @@ class Worker:
         except Exception as exc:  # executor apa pun tidak boleh mematikan worker
             err = f"{type(exc).__name__}: {exc}"
             traceback.print_exc(limit=3, file=sys.stderr)
+        finally:
+            stop.set()
+            if beat is not None:
+                beat.join(timeout=5)
         try:
-            done = self.store.finish_job(job["tenant_id"], job["job_id"], "failed", 0, None, err[:500])
+            done = self.store.finish_job(job["tenant_id"], job["job_id"], "failed", 0, None, err[:500],
+                                         worker_id=self.worker_id)
         except ControlPlaneError:
+            # lease_lost (diambil worker lain) atau job_closed (sudah ditutup sebelum artefak gagal)
             done = {"status": "lease_lost", "job_id": job["job_id"]}
         return {"claimed": job["job_id"], "status": done["status"], "error": err,
                 "worker_id": self.worker_id}
@@ -131,8 +164,14 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--poll", type=float, default=2.0)
     ap.add_argument("--lease-seconds", type=int, default=120)
     ap.add_argument("--worker-id", default=None)
+    ap.add_argument("--executor", choices=sorted(EXECUTORS), required=True,
+                    help="executor wajib dipilih eksplisit; 'echo' = uji tanpa kerja nyata (tetap menagih!)")
     args = ap.parse_args(argv)
-    worker = Worker(Store(args.db), echo_executor, args.worker_id, args.lease_seconds)
+    if args.executor == "echo" and os.environ.get("SDB_ALLOW_ECHO_EXECUTOR") != "1":
+        # echo_executor menagih token fiktif. Di DB produksi itu = menagih pelanggan atas kerja palsu.
+        print("executor 'echo' hanya untuk uji: set SDB_ALLOW_ECHO_EXECUTOR=1 secara sadar", file=sys.stderr)
+        return 2
+    worker = Worker(Store(args.db), EXECUTORS[args.executor], args.worker_id, args.lease_seconds)
     if args.once:
         print(worker.run_once())
         return 0

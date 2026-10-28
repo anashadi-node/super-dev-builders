@@ -174,7 +174,7 @@ def test_invoice_menjumlahkan_charge_periode(store):
     job = _job(store, t)
     store.finish_job(t["tenant_id"], job["job_id"], "succeeded", 2000)
     start = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=1)).isoformat(timespec="seconds")
-    end = (dt.datetime.now(dt.timezone.utc) + dt.timedelta(days=1)).isoformat(timespec="seconds")
+    end = dt.datetime.now(dt.timezone.utc).isoformat(timespec="microseconds")  # periode sudah tertutup
     inv = store.billing.issue_invoice(t["tenant_id"], start, end)
     assert inv["total_microusd"] == price_tokens(2000, "pro") and inv["jobs"] == 1
     again = store.billing.issue_invoice(t["tenant_id"], start, end)
@@ -187,7 +187,7 @@ def test_invoice_abadi_saat_snapshot_diubah(store):
     job = _job(store, t)
     store.finish_job(t["tenant_id"], job["job_id"], "succeeded", 700)
     start = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=1)).isoformat(timespec="seconds")
-    end = (dt.datetime.now(dt.timezone.utc) + dt.timedelta(days=1)).isoformat(timespec="seconds")
+    end = dt.datetime.now(dt.timezone.utc).isoformat(timespec="microseconds")  # periode sudah tertutup
     inv = store.billing.issue_invoice(t["tenant_id"], start, end)
     store.db.execute("UPDATE invoices SET total_microusd = 0 WHERE invoice_id = ?", (inv["invoice_id"],))
     store.db.commit()
@@ -200,7 +200,7 @@ def test_invoice_tidak_mencampur_tenant(store):
     ja = _job(store, a)
     store.finish_job(a["tenant_id"], ja["job_id"], "succeeded", 1000)
     start = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=1)).isoformat(timespec="seconds")
-    end = (dt.datetime.now(dt.timezone.utc) + dt.timedelta(days=1)).isoformat(timespec="seconds")
+    end = dt.datetime.now(dt.timezone.utc).isoformat(timespec="microseconds")  # periode sudah tertutup
     inv = store.billing.issue_invoice(b["tenant_id"], start, end)
     assert inv["total_microusd"] == 0 and inv["jobs"] == 0
 
@@ -408,13 +408,18 @@ def test_http_invoice_dan_isolasi(server):
         "type": "recon", "pack": {"id": "sdb-recon", "version": "1.0.0"},
         "target_ref": "artifact://a/1", "budget": {"tokens": 4000, "seconds": 300},
         "idempotency_key": "http-inv-1"}, key=a["api_key"])
-    _http(base, "POST", f"/v1/jobs/{job['job']['job_id']}/finish",
-          {"status": "succeeded", "tokens_used": 1000}, key=a["api_key"])
+    _http(base, "POST", "/v1/worker/claim", {"worker_id": "w-http-inv"}, worker=WKEY)
+    _http(base, "POST", f"/v1/jobs/{job['job']['job_id']}/complete",
+          {"worker_id": "w-http-inv", "status": "succeeded", "tokens_used": 1000}, worker=WKEY)
     start = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=1)).isoformat(timespec="seconds")
-    end = (dt.datetime.now(dt.timezone.utc) + dt.timedelta(days=1)).isoformat(timespec="seconds")
-    status, inv = _http(base, "POST", "/v1/invoices", {"period_start": start, "period_end": end},
-                        key=a["api_key"])
+    end = dt.datetime.now(dt.timezone.utc).isoformat(timespec="microseconds")  # periode sudah tertutup
+    assert _http(base, "POST", "/v1/admin/invoices", {"tenant_id": a["tenant"]["tenant_id"],
+                 "period_start": start, "period_end": end}, key=a["api_key"])[0] == 401  # tenant tak boleh terbitkan
+    status, inv = _http(base, "POST", "/v1/admin/invoices", {"tenant_id": a["tenant"]["tenant_id"],
+                        "period_start": start, "period_end": end}, admin=ADMIN)
     assert status == 201 and inv["invoice"]["total_microusd"] == price_tokens(1000, "pro")
+    status, mine = _http(base, "GET", "/v1/invoices", key=a["api_key"])
+    assert status == 200 and len(mine["invoices"]) == 1
     status, other = _http(base, "GET", "/v1/invoices", key=b["api_key"])
     assert status == 200 and other["invoices"] == []
 

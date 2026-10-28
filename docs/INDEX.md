@@ -28,6 +28,7 @@ tanggalnya menang — dan yang kalah **harus** dipindahkan ke `docs/archive/`, b
 | `adr/0001-model-tenancy.md` | pool + namespace default; silo hanya Enterprise |
 | `adr/0002-artefak-di-object-store.md` | artefak keluar dari git |
 | `adr/0003-distribusi-skill-lewat-pack.md` | pack manifest, bukan salin-per-profil |
+| `adr/0004-kode-produk-di-sdb-platform.md` | kode produk di `sdb_platform/`, kontrak di `platform/` |
 
 ## Kebijakan & keamanan
 
@@ -88,3 +89,12 @@ sumbernya `.md`). Jangan menautkan arsip sebagai rujukan utama.
 2. Kebijakan → `docs/`; keputusan → `docs/adr/`; prosedur insiden → `docs/runbooks/`; temuan → `reports/`.
 3. Perbarui indeks ini di commit yang sama. Dokumen tanpa indeks dianggap draf.
 4. Format: `.md` adalah sumber; `.html`/`.pdf` hanya hasil generate, tidak disimpan di repo (ADR-0002).
+
+## Kontrak & kode Fase 2
+
+| Berkas | Isi |
+|---|---|
+| `sdb_platform/control_plane/README.md` | rute API, batas yang ditegakkan, yang belum ada |
+| `platform/schemas/*.schema.json` | kontrak tenant/job/artifact |
+| `platform/packs/*.json` | manifest skill per divisi (hash + lisensi) |
+| `THIRD_PARTY_NOTICES.md` | lisensi pihak ketiga + aturan pemisahan CC-BY-SA |

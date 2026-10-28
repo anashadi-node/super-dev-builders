@@ -33,7 +33,7 @@ test:
 	$(PY_SYS) -m pytest tests skills -q
 
 lint:
-	ruff check scripts tests skills dashboard
+	ruff check sdb_platform scripts tests skills dashboard
 
 # skill terpasang (main + profil) vs sumber repo; exit 1 bila MISSING/DIFF.
 # Drift hanya bermakna bila Host punya Hermes. Di runner CI (~/.hermes tidak ada)
@@ -48,6 +48,11 @@ check: lint lint-registry test drift hygiene packs
 # Manifest paket per divisi (ADR-0003): hash + lisensi harus cocok dengan registry & SKILL.md.
 packs:
 	$(PY_SYS) scripts/pack_build.py verify
+
+# Control plane lokal (Fase 2). Butuh SDB_ADMIN_KEY >= 24 karakter.
+control-plane:
+	@test -n "$$SDB_ADMIN_KEY" || (echo "set SDB_ADMIN_KEY dulu (>=24 char)"; exit 2)
+	$(PY_SYS) -m sdb_platform.control_plane.app --db data/control.db --port 8088
 
 # Aturan penempatan (docs/PETA_STRUKTUR.md §4): tidak ada artefak besar/PII baru di git.
 # Baseline di platform/hygiene-baseline.json mencatat utang lama sebagai WARN.

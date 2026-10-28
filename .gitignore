@@ -34,6 +34,8 @@ evidence/**/*.raw
 
 # Data besar / hasil sementara
 data/raw/
+# database lokal control plane / sqlite runtime
+/data/
 *.log.tmp
 
 # Workspace uji E2E / self-test (dibuat `sdb init` saat uji) — jangan ikut commit

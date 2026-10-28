@@ -18,6 +18,8 @@ kredit pelanggan tertahan selamanya).
    → `failed` + kredit dilepas.
 3. **Penyelesaian tepat sekali**: `finish_job` hanya menerima status `queued|running`, dan billing
    `settle` idempoten lewat `job_charges` (PK `job_id`). Retry penyelesaian tidak menagih dua kali.
+   *Diperketat oleh ADR-0007:* cek status + tulis kini satu transaksi, hanya pemegang lease yang boleh
+   menutup, dan status tujuan wajib status penutup.
 4. **Budget ditegakkan dua arah**: token (dipotong ke budget, status `budget_exceeded`) dan
    wall-clock (`time.monotonic`, bukan waktu sistem yang bisa mundur).
 5. **Executor adalah fungsi murni** `job -> ExecutionResult`; worker tidak tahu isi pekerjaan.

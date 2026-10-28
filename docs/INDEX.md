@@ -31,6 +31,7 @@ tanggalnya menang — dan yang kalah **harus** dipindahkan ke `docs/archive/`, b
 | `adr/0004-kode-produk-di-sdb-platform.md` | kode produk di `sdb_platform/`, kontrak di `platform/` |
 | `adr/0005-billing-prabayar-ber-rantai-hash.md` | uang integer μUSD, hold/charge/release, ledger ber-rantai |
 | `adr/0006-worker-lease-dan-idempotensi.md` | klaim atomik, lease, penyelesaian tepat sekali |
+| `adr/0007-pengetatan-pasca-audit.md` | siapa boleh menutup job, batal ditagih pemakaian, invoice admin, hash v2 |
 
 ## Kebijakan & keamanan
 

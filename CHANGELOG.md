@@ -2,6 +2,68 @@
 
 Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/) dan [SemVer](https://semver.org/lang/id/).
 
+## [0.6.0] — 2026-10-29
+
+Rilis audit fundamental. 30 cacat direproduksi dulu, baru diperbaiki (control plane 26 dari 27 hipotesis
+terkonfirmasi, dashboard 3, skrip 1); tiap cacat punya tes regresi. 37 dari 39 tes regresi baru
+**gagal di v0.5.0** — bukti tesnya membedakan; 2 sisanya pagar perilaku yang sudah benar. Laporan lengkap:
+`reports/SDB_AUDIT_FUNDAMENTAL_20261029.md`. Keputusan desain: ADR-0007.
+
+### Breaking
+
+- `POST /v1/jobs/{id}/finish` → `410 endpoint_removed`. Tenant membatalkan lewat `/cancel`; job
+  ditutup worker lewat `/v1/jobs/{id}/complete`.
+- `POST /v1/invoices` (tenant) dihapus → `POST /v1/admin/invoices` (admin, body `tenant_id`).
+  Tenant tetap bisa `GET /v1/invoices`.
+- Worker CLI wajib `--executor`; `echo` butuh `SDB_ALLOW_ECHO_EXECUTOR=1`.
+- URI artefak wajib `s3://<bucket>/<tenant_id>/…` atau `artifact://<tenant_id>/…`;
+  `retention_until` wajib tanggal ISO masa depan.
+
+### Fixed — uang
+
+- Tenant bisa menutup job yang sedang dikerjakan worker → tagihan hilang (H1).
+- `finish_job` menerima status `queued`/`running` → job ditagih 0 lalu dikerjakan ulang gratis (H2).
+- Batal + worker mati → job macet `queued` selamanya, kredit tertahan (H3).
+- Batal di detik terakhir → seluruh token terpakai gratis; kini ditagih pemakaian (H4).
+- Worker lambat bisa menutup job yang sudah diambil worker lain (H5); cek & tulis kini satu transaksi.
+- Invoice tumpang-tindih menagih charge sama dua kali; periode sampah/masa depan diterima (H9).
+- Cek kuota job/storage dan idempotensi di luar transaksi → kuota jebol / 500 saat balapan (H25).
+
+### Fixed — integritas & isolasi
+
+- Job tenant `suspended` tetap dikerjakan; tenant `deleted` tidak menutup antrean (H6).
+- Kunci idempotensi sama + isi beda diam-diam mengembalikan job lain → kini `409` (H7).
+- `INSERT OR REPLACE` memindahkan API key antar tenant → kini `409 key_exists` (H8).
+- URI artefak bisa menunjuk ruang tenant lain (H11); retensi bukan tanggal diterima (H10).
+- `entry_id` di respons ≠ di DB (H12); memo ledger tidak terlindung hash (H13) → hash v2 + cek saldo
+  per baris; baris v1 tetap terverifikasi. Refund tanpa transaksi (H14).
+- Echo executor (token fiktif yang ditagih) jadi default CLI worker (H15).
+- Lease 120 s tanpa heartbeat otomatis untuk job s/d 4 jam → diklaim ganda (H16).
+
+### Changed — upgrade (bukan cacat terbukti)
+
+- Klaim fair-share antar tenant (H17: probe kelaparan di v0.5.0 **REFUTED**; tetap ditambahkan karena
+  FIFO murni membiarkan satu tenant yang mengantre ribuan job menunda semua tenant lain). FIFO dalam
+  satu tenant kini deterministik (`rowid`), bukan acak dalam milidetik yang sama.
+
+### Fixed — HTTP
+
+- Body JSON non-objek, `pack`/`budget` non-objek, `lease_seconds` non-int, `Content-Length` cacat →
+  500; kini 400 (H18–H21). `lease_seconds` tanpa batas (H22) → 10..3600.
+- Tanpa socket timeout (slowloris) di control plane dan dashboard (H23, D3) → 30 s.
+- Error 500 tidak tercatat di mana pun (H24) → traceback ke stderr, tanpa header/body.
+- Header kunci non-ASCII → 500 (H26) → 401.
+- Dashboard: body JSON non-objek → 500 yang membocorkan pesan internal Python (D1/D2) → 400.
+- Respons API: `Cache-Control: no-store`, `X-Content-Type-Options: nosniff`.
+- `scripts/md_to_pdf.py --help` keluar kode 2 → 0; nama berkas di-escape di HTML.
+
+### Catatan
+
+- Purge riwayat (di bawah) menyebut "96 commit / 2,7 MB": itu angka **saat purge** dijalankan.
+  `RESULT.md` (97 / 2,8 MB) dan laporan (98 / 2,9 MB) diambil setelah commit dokumentasi berikutnya —
+  bukan kontradiksi, melainkan potret pada waktu berbeda.
+- Tes: 384 (341 → 384). Migrasi DB v0.5.0 otomatis (kolom `ledger.hv`, 2 indeks).
+
 ## [0.5.0] — 2026-10-29
 
 Fase 2b: produk bisa menagih dan pekerjaan benar-benar dijalankan. Masih **belum** ada gateway

@@ -3,7 +3,7 @@ name: accessibility-audit
 description: "Verify WCAG accessibility with axe plus manual checks"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
-license: MIT
+license: BUSL-1.1
 platforms: [linux, macos]
 metadata:
   hermes:

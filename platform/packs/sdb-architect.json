@@ -1,0 +1,82 @@
+{
+ "pack": "sdb-architect",
+ "version": "1.0.0",
+ "role": "sdb-architect",
+ "license": "BUSL-1.1",
+ "required_native": [
+  "source_trust_check",
+  "pin_revision",
+  "hermes_native_scan",
+  "manual_source_review",
+  "sandbox_test",
+  "allowlist_tools",
+  "human_approval"
+ ],
+ "source": {
+  "registry_version": "2.2.0",
+  "registry_updated": "2026-10-11",
+  "skill_count": 10
+ },
+ "skills": [
+  {
+   "id": "api-contract",
+   "path": "skills/api-contract",
+   "sha256": "39d95ba1f5ae15a7550bc8a9b8637f0b88cf0ae35bbd07bebd36a57153ce34cd",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "architecture-decision-record",
+   "path": "skills/architecture-decision-record",
+   "sha256": "cc8b2f1ede295a09d82a9439b1e95092eb0cb3af063aeb919cb3e1ef06893d2a",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "architecture-docs",
+   "path": "skills/architecture-docs",
+   "sha256": "641172b6054dda542eb9b99050dbec279ae513d88f90520bb19322b81b909cbb",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "geo-audit",
+   "path": "skills/geo-audit",
+   "sha256": "7a31c70d0345dec49128452fd069667df47cc3cb00bc4adc2a365339ed8717db",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "product-change",
+   "path": "skills/product-change",
+   "sha256": "093235067eff20523a385813c7cae4c9bead2d3917bd1284fc25ec91db22fc7b",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "product-kit",
+   "path": "skills/product-kit",
+   "sha256": "2dfc13ce2c925f207b34464ed24759aa8b7630230086a52512b26b151639bc9a",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "rea-reverse-engineering",
+   "path": "skills/rea-reverse-engineering",
+   "sha256": "57fd0b49b49f827c605d2d3f6685d3df86344abb0e908d66a19ee4122d7eaa81",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "reconstruction-spec",
+   "path": "skills/reconstruction-spec",
+   "sha256": "0698251330b036435f589b8b80d516e83af975dc63aa1a893f1f4a3e631fc655",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "target-inventory",
+   "path": "skills/target-inventory",
+   "sha256": "c359483b7f5c5e9ca7b0e448503fc75f9954f469b9b24518be8a4c07313bc2c6",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "technology-selection",
+   "path": "skills/technology-selection",
+   "sha256": "2285e3eab5d8402e91dbc577f863dcf673f6ab93fffde19a6469ba38874839fb",
+   "license": "BUSL-1.1"
+  }
+ ]
+}

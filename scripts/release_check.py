@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import glob
+import json
 import os
 import sys
 import time
@@ -71,6 +72,38 @@ def main(argv=None) -> int:
                              "path": found})
         else:
             satisfied.append({"gate": gate, "path": found, "age_hours": round(age_h, 2)})
+
+    # A fresh decision artifact can still say FAIL. Treat verdict content as a
+    # machine contract; never infer it from prose or existence alone.
+    for gate, spec in (cfg.get("required_verdicts") or {}).items():
+        patterns = spec.get("patterns", [])
+        if isinstance(patterns, str):
+            patterns = [patterns]
+        found = None
+        for pattern in patterns:
+            found = newest(os.path.join(project, pattern))
+            if found:
+                break
+        if not found:
+            failures.append({"gate": gate, "reason": "artefak verdict tidak ditemukan", "patterns": patterns})
+            continue
+        age_h = (time.time() - os.path.getmtime(found)) / 3600.0
+        if age_h > max_age:
+            failures.append({"gate": gate, "reason": f"verdict kedaluwarsa ({age_h:.1f} jam > {max_age} jam)", "path": found})
+            continue
+        try:
+            with open(found, encoding="utf-8") as handle:
+                payload = json.load(handle)
+        except (OSError, json.JSONDecodeError) as exc:
+            failures.append({"gate": gate, "reason": f"JSON tidak sah: {exc}", "path": found})
+            continue
+        field = spec.get("field", "verdict")
+        allowed = spec.get("allowed", ["PASS"])
+        value = payload.get(field) if isinstance(payload, dict) else None
+        if value not in allowed:
+            failures.append({"gate": gate, "reason": f"{field}={value!r}, wajib salah satu {allowed}", "path": found})
+            continue
+        satisfied.append({"gate": gate, "path": found, "age_hours": round(age_h, 2), field: value})
 
     verdict = "PASS" if not failures else "FAIL"
     result = {"gate": "release", "verdict": verdict, "checked_at": now_iso(), "project": project,

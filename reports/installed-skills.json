@@ -1,7 +1,631 @@
 {
-  "at": "2026-10-10T09:10:07+0700",
+  "at": "2026-10-29T05:45:58+0700",
   "uninstall": false,
   "operations": [
+    {
+      "action": "install",
+      "skill": "reconstruction-scope-gate",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/reconstruction-scope-gate"
+    },
+    {
+      "action": "install",
+      "skill": "target-inventory",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/target-inventory"
+    },
+    {
+      "action": "install",
+      "skill": "ui-ux-state-mapper",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/ui-ux-state-mapper"
+    },
+    {
+      "action": "install",
+      "skill": "observed-network-contract",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/observed-network-contract"
+    },
+    {
+      "action": "install",
+      "skill": "technology-profiler",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/technology-profiler"
+    },
+    {
+      "action": "install",
+      "skill": "evidence-normalizer",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/evidence-normalizer"
+    },
+    {
+      "action": "install",
+      "skill": "reconstruction-spec",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/reconstruction-spec"
+    },
+    {
+      "action": "install",
+      "skill": "reconstruction-fidelity",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/reconstruction-fidelity"
+    },
+    {
+      "action": "install",
+      "skill": "architecture-decision-record",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/architecture-decision-record"
+    },
+    {
+      "action": "install",
+      "skill": "technology-selection",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/technology-selection"
+    },
+    {
+      "action": "install",
+      "skill": "api-contract",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/api-contract"
+    },
+    {
+      "action": "install",
+      "skill": "database-migration-safety",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/database-migration-safety"
+    },
+    {
+      "action": "install",
+      "skill": "authz-authn-review",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/authz-authn-review"
+    },
+    {
+      "action": "install",
+      "skill": "accessibility-audit",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/accessibility-audit"
+    },
+    {
+      "action": "install",
+      "skill": "test-pyramid-and-risk",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/test-pyramid-and-risk"
+    },
+    {
+      "action": "install",
+      "skill": "architecture-compliance-audit",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/architecture-compliance-audit"
+    },
+    {
+      "action": "install",
+      "skill": "engineering-release-audit",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/engineering-release-audit"
+    },
+    {
+      "action": "install",
+      "skill": "ci-cd-release-gate",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/ci-cd-release-gate"
+    },
+    {
+      "action": "install",
+      "skill": "sdb-command-deck",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/sdb-command-deck"
+    },
+    {
+      "action": "install",
+      "skill": "rollback-and-recovery",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/rollback-and-recovery"
+    },
+    {
+      "action": "install",
+      "skill": "architecture-docs",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/architecture-docs"
+    },
+    {
+      "action": "install",
+      "skill": "release-handover-docs",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/release-handover-docs"
+    },
+    {
+      "action": "install",
+      "skill": "product-kit",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/product-kit"
+    },
+    {
+      "action": "install",
+      "skill": "product-status",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/product-status"
+    },
+    {
+      "action": "install",
+      "skill": "product-change",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/product-change"
+    },
+    {
+      "action": "install",
+      "skill": "product-execution",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/product-execution"
+    },
+    {
+      "action": "install",
+      "skill": "geo-audit",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/geo-audit"
+    },
+    {
+      "action": "install",
+      "skill": "feature-workflow",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/feature-workflow"
+    },
+    {
+      "action": "install",
+      "skill": "bug-workflow",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/bug-workflow"
+    },
+    {
+      "action": "install",
+      "skill": "chore-workflow",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/chore-workflow"
+    },
+    {
+      "action": "install",
+      "skill": "local-media-generation",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/local-media-generation"
+    },
+    {
+      "action": "install",
+      "skill": "model-hub-provenance",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/model-hub-provenance"
+    },
+    {
+      "action": "install",
+      "skill": "public-feed-reader",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/public-feed-reader"
+    },
+    {
+      "action": "install",
+      "skill": "html-to-video-render",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/html-to-video-render"
+    },
+    {
+      "action": "install",
+      "skill": "local-experiment-tracking",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/local-experiment-tracking"
+    },
+    {
+      "action": "install",
+      "skill": "privilege-free-tooling",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/privilege-free-tooling"
+    },
+    {
+      "action": "install",
+      "skill": "local-llm-serving",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/local-llm-serving"
+    },
+    {
+      "action": "install",
+      "skill": "realtime-visual-engine",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/realtime-visual-engine"
+    },
+    {
+      "action": "install",
+      "skill": "rea-reverse-engineering",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/rea-reverse-engineering"
+    },
+    {
+      "action": "install",
+      "skill": "reconstruction-scope-gate",
+      "profile": "cc-orchestrator",
+      "path": "/home/anashadi/.hermes/profiles/cc-orchestrator/skills/super-dev-builders/reconstruction-scope-gate"
+    },
+    {
+      "action": "install",
+      "skill": "product-kit",
+      "profile": "cc-orchestrator",
+      "path": "/home/anashadi/.hermes/profiles/cc-orchestrator/skills/super-dev-builders/product-kit"
+    },
+    {
+      "action": "install",
+      "skill": "product-status",
+      "profile": "cc-orchestrator",
+      "path": "/home/anashadi/.hermes/profiles/cc-orchestrator/skills/super-dev-builders/product-status"
+    },
+    {
+      "action": "install",
+      "skill": "product-change",
+      "profile": "cc-orchestrator",
+      "path": "/home/anashadi/.hermes/profiles/cc-orchestrator/skills/super-dev-builders/product-change"
+    },
+    {
+      "action": "install",
+      "skill": "product-execution",
+      "profile": "cc-orchestrator",
+      "path": "/home/anashadi/.hermes/profiles/cc-orchestrator/skills/super-dev-builders/product-execution"
+    },
+    {
+      "action": "install",
+      "skill": "geo-audit",
+      "profile": "cc-orchestrator",
+      "path": "/home/anashadi/.hermes/profiles/cc-orchestrator/skills/super-dev-builders/geo-audit"
+    },
+    {
+      "action": "install",
+      "skill": "public-feed-reader",
+      "profile": "cc-orchestrator",
+      "path": "/home/anashadi/.hermes/profiles/cc-orchestrator/skills/super-dev-builders/public-feed-reader"
+    },
+    {
+      "action": "install",
+      "skill": "rea-reverse-engineering",
+      "profile": "cc-orchestrator",
+      "path": "/home/anashadi/.hermes/profiles/cc-orchestrator/skills/super-dev-builders/rea-reverse-engineering"
+    },
+    {
+      "action": "install",
+      "skill": "reconstruction-scope-gate",
+      "profile": "cc-capture-forensics",
+      "path": "/home/anashadi/.hermes/profiles/cc-capture-forensics/skills/super-dev-builders/reconstruction-scope-gate"
+    },
+    {
+      "action": "install",
+      "skill": "target-inventory",
+      "profile": "cc-capture-forensics",
+      "path": "/home/anashadi/.hermes/profiles/cc-capture-forensics/skills/super-dev-builders/target-inventory"
+    },
+    {
+      "action": "install",
+      "skill": "ui-ux-state-mapper",
+      "profile": "cc-capture-forensics",
+      "path": "/home/anashadi/.hermes/profiles/cc-capture-forensics/skills/super-dev-builders/ui-ux-state-mapper"
+    },
+    {
+      "action": "install",
+      "skill": "observed-network-contract",
+      "profile": "cc-capture-forensics",
+      "path": "/home/anashadi/.hermes/profiles/cc-capture-forensics/skills/super-dev-builders/observed-network-contract"
+    },
+    {
+      "action": "install",
+      "skill": "technology-profiler",
+      "profile": "cc-capture-forensics",
+      "path": "/home/anashadi/.hermes/profiles/cc-capture-forensics/skills/super-dev-builders/technology-profiler"
+    },
+    {
+      "action": "install",
+      "skill": "evidence-normalizer",
+      "profile": "cc-capture-forensics",
+      "path": "/home/anashadi/.hermes/profiles/cc-capture-forensics/skills/super-dev-builders/evidence-normalizer"
+    },
+    {
+      "action": "install",
+      "skill": "reconstruction-spec",
+      "profile": "cc-capture-forensics",
+      "path": "/home/anashadi/.hermes/profiles/cc-capture-forensics/skills/super-dev-builders/reconstruction-spec"
+    },
+    {
+      "action": "install",
+      "skill": "reconstruction-fidelity",
+      "profile": "cc-capture-forensics",
+      "path": "/home/anashadi/.hermes/profiles/cc-capture-forensics/skills/super-dev-builders/reconstruction-fidelity"
+    },
+    {
+      "action": "install",
+      "skill": "rea-reverse-engineering",
+      "profile": "cc-capture-forensics",
+      "path": "/home/anashadi/.hermes/profiles/cc-capture-forensics/skills/super-dev-builders/rea-reverse-engineering"
+    },
+    {
+      "action": "install",
+      "skill": "reconstruction-scope-gate",
+      "profile": "cc-security-governor",
+      "path": "/home/anashadi/.hermes/profiles/cc-security-governor/skills/super-dev-builders/reconstruction-scope-gate"
+    },
+    {
+      "action": "install",
+      "skill": "database-migration-safety",
+      "profile": "cc-security-governor",
+      "path": "/home/anashadi/.hermes/profiles/cc-security-governor/skills/super-dev-builders/database-migration-safety"
+    },
+    {
+      "action": "install",
+      "skill": "authz-authn-review",
+      "profile": "cc-security-governor",
+      "path": "/home/anashadi/.hermes/profiles/cc-security-governor/skills/super-dev-builders/authz-authn-review"
+    },
+    {
+      "action": "install",
+      "skill": "architecture-compliance-audit",
+      "profile": "cc-security-governor",
+      "path": "/home/anashadi/.hermes/profiles/cc-security-governor/skills/super-dev-builders/architecture-compliance-audit"
+    },
+    {
+      "action": "install",
+      "skill": "engineering-release-audit",
+      "profile": "cc-security-governor",
+      "path": "/home/anashadi/.hermes/profiles/cc-security-governor/skills/super-dev-builders/engineering-release-audit"
+    },
+    {
+      "action": "install",
+      "skill": "ci-cd-release-gate",
+      "profile": "cc-security-governor",
+      "path": "/home/anashadi/.hermes/profiles/cc-security-governor/skills/super-dev-builders/ci-cd-release-gate"
+    },
+    {
+      "action": "install",
+      "skill": "model-hub-provenance",
+      "profile": "cc-security-governor",
+      "path": "/home/anashadi/.hermes/profiles/cc-security-governor/skills/super-dev-builders/model-hub-provenance"
+    },
+    {
+      "action": "install",
+      "skill": "local-experiment-tracking",
+      "profile": "cc-security-governor",
+      "path": "/home/anashadi/.hermes/profiles/cc-security-governor/skills/super-dev-builders/local-experiment-tracking"
+    },
+    {
+      "action": "install",
+      "skill": "privilege-free-tooling",
+      "profile": "cc-security-governor",
+      "path": "/home/anashadi/.hermes/profiles/cc-security-governor/skills/super-dev-builders/privilege-free-tooling"
+    },
+    {
+      "action": "install",
+      "skill": "rea-reverse-engineering",
+      "profile": "cc-security-governor",
+      "path": "/home/anashadi/.hermes/profiles/cc-security-governor/skills/super-dev-builders/rea-reverse-engineering"
+    },
+    {
+      "action": "install",
+      "skill": "target-inventory",
+      "profile": "cc-architect",
+      "path": "/home/anashadi/.hermes/profiles/cc-architect/skills/super-dev-builders/target-inventory"
+    },
+    {
+      "action": "install",
+      "skill": "reconstruction-spec",
+      "profile": "cc-architect",
+      "path": "/home/anashadi/.hermes/profiles/cc-architect/skills/super-dev-builders/reconstruction-spec"
+    },
+    {
+      "action": "install",
+      "skill": "architecture-decision-record",
+      "profile": "cc-architect",
+      "path": "/home/anashadi/.hermes/profiles/cc-architect/skills/super-dev-builders/architecture-decision-record"
+    },
+    {
+      "action": "install",
+      "skill": "technology-selection",
+      "profile": "cc-architect",
+      "path": "/home/anashadi/.hermes/profiles/cc-architect/skills/super-dev-builders/technology-selection"
+    },
+    {
+      "action": "install",
+      "skill": "api-contract",
+      "profile": "cc-architect",
+      "path": "/home/anashadi/.hermes/profiles/cc-architect/skills/super-dev-builders/api-contract"
+    },
+    {
+      "action": "install",
+      "skill": "architecture-docs",
+      "profile": "cc-architect",
+      "path": "/home/anashadi/.hermes/profiles/cc-architect/skills/super-dev-builders/architecture-docs"
+    },
+    {
+      "action": "install",
+      "skill": "product-kit",
+      "profile": "cc-architect",
+      "path": "/home/anashadi/.hermes/profiles/cc-architect/skills/super-dev-builders/product-kit"
+    },
+    {
+      "action": "install",
+      "skill": "product-change",
+      "profile": "cc-architect",
+      "path": "/home/anashadi/.hermes/profiles/cc-architect/skills/super-dev-builders/product-change"
+    },
+    {
+      "action": "install",
+      "skill": "geo-audit",
+      "profile": "cc-architect",
+      "path": "/home/anashadi/.hermes/profiles/cc-architect/skills/super-dev-builders/geo-audit"
+    },
+    {
+      "action": "install",
+      "skill": "rea-reverse-engineering",
+      "profile": "cc-architect",
+      "path": "/home/anashadi/.hermes/profiles/cc-architect/skills/super-dev-builders/rea-reverse-engineering"
+    },
+    {
+      "action": "install",
+      "skill": "reconstruction-fidelity",
+      "profile": "cc-reviewer-qa",
+      "path": "/home/anashadi/.hermes/profiles/cc-reviewer-qa/skills/super-dev-builders/reconstruction-fidelity"
+    },
+    {
+      "action": "install",
+      "skill": "api-contract",
+      "profile": "cc-reviewer-qa",
+      "path": "/home/anashadi/.hermes/profiles/cc-reviewer-qa/skills/super-dev-builders/api-contract"
+    },
+    {
+      "action": "install",
+      "skill": "accessibility-audit",
+      "profile": "cc-reviewer-qa",
+      "path": "/home/anashadi/.hermes/profiles/cc-reviewer-qa/skills/super-dev-builders/accessibility-audit"
+    },
+    {
+      "action": "install",
+      "skill": "test-pyramid-and-risk",
+      "profile": "cc-reviewer-qa",
+      "path": "/home/anashadi/.hermes/profiles/cc-reviewer-qa/skills/super-dev-builders/test-pyramid-and-risk"
+    },
+    {
+      "action": "install",
+      "skill": "product-status",
+      "profile": "cc-reviewer-qa",
+      "path": "/home/anashadi/.hermes/profiles/cc-reviewer-qa/skills/super-dev-builders/product-status"
+    },
+    {
+      "action": "install",
+      "skill": "product-execution",
+      "profile": "cc-reviewer-qa",
+      "path": "/home/anashadi/.hermes/profiles/cc-reviewer-qa/skills/super-dev-builders/product-execution"
+    },
+    {
+      "action": "install",
+      "skill": "bug-workflow",
+      "profile": "cc-reviewer-qa",
+      "path": "/home/anashadi/.hermes/profiles/cc-reviewer-qa/skills/super-dev-builders/bug-workflow"
+    },
+    {
+      "action": "install",
+      "skill": "rea-reverse-engineering",
+      "profile": "cc-reviewer-qa",
+      "path": "/home/anashadi/.hermes/profiles/cc-reviewer-qa/skills/super-dev-builders/rea-reverse-engineering"
+    },
+    {
+      "action": "install",
+      "skill": "api-contract",
+      "profile": "cc-frontend",
+      "path": "/home/anashadi/.hermes/profiles/cc-frontend/skills/super-dev-builders/api-contract"
+    },
+    {
+      "action": "install",
+      "skill": "sdb-command-deck",
+      "profile": "cc-frontend",
+      "path": "/home/anashadi/.hermes/profiles/cc-frontend/skills/super-dev-builders/sdb-command-deck"
+    },
+    {
+      "action": "install",
+      "skill": "api-contract",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/api-contract"
+    },
+    {
+      "action": "install",
+      "skill": "database-migration-safety",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/database-migration-safety"
+    },
+    {
+      "action": "install",
+      "skill": "authz-authn-review",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/authz-authn-review"
+    },
+    {
+      "action": "install",
+      "skill": "accessibility-audit",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/accessibility-audit"
+    },
+    {
+      "action": "install",
+      "skill": "test-pyramid-and-risk",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/test-pyramid-and-risk"
+    },
+    {
+      "action": "install",
+      "skill": "product-execution",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/product-execution"
+    },
+    {
+      "action": "install",
+      "skill": "geo-audit",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/geo-audit"
+    },
+    {
+      "action": "install",
+      "skill": "feature-workflow",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/feature-workflow"
+    },
+    {
+      "action": "install",
+      "skill": "bug-workflow",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/bug-workflow"
+    },
+    {
+      "action": "install",
+      "skill": "chore-workflow",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/chore-workflow"
+    },
+    {
+      "action": "install",
+      "skill": "local-media-generation",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/local-media-generation"
+    },
+    {
+      "action": "install",
+      "skill": "model-hub-provenance",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/model-hub-provenance"
+    },
+    {
+      "action": "install",
+      "skill": "public-feed-reader",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/public-feed-reader"
+    },
+    {
+      "action": "install",
+      "skill": "html-to-video-render",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/html-to-video-render"
+    },
+    {
+      "action": "install",
+      "skill": "local-experiment-tracking",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/local-experiment-tracking"
+    },
+    {
+      "action": "install",
+      "skill": "privilege-free-tooling",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/privilege-free-tooling"
+    },
+    {
+      "action": "install",
+      "skill": "local-llm-serving",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/local-llm-serving"
+    },
+    {
+      "action": "install",
+      "skill": "realtime-visual-engine",
+      "profile": "cc-builder",
+      "path": "/home/anashadi/.hermes/profiles/cc-builder/skills/super-dev-builders/realtime-visual-engine"
+    },
     {
       "action": "install",
       "skill": "database-migration-safety",
@@ -73,18 +697,6 @@
       "skill": "realtime-visual-engine",
       "profile": "cc-devops-docs",
       "path": "/home/anashadi/.hermes/profiles/cc-devops-docs/skills/super-dev-builders/realtime-visual-engine"
-    },
-    {
-      "action": "install",
-      "skill": "api-contract",
-      "profile": "cc-frontend",
-      "path": "/home/anashadi/.hermes/profiles/cc-frontend/skills/super-dev-builders/api-contract"
-    },
-    {
-      "action": "install",
-      "skill": "sdb-command-deck",
-      "profile": "cc-frontend",
-      "path": "/home/anashadi/.hermes/profiles/cc-frontend/skills/super-dev-builders/sdb-command-deck"
     }
   ],
   "missing_profiles": []

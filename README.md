@@ -43,6 +43,15 @@ tests/           test untuk scripts/ (dijalankan sebelum commit)
 > log, laporan generate) pindah ke object store per tenant. Repo tidak boleh tumbuh karena data pelanggan —
 > dijaga oleh `make hygiene`. Peta lengkap: `docs/PETA_STRUKTUR.md`; indeks dokumen: `docs/INDEX.md`.
 
+## Lisensi
+
+SDB berlisensi **Business Source License 1.1** (`LICENSE`): bebas untuk penggunaan **non-produksi**; pemakaian
+produksi untuk klien atau sebagai bagian layanan berbayar memerlukan perjanjian komersial. Setiap versi beralih
+ke Apache-2.0 pada 2030-10-26. Komponen pihak ketiga punya lisensinya sendiri — lihat `THIRD_PARTY_NOTICES.md`
+(perhatian: satu paket skill memakai CC-BY-SA-4.0 dan tidak boleh dilisensikan ulang sebagai BUSL).
+
+Kontak lisensi/komersial: `lisensi [at] anantara-sakti [dot] id`.
+
 ## Mulai dari sini
 Baru pertama kali? Ikuti **`docs/GETTING_STARTED.md`** — panduan Bahasa Indonesia dari nol
 sampai bisa dipakai sendiri (pasang, verifikasi, buat target, Gate #0, workflow 16 tahap,

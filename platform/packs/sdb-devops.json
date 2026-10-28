@@ -1,0 +1,94 @@
+{
+ "pack": "sdb-devops",
+ "version": "1.0.0",
+ "role": "sdb-devops",
+ "license": "BUSL-1.1",
+ "required_native": [
+  "source_trust_check",
+  "pin_revision",
+  "hermes_native_scan",
+  "manual_source_review",
+  "sandbox_test",
+  "allowlist_tools",
+  "human_approval"
+ ],
+ "source": {
+  "registry_version": "2.2.0",
+  "registry_updated": "2026-10-11",
+  "skill_count": 12
+ },
+ "skills": [
+  {
+   "id": "architecture-docs",
+   "path": "skills/architecture-docs",
+   "sha256": "641172b6054dda542eb9b99050dbec279ae513d88f90520bb19322b81b909cbb",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "ci-cd-release-gate",
+   "path": "skills/ci-cd-release-gate",
+   "sha256": "bbc2157dd86264680aff3dc32a559fb1149ead61190a8eaf03b0793c1dbef6ab",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "database-migration-safety",
+   "path": "skills/database-migration-safety",
+   "sha256": "90a2993bef717398c8af9d85a0e8d98a9b89591460de8d41ba4c87a4ff1353a5",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "engineering-release-audit",
+   "path": "skills/engineering-release-audit",
+   "sha256": "fae8a16f0c3adacf74067378c2bf9ac014a1a8d28f9a57f9c1f14a5164917989",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "html-to-video-render",
+   "path": "skills/html-to-video-render",
+   "sha256": "7ab7b39181c5912989efccc80c7ce6f8d78eb477487ce74abd17dd51a5389c22",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "local-llm-serving",
+   "path": "skills/local-llm-serving",
+   "sha256": "f90248051ba2caa0f8cb73ee5f2ea04660de6fb67b595c8e09257328b1771b4e",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "local-media-generation",
+   "path": "skills/local-media-generation",
+   "sha256": "399a9032d7927f701b1db1ade995ecbe03a415b0e2421d5c7777ab0897be68b4",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "privilege-free-tooling",
+   "path": "skills/privilege-free-tooling",
+   "sha256": "150e79df1653fb70b809c6e9f5f5a2df22e3a41a4d0fe3833939b8235e7e5d46",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "realtime-visual-engine",
+   "path": "skills/realtime-visual-engine",
+   "sha256": "634619b006217d506f287c4f740bece710c59b79b769a8c3e19529e79a7dab9b",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "release-handover-docs",
+   "path": "skills/release-handover-docs",
+   "sha256": "5cd962ec8ee54c9cc658a9cb4eeb1e0e38844c14e1097aeff182e81e74145e18",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "rollback-and-recovery",
+   "path": "skills/rollback-and-recovery",
+   "sha256": "1792596561cc08ad26deb0ebf0032d3d94d869e6fbf7acd6312e755a446e3f80",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "sdb-command-deck",
+   "path": "skills/sdb-command-deck",
+   "sha256": "a93897815774996c926a6aa669bd4f40497e3feb3a599fb9ed74c20d9db02032",
+   "license": "BUSL-1.1"
+  }
+ ]
+}

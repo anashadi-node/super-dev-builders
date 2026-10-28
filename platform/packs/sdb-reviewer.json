@@ -1,0 +1,70 @@
+{
+ "pack": "sdb-reviewer",
+ "version": "1.0.0",
+ "role": "sdb-reviewer",
+ "license": "BUSL-1.1",
+ "required_native": [
+  "source_trust_check",
+  "pin_revision",
+  "hermes_native_scan",
+  "manual_source_review",
+  "sandbox_test",
+  "allowlist_tools",
+  "human_approval"
+ ],
+ "source": {
+  "registry_version": "2.2.0",
+  "registry_updated": "2026-10-11",
+  "skill_count": 8
+ },
+ "skills": [
+  {
+   "id": "accessibility-audit",
+   "path": "skills/accessibility-audit",
+   "sha256": "b50278e329b5e3b44b913e208dbeb7370ded43d6e77d18cd6783581edcfdcead",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "api-contract",
+   "path": "skills/api-contract",
+   "sha256": "39d95ba1f5ae15a7550bc8a9b8637f0b88cf0ae35bbd07bebd36a57153ce34cd",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "bug-workflow",
+   "path": "skills/bug-workflow",
+   "sha256": "186f9cb1e5c4a9aff920e0cfd01c523d497ca7e81158f5eb72f25744146a0f09",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "product-execution",
+   "path": "skills/product-execution",
+   "sha256": "39e68bdc2f712ff59cc488bbd1ce56427a27f8a363dccca9a2e3202125d4c834",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "product-status",
+   "path": "skills/product-status",
+   "sha256": "7bc3df1a728547872f4b53e4ddee888f025b650017bc0c1d29214111f88f063c",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "rea-reverse-engineering",
+   "path": "skills/rea-reverse-engineering",
+   "sha256": "57fd0b49b49f827c605d2d3f6685d3df86344abb0e908d66a19ee4122d7eaa81",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "reconstruction-fidelity",
+   "path": "skills/reconstruction-fidelity",
+   "sha256": "0500d60a0e218398fab61fdf1793cbfc387121b293f37856d4564c4bc2f37526",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "test-pyramid-and-risk",
+   "path": "skills/test-pyramid-and-risk",
+   "sha256": "dd7452b7e5c093c240a45ad076afc9b3be543f8f6333c051e94cd0f3f2adef1b",
+   "license": "BUSL-1.1"
+  }
+ ]
+}

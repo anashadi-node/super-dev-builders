@@ -1,0 +1,82 @@
+{
+ "pack": "sdb-security",
+ "version": "1.0.0",
+ "role": "sdb-security",
+ "license": "BUSL-1.1",
+ "required_native": [
+  "source_trust_check",
+  "pin_revision",
+  "hermes_native_scan",
+  "manual_source_review",
+  "sandbox_test",
+  "allowlist_tools",
+  "human_approval"
+ ],
+ "source": {
+  "registry_version": "2.2.0",
+  "registry_updated": "2026-10-11",
+  "skill_count": 10
+ },
+ "skills": [
+  {
+   "id": "architecture-compliance-audit",
+   "path": "skills/architecture-compliance-audit",
+   "sha256": "4eb9a8a06ee6df385347f24bcaffef85b60e7615f9b39bfeeb3673fca42422aa",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "authz-authn-review",
+   "path": "skills/authz-authn-review",
+   "sha256": "ed393492248324d13b97575113f2397f98b86c8b28599e02a91fc608e272006c",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "ci-cd-release-gate",
+   "path": "skills/ci-cd-release-gate",
+   "sha256": "bbc2157dd86264680aff3dc32a559fb1149ead61190a8eaf03b0793c1dbef6ab",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "database-migration-safety",
+   "path": "skills/database-migration-safety",
+   "sha256": "90a2993bef717398c8af9d85a0e8d98a9b89591460de8d41ba4c87a4ff1353a5",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "engineering-release-audit",
+   "path": "skills/engineering-release-audit",
+   "sha256": "fae8a16f0c3adacf74067378c2bf9ac014a1a8d28f9a57f9c1f14a5164917989",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "local-experiment-tracking",
+   "path": "skills/local-experiment-tracking",
+   "sha256": "329c21ac64c436180de8edbc32f24f05634d0488b0ceee80b36d8b07bb178175",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "model-hub-provenance",
+   "path": "skills/model-hub-provenance",
+   "sha256": "e213e81e45cf6d3c156f1ebe6fce8e58f1c1a30bf3d5b91c06ef79ef71f56ee2",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "privilege-free-tooling",
+   "path": "skills/privilege-free-tooling",
+   "sha256": "150e79df1653fb70b809c6e9f5f5a2df22e3a41a4d0fe3833939b8235e7e5d46",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "rea-reverse-engineering",
+   "path": "skills/rea-reverse-engineering",
+   "sha256": "57fd0b49b49f827c605d2d3f6685d3df86344abb0e908d66a19ee4122d7eaa81",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "reconstruction-scope-gate",
+   "path": "skills/reconstruction-scope-gate",
+   "sha256": "733cc49220f40da7401f9a1b2a6b80daeb1e505b5d5c7149a9de46e38e45233c",
+   "license": "BUSL-1.1"
+  }
+ ]
+}

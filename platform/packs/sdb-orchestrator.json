@@ -1,0 +1,70 @@
+{
+ "pack": "sdb-orchestrator",
+ "version": "1.0.0",
+ "role": "sdb-orchestrator",
+ "license": "BUSL-1.1",
+ "required_native": [
+  "source_trust_check",
+  "pin_revision",
+  "hermes_native_scan",
+  "manual_source_review",
+  "sandbox_test",
+  "allowlist_tools",
+  "human_approval"
+ ],
+ "source": {
+  "registry_version": "2.2.0",
+  "registry_updated": "2026-10-11",
+  "skill_count": 8
+ },
+ "skills": [
+  {
+   "id": "geo-audit",
+   "path": "skills/geo-audit",
+   "sha256": "7a31c70d0345dec49128452fd069667df47cc3cb00bc4adc2a365339ed8717db",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "product-change",
+   "path": "skills/product-change",
+   "sha256": "093235067eff20523a385813c7cae4c9bead2d3917bd1284fc25ec91db22fc7b",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "product-execution",
+   "path": "skills/product-execution",
+   "sha256": "39e68bdc2f712ff59cc488bbd1ce56427a27f8a363dccca9a2e3202125d4c834",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "product-kit",
+   "path": "skills/product-kit",
+   "sha256": "2dfc13ce2c925f207b34464ed24759aa8b7630230086a52512b26b151639bc9a",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "product-status",
+   "path": "skills/product-status",
+   "sha256": "7bc3df1a728547872f4b53e4ddee888f025b650017bc0c1d29214111f88f063c",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "public-feed-reader",
+   "path": "skills/public-feed-reader",
+   "sha256": "a90ffd7849b236beab132a8bc6f187e078085436a1d5185ec0b9a352ac4ac31f",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "rea-reverse-engineering",
+   "path": "skills/rea-reverse-engineering",
+   "sha256": "57fd0b49b49f827c605d2d3f6685d3df86344abb0e908d66a19ee4122d7eaa81",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "reconstruction-scope-gate",
+   "path": "skills/reconstruction-scope-gate",
+   "sha256": "733cc49220f40da7401f9a1b2a6b80daeb1e505b5d5c7149a9de46e38e45233c",
+   "license": "BUSL-1.1"
+  }
+ ]
+}

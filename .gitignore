@@ -56,3 +56,11 @@ runs/rt-rw-portal/ulang2-clean/
 # Keluaran pindai rahasia (regenerable via `make secrets` / `make secrets-raw`)
 state/gitleaks-raw.json
 state/gitleaks-nofilter.toml
+
+# artefak kerja — diarsipkan ke luar git (ADR-0002), jangan dilacak lagi
+/runs/
+/evidence/
+/verification/
+/normalized/
+!runs/INDEX.md
+!evidence/INDEX.md

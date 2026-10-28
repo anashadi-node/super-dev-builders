@@ -1,0 +1,91 @@
+{
+  "keterangan": "BASELINE risiko-terbuka S-2 (devDependency npm, hanya mesin build; paket tar ditarik @capacitor/cli). BUKAN persetujuan pemilik: hanya membedakan temuan yang sudah diketahui dari yang BARU. Dihasilkan dari trivy --include-dev-deps pada commit 83f9b95, 11 Okt 2026.",
+  "sumber": "android/package-lock.json",
+  "commit": "83f9b95",
+  "trivy": [
+    {
+      "id": "CVE-2026-23745",
+      "pkg": "tar",
+      "versi": "6.2.1",
+      "tingkat": "HIGH",
+      "perbaikan": "7.5.3"
+    },
+    {
+      "id": "CVE-2026-23950",
+      "pkg": "tar",
+      "versi": "6.2.1",
+      "tingkat": "HIGH",
+      "perbaikan": "7.5.4"
+    },
+    {
+      "id": "CVE-2026-24842",
+      "pkg": "tar",
+      "versi": "6.2.1",
+      "tingkat": "HIGH",
+      "perbaikan": "7.5.7"
+    },
+    {
+      "id": "CVE-2026-26960",
+      "pkg": "tar",
+      "versi": "6.2.1",
+      "tingkat": "HIGH",
+      "perbaikan": "7.5.8"
+    },
+    {
+      "id": "CVE-2026-29786",
+      "pkg": "tar",
+      "versi": "6.2.1",
+      "tingkat": "HIGH",
+      "perbaikan": "7.5.10"
+    },
+    {
+      "id": "CVE-2026-31802",
+      "pkg": "tar",
+      "versi": "6.2.1",
+      "tingkat": "HIGH",
+      "perbaikan": "7.5.11"
+    },
+    {
+      "id": "CVE-2026-53655",
+      "pkg": "tar",
+      "versi": "6.2.1",
+      "tingkat": "MEDIUM",
+      "perbaikan": "7.5.16"
+    },
+    {
+      "id": "CVE-2026-59871",
+      "pkg": "tar",
+      "versi": "6.2.1",
+      "tingkat": "MEDIUM",
+      "perbaikan": "7.5.18"
+    },
+    {
+      "id": "CVE-2026-59873",
+      "pkg": "tar",
+      "versi": "6.2.1",
+      "tingkat": "CRITICAL",
+      "perbaikan": "7.5.19"
+    },
+    {
+      "id": "CVE-2026-59874",
+      "pkg": "tar",
+      "versi": "6.2.1",
+      "tingkat": "HIGH",
+      "perbaikan": "7.5.18"
+    },
+    {
+      "id": "CVE-2026-59875",
+      "pkg": "tar",
+      "versi": "6.2.1",
+      "tingkat": "MEDIUM",
+      "perbaikan": "7.5.17"
+    },
+    {
+      "id": "CVE-2026-73566",
+      "pkg": "tar",
+      "versi": "6.2.1",
+      "tingkat": "HIGH",
+      "perbaikan": "7.5.21"
+    }
+  ]
+}

@@ -3,7 +3,7 @@ name: html-to-video-render
 description: "Render HTML/CSS animations to MP4/WebM"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
-license: MIT
+license: BUSL-1.1
 platforms: [linux]
 metadata:
   hermes:

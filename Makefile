@@ -42,8 +42,12 @@ drift:
 	@if [ -d "$$HOME/.hermes/skills" ]; then $(PY_SYS) scripts/doctor.py --drift-only; \
 	else echo "SKIP drift — tanpa $$HOME/.hermes/skills (mis. runner CI)"; fi
 
-# gerbang lokal sebelum commit: lint + registry + test + drift + higiene artefak
-check: lint lint-registry test drift hygiene
+# gerbang lokal sebelum commit: lint + registry + test + drift + higiene artefak + pack
+check: lint lint-registry test drift hygiene packs
+
+# Manifest paket per divisi (ADR-0003): hash + lisensi harus cocok dengan registry & SKILL.md.
+packs:
+	$(PY_SYS) scripts/pack_build.py verify
 
 # Aturan penempatan (docs/PETA_STRUKTUR.md §4): tidak ada artefak besar/PII baru di git.
 # Baseline di platform/hygiene-baseline.json mencatat utang lama sebagai WARN.

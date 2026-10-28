@@ -3,7 +3,7 @@ name: architecture-compliance-audit
 description: "Detect architecture drift vs ADRs and specs"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
-license: MIT
+license: BUSL-1.1
 platforms: [linux, macos]
 metadata:
   hermes:

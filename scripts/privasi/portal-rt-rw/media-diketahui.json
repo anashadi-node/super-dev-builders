@@ -1,0 +1,330 @@
+{
+ "_catatan": "Pembeda temuan LAMA vs BARU untuk kanal privasi media (scan-privasi-media.py). BUKAN persetujuan pemilik dan BUKAN pernyataan aman. Kunci = sha256 isi berkas: begitu berkas disunting (diblur/dinetralkan) entri otomatis gugur dan berkas dinilai ulang. Seluruh entri = temuan terbuka OQ-7 yang menunggu keputusan pemilik (2026-10-11).",
+ "1e7e44a83e999d2503727478e633ef3ef55f6f60b7f40a8363a0c10efd23364d": {
+  "berkas": "reports/ui-v4/baseline_emergency.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "f75c9745af1a2185bcd1ecc1e0a2588ae6fa8904eca91a7fde36ae1acaa5ece9": {
+  "berkas": "reports/shot-10-dashboard-baru.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "fb2567f89d0c793b09ad9061a127c76317ce3e125aa81f79b382847205ae3f8e": {
+  "berkas": "reports/shot-11-dashboard-grafik.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "9f941960c8b7cbdd49a2fff10d72b33d1c0254af5a5c0be295a0d3a600b39ef6": {
+  "berkas": "reports/shot-12-dashboard-final.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "29ae817fcc381ca73a27ecf625adae5be7cd165a20716c925c5f24033b909259": {
+  "berkas": "reports/shot-13-mobile-dashboard.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "a6f56a33e4e602db0cb2a67bf62d5f38e1c28c3626ced12a3a5b67e38537452e": {
+  "berkas": "reports/shot-2-beranda.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "46b805b2328336c0cc71027a343e625da1af7676c718b25b15a8cc7ada4dc817": {
+  "berkas": "reports/shot-3-cctv-live.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "8e264582936abc2ab642d02925cdb68b42a817cc35fb22c9f885b47f12fc0e6e": {
+  "berkas": "reports/shot-4-mobile-darurat.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "77203df67325d382e27c308da3bbaa297aff35ecc10c6a1b9b1bb928830510e7": {
+  "berkas": "reports/shot-5-apk-launcher.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "4ff8343055f77c9131be77dbf20c0935820f9b0ac7a17f4b795f8ffe253dac7c": {
+  "berkas": "reports/shot-6-landing-hero.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "dd9184663e17ef6d539e8182b6a80f3b8a9f5456b4b5b2583432a31a3e7eaa34": {
+  "berkas": "reports/shot-7-landing-fitur.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "ba340c07c51707c3d85262669dcdfb5cb3836c5316d262dfb3bd2ed96bd15b41": {
+  "berkas": "reports/shot-8-akun-warga.png",
+  "kategori": [
+   "nama-merek"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "4a5a132168c567c52dd99b93f7be2f7d98b71b5c746535e5d37ec948ee9940ab": {
+  "berkas": "reports/shot-9-aktivasi.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "3b9a3ac77ab3d39d9722c491d0fd0e1ca5beae2078dd04c2683783ecd9425743": {
+  "berkas": "reports/ui-v4/baseline_cctv.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "503d7133ed36804aa75c2e9a474b3849536945ad6fb05a5302f41c13c4e7602d": {
+  "berkas": "reports/ui-v4/baseline_dash.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "924329989dbaadba1c950fa138bfb478617ddf8b7e9fec1d61bf1f719f9c0070": {
+  "berkas": "reports/ui-v4/baseline_iuran.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "085c3bf73014fb7a652a3db5f6ce0d9874d971d3bb141109e2d0ce9e5edacedd": {
+  "berkas": "reports/ui-v4/baseline_pengumuman.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "69192c629b38a911853be4fc1dff7ce0e293cc1eba4fed9c8561ecba4da6d1e8": {
+  "berkas": "reports/ui-v4/baseline_profil.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "471093e1301980101fb50618c611fe85812a111633f2d0573a91ba370ea01969": {
+  "berkas": "reports/ui-v4/baseline_surat.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "ca0bed49eabcd9196e151ce2c6a3ca2c7384cebcf23ef023590d79ffacea9537": {
+  "berkas": "reports/ui-v4/dashboard-rt-full.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "70935850707a14970cf3f865e810b4c4c5ca00278e0a15528ab2a600cff1d93d": {
+  "berkas": "reports/ui-v4/modul-iuran.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "8e3049a81b7741e3dc62e5ef4f8c4d174acb8c1a2d59e0fd5697cfbfc3c6f315": {
+  "berkas": "reports/ui-v4/topbar_final.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "9b05b0e0120dbe9a5d7ad982155f35d56a1ed1c99b45f429bf7e9ad4826827a4": {
+  "berkas": "reports/ui-v4/v4_cctv.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "4a37f338dfab77800c7be3051ee1a0aad476e56d7dc6169cf182751b42d10451": {
+  "berkas": "reports/ui-v4/v4_dash.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "eca0a4c8c0f4b5c5f9fb8d415cd76ef2f15814a8ca8ff81eb7d0c9b480252192": {
+  "berkas": "reports/ui-v4/v4_emergency.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "1d49e7efa3c7032329306fb7e42695c65e59dea52c016ae493ab5010eca0f85f": {
+  "berkas": "reports/ui-v4/v4_iuran.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "3670dd9a8bfc4aaa20a85a779af670aaf69b03c9aff44c3d8e26c0c3d7aad1c8": {
+  "berkas": "reports/ui-v4/v4_keamanan.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "b77095d3e937f95d8382bd10d592e8d74361dde2989febfac54cf9b5a17926f2": {
+  "berkas": "reports/ui-v4/v4_pengaduan.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "955471ff7107428d6f2fac147340d867271003a11f898f553d4a0fbb6914ab2d": {
+  "berkas": "reports/ui-v4/v4_pengumuman.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "d563f455636125691f3db08cb63c1fe722ca3da34587ba2cd034d276ed30514a": {
+  "berkas": "reports/ui-v4/v4_profil.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "e13383992ced559d724ac00709f91898ac865dff5e530847745bc1cb9f9c9c80": {
+  "berkas": "reports/ui-v4/v4_surat.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "6d4e928e30ce15ee65eb51d1459ae875e81ef5c093ca4f01b76d341d3eb6d3e3": {
+  "berkas": "reports/ui-v4/v4b_.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "879df9a49b44a1b8dd8ac11a0dfca593271ec3f7cc0bf8aae064de23fe8483ad": {
+  "berkas": "reports/ui-v4/v4b_dash_dark.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "0256882fd0181a25828ace20cd2817bbffea9ca1e6fe938da4d7a82a8427f86f": {
+  "berkas": "reports/ui-v4/v4b_iuran.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "9c03c25457090fe25e230e5c4a57b6e449a8ce866dc0a2824cd6eb9a5836ee4b": {
+  "berkas": "reports/ui-v4/v4b_mobile390.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "69b6bbbfbc38b2e0d9d7e5432529ff1325a1e061b183cc978f0ec6a3a1b0a72a": {
+  "berkas": "reports/ui-v4/v4b_tablet1024.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "9adc78aa9ae2af9a947cec7362a1f2416b130463d912594d2a50363f9519f736": {
+  "berkas": "verification/video-demo-midframe-final.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "b071ae878362c493981a7d20f8c5c265bbf34ebbb47bbf70fe22aa89d828bc34": {
+  "berkas": "verification/video-demo-midframe-pilot.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "ceabb350dcf6bf8717eeef0fbe3347e3f78dec49aa7c384959c23e23e495dcac": {
+  "berkas": "verification/video-demo-midframe-v2.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "9cb8897bb0bdbd371f9d3e0389733c55a675cfc949d5007549bd8f0f8741a2f6": {
+  "berkas": "verification/video-demo-midframe.png",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ },
+ "79d3142e41da03335ab88773af484345dc65cb09bf444fc356bcc05835d9c82a": {
+  "berkas": "video-demo-portal-warga.mp4",
+  "kategori": [
+   "nama-merek",
+   "varian-nomor-rw"
+  ],
+  "status": "TERBUKA-OQ-7"
+ }
+}

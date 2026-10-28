@@ -11,6 +11,10 @@ required_artifacts:
   security: [reports/security-gate.md]
   audit: [reports/assurance-audit.md]
   docs: [docs/README-*, reports/handover-*.md]
+# Verdict content = kontrak mesin: artefak fresh yang berisi FAIL tetap FAIL.
+# Keberadaan + kesegaran saja TIDAK PERNAH cukup untuk PASS.
+required_verdicts:
+  security-verdict: {patterns: [reports/security-verdict.json], field: verdict, allowed: [PASS]}
 risk_class_controls:
   LOW: {human_approval: false}
   MEDIUM: {human_approval: true, branch_required: true}

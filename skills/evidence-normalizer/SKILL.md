@@ -3,7 +3,7 @@ name: evidence-normalizer
 description: "Normalize raw captures into validated JSON evidence"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
-license: MIT
+license: BUSL-1.1
 platforms: [linux, macos]
 metadata:
   hermes:

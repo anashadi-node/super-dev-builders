@@ -3,7 +3,7 @@ name: database-migration-safety
 description: "Backup and rollback plan before schema changes"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
-license: MIT
+license: BUSL-1.1
 platforms: [linux, macos]
 metadata:
   hermes:

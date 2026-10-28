@@ -1,0 +1,34 @@
+{
+ "pack": "sdb-frontend",
+ "version": "1.0.0",
+ "role": "sdb-frontend",
+ "license": "BUSL-1.1",
+ "required_native": [
+  "source_trust_check",
+  "pin_revision",
+  "hermes_native_scan",
+  "manual_source_review",
+  "sandbox_test",
+  "allowlist_tools",
+  "human_approval"
+ ],
+ "source": {
+  "registry_version": "2.2.0",
+  "registry_updated": "2026-10-11",
+  "skill_count": 2
+ },
+ "skills": [
+  {
+   "id": "api-contract",
+   "path": "skills/api-contract",
+   "sha256": "39d95ba1f5ae15a7550bc8a9b8637f0b88cf0ae35bbd07bebd36a57153ce34cd",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "sdb-command-deck",
+   "path": "skills/sdb-command-deck",
+   "sha256": "a93897815774996c926a6aa669bd4f40497e3feb3a599fb9ed74c20d9db02032",
+   "license": "BUSL-1.1"
+  }
+ ]
+}

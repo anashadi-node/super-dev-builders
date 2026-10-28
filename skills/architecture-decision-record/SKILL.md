@@ -3,7 +3,7 @@ name: architecture-decision-record
 description: "Record architecture decisions with context (ADR)"
 version: 1.0.0
 author: Super Dev Builders Ecosystem
-license: MIT
+license: BUSL-1.1
 platforms: [linux, macos]
 metadata:
   hermes:

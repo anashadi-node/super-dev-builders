@@ -7,6 +7,7 @@ Pemakaian:
 """
 from __future__ import annotations
 
+import html as html_lib
 import os
 import sys
 
@@ -29,8 +30,11 @@ footer{margin-top:28px;color:var(--muted);font-size:.85rem}
 """
 
 def main() -> int:
-    if len(sys.argv) < 3:
+    if any(a in ("-h", "--help") for a in sys.argv[1:]):
         print(__doc__)
+        return 0
+    if len(sys.argv) < 3:
+        print(__doc__, file=sys.stderr)
         return 2
     src, out_base = sys.argv[1], sys.argv[2]
     os.makedirs(os.path.dirname(out_base) or ".", exist_ok=True)
@@ -38,9 +42,10 @@ def main() -> int:
 
     raw = open(src, encoding="utf-8").read()
     body = markdown.markdown(raw, extensions=["tables", "fenced_code", "toc", "sane_lists"])
+    name = html_lib.escape(os.path.basename(src))
     html = (f"<!doctype html><html lang='id'><head><meta charset='utf-8'>"
-            f"<title>{os.path.basename(src)}</title><style>{CSS}</style></head>"
-            f"<body><main>{body}<footer>Dihasilkan dari <code>{src}</code> · "
+            f"<title>{name}</title><style>{CSS}</style></head>"
+            f"<body><main>{body}<footer>Dihasilkan dari <code>{html_lib.escape(src)}</code> · "
             f"md_to_pdf.py · tanpa layanan pihak ketiga</footer></main></body></html>")
     html_path = out_base + ".html"
     open(html_path, "w", encoding="utf-8").write(html)

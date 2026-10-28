@@ -57,10 +57,13 @@ runs/rt-rw-portal/ulang2-clean/
 state/gitleaks-raw.json
 state/gitleaks-nofilter.toml
 
-# artefak kerja — diarsipkan ke luar git (ADR-0002), jangan dilacak lagi
-/runs/
-/evidence/
-/verification/
-/normalized/
-!runs/INDEX.md
-!evidence/INDEX.md
+# artefak kerja — diarsipkan ke luar git (ADR-0002), jangan dilacak lagi.
+# Pola /* dipakai (bukan /) supaya pengecualian INDEX.md tetap berlaku.
+/runs/*
+!/runs/INDEX.md
+/evidence/*
+!/evidence/INDEX.md
+/verification/*
+!/verification/INDEX.md
+/normalized/*
+!/normalized/INDEX.md

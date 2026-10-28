@@ -44,6 +44,11 @@ pembayaran, RBAC/SSO, sandbox eksekusi, dan antrean terdistribusi.
   → invoice 2.903 μUSD (1 job).
 - Belum ada: pembayaran (kartu/VA), pajak, proration upgrade, dunning, prioritas antrean,
   dead-letter queue, sandbox eksekusi, metrik Prometheus.
+- **Riwayat git dibersihkan** (`git filter-repo`): `runs/`, `evidence/`, `verification/`, `normalized/`,
+  `reconstruction/` dihapus dari 96 commit. `.git` 38 MB → 2,7 MB; 0 objek artefak tersisa; isi HEAD
+  di luar artefak identik; tag `v0.4.0`/`v0.5.0` dipertahankan (SHA ditulis ulang). Backup:
+  `~/sdb-archive/pre-purge-20261029/` (mirror + bundle). Remote `origin` dilepas filter-repo —
+  **belum** di-push ulang; push paksa ke remote bersama butuh keputusan terpisah.
 
 ## [0.4.0] — 2026-10-29
 

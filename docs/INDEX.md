@@ -58,6 +58,7 @@ tanggalnya menang — dan yang kalah **harus** dipindahkan ke `docs/archive/`, b
 
 | Dokumen | Isi |
 |---|---|
+| `runbooks/GIT_PURGE.md` | pembersihan artefak dari riwayat git (destruktif, wajib backup) |
 | `runbooks/RELEASE.md` | cara menandai & rollback rilis |
 | `INSTALLATION_PLAN.md` | instalasi |
 | `ROLLBACK_PLAN.md` | rollback umum |

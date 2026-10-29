@@ -2,6 +2,24 @@
 
 Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/) dan [SemVer](https://semver.org/lang/id/).
 
+## [0.7.0] — 2026-10-29
+
+Fase 2c: pembatas laju per tenant, metrik Prometheus, dan pembatasan percobaan PIN dashboard.
+Keputusan desain: ADR-0008. 396 tes (sebelumnya 384).
+
+### Ditambahkan
+
+- `429 rate_limited` + `Retry-After` saat tenant melewati jatah permintaan (token bucket di memori,
+  default 600/menit, `SDB_RATE_PER_MIN`). Jatah per tenant lewat `limits.rate_per_min` (kolom baru
+  `tenants.rate_per_min`, dimigrasi otomatis). Admin/worker tidak dibatasi.
+- `GET /metrics` (admin) dalam format teks Prometheus: permintaan per rute/status, job dibuat/selesai,
+  token terpakai, penolakan laju, uptime.
+- Dashboard: >30 kegagalan token per IP dalam 60 detik → `429`.
+
+### Catatan
+
+- Penghitung metrik disimpan di proses: hilang saat restart, tidak dijumlah antar instance.
+
 ## [0.6.0] — 2026-10-29
 
 Rilis audit fundamental. 30 cacat direproduksi dulu, baru diperbaiki (control plane 26 dari 27 hipotesis

@@ -18,6 +18,7 @@ import threading
 import traceback
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
+from .metrics import Metrics, RateLimited, RateLimiter
 from .store import ControlPlaneError, Store
 
 JOB_ARTIFACTS_RE = re.compile(r"^/v1/jobs/([A-Za-z0-9_]+)/artifacts$")
@@ -63,6 +64,9 @@ class Api:
         # MVP satu proses: serialisasi semua mutasi supaya cek-kuota + INSERT tidak balapan.
         # Skala horizontal nanti = Postgres dengan transaksi/row lock, bukan mengandalkan lock ini.
         self.lock = threading.Lock()
+        self.metrics = Metrics()
+        # Jatah laju per tenant (permintaan/menit). Dapat ditimpa per tenant lewat limits.rate_per_min.
+        self.limiter = RateLimiter(int(os.environ.get("SDB_RATE_PER_MIN", "600") or 600))
 
     def _admin(self, headers: dict) -> None:
         if not _same(headers.get("x-admin-key", ""), self.admin_key):
@@ -78,7 +82,15 @@ class Api:
         key = headers.get("x-api-key", "")
         if not key:
             raise ControlPlaneError(401, "unauthorized", "X-API-Key wajib")
-        return self.store.tenant_for_key(key)
+        tid = self.store.tenant_for_key(key)
+        # Pembatas laju per tenant: satu tenant yang membombardir API tidak boleh menghabiskan
+        # CPU/lock bersama. Diterapkan setelah auth supaya tenant lain tetap terlayani.
+        try:
+            self.limiter.check(tid, self.store.get_tenant(tid).get("rate_per_min") or None)
+        except RateLimited:
+            self.metrics.inc("sdb_rate_limited_total")
+            raise
+        return tid
 
     def handle(self, method: str, path: str, headers: dict, body: dict | None) -> tuple[int, dict]:
         h = {k.lower(): v for k, v in headers.items()}
@@ -86,6 +98,11 @@ class Api:
 
         if method == "GET" and path == "/healthz":
             return 200, {"status": "ok"}
+
+        if method == "GET" and path == "/metrics":
+            # Admin-only: angka per tenant/penolakan kuota bukan informasi publik.
+            self._admin(h)
+            return 200, self.metrics.render()  # str -> teks Prometheus (bukan JSON)
 
         if method == "POST" and path == "/v1/tenants":
             self._admin(h)
@@ -101,6 +118,8 @@ class Api:
             job, replayed = self.store.create_job(
                 tid, body.get("type", ""), _obj(body, "pack"), body.get("target_ref", ""),
                 _obj(body, "budget"), body.get("idempotency_key", ""))
+            if not replayed:
+                self.metrics.inc("sdb_jobs_created_total", {"type": str(job.get("type", ""))[:40]})
             return (200 if replayed else 201), {"job": job, "replayed": replayed}
 
         m = JOB_FINISH_RE.match(path)
@@ -146,7 +165,10 @@ class Api:
         m = JOB_COMPLETE_RE.match(path)
         if method == "POST" and m:
             self._worker(h)
-            return 200, {"job": self._complete(m.group(1), body)}
+            done = self._complete(m.group(1), body)
+            self.metrics.inc("sdb_jobs_completed_total", {"status": str(done.get("status", ""))})
+            self.metrics.inc("sdb_tokens_used_total", value=float(done.get("tokens_used") or 0))
+            return 200, {"job": done}
 
         m = JOB_CANCEL_RE.match(path)
         if method == "POST" and m:
@@ -201,6 +223,16 @@ class Api:
                                      body.get("error"), worker_id=worker_id)
 
 
+def _route_class(path: str) -> str:
+    """Normalisasi path ke templat rute: label metrik tidak boleh meledak per job_id (kardinalitas)."""
+    for rx, template in ((JOB_ARTIFACTS_RE, "/v1/jobs/:id/artifacts"), (JOB_HEARTBEAT_RE, "/v1/jobs/:id/heartbeat"),
+                         (JOB_COMPLETE_RE, "/v1/jobs/:id/complete"), (JOB_CANCEL_RE, "/v1/jobs/:id/cancel"),
+                         (JOB_FINISH_RE, "/v1/jobs/:id/finish"), (JOB_RE, "/v1/jobs/:id")):
+        if rx.match(path):
+            return template
+    return path if len(path) <= 64 else "/lainnya"
+
+
 def make_handler(api: Api):
     class Handler(BaseHTTPRequestHandler):
         protocol_version = "HTTP/1.1"
@@ -227,10 +259,15 @@ def make_handler(api: Api):
                 raise ControlPlaneError(400, "invalid_json", "body harus objek JSON")
             return data
 
-        def _send(self, status: int, payload: dict) -> None:
-            data = json.dumps(payload, ensure_ascii=False).encode()
+        def _send(self, status: int, payload, extra: dict | None = None) -> None:
+            text = isinstance(payload, str)  # teks siap kirim: /metrics (Prometheus)
+            data = (payload if text else json.dumps(payload, ensure_ascii=False)).encode()
             self.send_response(status)
-            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Type",
+                             "text/plain; version=0.0.4; charset=utf-8" if text
+                             else "application/json; charset=utf-8")
+            for k, v in (extra or {}).items():
+                self.send_header(k, v)
             self.send_header("Content-Length", str(len(data)))
             self.send_header("Cache-Control", "no-store")
             self.send_header("X-Content-Type-Options", "nosniff")
@@ -240,13 +277,19 @@ def make_handler(api: Api):
             self.wfile.write(data)
 
         def _handle(self, method: str) -> None:
+            extra: dict | None = None
+            path = self.path.split("?")[0]
             try:
                 if method != "POST" and (self.headers.get("Content-Length") or "0") != "0":
                     self.close_connection = True  # body GET tidak dibaca: jangan pakai ulang koneksi
                 body = self._read_body() if method == "POST" else None
                 with api.lock:
-                    status, payload = api.handle(
-                        method, self.path.split("?")[0], dict(self.headers.items()), body)
+                    status, payload = api.handle(method, path, dict(self.headers.items()), body)
+            except RateLimited as exc:
+                status = 429
+                payload = {"error": {"code": "rate_limited",
+                                     "message": "jatah permintaan per menit habis; coba lagi nanti"}}
+                extra = {"Retry-After": str(exc.retry_after)}
             except Exception as exc:  # ControlPlaneError & BillingError berbagi bentuk status/code/message
                 if hasattr(exc, "status") and hasattr(exc, "code"):
                     status = exc.status
@@ -255,9 +298,11 @@ def make_handler(api: Api):
                     status, payload = 500, {"error": {"code": "internal_error",
                                                       "message": type(exc).__name__}}
                     # Hanya method + path + traceback; header/body tidak dicatat (bisa memuat kunci).
-                    print(f"[control-plane] 500 {method} {self.path.split('?')[0]}", file=sys.stderr)
+                    print(f"[control-plane] 500 {method} {path}", file=sys.stderr)
                     traceback.print_exc(file=sys.stderr)
-            self._send(status, payload)
+            api.metrics.inc("sdb_http_requests_total",
+                            {"method": method, "route": _route_class(path), "status": str(status)})
+            self._send(status, payload, extra)
 
         def do_GET(self) -> None:
             self._handle("GET")

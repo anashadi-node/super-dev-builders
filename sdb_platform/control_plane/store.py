@@ -120,7 +120,8 @@ class Store:
               jobs_per_month INTEGER NOT NULL,
               tokens_per_month INTEGER NOT NULL,
               storage_gb INTEGER NOT NULL,
-              created_at TEXT NOT NULL
+              created_at TEXT NOT NULL,
+              rate_per_min INTEGER
             );
             CREATE TABLE IF NOT EXISTS api_keys (
               key_hash TEXT PRIMARY KEY,
@@ -163,6 +164,9 @@ class Store:
             CREATE INDEX IF NOT EXISTS idx_artifacts_tenant ON artifacts(tenant_id, job_id);
             """
         )
+        cols = {r["name"] for r in self.db.execute("PRAGMA table_info(tenants)")}
+        if "rate_per_min" not in cols:  # DB v0.6.0 dan lebih lama
+            self.db.execute("ALTER TABLE tenants ADD COLUMN rate_per_min INTEGER")
         self.db.commit()
 
     # ----------------------------------------------------------------- tenant
@@ -182,13 +186,18 @@ class Store:
                 if k in limits:
                     _require(_is_int(limits[k]) and limits[k] > 0, 400, "invalid_limits", f"{k} harus int > 0")
                     base[k] = limits[k]
+            # Jatah laju per menit (permintaan API). NULL = pakai default server.
+            if "rate_per_min" in limits:
+                _require(_is_int(limits["rate_per_min"]) and 1 <= limits["rate_per_min"] <= 100_000,
+                         400, "invalid_limits", "rate_per_min harus int 1..100000")
+                base["rate_per_min"] = limits["rate_per_min"]
         from .billing import TRIAL_CREDIT
         self.db.execute(
             "INSERT INTO tenants (tenant_id, name, plan, status, isolation, jobs_per_month,"
-            " tokens_per_month, storage_gb, created_at, credit_microusd, credit_held_microusd)"
-            " VALUES (?,?,?,?,?,?,?,?,?,0,0)",
+            " tokens_per_month, storage_gb, created_at, rate_per_min, credit_microusd, credit_held_microusd)"
+            " VALUES (?,?,?,?,?,?,?,?,?,?,0,0)",
             (tid, name, plan, "active", isolation, base["jobs_per_month"],
-             base["tokens_per_month"], base["storage_gb"], utcnow()),
+             base["tokens_per_month"], base["storage_gb"], utcnow(), base.get("rate_per_min")),
         )
         self.db.commit()
         if TRIAL_CREDIT[plan]:

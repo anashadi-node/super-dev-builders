@@ -23,6 +23,7 @@ import ws_api
 def live(tmp_path, monkeypatch):
     monkeypatch.setattr(ws_api, "DATA", tmp_path)
     monkeypatch.setattr(ws_api, "TOKEN_FILE", tmp_path / ".token")
+    ws_api.rate_401.clear()  # state modul: jangan mewarisi hitungan 401 tes sebelumnya
     srv = ThreadingHTTPServer(("127.0.0.1", 0), server.Handler)
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     yield f"http://127.0.0.1:{srv.server_address[1]}", ws_api.get_token()
@@ -223,3 +224,20 @@ def test_body_json_bukan_objek_400_tanpa_bocor_internal(live, route):
 
 def test_handler_punya_socket_timeout():
     assert 0 < (server.Handler.timeout or 0) <= 60
+
+
+def test_401_dibatasi_laju_setelah_30_percobaan_dalam_60_detik(live):
+    base, tok = live
+    codes = []
+    for i in range(35):
+        req = urllib.request.Request(f"{base}/api/ws/projects", method="GET",
+                                     headers={"X-SDB-Token": f"salah-{i}"})
+        try:
+            with urllib.request.urlopen(req, timeout=5) as r:
+                codes.append(r.status)
+        except urllib.error.HTTPError as e:
+            codes.append(e.code)
+    assert codes[:30] == [401] * 30, codes
+    assert codes[30:] == [429] * 5, codes
+    req = urllib.request.Request(f"{base}/api/ws/projects", headers={"X-SDB-Token": tok})
+    assert urllib.request.urlopen(req, timeout=5).status == 200

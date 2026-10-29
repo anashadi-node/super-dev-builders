@@ -83,6 +83,10 @@ def slugify(text):
     return (s or "proyek")[:40]
 
 
+rate_401: dict[str, list[float]] = {}
+rate_lock = threading.Lock()
+
+
 def get_token():
     DATA.mkdir(parents=True, exist_ok=True)
     tmp = None
@@ -484,6 +488,17 @@ def handle(h, method, send):
     given = h.headers.get("X-SDB-Token", "")
     # bytes: compare_digest(str) melempar TypeError untuk header non-ASCII.
     if not hmac.compare_digest(given.encode("utf-8", "replace"), token.encode("utf-8")):
+        # Laju 401 per klien: menebak PIN 72-bit tetap mustahil, tetapi membatasi percobaan membuat
+        # percobaan otomatis gagal cepat alih-alih membebani proses.
+        client = h.client_address[0]
+        now = time.monotonic()
+        with rate_lock:
+            hits = [t for t in rate_401.get(client, ()) if now - t < 60.0] + [now]
+            rate_401[client] = hits[-40:]
+            burst = len(hits)
+        if burst > 30:
+            send(429, {"error": "terlalu banyak kegagalan autentikasi; coba lagi sebentar"})
+            return True
         send(401, {"error": "token salah/kosong — buka dari PC lokal untuk melihat PIN"})
         return True
     try:

@@ -2,6 +2,30 @@
 
 Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/) dan [SemVer](https://semver.org/lang/id/).
 
+## [0.7.5] — 2026-10-29
+
+### Diperbaiki
+- **Command Deck menggantung di "Menyiapkan Super Dev Builders Workspace…"**: akar masalah
+  bukan izin launcher, melainkan `new THREE.WebGLRenderer()` melempar
+  `Error creating WebGL context` di PC tanpa driver EGL (`No suitable EGL configs found`).
+  Karena dilempar di top-level modul, overlay loader tidak pernah ditutup.
+  - `dashboard/ws/world.js`: renderer dibuat dengan dua percobaan, lalu melempar
+    `WEBGL_UNAVAILABLE` berkode agar bisa ditangani.
+  - `dashboard/ws/app.js`: boot aman — bila WebGL gagal, deck tetap terbuka dalam **mode 2D**
+    (chat, proyek, tim, panel hidup; hanya kantor 3D dimatikan) plus pemberitahuan penyebab.
+  - Watchdog 8 detik: overlay loader **selalu** ditutup walau `ready` tak pernah datang.
+  - `data-mode` / `data-mode-why` diekspos untuk diagnosis.
+
+### Diubah
+- Launcher deck (`install_shortcuts.sh`, `sdb-deck`, `sdb-fix-launcher.sh`) memakai
+  `--enable-unsafe-swiftshader` supaya Chrome memakai renderer perangkat lunak ketika
+  GPU/EGL tidak bisa membuat konteks WebGL — kantor 3D tetap tampil.
+- Self-heal mengembalikan flag tersebut bila hilang dari `.desktop` terpasang.
+
+### Ditambahkan
+- `tests/test_deck_boot.py` (4 tes): GL rusak -> mode 2D tanpa loader; GL normal -> mode 3D
+  dengan scene terbangun; launcher wajib mengizinkan Swiftshader; jalur gagal + watchdog ada.
+
 ## [0.7.4] — 2026-10-29
 
 ### Perbaikan

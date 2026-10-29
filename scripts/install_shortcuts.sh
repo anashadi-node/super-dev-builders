@@ -18,7 +18,8 @@ cat > "$BIN/sdb-deck" <<'EOF'
 # Buka Command Deck SDB (:8484) setelah memastikan layanannya hidup.
 systemctl --user is-active --quiet sdb-command-deck \
   || { echo "sdb-command-deck tidak aktif: systemctl --user start sdb-command-deck"; exit 1; }
-exec google-chrome --new-window --app=http://127.0.0.1:8484/
+bash "$HOME/super-dev-builders/scripts/sdb-fix-launcher.sh" >/dev/null 2>&1 || true
+exec google-chrome --new-window --enable-unsafe-swiftshader --app=http://127.0.0.1:8484/
 EOF
 chmod 700 "$BIN/sdb-deck"
 
@@ -96,7 +97,7 @@ cat > "$BIN/sdb-open" <<'EOF'
 #!/usr/bin/env bash
 # sdb://deck -> buka Command Deck. Dipanggil oleh handler sdb://.
 case "${1:-}" in
-  sdb://deck|sdb://deck/) exec google-chrome --new-window --app=http://127.0.0.1:8484/ ;;
+  sdb://deck|sdb://deck/) exec google-chrome --new-window --enable-unsafe-swiftshader --app=http://127.0.0.1:8484/ ;;
   *) echo "sdb:// belum didukung: $1 (yang ada: sdb://deck)" >&2; exit 1 ;;
 esac
 EOF
@@ -110,7 +111,7 @@ Version=1.0
 Name=SDB Command Deck
 GenericName=Super Dev Builders Dashboard
 Comment=Dashboard lokal Super Dev Builders — 12 divisi, 10 profil, routing 4 model (bisa dibuka dari HP via WiFi)
-Exec=google-chrome --new-window --app=http://127.0.0.1:8484/
+Exec=google-chrome --new-window --enable-unsafe-swiftshader --app=http://127.0.0.1:8484/
 Icon=utilities-system-monitor
 Terminal=false
 Categories=Development;

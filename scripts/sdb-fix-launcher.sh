@@ -14,7 +14,16 @@ if [ ! -e "$SRC" ]; then
 fi
 [ -e "$SRC" ] || { echo "sdb-fix-launcher: sumber $SRC hilang, pemasangan gagal" >&2; exit 1; }
 
-# 2) Salinan Desktop: buat ulang bila hilang / berbeda isi dari sumber.
+# 2) Flag Chrome wajib: di PC tanpa driver EGL, WebGL hanya hidup bila Swiftshader diizinkan.
+#    Tanpa flag ini deck berhenti di layar "Menyiapkan Super Dev Builders Workspace…".
+for f in "$APPS"/sdb-*.desktop; do
+  if grep -q '127\.0\.0\.1:8484' "$f" && ! grep -q -- '--enable-unsafe-swiftshader' "$f"; then
+    sed -i 's#^Exec=google-chrome #Exec=google-chrome --enable-unsafe-swiftshader #' "$f"
+    changed=1
+  fi
+done
+
+# 3) Salinan Desktop: buat ulang bila hilang / berbeda isi dari sumber.
 if [ ! -e "$DESK" ] || ! cmp -s "$SRC" "$DESK"; then
   cp "$SRC" "$DESK"; changed=1
 fi

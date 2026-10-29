@@ -416,6 +416,8 @@ sampai lolos gate.
 | `skill drift: ... 0 bermasalah` diikuti `DIFF` | Skill repo ≠ skill terpasang di profil | sinkronkan salinan profil, jalankan `make drift` lagi |
 | Gate #0 `BLOCKED` | `authorization.yaml` belum ada | salin dari `templates/`, isi, ulangi `sdb gate` |
 | Tahap `MISSING` di workflow | Tahap itu memang belum dikerjakan | kerjakan, atau pakai `--require-all` hanya saat jadi gate |
+| Deck berhenti di "Menyiapkan Super Dev Builders Workspace…" | GPU/EGL PC tidak bisa membuat konteks WebGL (sejak 0.7.5 deck otomatis jatuh ke mode 2D + pesan, tidak lagi menggantung) | tutup jendela, buka lagi lewat ikon **SDB Command Deck** (launcher memakai `--enable-unsafe-swiftshader`); kalau tetap 2D, itu batas driver — seluruh fitur selain kantor 3D tetap jalan |
+| Dialog "Invalid Permissions on Desktop File" | `.desktop` tanpa bit `x` / tanpa `metadata::trusted` | `bash scripts/sdb-fix-launcher.sh` (juga otomatis tiap hari + tiap `sdb-deck`) |
 
 Perintah diagnosis yang aman dijalankan kapan saja (semuanya read-only):
 

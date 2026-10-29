@@ -32,7 +32,21 @@ const seatOf = (r) => new THREE.Vector3(r.cx, 0, r.cz - 1.5);
 
 export function createWorld(host, opts = {}) {
   const coarse = matchMedia('(pointer:coarse)').matches || innerWidth < 800;
-  const renderer = new THREE.WebGLRenderer({ antialias: !coarse, alpha: true, powerPreference: 'high-performance' });
+  // WebGL bisa gagal total di PC tanpa driver EGL ("No suitable EGL configs found").
+  // Dua percobaan, lalu lempar error berkode supaya app.js bisa jatuh ke mode 2D — JANGAN menggantung.
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ antialias: !coarse, alpha: true, powerPreference: 'high-performance' });
+  } catch (e1) {
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
+    } catch (e2) {
+      const err = new Error('WEBGL_UNAVAILABLE: konteks WebGL tidak bisa dibuat di perangkat ini');
+      err.code = 'WEBGL_UNAVAILABLE';
+      err.cause = e2;
+      throw err;
+    }
+  }
   renderer.setPixelRatio(Math.min(devicePixelRatio, coarse ? 1.5 : 2));
   renderer.shadowMap.enabled = !coarse; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;

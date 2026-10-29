@@ -22,11 +22,79 @@ function showGate() { $('#gate').classList.add('on'); }
 $('#pinok').onclick = () => { TOKEN = $('#pinin').value.trim(); localStorage.setItem('sdb_token', TOKEN); $('#gate').classList.remove('on'); boot2(); };
 
 // ------------------------------------------------------------------ dunia
-const world = createWorld($('#stage'));
+// BOOT AMAN — 3D itu opsional. Layar "Menyiapkan…" TIDAK BOLEH menggantung apa pun yang terjadi:
+// WebGL gagal / driver EGL tidak ada / renderer error -> deck tetap terbuka dalam mode 2D.
+const BOOT_TIMEOUT_MS = 8000;
+let booted = false;
+
+function hideLoader() {
+  const l = $('#load');
+  if (!l || l.classList.contains('off')) return;
+  l.classList.add('off');
+  setTimeout(() => l.remove(), 800);
+}
+
+function deckNotice(title, lines) {
+  document.getElementById('nogl')?.remove();
+  const box = el('div');
+  box.id = 'nogl';
+  box.style.cssText = 'position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:70;max-width:660px;width:calc(100% - 32px);'
+    + 'background:#191418;color:#f4ece6;border:1px solid #4a3a3a;border-radius:14px;padding:14px 16px;'
+    + 'box-shadow:0 14px 44px rgba(0,0,0,.5);font-size:13px;line-height:1.5';
+  box.innerHTML = `<b style="font-size:15px">${esc(title)}</b>`
+    + `<div style="margin-top:6px;color:#cbbfba">${lines.map(esc).join('<br>')}</div>`
+    + '<button id="noglr" style="margin-top:10px;margin-right:8px;border:1px solid #6a5a4a;background:#2b2030;color:#f4ece6;'
+    + 'border-radius:9px;padding:6px 12px;font:inherit;cursor:pointer">Muat ulang</button>'
+    + '<button id="noglx" style="margin-top:10px;border:1px solid #5a4a4a;background:#241c22;color:#f4ece6;'
+    + 'border-radius:9px;padding:6px 12px;font:inherit;cursor:pointer">Tutup</button>';
+  document.body.appendChild(box);
+  box.querySelector('#noglx').onclick = () => box.remove();
+  box.querySelector('#noglr').onclick = () => location.reload();
+}
+
+function stubWorld() {
+  const noop = () => {};
+  return {
+    A: {}, inside: false, stats: () => ({ meshes: 0, actors: 0, rooms: 0 }), on: noop,
+    setDen: noop, snap: noop, select: noop, setProjects: noop, setState: noop, setPanelShift: noop,
+    reset: noop, toggleDen: () => false, setInside: noop, setJoy: noop, focusOn: noop,
+  };
+}
+
+let world;
+try {
+  world = createWorld($('#stage'));
+  document.documentElement.dataset.mode = '3d';
+} catch (e) {
+  world = stubWorld();
+  document.documentElement.dataset.mode = '2d';
+  document.documentElement.dataset.modeWhy = (e && (e.code || e.message)) || 'unknown';
+  hideLoader();
+  booted = true; // jangan biarkan watchdog menimpa pesan yang lebih akurat
+  deckNotice('Mode 2D — WebGL tidak tersedia di PC ini', [
+    'Workspace tetap bisa dipakai: chat, proyek, tim, dan panel berjalan normal; hanya kantor 3D yang dimatikan.',
+    `Penyebab: ${(e && (e.code || e.message)) || 'konteks WebGL gagal dibuat'}.`,
+    'Cara mengaktifkan 3D: tutup jendela ini lalu buka lagi lewat ikon “SDB Command Deck” (launcher sudah memakai renderer perangkat lunak).',
+  ]);
+  console.warn('[SDB] mode 2D:', e);
+}
 window.__world = world;
+const bootTimer = setTimeout(() => {
+  if (booted) return;
+  hideLoader();
+  document.documentElement.dataset.mode ||= '3d-timeout';
+  deckNotice('Mode 2D — kantor 3D tidak selesai dimuat', [
+    'Deck tetap terbuka dan bisa dipakai; hanya latar 3D yang tidak tampil.',
+    'Tutup jendela ini lalu buka lagi lewat ikon “SDB Command Deck”.',
+  ]);
+}, BOOT_TIMEOUT_MS);
+
 if (new URLSearchParams(location.search).get('den') === '1') { world.setDen(true); world.snap(); }
-world.on('ready', () => { document.documentElement.setAttribute('data-stats', JSON.stringify(world.stats())); });
-world.on('ready', () => setTimeout(() => $('#load').classList.add('off'), 350));
+world.on('ready', () => {
+  booted = true; clearTimeout(bootTimer);
+  document.documentElement.setAttribute('data-stats', JSON.stringify(world.stats()));
+});
+world.on('ready', () => setTimeout(hideLoader, 350));
 world.on('select', (s) => showCard(s));
 world.on('den', (on) => $('#bDen').classList.toggle('on', on));
 world.on('inside', (on) => { $('#bIn').classList.toggle('on', on); $('#dpad').classList.toggle('on', on); const h = $('#hint'); h.style.display = on ? 'block' : 'none'; h.textContent = 'WASD / panah untuk berjalan · seret mouse/jari untuk menoleh · tekan “Masuk” lagi untuk keluar'; });

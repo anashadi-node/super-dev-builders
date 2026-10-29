@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Workflow SDB — Semua Skenario</title>
+<meta name="description" content="Alur kerja SDB untuk clone/reverse engineering, PRD jadi, chat ide, game, mobile, CLI, data, refactor, audit, dan operasional.">
+<style>
+:root{--bg:#fff;--fg:#16181d;--muted:#5b6472;--line:#e3e7ee;--accent:#1e5fbf;--accent-soft:#eef4ff;
+--warn:#8a5a00;--warn-bg:#fff8e6;--code-bg:#f6f8fb}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;color:var(--fg);background:var(--bg);
+font:16px/1.72 -apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:0 28px 96px}
+header.hero{border-bottom:1px solid var(--line);margin-bottom:36px;padding:56px 0 28px;
+background:linear-gradient(180deg,var(--accent-soft),transparent)}
+.hero .kicker{color:var(--accent);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:12px}
+.hero h1{font-size:clamp(26px,4vw,40px);line-height:1.2;margin:10px 0 12px;letter-spacing:-.02em}
+.hero p{margin:0;color:var(--muted);max-width:70ch}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.badge{font-size:12.5px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);background:#fff}
+.layout{display:grid;grid-template-columns:266px minmax(0,1fr);gap:44px;align-items:start}
+nav.toc{position:sticky;top:18px;max-height:calc(100vh - 36px);overflow:auto;border-right:1px solid var(--line);padding-right:14px}
+nav.toc .toc-title,.toc-inline .toc-title{font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+color:var(--muted);font-weight:700;margin-bottom:10px}
+nav.toc ul{list-style:none;margin:0;padding:0;font-size:13.5px;line-height:1.45}
+nav.toc ul ul{margin:4px 0 8px 12px;border-left:1px solid var(--line);padding-left:10px}
+nav.toc li{margin:6px 0}
+nav.toc a{color:var(--muted);text-decoration:none;display:block;padding:2px 4px;border-radius:4px}
+nav.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+main{min-width:0}
+h1,h2,h3,h4{line-height:1.28;letter-spacing:-.015em}
+h2{font-size:26px;margin:46px 0 14px;padding-top:14px;border-top:1px solid var(--line)}
+h3{font-size:19.5px;margin:30px 0 10px}
+h4{font-size:16.5px;margin:22px 0 8px}
+p{margin:12px 0}
+a{color:var(--accent)}
+ul,ol{padding-left:22px}
+li{margin:6px 0}
+strong{font-weight:650}
+hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+code{font-family:ui-monospace,SFMono-Regular,"JetBrains Mono",Menlo,Consolas,monospace;font-size:13.6px;
+background:var(--code-bg);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+pre{background:var(--code-bg);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow:auto;line-height:1.55}
+pre code{background:none;border:0;padding:0;font-size:13.2px;white-space:pre}
+blockquote{margin:18px 0;padding:14px 18px;border-left:4px solid var(--warn);background:var(--warn-bg);
+color:#3a2b00;border-radius:0 8px 8px 0}
+blockquote p{margin:6px 0}
+.table-wrap{overflow:auto;margin:18px 0;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:14.2px}
+th,td{padding:10px 13px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:#f8fafc;font-weight:650;white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:#fbfcfe}
+.toc-inline{border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin:18px 0 26px;background:#fbfcfe}
+.toc-inline ul{list-style:none;margin:0;padding:0;columns:2;column-gap:28px;font-size:13.8px}
+.toc-inline ul ul{columns:1;margin:2px 0 6px 12px;border-left:1px solid var(--line);padding-left:10px}
+.toc-inline a{color:var(--fg);text-decoration:none}
+.toc-inline a:hover{color:var(--accent)}
+.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13.5px}
+@media print{
+  nav.toc{display:none}
+  .layout{display:block}
+  header.hero{background:none;padding-top:0}
+  body{font-size:11.2pt;line-height:1.5}
+  h2,h3{page-break-after:avoid;margin-top:22px}
+  pre,table,blockquote{page-break-inside:avoid}
+  a{color:#000;text-decoration:none}
+  .wrap{max-width:none;padding:0}
+  @page{size:A4;margin:16mm 14mm}
+}
+@media (max-width:900px){
+  .layout{display:block}
+  nav.toc{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--line);
+    padding:0 0 14px;margin-bottom:22px}
+}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <div class="kicker">Super Dev Builders · Workflow Skenario</div>
+  <h1>Workflow SDB — Semua Skenario</h1>
+  <p>Alur kerja SDB untuk clone/reverse engineering, PRD jadi, chat ide, game, mobile, CLI, data, refactor, audit, dan operasional.</p>
+  <div class="badges"><span class="badge">dokumentasi</span><span class="badge">tanpa dependensi runtime</span></div>
+</div></header>
+<div class="wrap layout">
+<nav class="toc"><div class="toc-title">Daftar Isi</div><div class="toc">
+<ul>
+<li><a href="#daftar-isi">Daftar Isi</a></li>
+<li><a href="#1-peta-mesin-16-tahap-berlaku-untuk-semua-skenario">1. Peta mesin: 16 tahap (berlaku untuk semua skenario)</a><ul>
+<li><a href="#aturan-yang-tidak-berubah-di-semua-skenario">Aturan yang tidak berubah di semua skenario</a></li>
+</ul>
+</li>
+<li><a href="#2-skenario-a-anda-punya-contoh-copy-clone-reverse-engineering-situs-saas-atau-aplikasi">2. Skenario A — Anda punya contoh: copy-clone / reverse engineering situs, SaaS, atau aplikasi</a><ul>
+<li><a href="#a1-kapan-ini-boleh">A.1 Kapan ini boleh</a></li>
+<li><a href="#a2-alur-yang-membedakan-dari-skenario-lain-tahap-01b-berat">A.2 Alur (yang membedakan dari skenario lain: tahap 01B berat)</a></li>
+<li><a href="#a3-perintah-nyata">A.3 Perintah nyata</a></li>
+<li><a href="#a4-yang-tidak-dilakukan-sdb-dan-tidak-akan">A.4 Yang tidak dilakukan SDB (dan tidak akan)</a></li>
+<li><a href="#a5-hasil-yang-bisa-anda-harapkan">A.5 Hasil yang bisa Anda harapkan</a></li>
+</ul>
+</li>
+<li><a href="#3-skenario-b-anda-sudah-punya-prd">3. Skenario B — Anda sudah punya PRD</a><ul>
+<li><a href="#b1-yang-harus-ada-di-prd-agar-lancar">B.1 Yang harus ada di PRD agar lancar</a></li>
+<li><a href="#b2-alur">B.2 Alur</a></li>
+<li><a href="#b3-perintah-nyata">B.3 Perintah nyata</a></li>
+<li><a href="#b4-kesalahan-umum-dan-akibatnya">B.4 Kesalahan umum (dan akibatnya)</a></li>
+</ul>
+</li>
+<li><a href="#4-skenario-c-anda-hanya-chat-saya-mau-bikin-x-targetnya-y">4. Skenario C — Anda hanya chat: "saya mau bikin X, targetnya Y"</a><ul>
+<li><a href="#c1-alur">C.1 Alur</a></li>
+<li><a href="#c2-contoh-percakapan-yang-benar-dan-yang-salah">C.2 Contoh percakapan yang benar (dan yang salah)</a></li>
+<li><a href="#c3-perintah-nyata">C.3 Perintah nyata</a></li>
+<li><a href="#c4-tanda-agen-sedang-slop-hentikan">C.4 Tanda agen sedang "slop" (hentikan)</a></li>
+</ul>
+</li>
+<li><a href="#5-skenario-lain-lengkap">5. Skenario lain (lengkap)</a><ul>
+<li><a href="#51-game-2d3d-web-atau-desktop">5.1 Game (2D/3D, web atau desktop)</a></li>
+<li><a href="#52-aplikasi-mobile-androidios">5.2 Aplikasi mobile (Android/iOS)</a></li>
+<li><a href="#53-programcliotomasi-bukan-web">5.3 Program/CLI/otomasi (bukan web)</a></li>
+<li><a href="#54-data-pipeline-laporan-analitik">5.4 Data pipeline / laporan / analitik</a></li>
+<li><a href="#55-maintenance-refactor-kode-yang-sudah-ada">5.5 Maintenance / refactor kode yang sudah ada</a></li>
+<li><a href="#56-audit-keamanan-review-kode-pihak-lain">5.6 Audit keamanan / review kode pihak lain</a></li>
+<li><a href="#57-menjalankan-produk-yang-sudah-ada-operasional-harian">5.7 Menjalankan produk yang sudah ada (operasional harian)</a></li>
+</ul>
+</li>
+<li><a href="#6-tabel-pemetaan-skenario-tahap-yang-dipangkas">6. Tabel pemetaan: skenario → tahap yang dipangkas</a></li>
+<li><a href="#7-kesalahan-lintas-skenario-semua-ini-pernah-merusak-proyek-nyata">7. Kesalahan lintas-skenario (semua ini pernah merusak proyek nyata)</a></li>
+<li><a href="#8-ringkasan-satu-halaman">8. Ringkasan satu halaman</a></li>
+</ul>
+</div>
+</nav>
+<main>
+<p>Dokumen ini menjawab satu pertanyaan: <strong>"saya punya X (contoh situs / PRD / ide di kepala / kode
+lama / ide game), bagaimana alurnya di SDB?"</strong></p>
+<p>Semua skenario di bawah berjalan di atas <strong>satu</strong> mesin yang sama: 16 tahap workflow dengan Gate #0
+(authorization/scope) di depan. Yang berbeda antar-skenario bukan mesinnya, melainkan <strong>titik masuk</strong>
+dan <strong>tahap mana yang boleh dipangkas</strong>.</p>
+<blockquote>
+<p>Verifikasi fakta: <code>sdb workflow --list-stages</code> (18 baris: 01, 01A, 01B, 02–16).
+Runner memeriksa <strong>keberadaan artefak</strong>, bukan menilai kualitas. <code>MISSING</code> = belum dikerjakan.</p>
+</blockquote>
+<hr />
+<h2 id="daftar-isi">Daftar Isi</h2>
+<div class="toc-inline"><div class="toc-title">Daftar Isi</div><div class="toc">
+<ul>
+<li><a href="#daftar-isi">Daftar Isi</a></li>
+<li><a href="#1-peta-mesin-16-tahap-berlaku-untuk-semua-skenario">1. Peta mesin: 16 tahap (berlaku untuk semua skenario)</a><ul>
+<li><a href="#aturan-yang-tidak-berubah-di-semua-skenario">Aturan yang tidak berubah di semua skenario</a></li>
+</ul>
+</li>
+<li><a href="#2-skenario-a-anda-punya-contoh-copy-clone-reverse-engineering-situs-saas-atau-aplikasi">2. Skenario A — Anda punya contoh: copy-clone / reverse engineering situs, SaaS, atau aplikasi</a><ul>
+<li><a href="#a1-kapan-ini-boleh">A.1 Kapan ini boleh</a></li>
+<li><a href="#a2-alur-yang-membedakan-dari-skenario-lain-tahap-01b-berat">A.2 Alur (yang membedakan dari skenario lain: tahap 01B berat)</a></li>
+<li><a href="#a3-perintah-nyata">A.3 Perintah nyata</a></li>
+<li><a href="#a4-yang-tidak-dilakukan-sdb-dan-tidak-akan">A.4 Yang tidak dilakukan SDB (dan tidak akan)</a></li>
+<li><a href="#a5-hasil-yang-bisa-anda-harapkan">A.5 Hasil yang bisa Anda harapkan</a></li>
+</ul>
+</li>
+<li><a href="#3-skenario-b-anda-sudah-punya-prd">3. Skenario B — Anda sudah punya PRD</a><ul>
+<li><a href="#b1-yang-harus-ada-di-prd-agar-lancar">B.1 Yang harus ada di PRD agar lancar</a></li>
+<li><a href="#b2-alur">B.2 Alur</a></li>
+<li><a href="#b3-perintah-nyata">B.3 Perintah nyata</a></li>
+<li><a href="#b4-kesalahan-umum-dan-akibatnya">B.4 Kesalahan umum (dan akibatnya)</a></li>
+</ul>
+</li>
+<li><a href="#4-skenario-c-anda-hanya-chat-saya-mau-bikin-x-targetnya-y">4. Skenario C — Anda hanya chat: "saya mau bikin X, targetnya Y"</a><ul>
+<li><a href="#c1-alur">C.1 Alur</a></li>
+<li><a href="#c2-contoh-percakapan-yang-benar-dan-yang-salah">C.2 Contoh percakapan yang benar (dan yang salah)</a></li>
+<li><a href="#c3-perintah-nyata">C.3 Perintah nyata</a></li>
+<li><a href="#c4-tanda-agen-sedang-slop-hentikan">C.4 Tanda agen sedang "slop" (hentikan)</a></li>
+</ul>
+</li>
+<li><a href="#5-skenario-lain-lengkap">5. Skenario lain (lengkap)</a><ul>
+<li><a href="#51-game-2d3d-web-atau-desktop">5.1 Game (2D/3D, web atau desktop)</a></li>
+<li><a href="#52-aplikasi-mobile-androidios">5.2 Aplikasi mobile (Android/iOS)</a></li>
+<li><a href="#53-programcliotomasi-bukan-web">5.3 Program/CLI/otomasi (bukan web)</a></li>
+<li><a href="#54-data-pipeline-laporan-analitik">5.4 Data pipeline / laporan / analitik</a></li>
+<li><a href="#55-maintenance-refactor-kode-yang-sudah-ada">5.5 Maintenance / refactor kode yang sudah ada</a></li>
+<li><a href="#56-audit-keamanan-review-kode-pihak-lain">5.6 Audit keamanan / review kode pihak lain</a></li>
+<li><a href="#57-menjalankan-produk-yang-sudah-ada-operasional-harian">5.7 Menjalankan produk yang sudah ada (operasional harian)</a></li>
+</ul>
+</li>
+<li><a href="#6-tabel-pemetaan-skenario-tahap-yang-dipangkas">6. Tabel pemetaan: skenario → tahap yang dipangkas</a></li>
+<li><a href="#7-kesalahan-lintas-skenario-semua-ini-pernah-merusak-proyek-nyata">7. Kesalahan lintas-skenario (semua ini pernah merusak proyek nyata)</a></li>
+<li><a href="#8-ringkasan-satu-halaman">8. Ringkasan satu halaman</a></li>
+</ul>
+</div>
+</div>
+<hr />
+<h2 id="1-peta-mesin-16-tahap-berlaku-untuk-semua-skenario">1. Peta mesin: 16 tahap (berlaku untuk semua skenario)</h2>
+<pre><code class="language-text">01    USER OBJECTIVE                  tujuan terukur + definisi selesai
+01A   AUTHORIZATION/SCOPE GATE        gate_check.py  ← WAJIB, tidak bisa dilewati
+01B   RECON/EVIDENCE PACKAGE          bukti apa yang boleh dipakai
+02    ORCHESTRATOR: KLARIFIKASI       pertanyaan sampai ambigu hilang
+03    RESEARCH                        hanya bila ada ketidakpastian teknis nyata
+04    ARCHITECTURE + ADR              keputusan + alasannya, tertulis
+05    HUMAN DESIGN APPROVAL           Anda menyetujui desain
+06    IMPLEMENTATION PLAN             urutan kerja, berkas yang disentuh
+07    IMPLEMENTASI (FE/BE)            kode
+08    CODE REVIEW                     diff dibaca, bukan dipercaya
+09    QA / INTEGRATION / E2E          tes nyata, output nyata
+10    SECURITY (SAST/DEP/SECRET)      semgrep/gitleaks/dependency
+11    CODE AUDIT &amp; ASSURANCE          audit menyeluruh
+12    RELEASE GATE                    release_check.py  ← WAJIB sebelum deploy
+13    HUMAN APPROVAL PRODUKSI         Anda menyetujui rilis
+14    DEVOPS DEPLOY                   satu layanan sekaligus
+15    OBSERVABILITY/SMOKE/ROLLBACK    bukti pasca-deploy
+16    DOCS + HANDOVER                 dokumen yang bisa dibaca orang lain
+</code></pre>
+<p>Dua tahap punya alat deterministik: <strong>01A</strong> (<code>gate_check.py</code>) dan <strong>12</strong> (<code>release_check.py</code>).
+Sisanya dijalankan agen + Anda. Itu batasan yang diketahui — bukan klaim otomatis penuh.</p>
+<h3 id="aturan-yang-tidak-berubah-di-semua-skenario">Aturan yang tidak berubah di semua skenario</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Aturan</th>
+<th>Konsekuensi bila dilanggar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gate #0 PASS sebelum recon/scan</td>
+<td>runner menolak; tidak ada evidence package</td>
+</tr>
+<tr>
+<td>Tidak ada kredensial/PII di evidence</td>
+<td><code>evidence_lint.py</code> FAIL, paket tidak sah</td>
+</tr>
+<tr>
+<td>Tidak ada klaim "selesai" tanpa artefak</td>
+<td>tahap tetap <code>MISSING</code></td>
+</tr>
+<tr>
+<td>Deploy butuh persetujuan Anda</td>
+<td>tahap 13 tidak bertanda tangan</td>
+</tr>
+<tr>
+<td>Satu perubahan → satu verifikasi</td>
+<td>rollback tidak mungkin dilacak</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="2-skenario-a-anda-punya-contoh-copy-clone-reverse-engineering-situs-saas-atau-aplikasi">2. Skenario A — Anda punya contoh: copy-clone / reverse engineering situs, SaaS, atau aplikasi</h2>
+<p>Ini skenario <strong>paling berisiko</strong> dan paling sering disalahpahami. SDB tidak "menyalin" situs orang
+lain; SDB merekonstruksi <strong>perilaku yang Anda berhak pelajari</strong>, dengan batas yang Anda tulis
+sendiri di <code>authorization.yaml</code>.</p>
+<h3 id="a1-kapan-ini-boleh">A.1 Kapan ini boleh</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Kondisi</th>
+<th>Contoh sah</th>
+<th>Contoh TIDAK sah</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Milik Anda sendiri</td>
+<td>situs lama Anda, kode warisan</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Lisensi mengizinkan</td>
+<td>MIT/Apache, konten CC</td>
+<td>repo tanpa lisensi + klaim "bebas"</td>
+</tr>
+<tr>
+<td>Anda punya izin tertulis</td>
+<td>kontrak kerja, NDA</td>
+<td>"kata orang boleh"</td>
+</tr>
+<tr>
+<td>Publik &amp; hanya untuk belajar pola</td>
+<td>membaca struktur halaman publik</td>
+<td>menyalin aset berhak cipta</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="a2-alur-yang-membedakan-dari-skenario-lain-tahap-01b-berat">A.2 Alur (yang membedakan dari skenario lain: tahap 01B berat)</h3>
+<pre><code>01   Tujuan: &quot;rekonstruksi alur checkout X untuk dipelajari&quot; (bukan &quot;clone X&quot;)
+01A  authorization.yaml → gate_check.py  ← PASS wajib
+01B  capture terkendali: struktur halaman, alur navigasi, kontrak API yang terlihat
+     → normalize_capture.py → evidence_lint.py (kredensial otomatis [REDACTED])
+02   Klarifikasi: bagian mana yang direkonstruksi, bagian mana yang TIDAK
+03   Research: pola alternatif yang lebih baik (jangan menyalin cacat desain)
+04   ADR: keputusan teknologi Anda sendiri, bukan warisan target
+05–09 desain → implementasi → review → QA
+10–11 SAST, dependency, secret scan, audit
+12   release_check.py
+13–16 deploy (bila perlu) → smoke → dokumen
+</code></pre>
+<h3 id="a3-perintah-nyata">A.3 Perintah nyata</h3>
+<pre><code class="language-bash">cd ~/super-dev-builders
+
+# 1) siapkan target + authorization
+sdb init nama-target            # atau: make init TARGET=nama-target
+$EDITOR targets/nama-target/authorization.yaml   # isi dasar hukum, cakupan, larangan
+
+# 2) Gate #0 — tanpa PASS, jangan lanjut
+sdb gate nama-target            # atau: python3 scripts/gate_check.py targets/nama-target
+
+# 3) baru boleh capture/recon (terkendali, tanpa bypass)
+sdb capture nama-target --url https://contoh.tld/halaman-publik
+python3 scripts/evidence_lint.py targets/nama-target
+
+# 4) jalankan sisa tahap
+sdb workflow nama-target
+</code></pre>
+<h3 id="a4-yang-tidak-dilakukan-sdb-dan-tidak-akan">A.4 Yang <strong>tidak</strong> dilakukan SDB (dan tidak akan)</h3>
+<ul>
+<li>Melewati login/CAPTCHA/paywall/DRM/pinning.</li>
+<li>Menyimpan cookie/token/PII ke evidence — <code>evidence_lint.py</code> memaksa <code>[REDACTED]</code>.</li>
+<li>Menyalin aset berhak cipta ke produk Anda.</li>
+<li>Menyalin kode tanpa lisensi lalu mengganti nama variabel.</li>
+</ul>
+<p>Kalau tujuan Anda "supaya fitur sama", jalur yang benar adalah <strong>memahami pola lalu
+mengimplementasikan ulang</strong> — itu tetap sah, dan itu yang diukur <code>fidelity_compare.py</code>
+(kesamaan perilaku, bukan kesamaan kode).</p>
+<h3 id="a5-hasil-yang-bisa-anda-harapkan">A.5 Hasil yang bisa Anda harapkan</h3>
+<ul>
+<li><code>targets/nama-target/evidence/</code> — paket bukti bersih, bisa diaudit.</li>
+<li><code>fidelity_report</code> — dimensi apa yang cocok/berbeda dari target (bukan "clone 100%").</li>
+<li>ADR yang menjelaskan <strong>mengapa</strong> implementasi Anda berbeda dari target.</li>
+</ul>
+<hr />
+<h2 id="3-skenario-b-anda-sudah-punya-prd">3. Skenario B — Anda sudah punya PRD</h2>
+<p>Ini skenario <strong>tercepat</strong> karena tahap 01–02 sudah 80% selesai di dokumen Anda. Yang perlu
+dilakukan: mengubah PRD menjadi artefak yang bisa diperiksa mesin.</p>
+<h3 id="b1-yang-harus-ada-di-prd-agar-lancar">B.1 Yang harus ada di PRD agar lancar</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Bagian PRD</th>
+<th>Dipakai di tahap</th>
+<th>Bila tidak ada</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tujuan + metrik sukses</td>
+<td>01</td>
+<td>tahap 01 <code>MISSING</code>, agen menebak — jangan</td>
+</tr>
+<tr>
+<td>Daftar fitur + prioritas (MoSCoW)</td>
+<td>02, 06</td>
+<td>plan jadi acak</td>
+</tr>
+<tr>
+<td>Persona/aktor + hak akses</td>
+<td>02, 04, 10</td>
+<td>kontrol akses bolong</td>
+</tr>
+<tr>
+<td>Alur utama + alur gagal</td>
+<td>02, 09</td>
+<td>QA tidak punya skenario negatif</td>
+</tr>
+<tr>
+<td>Non-fungsional (perf, privasi, skala)</td>
+<td>04, 12</td>
+<td>release gate tidak bisa menilai</td>
+</tr>
+<tr>
+<td>Di luar cakupan (eksplisit)</td>
+<td>01A</td>
+<td>scope creep tak terdeteksi</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="b2-alur">B.2 Alur</h3>
+<pre><code>01   salin tujuan + metrik dari PRD ke objectives.md
+01A  authorization.yaml: &quot;ini produk saya, tidak ada pihak ketiga&quot; → gate PASS
+01B  evidence = PRD + wireframe + referensi (bukan scan target)
+02   klien (Anda) mengonfirmasi hal yang PRD-nya masih ambigu ← jangan dilewati
+03   research hanya untuk bagian yang PRD-nya menyebut teknologi belum dikenal
+04   ADR dari keputusan yang PRD sudah tetapkan + yang PRD serahkan ke tim
+05   Anda menyetujui desain (ini titik koreksi termurah)
+06   plan per fitur, dipetakan ke acceptance criteria PRD
+07–09 implementasi → review → QA terhadap acceptance criteria (bukan &quot;kira-kira jalan&quot;)
+10–11 security + audit
+12   release gate: acceptance criteria PRD = daftar periksa
+13–16 deploy → smoke → handover
+</code></pre>
+<h3 id="b3-perintah-nyata">B.3 Perintah nyata</h3>
+<pre><code class="language-bash">sdb init produk-baru
+# taruh PRD sebagai artefak tahap 01/01B
+cp ~/Dokumen/PRD-produk-baru.md targets/produk-baru/objectives.md
+$EDITOR targets/produk-baru/authorization.yaml
+sdb gate produk-baru
+sdb workflow produk-baru
+</code></pre>
+<h3 id="b4-kesalahan-umum-dan-akibatnya">B.4 Kesalahan umum (dan akibatnya)</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Kesalahan</th>
+<th>Akibat</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PRD tanpa metrik</td>
+<td>tidak ada cara membuktikan "selesai"</td>
+</tr>
+<tr>
+<td>PRD tanpa "di luar cakupan"</td>
+<td>pekerjaan membengkak tanpa persetujuan</td>
+</tr>
+<tr>
+<td>Langsung ke tahap 07</td>
+<td>desain tidak pernah disetujui → mahal saat revisi</td>
+</tr>
+<tr>
+<td>Acceptance criteria tidak dipetakan</td>
+<td>QA lulus, produk tidak sesuai PRD</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="4-skenario-c-anda-hanya-chat-saya-mau-bikin-x-targetnya-y">4. Skenario C — Anda hanya chat: "saya mau bikin X, targetnya Y"</h2>
+<p>Ini skenario <strong>paling umum</strong> dan paling rawan <strong>SLOP</strong>: ide masih kabur, agen cenderung mengarang
+kebutuhan. SDB menanganinya dengan <strong>memaksa tahap 02 (klarifikasi)</strong> sebelum satu baris kode.</p>
+<h3 id="c1-alur">C.1 Alur</h3>
+<pre><code>01   tulis tujuan dalam satu kalimat + definisi selesai yang bisa diukur
+01A  authorization.yaml (biasanya: produk milik Anda, tanpa target pihak ketiga)
+02   ORCHESTRATOR bertanya — minimal: aktor, alur utama, data, skala, batas waktu,
+     apa yang TIDAK dikerjakan
+03   research bila Anda menyebut teknologi yang belum dipakai tim
+04   arsitektur + ADR (pilihan teknologi + alasan)
+05   Anda menyetujui desain ← gerbang termurah untuk mengubah arah
+06   plan
+07–16 seperti biasa
+</code></pre>
+<h3 id="c2-contoh-percakapan-yang-benar-dan-yang-salah">C.2 Contoh percakapan yang benar (dan yang salah)</h3>
+<p><strong>Salah</strong> — melompat ke kode:</p>
+<blockquote>
+<p>Anda: "buatkan SaaS invoice"
+Agen: <em>langsung menulis 40 berkas</em></p>
+</blockquote>
+<p><strong>Benar</strong> — klarifikasi dulu, baru kode:</p>
+<blockquote>
+<p>Anda: "Saya mau SaaS invoice sederhana untuk freelancer Indonesia. Target: 10 pengguna aktif
+pertama dalam 30 hari, satu orang bisa menerbitkan invoice dan kliennya membayar via transfer
+manual (belum payment gateway)."</p>
+<p>Agen (tahap 02): "Lima hal perlu dipastikan: (1) multi-tenant atau satu akun? (2) mata uang IDR
+saja? (3) invoice berulang perlu? (4) pajak/PPN dihitung? (5) siapa yang boleh melihat invoice —
+hanya pemilik atau klien juga lewat tautan?"</p>
+<p>Anda menjawab → <strong>baru</strong> tahap 04–07 berjalan dengan asumsi tertulis.</p>
+</blockquote>
+<h3 id="c3-perintah-nyata">C.3 Perintah nyata</h3>
+<pre><code class="language-bash">sdb init saas-invoice
+$EDITOR targets/saas-invoice/objectives.md     # tujuan + metrik + definisi selesai
+$EDITOR targets/saas-invoice/authorization.yaml
+sdb gate saas-invoice
+sdb workflow saas-invoice
+</code></pre>
+<h3 id="c4-tanda-agen-sedang-slop-hentikan">C.4 Tanda agen sedang "slop" (hentikan)</h3>
+<ul>
+<li>Menulis kode sebelum Anda menyetujui desain.</li>
+<li>Mengarang angka pasar ("pasti laku") tanpa sumber.</li>
+<li>Menambah fitur yang tidak Anda minta "untuk nanti".</li>
+<li>Menyatakan "selesai" tanpa tes yang dijalankan.</li>
+</ul>
+<hr />
+<h2 id="5-skenario-lain-lengkap">5. Skenario lain (lengkap)</h2>
+<h3 id="51-game-2d3d-web-atau-desktop">5.1 Game (2D/3D, web atau desktop)</h3>
+<p>Titik masuk: <strong>Game Design Document</strong> berperan seperti PRD, tetapi ada tahap tambahan yang tidak
+ada di web: <strong>loop inti</strong>, <strong>keseimbangan</strong>, dan <strong>aset</strong>.</p>
+<pre><code>01   tujuan: &quot;game X, platform Y, durasi sesi Z menit, metrik retensi&quot;
+01A  authorization: aset sendiri / lisensi aset jelas ← sering dilupakan di game
+01B  evidence: GDD, referensi mekanik (bukan aset orang)
+02   klarifikasi: loop inti, kontrol, progres, monetisasi (bila ada)
+03   research: engine + pola (bukan menyalin level orang)
+04   ADR: engine, arsitektur state, pipeline aset
+05   approval desain
+06   plan per milestone (vertical slice dulu — jangan seluruh game)
+07   implementasi loop inti → playable
+09   QA: feel, kontrol, performa frame, crash
+10–16 seperti biasa (build, distribusi, telemetri)
+</code></pre>
+<p>Aturan khusus game: <strong>jangan</strong> menilai kualitas dari daftar fitur; nilai dari <strong>vertical slice yang
+bisa dimainkan</strong>. Tahap 09 harus menghasilkan rekaman sesi, bukan "sudah dicoba".</p>
+<h3 id="52-aplikasi-mobile-androidios">5.2 Aplikasi mobile (Android/iOS)</h3>
+<p>Sama seperti web, dengan tambahan yang wajib ada di tahap 02/04/10:</p>
+<ul>
+<li>Izin OS yang benar-benar dipakai (kamera, lokasi, notifikasi) — lebih sedikit lebih baik.</li>
+<li>Strategi penyimpanan lokal + sinkronisasi konflik.</li>
+<li>Rilis: signing key, kebijakan privasi toko, jalur rollback (versi lama tetap bisa dipasang).</li>
+<li>QA di perangkat nyata, bukan hanya emulator.</li>
+</ul>
+<h3 id="53-programcliotomasi-bukan-web">5.3 Program/CLI/otomasi (bukan web)</h3>
+<p>Skenario paling ringan; banyak tahap bisa dipangkas <strong>dengan alasan tertulis</strong>:</p>
+<pre><code>01, 01A, 02 (wajib) → 04 (bila &gt;1 modul) → 06 → 07 → 08 → 09 (tes CLI nyata)
+10 (dependency + secret) → 12 → 16 (README pemakaian)
+</code></pre>
+<p>Yang tidak boleh dipangkas: 01A, 09 (tes benar-benar dijalankan), 10 (secret scan).</p>
+<h3 id="54-data-pipeline-laporan-analitik">5.4 Data pipeline / laporan / analitik</h3>
+<p>Tambahan wajib: definisi sumber data, kepemilikan data, retensi, dan <strong>cara memverifikasi angka</strong>.
+Tahap 09 harus membandingkan keluaran dengan hitungan manual pada sampel. Tanpa itu, laporan
+"terlihat benar" tetapi tidak bisa dipertanggungjawabkan.</p>
+<h3 id="55-maintenance-refactor-kode-yang-sudah-ada">5.5 Maintenance / refactor kode yang sudah ada</h3>
+<p>Titik masuk bukan tahap 01, melainkan <strong>01B (baseline)</strong>: potret perilaku sekarang sebelum diubah.</p>
+<pre><code>01B  baseline: tes yang ada dijalankan, keluaran direkam (bukti &quot;sebelum&quot;)
+07   perubahan sekecil mungkin (surgical)
+09   tes yang sama dijalankan → bandingkan dengan baseline
+12   release gate: tidak ada regresi
+</code></pre>
+<p>Aturan: refactor tanpa baseline = tidak bisa membuktikan tidak ada yang rusak.</p>
+<h3 id="56-audit-keamanan-review-kode-pihak-lain">5.6 Audit keamanan / review kode pihak lain</h3>
+<p>Tahap 01B adalah inti; 07–09 biasanya tidak ada. Keluaran: temuan + tingkat keyakinan + bukti
+reproduksi (bukan opini). Setiap temuan wajib punya langkah reproduksi, jika tidak → turunkan ke
+"kecurigaan".</p>
+<h3 id="57-menjalankan-produk-yang-sudah-ada-operasional-harian">5.7 Menjalankan produk yang sudah ada (operasional harian)</h3>
+<p>Ini bukan pembuatan, tetapi punya alur sendiri: <code>sdb-health</code> → log → metrik → insiden → postmortem.
+Aturan: satu perubahan per insiden, dan postmortem tanpa menyalahkan orang.</p>
+<hr />
+<h2 id="6-tabel-pemetaan-skenario-tahap-yang-dipangkas">6. Tabel pemetaan: skenario → tahap yang dipangkas</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Skenario</th>
+<th>Titik masuk</th>
+<th>Dipangkas (dengan alasan)</th>
+<th>Tidak boleh dipangkas</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A. Clone/RE</td>
+<td>01A + 01B berat</td>
+<td>07 bila hanya analisis</td>
+<td>01A, 01B (bukti bersih), 10</td>
+</tr>
+<tr>
+<td>B. PRD jadi</td>
+<td>01 (salin dari PRD)</td>
+<td>03 bila teknologi sudah dikenal</td>
+<td>02 (konfirmasi ambiguitas), 05, 09, 12</td>
+</tr>
+<tr>
+<td>C. Chat ide</td>
+<td>01 + 02 berat</td>
+<td>01B ringan (tanpa target pihak ketiga)</td>
+<td>02, 05, 09</td>
+</tr>
+<tr>
+<td>Game</td>
+<td>GDD sebagai 01/01B</td>
+<td>03 bila engine sudah dipilih</td>
+<td>02 (loop inti), 09 (playable), 10</td>
+</tr>
+<tr>
+<td>Mobile</td>
+<td>01 + 01B</td>
+<td>03 bila stack dikenal</td>
+<td>02 (izin OS), 09 (perangkat nyata), 10</td>
+</tr>
+<tr>
+<td>CLI/otomasi</td>
+<td>01</td>
+<td>04, 05, 06, 11, 13–15</td>
+<td>01A, 09, 10</td>
+</tr>
+<tr>
+<td>Data/laporan</td>
+<td>01 + 01B</td>
+<td>05, 07 sebagian</td>
+<td>09 (verifikasi angka), 10</td>
+</tr>
+<tr>
+<td>Refactor</td>
+<td>01B (baseline)</td>
+<td>03, 04 sebagian</td>
+<td>01B, 09 (bandingkan), 12</td>
+</tr>
+<tr>
+<td>Audit</td>
+<td>01B</td>
+<td>06–09</td>
+<td>01B, 10, 11</td>
+</tr>
+<tr>
+<td>Operasional</td>
+<td>—</td>
+<td>semua tahap bangun</td>
+<td>15 (smoke/rollback)</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="7-kesalahan-lintas-skenario-semua-ini-pernah-merusak-proyek-nyata">7. Kesalahan lintas-skenario (semua ini pernah merusak proyek nyata)</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Kesalahan</th>
+<th>Kenapa fatal</th>
+<th>Pencegahan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Melewati Gate #0 "karena buru-buru"</td>
+<td>seluruh pekerjaan tidak sah, tak bisa diaudit</td>
+<td><code>sdb gate</code> dijalankan sebelum capture apa pun</td>
+</tr>
+<tr>
+<td>Evidence berisi token/cookie</td>
+<td>kebocoran kredensial permanen</td>
+<td><code>evidence_lint.py</code> wajib, <code>[REDACTED]</code></td>
+</tr>
+<tr>
+<td>"Selesai" tanpa tes dijalankan</td>
+<td>klaim palsu</td>
+<td>tahap 09 hanya hijau bila ada keluaran nyata</td>
+</tr>
+<tr>
+<td>Deploy semua layanan sekaligus</td>
+<td>rollback tidak terarah</td>
+<td>satu layanan per deploy</td>
+</tr>
+<tr>
+<td>Menilai dari daftar fitur</td>
+<td>produk terlihat lengkap, tak terpakai</td>
+<td>nilai dari alur ujung-ke-ujung</td>
+</tr>
+<tr>
+<td>Desain tidak disetujui lalu dikodekan</td>
+<td>revisi termahal</td>
+<td>tahap 05 selalu dijalankan</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="8-ringkasan-satu-halaman">8. Ringkasan satu halaman</h2>
+<ol>
+<li>Semua skenario memakai mesin 16 tahap yang sama; yang berubah hanya titik masuk.</li>
+<li><strong>Gate #0 tidak pernah dipangkas</strong> — ia yang membuat pekerjaan Anda sah.</li>
+<li>Skenario clone/RE: izin tertulis dulu, bukti bersih, lalu rekonstruksi perilaku (bukan salin aset).</li>
+<li>Skenario PRD: paling cepat, asalkan PRD punya metrik + cakupan eksplisit.</li>
+<li>Skenario chat: klarifikasi dulu; kode setelah desain Anda setujui.</li>
+<li>Game/mobile/data punya tambahan wajib (loop inti, izin OS, verifikasi angka).</li>
+<li>"Selesai" = ada artefak + tes dijalankan + Anda menyetujui.</li>
+</ol>
+<hr />
+<p><em>Bagian dari ekosistem SDB v0.7.3. Bila perilaku sistem berbeda dari dokumen ini, yang benar adalah
+kode dan tesnya — laporkan selisihnya.</em></p>
+<div class="foot">Alur kerja SDB untuk clone/reverse engineering, PRD jadi, chat ide, game, mobile, CLI, data, refactor, audit, dan operasional.</div>
+</main>
+</div>
+</body>
+</html>

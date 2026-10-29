@@ -74,6 +74,10 @@ docs-tutorial:
 	  --title "Panduan Pribadi SDB — PC Ini & Telegram" \
 	  --desc "Panduan pemakaian pribadi SDB: Command Deck lokal, shortcut desktop, control plane, dan bot Telegram read-only." \
 	  --kicker "Super Dev Builders · Panduan Pribadi"
+	$(PY_DOC) scripts/build_tutorial.py docs/WORKFLOW_SKENARIO.md \
+	  --title "Workflow SDB — Semua Skenario" \
+	  --desc "Alur kerja SDB untuk clone/reverse engineering, PRD jadi, chat ide, game, mobile, CLI, data, refactor, audit, dan operasional." \
+	  --kicker "Super Dev Builders · Workflow Skenario"
 
 hygiene:
 	$(PY_SYS) scripts/repo_hygiene.py

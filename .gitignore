@@ -73,3 +73,4 @@ state/gitleaks-nofilter.toml
 # PDF hasil build tutorial (regenerasi: lihat docs/TUTORIAL_PENGGUNAAN.md bagian atas)
 docs/TUTORIAL_PENGGUNAAN.pdf
 docs/TUTORIAL_PRIBADI.pdf
+docs/WORKFLOW_SKENARIO.pdf

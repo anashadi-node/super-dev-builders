@@ -2,6 +2,38 @@
 
 Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/) dan [SemVer](https://semver.org/lang/id/).
 
+## [0.7.4] — 2026-10-29
+
+### Perbaikan
+
+- **Command Deck tidak bisa dibuka dari ikon Desktop** (dialog *"Invalid Permissions on Desktop
+  File"*, ikon X merah). Akar masalah: `~/Desktop/sdb-command-deck.desktop` pernah dibuat manual
+  dengan mode `664` (tanpa bit executable) dan tanpa metadata GNOME `trusted` — tidak pernah
+  dipasang oleh skrip repo mana pun. Server deck sendiri sehat (`HTTP 200` di `:8484`).
+- `scripts/install_shortcuts.sh` kini **memasang sendiri** peluncur Command Deck ke
+  `~/.local/share/applications/` + menyalinnya ke `~/Desktop`, menetapkan `chmod 755` dan
+  `metadata::trusted true`, lalu **memverifikasi** (`desktop-file-validate`, bit `x`, keberadaan
+  salinan Desktop) dan **gagal keras** (`exit 1`) bila ada yang menyimpang — bukan sekadar
+  peringatan.
+- `scripts/sdb-fix-launcher.sh` (baru) — self-heal: memulihkan izin, salinan Desktop, dan
+  metadata trusted secara otomatis. Dipanggil harian oleh `sdb-deck-health.service` dan setiap
+  kali `sdb-deck` dijalankan, sehingga kelas bug ini tidak bisa bertahan lebih dari satu siklus.
+
+### Ditambahkan
+
+- `docs/WORKFLOW_SKENARIO.{md,html,pdf}` — alur kerja untuk semua skenario: clone/reverse
+  engineering (Gate #0 + evidence bersih), PRD jadi, chat ide, game, mobile, CLI/otomasi,
+  data/laporan, refactor (baseline), audit, dan operasional — termasuk tabel tahap yang boleh
+  dipangkas per skenario.
+- `tests/test_install_shortcuts.py` — 7 tes regresi guard launcher (sintaks skrip, `chmod 755`,
+  `metadata::trusted`, verifikasi fail-loud, tanpa `sudo`) + cakupan dokumen skenario.
+
+### Verifikasi
+
+- 7 tes baru PASS; seluruh suite (415 tes) PASS; `make check` RC=0.
+- Uji nyata di PC: `chmod 644` pada launcher → self-heal memulihkan `755` + `trusted=true`;
+  `gio launch ~/Desktop/sdb-command-deck.desktop` membuka deck (RC=0).
+
 ## [0.7.3] — 2026-10-29
 
 ### Ditambahkan

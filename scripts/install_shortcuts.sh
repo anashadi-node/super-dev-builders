@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # Pasang peluncur desktop & handler sdb:// untuk ekosistem SDB — tanpa hak admin.
-# Semua berkas di ~/.local/share/applications/ dan ~/.local/bin/.
+# Semua berkas di ~/.local/share/applications/, ~/Desktop/, dan ~/.local/bin/.
+#
+# ROOT-CAUSE GUARD (kasus "Invalid Permissions on Desktop File"):
+# Semua .desktop WAJIB chmod 755 + gio trusted (di Desktop), dan diverifikasi
+# di akhir skrip — gagal verifikasi = gagal skrip (exit non-zero), bukan peringatan.
 set -euo pipefail
 
 BIN="$HOME/.local/bin"
@@ -98,6 +102,23 @@ esac
 EOF
 chmod 700 "$BIN/sdb-open"
 
+# --- peluncur utama di Desktop (satu sumber: APPS lalu hardlink ke Desktop) ---
+cat > "$APPS/sdb-command-deck.desktop" <<'EOF'
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=SDB Command Deck
+GenericName=Super Dev Builders Dashboard
+Comment=Dashboard lokal Super Dev Builders — 12 divisi, 10 profil, routing 4 model (bisa dibuka dari HP via WiFi)
+Exec=google-chrome --new-window --app=http://127.0.0.1:8484/
+Icon=utilities-system-monitor
+Terminal=false
+Categories=Development;
+Keywords=dashboard;super dev builders;hermes;SDB;
+StartupWMClass=SDB Command Deck
+X-GNOME-UsesNotifications=false
+EOF
+# --- handler URL sdb:// (buka deck dari browser/CLI mana pun) ---
 cat > "$APPS/sdb-url.desktop" <<EOF
 [Desktop Entry]
 Type=Application
@@ -112,10 +133,30 @@ MimeType=x-scheme-handler/sdb;
 Categories=Development;
 EOF
 
+# Salin (bukan symlink — GNOME ding paling andal dengan berkas nyata) ke Desktop.
+DESKTOP_FILE="$HOME/Desktop/sdb-command-deck.desktop"
+cp "$APPS/sdb-command-deck.desktop" "$DESKTOP_FILE"
+
+chmod 755 "$APPS"/*.desktop "$DESKTOP_FILE"
+# GNOME: ikon di Desktop butuh metadata trusted agar tak muncul "Invalid Permissions"/X merah.
+gio set "$DESKTOP_FILE" metadata::trusted true 2>/dev/null || true
+
 update-desktop-database "$APPS" 2>/dev/null || true
 xdg-mime default sdb-url.desktop x-scheme-handler/sdb 2>/dev/null || true
 
+# --- VERIFIKASI WAJIB (fail-loud, bukan peringatan) ---
+FAIL=0
+for f in "$APPS"/sdb-*.desktop; do
+  if ! desktop-file-validate "$f" >/dev/null 2>&1; then
+    echo "GAGAL validasi: $f" >&2; desktop-file-validate "$f" >&2 || true; FAIL=1
+  fi
+  [ -x "$f" ] || { echo "GAGAL: $f tidak executable" >&2; FAIL=1; }
+done
+if [ ! -e "$DESKTOP_FILE" ]; then echo "GAGAL: $DESKTOP_FILE hilang" >&2; FAIL=1; fi
+[ "$FAIL" -eq 0 ] || { echo "install_shortcuts: VERIFIKASI GAGAL" >&2; exit 1; }
+
 echo "Terpasang:"
 ls -1 "$APPS"/sdb-*.desktop | sed "s|.*/|  |"
+echo "  Desktop    : sdb-command-deck.desktop (salinan dari $APPS, trusted)"
 echo "  ~/.local/bin: sdb-deck, sdb-health, sdb-open"
 echo "Cek handler:  xdg-mime query default x-scheme-handler/sdb  (harus: sdb-url.desktop)"

@@ -122,7 +122,16 @@ echo "=== 3/5 trivy (kerentanan + rahasia) ==="
 #   - semua temuan ada di baseline        => BERSYARAT: dilaporkan keras per tingkat, bukan
 #                                            disenyapkan. Baseline BUKAN persetujuan; ia hanya
 #                                            membedakan "sudah diketahui" dari "baru".
+# --skip-dirs: berkas di runs/, evidence/, targets/ adalah ARTEFAK TANGKAPAN proyek yang
+# diaudit (mis. SBOM target lama). Memindainya mengukur risiko PIHAK LAIN, bukan risiko
+# produk ini — dan hasilnya membuat gerbang proyek sendiri gagal selamanya (terbukti
+# 30 Okt 2026: 43 temuan, semuanya Pillow 12.3.0 dari
+# runs/rt-rw-portal/reports/raw/sbom/requirements.txt). Dependensi produk tetap dipindai
+# lewat .venv/ node_modules/ lockfile di dalam proyek.
 trivy fs --include-dev-deps --format json --output "$RAW/trivy.json" \
+    --skip-dirs .git --skip-dirs node_modules --skip-dirs runs --skip-dirs evidence \
+    --skip-dirs targets --skip-dirs reconstruction --skip-dirs normalization \
+    --skip-dirs screens --skip-dirs trace --skip-dirs dom \
     --scanners vuln,secret,misconfig "$PROYEK" >"$RAW/trivy.log" 2>&1
 KODE=$?
 # Baseline risiko-terbuka: milik run bila ada, jika tidak milik toolchain bersama
@@ -163,10 +172,12 @@ echo "=== 4/5 ruff (keamanan pola — konfigurasi DIPIN di dalam repo) ==="
 # Gerbang ini memakai ruff.toml milik repo, BUKAN set bawaan ruff di mesin ini. Tanpa
 # konfigurasi dipin, "hijau" bisa berarti "aturan di mesin ini kebetulan lebih longgar",
 # bukan "kode bersih" — dan hasilnya tidak bisa direproduksi di mesin lain.
-if [ ! -f "$PROYEK/ruff.toml" ]; then
-  catat ruff 1 "GAGAL: $PROYEK/ruff.toml tidak ada — aturan lint tidak dipin di repo"
-else
-  ( cd "$PROYEK" && ruff check --output-format=json . >"$RAW/ruff.json" 2>"$RAW/ruff.err" )
+# ruff menerima ruff.toml, .ruff.toml, atau pyproject.toml[tool.ruff]. Menuntut satu nama
+# berkas tertentu membuat proyek yang SUDAH mem-pin aturan di pyproject.toml gagal tanpa
+# alasan (terbukti 30 Okt 2026 pada repo SDB sendiri). Yang wajib: konfigurasi ada di repo.
+if [ -f "$PROYEK/ruff.toml" ] || [ -f "$PROYEK/.ruff.toml" ] \
+   || { [ -f "$PROYEK/pyproject.toml" ] && grep -q "^\[tool\.ruff" "$PROYEK/pyproject.toml"; }; then
+  ( cd "$PROYEK" && ruff check --exclude targets --exclude evidence --exclude runs --exclude reconstruction --exclude normalization --exclude screens --exclude trace --exclude dom --output-format=json . >"$RAW/ruff.json" 2>"$RAW/ruff.err" )
   KODE=$?
   TEMUAN=$("$PY" - "$RAW/ruff.json" <<'PUB'
 import json,sys
@@ -180,8 +191,12 @@ PUB
   # INTI WAJIB — ruff.toml proyek TIDAK boleh bisa mematikan deteksi keamanan.
   # Bukti kegagalan (30 Okt 2026): proyek yang memilih hanya E9/B lolos dengan
   # `eval(x)` di kode (S307) => verdict PASS. Alat, bukan proyek, yang menentukan inti.
-  ( cd "$PROYEK" && ruff check --isolated --select S,BLE,E9 --output-format=json . \
-      >"$RAW/ruff-inti.json" 2>"$RAW/ruff-inti.err" )
+  # Cakupan INTI = kode produk: artefak tangkapan (targets/, runs/, evidence/, ...) dikecualikan
+  # karena itu milik proyek yang diaudit, bukan produk ini. S101 (assert) diabaikan HANYA di
+  # tests/: assert adalah mekanisme tes, bukan temuan; di kode produk S101 tetap dilaporkan.
+  ( cd "$PROYEK" && ruff check --isolated --select S,BLE,E9 --exclude targets --exclude evidence --exclude runs --exclude reconstruction --exclude normalization --exclude screens --exclude trace --exclude dom \
+      --per-file-ignores "tests/*:S101" --per-file-ignores "*_test.py:S101" \
+      --output-format=json . >"$RAW/ruff-inti.json" 2>"$RAW/ruff-inti.err" )
   KODE_INTI=$?
   TEMUAN_INTI=$("$PY" - "$RAW/ruff-inti.json" <<'PUB'
 import json, sys
@@ -195,10 +210,15 @@ PUB
   catat ruff-inti "$KODE_INTI" "temuan=$TEMUAN_INTI (S/BLE/E9 dipaksa --isolated; ruff.toml proyek tidak bisa mematikan)"
   # Utang GAYA dilaporkan sebagai tren supaya tidak menghilang, TANPA menggagalkan gerbang
   # keamanan (kosmetik bukan risiko rilis). Ditulis ke ringkasan, bukan lewat catat().
-  ( cd "$PROYEK" && ruff check --select UP,RUF,F,EXE,PL,I,SIM,ISC,FURB,DTZ,RET \
+  ( cd "$PROYEK" && ruff check --exclude targets --exclude evidence --exclude runs --exclude reconstruction --exclude normalization --exclude screens --exclude trace --exclude dom --select UP,RUF,F,EXE,PL,I,SIM,ISC,FURB,DTZ,RET \
       --statistics . 2>/dev/null | grep -E "^Found" | tail -1 ) >"$RAW/ruff-gaya.txt"
   printf '%-9s %-3s %s\n' "ruff-gaya" "-" \
     "utang gaya (daftar aturan TETAP, tidak menggagalkan): $(cat "$RAW/ruff-gaya.txt")" >>"$RINGKASAN"
+else
+  # Tidak ada konfigurasi ruff di repo: gerbang TIDAK boleh menebak aturan. Ini GAGAL,
+  # bukan dilewati — "aturan tidak dipin" berarti hasil tidak bisa direproduksi.
+  catat ruff 1 "GAGAL: tidak ada konfigurasi ruff di repo (ruff.toml/.ruff.toml/pyproject.toml[tool.ruff]) — aturan lint tidak dipin"
+  catat ruff-inti 1 "GAGAL: inti keamanan tidak dapat dijalankan tanpa konfigurasi proyek"
 fi
 
 echo "=== 5/5 privasi-media (identitas pada MEDIA TERLACAK, kanal OCR) ==="

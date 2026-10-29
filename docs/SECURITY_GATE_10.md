@@ -45,6 +45,18 @@ mencetak "semua aman" tetapi keluar ≠0 tetap `FAIL`.
    atau `privacy-terms.json` (`["istilah", ...]`). Tidak ada sumber = keluar 2, bukan "bersih".
 5. **Baseline risiko terbuka** (`risiko-diterima.json`) hanya menurunkan temuan yang sudah
    tercatat; tanpa baseline, semua temuan dihitung baru.
+6. **Cakupan = kode produk, bukan artefak tangkapan.** `targets/`, `runs/`, `evidence/`,
+   `screens/`, `trace/`, `dom/`, `reconstruction/`, `normalization/` dikecualikan dari ruff
+   dan trivy: isinya milik proyek yang **diaudit**, bukan produk ini. Tanpa aturan ini,
+   SBOM target lama (43 temuan Pillow) membuat gerbang proyek sendiri gagal selamanya.
+7. **Konfigurasi ruff boleh di mana saja yang sah**: `ruff.toml`, `.ruff.toml`, atau
+   `pyproject.toml[tool.ruff]`. Tidak ada konfigurasi = **FAIL** (aturan tidak dipin →
+   hasil tidak reproducible), bukan dilewati.
+8. **`S101` (assert) hanya diabaikan di `tests/`** — assert adalah mekanisme tes. Di kode
+   produk S101 tetap dilaporkan.
+9. **`privacy-terms.json` sengaja gitignored** (berisi nama orang/klien);
+   `privacy-terms.example.json` yang dilacak. Tanpa berkas itu, kanal privasi
+   `TAK DIVERIFIKASI` — jangan diakali dengan daftar kosong.
 
 ## 4. Cara menjalankan
 
@@ -70,6 +82,9 @@ akan tertulis di tempat yang salah.
 | Setiap run/proyek baru → `BLOCKED` | alat hanya ada di `scripts/privasi/portal-rt-rw/` dan `RUN` di-hardcode ke `runs/rt-rw-portal` | alat dipromosikan ke `tools/`, jalur lewat env + fallback |
 | Proyek ber-`ruff.toml` longgar lolos `eval()` | aturan keamanan sepenuhnya diserahkan ke config proyek | inti `--isolated --select S,BLE,E9` dipaksa alat |
 | Proyek tanpa aset visual mustahil rilis | "0 media" dianggap `TAK DIVERIFIKASI` | `TIDAK BERLAKU` (keluar 0) bila repo punya berkas terlacak |
+| Gerbang proyek sendiri gagal selamanya: 43 temuan Pillow 12.3.0 | trivy memindai SBOM **target audit** di `runs/` sebagai dependensi produk | `--skip-dirs` untuk direktori artefak (trivy + ruff) |
+| Repo SDB (config di `pyproject.toml`) dianggap "aturan tidak dipin" | alat hanya menerima berkas bernama `ruff.toml` | terima `ruff.toml`/`.ruff.toml`/`pyproject.toml[tool.ruff]` |
+| 631 temuan `S101` di tests menenggelamkan temuan nyata | `S101` (assert) dianggap temuan di seluruh repo | `--per-file-ignores "tests/*:S101"` |
 
 Bukti uji: fixtures `/tmp` (backend tanpa media) → `PASS`; fixture dengan `eval(x)` →
 `FAIL`; repo tanpa berkas terlacak → `TAK DIVERIFIKASI`. Semua dijalankan lewat

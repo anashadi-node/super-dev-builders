@@ -1,0 +1,4 @@
+{
+  "_catatan": "Salin ke privacy-terms.json (gitignored) dan isi istilah identitas yang TIDAK boleh muncul di media: nama orang, nama klien, nomor rumah, dsb. Daftar kosong = tidak ada yang dicari; berkas yang tidak ada = kanal TAK DIVERIFIKASI (fail-closed).",
+  "terlarang": ["nama-pemilik", "nama-klien"]
+}

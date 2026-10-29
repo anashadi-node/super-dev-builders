@@ -186,5 +186,25 @@ def test_inti_keamanan_ruff_tidak_bisa_dimatikan_oleh_ruff_toml_proyek():
     assert "tidak bisa mematikan" in skrip
 
 
+def test_cakupan_inti_mengecualikan_artefak_dan_mengizinkan_assert_di_tests():
+    """Regresi 30 Okt 2026: gerbang menilai artefak TANGKAPAN sebagai kode produk.
+
+    Dua hal yang dijaga di skrip: (1) direktori artefak (targets/, runs/, evidence/, ...)
+    dikecualikan dari ruff inti maupun trivy — isinya milik proyek yang diaudit, bukan
+    produk ini; (2) S101 hanya diabaikan di tests/ (assert = mekanisme tes), bukan di
+    kode produk.
+    """
+    skrip = open(sv.repo_path("tools/scan-keamanan.sh"), encoding="utf-8").read()
+    assert "--exclude targets --exclude evidence --exclude runs" in skrip
+    assert '--per-file-ignores "tests/*:S101"' in skrip
+    assert "--skip-dirs runs --skip-dirs evidence" in skrip
+
+
+def test_konfigurasi_ruff_boleh_berada_di_pyproject_toml():
+    """Repo yang sudah mem-pin aturan di pyproject.toml dulu gagal tanpa alasan."""
+    skrip = open(sv.repo_path("tools/scan-keamanan.sh"), encoding="utf-8").read()
+    assert '[ -f "$PROYEK/pyproject.toml" ] && grep -q "^\\[tool\\.ruff"' in skrip
+
+
 if __name__ == "__main__":
     sys.exit(pytest.main([os.path.abspath(__file__), "-q"]))

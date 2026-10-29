@@ -124,6 +124,10 @@ class Billing:
                          ("last_error", "TEXT"), ("cancel_requested", "INTEGER NOT NULL DEFAULT 0"),
                          ("hold_microusd", "INTEGER NOT NULL DEFAULT 0")):
             if col not in jcols:
+                # Triase D8 (30 Okt 2026): bukan injeksi. `col`/`ddl` adalah literal di
+                # fungsi ini (bukan input pengguna) dan SQLite tidak bisa memparameterkan
+                # nama kolom/tipe pada ALTER TABLE — parameterisasi justru mustahil di sini.
+                # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query, python.lang.security.audit.formatted-sql-query.formatted-sql-query
                 cur.execute(f"ALTER TABLE jobs ADD COLUMN {col} {ddl}")
         cur.executescript(
             """

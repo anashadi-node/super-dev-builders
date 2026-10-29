@@ -276,7 +276,8 @@ def main(argv: list[str]) -> int:
             ensure_ascii=False, indent=1), encoding="utf-8")
         print(f"bukti mentah: {rahasia_json}")
     # Urutan keputusan penting: TAK DIVERIFIKASI mendahului BERSIH/BERSYARAT.
-    assert media, "N/A selalu keluar lebih awal; 0 media di sini berarti alur berubah"
+    if not media:  # tidak mungkin tercapai: N/A keluar lebih awal; jaga agar tidak lolos diam-diam
+        raise RuntimeError("alur berubah: 0 media sampai ke tahap pemutusan")
     if semua_buta:
         print(f"TAK DIVERIFIKASI: OCR tidak membaca teks apa pun dari {len(media)} berkas — "
               "alat/OCR merosot (fail-closed), bukan 'bersih'")

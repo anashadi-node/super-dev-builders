@@ -74,3 +74,7 @@ state/gitleaks-nofilter.toml
 docs/TUTORIAL_PENGGUNAAN.pdf
 docs/TUTORIAL_PRIBADI.pdf
 docs/WORKFLOW_SKENARIO.pdf
+
+# Istilah identitas per-proyek (jangan pernah commit: berisi nama orang/klien)
+/privacy-terms.json
+/privacy-terms.local.json

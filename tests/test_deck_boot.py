@@ -120,6 +120,31 @@ def test_launcher_wajib_izinkan_swiftshader() -> None:
         assert "--enable-unsafe-swiftshader" in body, f"{f.name} tidak mengizinkan Swiftshader"
 
 
+def test_launcher_pakai_profil_khusus() -> None:
+    """Flag Chrome hanya berlaku pada proses baru: ikon harus memakai profil sendiri.
+
+    Kalau ikon menumpang sesi Chrome yang sudah jalan, flag diabaikan dan WebGL
+    tetap mati. Juga: `%h` BUKAN field code yang sah untuk Exec (xdg desktop-entry
+    menolaknya) dan `$HOME` tidak di-expand di dalam heredoc berkutip.
+    """
+    body = INSTALL.read_text(encoding="utf-8")
+    assert "@PROFILE@" in body, "path profil harus disubstitusi setelah heredoc"
+    assert "sdb-deck/profile" in body, "profil khusus deck harus dipakai"
+    assert "user-data-dir=%h" not in body, "%h bukan field code Exec yang sah"
+    heal = HEAL.read_text(encoding="utf-8")
+    assert "--user-data-dir" in heal, "self-heal harus mengembalikan profil khusus"
+    # .desktop terpasang (kalau ada) harus sah menurut desktop-file-validate
+    import shutil as sh
+    import subprocess as sp
+    if sh.which("desktop-file-validate"):
+        for p in (Path.home() / ".local/share/applications/sdb-command-deck.desktop",
+                  Path.home() / "Desktop/sdb-command-deck.desktop"):
+            if p.exists():
+                r = sp.run(["desktop-file-validate", str(p)], capture_output=True, text=True)
+                assert r.returncode == 0, r.stdout + r.stderr
+                assert "--user-data-dir=" in p.read_text(encoding="utf-8")
+
+
 def test_kode_punya_jalur_gagal_dan_watchdog() -> None:
     app = APP_JS.read_text(encoding="utf-8")
     assert "WEBGL_UNAVAILABLE" in WORLD_JS.read_text(encoding="utf-8"), "world.js harus melempar kode error"

@@ -17,8 +17,17 @@ fi
 # 2) Flag Chrome wajib: di PC tanpa driver EGL, WebGL hanya hidup bila Swiftshader diizinkan.
 #    Tanpa flag ini deck berhenti di layar "Menyiapkan Super Dev Builders Workspace…".
 for f in "$APPS"/sdb-*.desktop; do
-  if grep -q '127\.0\.0\.1:8484' "$f" && ! grep -q -- '--enable-unsafe-swiftshader' "$f"; then
+  grep -q '127\.0\.0\.1:8484' "$f" || continue
+  if ! grep -q -- '--enable-unsafe-swiftshader' "$f"; then
     sed -i 's#^Exec=google-chrome #Exec=google-chrome --enable-unsafe-swiftshader #' "$f"
+    changed=1
+  fi
+  # Profil khusus: flag Chrome hanya berlaku pada proses baru. Kalau ikon memakai sesi
+  # Chrome yang sudah jalan, WebGL tetap mati -> deck jatuh ke mode 2D.
+  # %h bukan field code sah untuk Exec -> perbaiki jadi path absolut.
+  sed -i "s#%h/\.local/share/sdb-deck/profile#$HOME/.local/share/sdb-deck/profile#" "$f"
+  if ! grep -q -- '--user-data-dir=' "$f"; then
+    sed -i 's#^\(Exec=google-chrome .*\)--app=http://127\.0\.0\.1:8484/#\1--user-data-dir="$HOME/.local/share/sdb-deck/profile" --app=http://127.0.0.1:8484/#' "$f"
     changed=1
   fi
 done

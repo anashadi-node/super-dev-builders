@@ -2,6 +2,26 @@
 
 Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/) dan [SemVer](https://semver.org/lang/id/).
 
+## [0.7.6] — 2026-10-29
+
+### Diperbaiki
+- **Ikon Desktop tidak pernah membuat kantor 3D tampil**: dua sebab ditemukan saat uji
+  jalur nyata (klik ikon, bukan CLI).
+  1. Flag `--enable-unsafe-swiftshader` hanya berlaku untuk **proses Chrome baru**.
+     Saat Chrome sudah berjalan, klik ikon menumpang sesi lama ("Opening in existing
+     browser session") sehingga flag diabaikan dan WebGL tetap mati.
+  2. `--user-data-dir=%h/...` ditolak `desktop-file-validate` (`%h` bukan field code
+     Exec), dan `$HOME` tidak di-expand di dalam heredoc berkutip — Chrome sempat
+     membuat direktori literal bernama `$HOME`.
+  - Launcher kini memakai profil khusus `~/.local/share/sdb-deck/profile` dengan path
+    absolut yang disubstitusi setelah heredoc, sehingga flag benar-benar berlaku.
+  - `sdb-fix-launcher.sh` ikut memulihkan `--user-data-dir` (dan memperbaiki `%h`
+    warisan versi lama) pada `.desktop` yang sudah terpasang.
+
+### Ditambahkan
+- `tests/test_deck_boot.py::test_launcher_pakai_profil_khusus` — mengunci profil khusus,
+  menolak `%h`, dan memvalidasi `.desktop` terpasang dengan `desktop-file-validate`.
+
 ## [0.7.5] — 2026-10-29
 
 ### Diperbaiki

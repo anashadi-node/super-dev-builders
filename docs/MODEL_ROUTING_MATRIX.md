@@ -61,7 +61,7 @@ Batas 5 model sebelumnya = efek **saldo kosong**, bukan batas tetap kunci.
 
 | Model | Penyedia utama (native) | Cadangan |
 |---|---|---|
-| DeepSeek V4.1 Flash | **DeepSeek API** — ID sah `deepseek-flash` (`deepseek-v4.1-flash` -> HTTP 400) | `tokenrouter` -> `deepseek/deepseek-v4.1-flash` |
+| DeepSeek V4.1 Flash | **DeepSeek API** — ID sah `deepseek-flash` (`deepseek-v4.1-flash` -> HTTP 400) | `opencode-go` -> `glm-5.3-flash` (DeepSeek **tidak** lewat perantara) |
 | Sonnet 5.5 | **Anthropic** — `claude-sonnet-5-5` | `tokenrouter` -> `anthropic/claude-sonnet-5.5` |
 | Opus 5.5 | **Anthropic** — `claude-opus-5-5` | `tokenrouter` -> `anthropic/claude-opus-5.5` |
 | GPT-5.6 Sol | **OpenAI (Codex OAuth)** — `gpt-5.6-sol` | `tokenrouter` -> `openai/gpt-5.6-sol` |
@@ -72,9 +72,9 @@ Batas 5 model sebelumnya = efek **saldo kosong**, bukan batas tetap kunci.
 |---|---|---|---|---|
 | Research/recon | cc-capture-forensics | **GLM 5.3 Flash** | tokenrouter `z-ai/glm-5.3-flash` | tokenharbor `glm-5.3-flash` -> opencode-go `glm-5.3-flash` |
 | Frontend | cc-frontend | **GLM 5.3 Flash** | tokenrouter `z-ai/glm-5.3-flash` | tokenharbor `glm-5.3-flash` -> opencode-go `glm-5.3-flash` |
-| Plan/intake/docs | cc-orchestrator | DeepSeek V4.1 Flash | deepseek `deepseek-flash` | tokenrouter `deepseek/deepseek-v4.1-flash` |
-| Backend | cc-builder | **DeepSeek V4.1 Flash** | deepseek `deepseek-flash` | tokenrouter `deepseek/deepseek-v4.1-flash` |
-| DevOps deploy/docs | cc-devops-docs | DeepSeek V4.1 Flash | deepseek `deepseek-flash` | tokenrouter `deepseek/deepseek-v4.1-flash` |
+| Plan/intake/docs | cc-orchestrator | DeepSeek V4.1 Flash | **deepseek `deepseek-flash`** (API resmi) | opencode-go `glm-5.3-flash` |
+| Backend | cc-builder | **DeepSeek V4.1 Flash** | **deepseek `deepseek-flash`** (API resmi) | opencode-go `glm-5.3-flash` |
+| DevOps deploy/docs | cc-devops-docs | DeepSeek V4.1 Flash | **deepseek `deepseek-flash`** (API resmi) | opencode-go `glm-5.3-flash` |
 | Arsitektur/ADR | cc-architect | Sonnet 5.5 | anthropic `claude-sonnet-5-5` | tokenrouter `anthropic/claude-sonnet-5.5` |
 | Code review | cc-reviewer-qa | Sonnet 5.5 | anthropic `claude-sonnet-5-5` | tokenrouter `anthropic/claude-sonnet-5.5` |
 | **QA Assurance/Testing/E2E** | cc-reviewer-qa | **Sonnet 5.5** | anthropic `claude-sonnet-5-5` | tokenrouter `anthropic/claude-sonnet-5.5` |
@@ -83,12 +83,36 @@ Batas 5 model sebelumnya = efek **saldo kosong**, bukan batas tetap kunci.
 | **Audit Assurance** | auditor | **Opus 5.5 (atau Sol)** | anthropic `claude-opus-5-5` | openai-codex `gpt-5.6-sol` -> tokenrouter `anthropic/claude-opus-5.5` |
 | Safety/Privasi | keamanan | Sonnet 5.5 | anthropic `claude-sonnet-5-5` | tokenrouter `anthropic/claude-sonnet-5.5` |
 
-**Fallback config MAIN:** `tokenrouter/anthropic/claude-sonnet-5.5` -> `deepseek/deepseek-flash` -> `openai-codex/gpt-5.6-sol`.
+**Fallback config MAIN:** `tokenrouter/anthropic/claude-sonnet-5.5` -> `deepseek` `deepseek-flash` (API resmi) -> `openai-codex/gpt-5.6-sol`.
 
 **Catatan teknis (jebakan yang ditemukan & diperbaiki).** Saat pindah ke provider bawaan, field sisa
 `model.base_url`/`model.key_env` warisan scaffold `custom` **harus dihapus** — jika tidak, permintaan bisa
 salah alamat/kunci (contoh: `key_env: TOKENHARBOR_API_KEY` tersangkut di profil ber-`base_url` TokenRouter).
 Sudah dibersihkan di sepuluh profil di atas. Backup: `config.yaml.bak-routing2-20261009` per profil.
+
+## Revisi 4 — 2026-10-29: DeepSeek 100% jalur resmi (audit pemilik)
+
+**Temuan.** Sebelas profil divisi ternyata **masih** menyimpan `model.base_url: https://api.tokenrouter.com/v1`
+(warisan scaffold `custom`). Akibatnya meski `model.provider: deepseek`, permintaan DeepSeek tetap dikirim ke
+TokenRouter memakai kunci `DEEPSEEK_API_KEY` -> **HTTP 401 `Invalid token`**, dan layar routing deck menampilkan
+`tokenrouter - deepseek/deepseek-v4.1-flash`. Dua profil (`alpaca`, `lokal`) juga menyisakan `.env` tanpa
+`DEEPSEEK_API_KEY`, sehingga agen gagal dengan `No usable credentials found for provider 'deepseek'`.
+
+**Perbaikan (diverifikasi dengan panggilan nyata, bukan asumsi).**
+1. `model.base_url` sebelas profil -> `https://api.deepseek.com/v1`: alpaca, anantara-sakti, astronacci,
+   cex-binance, hl-harvest, lokal, pregain, robinhood, sodex, sodex-cex-monitor, villa-agency.
+2. `DEEPSEEK_API_KEY` disebarkan ke semua `.env` profil yang belum punya (21 profil).
+3. Cadangan DeepSeek yang masih menunjuk TokenRouter diganti **opencode-go `glm-5.3-flash`** untuk
+   cc-orchestrator/cc-builder/cc-devops-docs: kelas model sama, tapi DeepSeek tidak pernah lewat perantara.
+4. `dashboard/agents.json` `primary` -> `deepseek-flash`, `available_now` -> `deepseek-flash (DeepSeek API resmi)`.
+5. alias `deepseek` di config utama -> `deepseek-flash` + provider `deepseek` (sebelumnya menunjuk TokenRouter).
+
+**Bukti.** Panggilan uji `hermes -p <profil> -z "Balas HANYA: PONG" --usage-file` pada default, cc-builder,
+cc-orchestrator, cc-devops-docs, sodex, sodex-cex-monitor, alpaca, lokal, pregain, villa-agency: semuanya
+`model=deepseek-flash provider=deepseek`. Backup config sebelum perubahan: `~/.hermes/backup-deepseek-native-*`.
+
+**Aturan tetap.** DeepSeek hanya boleh muncul dengan provider `deepseek` (atau alias `deepseek` yang menunjuk
+sana). Bila platform DeepSeek bermasalah, cadangan memakai keluarga model lain — bukan DeepSeek dari perantara.
 
 ## Aturan biaya
 - Jangan pakai model kuat untuk transformasi mekanis berulang; jangan pakai model lemah untuk verdict keamanan/arsitektur.

@@ -39,6 +39,21 @@ Web usecase Super Dev Builders: ketik ide (web / Android / SaaS) → diskusi den
   tanpa itu systemd memberi 401 palsu. Nilai kunci tak pernah dicetak/di-log.
 - Ruang CONTOH selalu berlabel; jangan ubah jadi "nyata". Data sensors hanya id model/provider — jangan serve kunci/auth.json.
 
+## Pitfalls (deck tidak terbuka / "Menyiapkan…" terus)
+
+- **Overlay loader abadi** = `new THREE.WebGLRenderer()` melempar di top-level modul
+  (`No suitable EGL configs found`), jadi `#load` tak pernah ditutup. Sejak v0.7.5
+  `world.js` melempar kode `WEBGL_UNAVAILABLE` dan `app.js` jatuh ke mode 2D + watchdog 8s.
+  Cek: `document.documentElement.dataset.mode` (`3d`/`2d`) dan `data-mode-why`.
+- **Flag Chrome hanya berlaku pada proses baru.** Kalau Chrome sudah jalan, klik ikon
+  memakai sesi lama ("Opening in existing browser session") dan
+  `--enable-unsafe-swiftshader` diabaikan → WebGL tetap mati. Deck WAJIB pakai profil
+  sendiri (`--user-data-dir=~/.local/share/sdb-deck/profile`).
+- **`%h` bukan field code Exec** (`desktop-file-validate` menolak) dan `$HOME` tidak
+  di-expand di dalam heredoc berkutip — substitusi path absolut setelah heredoc.
+- Uji tanpa CDP: headless `--use-gl=angle --use-angle=gl` harus `data-mode="2d"`;
+  `--enable-unsafe-swiftshader` harus `data-mode="3d"` + `data-stats`.
+
 ## Verifikasi visual (headless, tanpa GPU)
 `google-chrome --headless=new --no-sandbox --enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader
 --window-size=1440,900 --virtual-time-budget=25000 --screenshot=/tmp/x.png URL` (±20–60 dtk).

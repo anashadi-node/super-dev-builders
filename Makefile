@@ -70,6 +70,10 @@ control-plane:
 # Dokumen tutorial: HTML dilacak, PDF hasil build tidak (melewati gerbang 512 KB di repo_hygiene).
 docs-tutorial:
 	$(PY_DOC) scripts/build_tutorial.py docs/TUTORIAL_PENGGUNAAN.md
+	$(PY_DOC) scripts/build_tutorial.py docs/TUTORIAL_PRIBADI.md \
+	  --title "Panduan Pribadi SDB — PC Ini & Telegram" \
+	  --desc "Panduan pemakaian pribadi SDB: Command Deck lokal, shortcut desktop, control plane, dan bot Telegram read-only." \
+	  --kicker "Super Dev Builders · Panduan Pribadi"
 
 hygiene:
 	$(PY_SYS) scripts/repo_hygiene.py

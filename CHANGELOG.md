@@ -2,6 +2,30 @@
 
 Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/) dan [SemVer](https://semver.org/lang/id/).
 
+## [0.7.3] — 2026-10-29
+
+### Ditambahkan
+
+- `docs/TUTORIAL_PRIBADI.{md,html}` — panduan pemakaian pribadi di PC ini dan lewat Telegram
+  (10 bagian: peta sistem, persiapan, rutinitas harian, contekan, bot read-only, shortcut, bahaya,
+  FAQ), termasuk langkah membuat bot di BotFather dan tabel diagnosis bot diam.
+- `scripts/sdb_tg_bot.py` — bot Telegram **read-only** (stdlib): `/status`, `/health`, `/revenue`,
+  `/help`; SQLite `mode=ro` (tolak tulis di tingkat driver), hanya chat ID pemilik, long polling
+  tanpa membuka port.
+- `scripts/install_shortcuts.sh` — peluncur `SDB Tutorial`, `SDB Tutorial Pribadi`, `SDB Health`,
+  handler `sdb://deck`, plus helper `sdb-deck`, `sdb-health`, `sdb-open` (mode 700, tanpa root).
+- Unit `systemd --user`: `sdb-control-plane.service`, `sdb-tg-bot.service` (EnvironmentFile 600).
+
+### Perbaikan
+
+- `make docs-tutorial` kini membangun dua dokumen (produk & pribadi).
+
+### Verifikasi
+
+- 408 tes (401 → 408; 7 tes baru untuk bot, termasuk bukti `mode=ro` menolak INSERT).
+- Smoke end-to-end bot terhadap DB hasil control plane nyata: 1 tenant, buku besar 75.000.000 μUSD.
+- `make check` RC=0; hygiene PASS (334 berkas, 0 FAIL).
+
 ## [0.7.2] — 2026-10-29
 
 ### Perbaikan

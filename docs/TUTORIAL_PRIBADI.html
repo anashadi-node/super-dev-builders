@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panduan Pribadi SDB — PC Ini & Telegram</title>
+<meta name="description" content="Panduan pemakaian pribadi SDB: Command Deck lokal, shortcut desktop, control plane, dan bot Telegram read-only.">
+<style>
+:root{--bg:#fff;--fg:#16181d;--muted:#5b6472;--line:#e3e7ee;--accent:#1e5fbf;--accent-soft:#eef4ff;
+--warn:#8a5a00;--warn-bg:#fff8e6;--code-bg:#f6f8fb}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;color:var(--fg);background:var(--bg);
+font:16px/1.72 -apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:0 28px 96px}
+header.hero{border-bottom:1px solid var(--line);margin-bottom:36px;padding:56px 0 28px;
+background:linear-gradient(180deg,var(--accent-soft),transparent)}
+.hero .kicker{color:var(--accent);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:12px}
+.hero h1{font-size:clamp(26px,4vw,40px);line-height:1.2;margin:10px 0 12px;letter-spacing:-.02em}
+.hero p{margin:0;color:var(--muted);max-width:70ch}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.badge{font-size:12.5px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);background:#fff}
+.layout{display:grid;grid-template-columns:266px minmax(0,1fr);gap:44px;align-items:start}
+nav.toc{position:sticky;top:18px;max-height:calc(100vh - 36px);overflow:auto;border-right:1px solid var(--line);padding-right:14px}
+nav.toc .toc-title,.toc-inline .toc-title{font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+color:var(--muted);font-weight:700;margin-bottom:10px}
+nav.toc ul{list-style:none;margin:0;padding:0;font-size:13.5px;line-height:1.45}
+nav.toc ul ul{margin:4px 0 8px 12px;border-left:1px solid var(--line);padding-left:10px}
+nav.toc li{margin:6px 0}
+nav.toc a{color:var(--muted);text-decoration:none;display:block;padding:2px 4px;border-radius:4px}
+nav.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+main{min-width:0}
+h1,h2,h3,h4{line-height:1.28;letter-spacing:-.015em}
+h2{font-size:26px;margin:46px 0 14px;padding-top:14px;border-top:1px solid var(--line)}
+h3{font-size:19.5px;margin:30px 0 10px}
+h4{font-size:16.5px;margin:22px 0 8px}
+p{margin:12px 0}
+a{color:var(--accent)}
+ul,ol{padding-left:22px}
+li{margin:6px 0}
+strong{font-weight:650}
+hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+code{font-family:ui-monospace,SFMono-Regular,"JetBrains Mono",Menlo,Consolas,monospace;font-size:13.6px;
+background:var(--code-bg);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+pre{background:var(--code-bg);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow:auto;line-height:1.55}
+pre code{background:none;border:0;padding:0;font-size:13.2px;white-space:pre}
+blockquote{margin:18px 0;padding:14px 18px;border-left:4px solid var(--warn);background:var(--warn-bg);
+color:#3a2b00;border-radius:0 8px 8px 0}
+blockquote p{margin:6px 0}
+.table-wrap{overflow:auto;margin:18px 0;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:14.2px}
+th,td{padding:10px 13px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:#f8fafc;font-weight:650;white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:#fbfcfe}
+.toc-inline{border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin:18px 0 26px;background:#fbfcfe}
+.toc-inline ul{list-style:none;margin:0;padding:0;columns:2;column-gap:28px;font-size:13.8px}
+.toc-inline ul ul{columns:1;margin:2px 0 6px 12px;border-left:1px solid var(--line);padding-left:10px}
+.toc-inline a{color:var(--fg);text-decoration:none}
+.toc-inline a:hover{color:var(--accent)}
+.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13.5px}
+@media print{
+  nav.toc{display:none}
+  .layout{display:block}
+  header.hero{background:none;padding-top:0}
+  body{font-size:11.2pt;line-height:1.5}
+  h2,h3{page-break-after:avoid;margin-top:22px}
+  pre,table,blockquote{page-break-inside:avoid}
+  a{color:#000;text-decoration:none}
+  .wrap{max-width:none;padding:0}
+  @page{size:A4;margin:16mm 14mm}
+}
+@media (max-width:900px){
+  .layout{display:block}
+  nav.toc{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--line);
+    padding:0 0 14px;margin-bottom:22px}
+}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <div class="kicker">Super Dev Builders · Panduan Pribadi</div>
+  <h1>Panduan Pribadi SDB — PC Ini & Telegram</h1>
+  <p>Panduan pemakaian pribadi SDB: Command Deck lokal, shortcut desktop, control plane, dan bot Telegram read-only.</p>
+  <div class="badges"><span class="badge">dokumentasi</span><span class="badge">tanpa dependensi runtime</span></div>
+</div></header>
+<div class="wrap layout">
+<nav class="toc"><div class="toc-title">Daftar Isi</div><div class="toc">
+<ul>
+<li><a href="#daftar-isi">Daftar Isi</a></li>
+<li><a href="#1-jawaban-atas-tiga-pertanyaan-anda">1. Jawaban atas tiga pertanyaan Anda</a></li>
+<li><a href="#2-peta-sistem-di-pc-ini-fakta-terukur">2. Peta sistem di PC ini (fakta terukur)</a></li>
+<li><a href="#3-persiapan-sekali-jalan-10-menit">3. Persiapan sekali jalan (± 10 menit)</a></li>
+<li><a href="#4-sehari-hari-di-pc-ini">4. Sehari-hari di PC ini</a><ul>
+<li><a href="#41-membuka-command-deck">4.1 Membuka Command Deck</a></li>
+<li><a href="#42-menghidupkan-control-plane-saat-dibutuhkan">4.2 Menghidupkan control plane (saat dibutuhkan)</a></li>
+<li><a href="#43-yang-aman-vs-berisiko">4.3 Yang aman vs berisiko</a></li>
+</ul>
+</li>
+<li><a href="#5-lembar-contekan-harian">5. Lembar contekan harian</a></li>
+<li><a href="#6-bot-telegram-khusus-sdb-scriptssdb_tg_botpy">6. Bot Telegram khusus SDB — scripts/sdb_tg_bot.py</a><ul>
+<li><a href="#61-perintah">6.1 Perintah</a></li>
+<li><a href="#62-kenapa-long-polling-bukan-webhook">6.2 Kenapa long polling, bukan webhook</a></li>
+<li><a href="#63-keterbatasan-fisik-yang-jujur">6.3 Keterbatasan fisik yang jujur</a></li>
+<li><a href="#64-menyiapkan-token-chat-id-sekali-saja-5-menit">6.4 Menyiapkan token &amp; chat ID (sekali saja, ± 5 menit)</a></li>
+<li><a href="#65-bila-bot-diam-tabel-diagnosis">6.5 Bila bot diam — tabel diagnosis</a></li>
+<li><a href="#66-menjalankan">6.6 Menjalankan</a></li>
+</ul>
+</li>
+<li><a href="#7-shortcut-apps-di-pc-ini">7. Shortcut apps di PC ini</a></li>
+<li><a href="#8-dua-bahaya-utama-dan-pagar-masing-masing">8. Dua bahaya utama dan pagar masing-masing</a></li>
+<li><a href="#9-faq">9. FAQ</a></li>
+</ul>
+</div>
+</nav>
+<main>
+<p>Dokumen untuk <strong>satu pengguna</strong>: Anda, di PC ini (Ubuntu 22.04, Yogyakarta). Tutorial lain
+(<code>TUTORIAL_PENGGUNAAN</code>) membahas kondisi produk sudah launching berbayar; dokumen ini sebaliknya —
+PC Anda sendiri, dashboard lokal, dan bot Telegram khusus SDB.</p>
+<blockquote>
+<p>Versi: v0.7.2. Regenerasi dokumen: <code>make docs-tutorial</code>.</p>
+</blockquote>
+<hr />
+<h2 id="daftar-isi">Daftar Isi</h2>
+<div class="toc-inline"><div class="toc-title">Daftar Isi</div><div class="toc">
+<ul>
+<li><a href="#daftar-isi">Daftar Isi</a></li>
+<li><a href="#1-jawaban-atas-tiga-pertanyaan-anda">1. Jawaban atas tiga pertanyaan Anda</a></li>
+<li><a href="#2-peta-sistem-di-pc-ini-fakta-terukur">2. Peta sistem di PC ini (fakta terukur)</a></li>
+<li><a href="#3-persiapan-sekali-jalan-10-menit">3. Persiapan sekali jalan (± 10 menit)</a></li>
+<li><a href="#4-sehari-hari-di-pc-ini">4. Sehari-hari di PC ini</a><ul>
+<li><a href="#41-membuka-command-deck">4.1 Membuka Command Deck</a></li>
+<li><a href="#42-menghidupkan-control-plane-saat-dibutuhkan">4.2 Menghidupkan control plane (saat dibutuhkan)</a></li>
+<li><a href="#43-yang-aman-vs-berisiko">4.3 Yang aman vs berisiko</a></li>
+</ul>
+</li>
+<li><a href="#5-lembar-contekan-harian">5. Lembar contekan harian</a></li>
+<li><a href="#6-bot-telegram-khusus-sdb-scriptssdb_tg_botpy">6. Bot Telegram khusus SDB — scripts/sdb_tg_bot.py</a><ul>
+<li><a href="#61-perintah">6.1 Perintah</a></li>
+<li><a href="#62-kenapa-long-polling-bukan-webhook">6.2 Kenapa long polling, bukan webhook</a></li>
+<li><a href="#63-keterbatasan-fisik-yang-jujur">6.3 Keterbatasan fisik yang jujur</a></li>
+<li><a href="#64-menyiapkan-token-chat-id-sekali-saja-5-menit">6.4 Menyiapkan token &amp; chat ID (sekali saja, ± 5 menit)</a></li>
+<li><a href="#65-bila-bot-diam-tabel-diagnosis">6.5 Bila bot diam — tabel diagnosis</a></li>
+<li><a href="#66-menjalankan">6.6 Menjalankan</a></li>
+</ul>
+</li>
+<li><a href="#7-shortcut-apps-di-pc-ini">7. Shortcut apps di PC ini</a></li>
+<li><a href="#8-dua-bahaya-utama-dan-pagar-masing-masing">8. Dua bahaya utama dan pagar masing-masing</a></li>
+<li><a href="#9-faq">9. FAQ</a></li>
+</ul>
+</div>
+</div>
+<hr />
+<h2 id="1-jawaban-atas-tiga-pertanyaan-anda">1. Jawaban atas tiga pertanyaan Anda</h2>
+<p><strong>"SDB ini agentic AI dengan kemampuan spesifik tertentu — benar?"</strong></p>
+<p>Benar, dengan satu koreksi penting. SDB = <strong>10 profil agen</strong> yang masing-masing punya peran spesifik
+(Orchestrator, Recon-Research, Architect, Frontend, Backend, Reviewer-QA, Security Governor,
+Auditor, DevOps-Docs, Keamanan) — dikoordinasi lewat Command Deck. Tapi SDB bukan cuma agen-agen:
+ada <strong>control plane</strong> (mesin penagihan uang, SQLite ber-rantai hash) dan <strong>worker runtime</strong> (yang
+benar-benar mengerjakan job). Analogi: agen-agen adalah "toko", control plane adalah "kasir", worker
+adalah "karyawan gudang". Jadi benar SDB adalah agentic AI, tapi ia <strong>juga</strong> produk SaaS dengan
+aspek penagihan — dua hal itu jangan tertukar saat dipakai.</p>
+<p><strong>"Apakah perlu &amp; bisa dibuatkan shortcut apps di PC ini?"</strong></p>
+<p>Sebagian <strong>sudah ada</strong> — saya tidak menggantikannya: peluncur <code>SDB Command Deck</code> (Chrome app-mode ke
+:8484). Yang <strong>kurang</strong> dan kini saya tambahkan: peluncur tutorial, peluncur kesehatan, dan handler
+<code>sdb://</code>. Yang <strong>tidak</strong> saya buat: aplikasi Electron/Tauri — tanpa nilai tambah, hanya menambah
+permukaan pemeliharaan dan risiko keamanan.</p>
+<p><strong>"Bisakah dibuatkan bot Telegram khusus SDB?"</strong></p>
+<p>Bisa, dan sudah dibuat: <code>scripts/sdb_tg_bot.py</code>. Desainnya <strong>read-only</strong> dan berbahaya rendah:
+membaca status dari <code>data/control.db</code> langsung (koneksi SQLite <code>mode=ro</code>, secara fisik tak bisa
+menulis) atau dari control plane bila hidup. Tidak ada satu pun perintah yang mengubah uang —
+perubahan uang tetap lewat control plane dengan jejak audit di git.</p>
+<hr />
+<h2 id="2-peta-sistem-di-pc-ini-fakta-terukur">2. Peta sistem di PC ini (fakta terukur)</h2>
+<pre><code>PC ini (Ubuntu 22.04, WIB)
+├─ Command Deck      http://127.0.0.1:8484   systemd --user: sdb-command-deck (AKTIF)
+├─ Health timer      sdb-deck-health.timer   tiap hari 07:30 WIB (PONG 10 profil)
+├─ Control Plane     http://127.0.0.1:8088   (unit dibuat hari ini; start saat dibutuhkan)
+├─ Data              ~/super-dev-builders/data/control.db + ~/sdb-workspace/
+├─ Peluncur          ~/.local/share/applications/*.desktop (3 lama + 3 baru)
+└─ Bot Telegram      scripts/sdb_tg_bot.py (long polling, read-only)
+</code></pre>
+<p>Status systemd yang saya verifikasi saat menulis: <code>sdb-command-deck</code> <strong>active (running)</strong>,
+<code>sdb-deck-health.timer</code> <strong>active (waiting)</strong> — jadi dashboard lokal Anda sehat, jangan diutak-atik.</p>
+<p>Tiga lapisan, tiga tingkat risiko:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Lapisan</th>
+<th>Untuk apa</th>
+<th>Risiko</th>
+<th>Akses</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Command Deck :8484</td>
+<td>kerja harian bersama agen</td>
+<td>rendah (bind 127.0.0.1)</td>
+<td>shortcut / <code>sdb://deck</code></td>
+</tr>
+<tr>
+<td>Control Plane :8088</td>
+<td>uang: job, tagihan, ledger</td>
+<td>menengah</td>
+<td>curl / skrip klien</td>
+</tr>
+<tr>
+<td>Bot Telegram</td>
+<td>pantau dari HP, di mana pun</td>
+<td>rendah (read-only)</td>
+<td>chat Telegram</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="3-persiapan-sekali-jalan-10-menit">3. Persiapan sekali jalan (± 10 menit)</h2>
+<pre><code class="language-bash">cd ~/super-dev-builders
+make test                          # semua tes harus PASS sebelum apa pun
+mkdir -p ~/.local/bin ~/.config/sdb
+</code></pre>
+<p>Buat <code>~/.config/sdb/control.env</code> (mode <code>600</code>):</p>
+<pre><code class="language-bash">SDB_ADMIN_KEY=&lt;acak ≥ 24 karakter&gt;
+SDB_WORKER_KEY=&lt;acak ≥ 24 karakter&gt;
+SDB_TG_BOT_TOKEN=&lt;dari @BotFather&gt;
+SDB_TG_CHAT_ID=&lt;chat ID Telegram Anda&gt;
+</code></pre>
+<p>Aturan kunci: tidak pernah di chat/git/laporan; yang pernah tercetak di mana saja dianggap <strong>bocor</strong>
+→ ganti. <code>.env</code> tidak masuk git (<code>git check-ignore .env</code> harus mengonfirmasi).</p>
+<hr />
+<h2 id="4-sehari-hari-di-pc-ini">4. Sehari-hari di PC ini</h2>
+<h3 id="41-membuka-command-deck">4.1 Membuka Command Deck</h3>
+<p>Klik peluncur <strong>SDB Command Deck</strong> (yang sudah ada), atau dari terminal:</p>
+<pre><code class="language-bash">sdb-deck        # cek layanan hidup, lalu buka browser app-mode
+sdb-health      # PONG 10 profil agen, ringkasan satu layar
+</code></pre>
+<p>Di browser mana pun Anda bisa mengetik <code>sdb://deck</code> (handler terpasang hari ini).</p>
+<h3 id="42-menghidupkan-control-plane-saat-dibutuhkan">4.2 Menghidupkan control plane (saat dibutuhkan)</h3>
+<pre><code class="language-bash">systemctl --user start sdb-control-plane    # hidupkan
+systemctl --user status sdb-control-plane   # cek
+systemctl --user stop sdb-control-plane     # matikan
+curl -s http://127.0.0.1:8088/healthz       # {&quot;status&quot;:&quot;ok&quot;} = hidup
+</code></pre>
+<p>Control plane tidak wajib hidup 24/7 di PC ini. Hidupkan saat akan membuat job / menagih / menguji.</p>
+<h3 id="43-yang-aman-vs-berisiko">4.3 Yang aman vs berisiko</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Aman</th>
+<th>Berisiko — hanya bila paham, catat di commit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>start / stop / status</code></td>
+<td>edit unit di <code>~/.config/systemd/user/</code></td>
+</tr>
+<tr>
+<td><code>curl /healthz</code>, <code>/metrics</code></td>
+<td>mengubah <code>SDB_RATE_PER_MIN</code> produksi</td>
+</tr>
+<tr>
+<td>baca <code>data/control.db</code> mode ro</td>
+<td>menulis langsung ke DB (jangan pernah)</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="5-lembar-contekan-harian">5. Lembar contekan harian</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Kebutuhan</th>
+<th>Perintah</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Status cepat control plane</td>
+<td><code>curl -s http://127.0.0.1:8088/healthz</code></td>
+</tr>
+<tr>
+<td>Kesehatan 10 agen</td>
+<td><code>sdb-health</code></td>
+</tr>
+<tr>
+<td>Buka deck</td>
+<td><code>sdb-deck</code> atau <code>sdb://deck</code></td>
+</tr>
+<tr>
+<td>Buka tutorial</td>
+<td>peluncur <strong>SDB Tutorial</strong></td>
+</tr>
+<tr>
+<td>Buat job</td>
+<td><code>POST /v1/jobs</code> — lihat tutorial utama §7</td>
+</tr>
+<tr>
+<td>Terbitkan invoice</td>
+<td><code>POST /v1/admin/invoices</code> — tutorial utama §10</td>
+</tr>
+<tr>
+<td>Lihat buku besar</td>
+<td><code>curl ... /v1/ledger -H "X-API-Key: ..."</code></td>
+</tr>
+<tr>
+<td>Cek metrik</td>
+<td><code>curl ... /metrics -H "X-Admin-Key: ..."</code></td>
+</tr>
+<tr>
+<td>Timer kesehatan</td>
+<td><code>systemctl --user list-timers \| grep sdb</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="6-bot-telegram-khusus-sdb-scriptssdb_tg_botpy">6. Bot Telegram khusus SDB — <code>scripts/sdb_tg_bot.py</code></h2>
+<p>Sudah dibuat hari ini, stdlib saja (tanpa dependensi baru), read-only.</p>
+<h3 id="61-perintah">6.1 Perintah</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Perintah</th>
+<th>Jawaban</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/status</code></td>
+<td>state control plane + kesehatan deck (dari <code>data/control.db</code> &amp; <code>health.json</code>)</td>
+</tr>
+<tr>
+<td><code>/health</code></td>
+<td>PONG per profil agen + umur health.json</td>
+</tr>
+<tr>
+<td><code>/revenue</code></td>
+<td>total charge/topup/refund agregat (dari DB, read-only)</td>
+</tr>
+<tr>
+<td><code>/help</code></td>
+<td>daftar perintah</td>
+</tr>
+</tbody>
+</table></div>
+<p>Perintah dari chat ID selain milik Anda <strong>diabaikan diam-diam</strong> (bukan ditolak dengan pesan — tidak
+memberi tahu penyerang bahwa bot ada).</p>
+<h3 id="62-kenapa-long-polling-bukan-webhook">6.2 Kenapa long polling, bukan webhook</h3>
+<p>Webhook butuh URL publik + sertifikat TLS. PC lokal tidak punya keduanya. Long polling hanya
+<strong>menarik</strong> update dari Telegram — tidak membuka satu pun port di jaringan rumah Anda. Ini pilihan
+keamanan, bukan keterbatasan.</p>
+<h3 id="63-keterbatasan-fisik-yang-jujur">6.3 Keterbatasan fisik yang jujur</h3>
+<p><strong>PC ini bukan server 24/7.</strong> Kalau PC mati/reboot/sleep, bot ikut diam — pemantauan malam hari
+tidak berfungsi. Dua pilihan jujur:</p>
+<ol>
+<li><strong>PC-in-the-loop</strong> (sekarang): jalankan bot saat PC hidup; cukup untuk pantau siang hari.</li>
+<li><strong>VPS</strong> (~$4–6/bln): bot hidup 24/7; sambungkan ke PC via SSH tunnel bila mau membaca DB lokal.</li>
+</ol>
+<p>Bot tidak bisa dijalankan di GitHub Actions/cron-servis untuk polling (kredensial bot di cloud pihak
+ketiga = permukaan bocor baru; tidak saya sarankan).</p>
+<h3 id="64-menyiapkan-token-chat-id-sekali-saja-5-menit">6.4 Menyiapkan token &amp; chat ID (sekali saja, ± 5 menit)</h3>
+<p>Langkah yang harus Anda lakukan sendiri — token bot hanya bisa dibuat dari akun Telegram Anda, dan
+<strong>jangan pernah mengirimkannya ke chat ini</strong>:</p>
+<ol>
+<li>Buka Telegram → cari <strong>@BotFather</strong> → <code>/newbot</code> → beri nama (mis. <code>SDB Monitor</code>) dan username
+   berakhiran <code>bot</code>. BotFather membalas satu baris token <code>123456:ABC-...</code> — itu <strong>kata sandi bot</strong>.</li>
+<li>Simpan token hanya ke berkas: <code>~/.config/sdb/control.env</code> baris <code>SDB_TG_BOT_TOKEN=...</code>, lalu
+   <code>chmod 600</code> berkas itu.</li>
+<li>Kirim <code>/start</code> ke bot Anda dari akun Telegram Anda.</li>
+<li>Ambil chat ID Anda tanpa membuka API manual:</li>
+</ol>
+<pre><code class="language-bash">source ~/.config/sdb/control.env
+python3 - &lt;&lt;'EOF'
+import json, os, urllib.request
+tok = os.environ[&quot;SDB_TG_BOT_TOKEN&quot;]
+u = f&quot;https://api.telegram.org/bot{tok}/getUpdates&quot;
+d = json.loads(urllib.request.urlopen(u, timeout=15).read())
+for r in d.get(&quot;result&quot;, []):
+    m = r.get(&quot;message&quot;) or {}
+    print(&quot;chat_id:&quot;, (m.get(&quot;chat&quot;) or {}).get(&quot;id&quot;), &quot;| dari:&quot;, (m.get(&quot;from&quot;) or {}).get(&quot;first_name&quot;))
+EOF
+</code></pre>
+<ol start="5">
+<li>Masukkan angka itu ke <code>SDB_TG_CHAT_ID</code>, lalu uji: <code>python3 scripts/sdb_tg_bot.py --once</code>
+   dan kirim <code>/status</code> ke bot.</li>
+</ol>
+<p>Token yang pernah ditempel di chat, screenshot, atau commit <strong>dianggap bocor</strong>: cabut lewat
+<code>/revoke</code> di BotFather, buat token baru, ulangi langkah 2.</p>
+<h3 id="65-bila-bot-diam-tabel-diagnosis">6.5 Bila bot diam — tabel diagnosis</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Gejala</th>
+<th>Penyebab paling mungkin</th>
+<th>Perbaikan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tidak ada balasan sama sekali</td>
+<td>token salah / bot belum di-<code>/start</code></td>
+<td>cek <code>SDB_TG_BOT_TOKEN</code>, kirim <code>/start</code></td>
+</tr>
+<tr>
+<td>Balasan hanya "SDB_TG_BOT_TOKEN / SDB_TG_CHAT_ID belum diset"</td>
+<td>env tidak dimuat</td>
+<td><code>source ~/.config/sdb/control.env</code>, atau jalankan lewat unit</td>
+</tr>
+<tr>
+<td>Bot menjawab orang lain tapi bukan Anda</td>
+<td><code>SDB_TG_CHAT_ID</code> bukan chat ID Anda</td>
+<td>ulangi langkah 4, perbarui nilai</td>
+</tr>
+<tr>
+<td>Jawaban <code>/revenue</code> bilang DB tidak ada</td>
+<td><code>data/control.db</code> belum pernah dibuat di PC ini</td>
+<td><code>make control-plane</code> sekali, atau arahkan <code>SDB_DB_PATH</code></td>
+</tr>
+<tr>
+<td>Balasan berhenti tiap malam</td>
+<td>PC mati/sleep (bukan bug)</td>
+<td>lihat §6.3 — butuh VPS untuk 24/7</td>
+</tr>
+<tr>
+<td><code>409 Conflict</code> di log</td>
+<td>bot yang sama jalan dua tempat (PC + VPS)</td>
+<td>hentikan salah satu; satu token = satu poller</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="66-menjalankan">6.6 Menjalankan</h3>
+<pre><code class="language-bash">source ~/.config/sdb/control.env
+cd ~/super-dev-builders
+python3 scripts/sdb_tg_bot.py          # mode polling (berhenti: Ctrl-C)
+python3 scripts/sdb_tg_bot.py --once   # tarik update sekali, proses, keluar (cocok cron/timer)
+</code></pre>
+<p>Untuk mode PC-in-the-loop yang rapi: unit <code>systemd --user sdb-tg-bot.service</code> — dibuat bersamaan
+hari ini, start dengan <code>systemctl --user start sdb-tg-bot</code>.</p>
+<hr />
+<h2 id="7-shortcut-apps-di-pc-ini">7. Shortcut apps di PC ini</h2>
+<p>Yang <strong>sudah ada sebelumnya</strong> (tidak disentuh): <code>sdb-command-deck.desktop</code> (Chrome app-mode ke :8484).</p>
+<p>Yang <strong>ditambahkan hari ini</strong>:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Peluncur</th>
+<th>Fungsi</th>
+<th>Berkas</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SDB Tutorial</strong></td>
+<td>buka HTML tutorial utama di browser</td>
+<td><code>sdb-tutorial.desktop</code></td>
+</tr>
+<tr>
+<td><strong>SDB Tutorial Pribadi</strong></td>
+<td>buka dokumen ini</td>
+<td><code>sdb-tutorial-personal.desktop</code></td>
+</tr>
+<tr>
+<td><strong>SDB Health</strong></td>
+<td>jalankan <code>sdb-health</code> (terminal)</td>
+<td><code>sdb-health.desktop</code></td>
+</tr>
+<tr>
+<td>Handler <code>sdb://deck</code></td>
+<td>buka deck dari browser/CLI mana pun</td>
+<td><code>sdb-url.desktop</code> + x-scheme-handler</td>
+</tr>
+</tbody>
+</table></div>
+<p>Semua di <code>~/.local/share/applications/</code>, tanpa hak admin. Contoh isi:</p>
+<pre><code class="language-ini">[Desktop Entry]
+Type=Application
+Name=SDB Tutorial Pribadi
+Exec=google-chrome --new-window file:///home/anashadi/super-dev-builders/docs/TUTORIAL_PRIBADI.html
+Icon=text-html
+Terminal=false
+Categories=Development;
+</code></pre>
+<p>Pemasangan ulang kapan saja (idempoten, tanpa hak admin):</p>
+<pre><code class="language-bash">bash scripts/install_shortcuts.sh
+update-desktop-database ~/.local/share/applications/   # sudah dipanggil skrip
+xdg-mime query default x-scheme-handler/sdb            # harus: sdb-url.desktop
+</code></pre>
+<p>Helper CLI yang ikut dipasang: <code>sdb-deck</code> (buka deck), <code>sdb-health</code> (PONG 10 profil), <code>sdb-open</code>
+(pembuka <code>sdb://</code>). Semuanya mode <code>700</code>; tidak ada yang berjalan sebagai root.</p>
+<hr />
+<h2 id="8-dua-bahaya-utama-dan-pagar-masing-masing">8. Dua bahaya utama dan pagar masing-masing</h2>
+<ol>
+<li><strong>Kunci admin bocor</strong> — orang lain bisa mengubah saldo, menagih sembarangan, suspend tenant.
+   Pagar: kunci acak ≥ 24 karakter, mode <code>600</code>, tidak pernah masuk chat/git/laporan; bila ragu →
+   rotasi (buat kunci baru, cabut lama).</li>
+<li><strong>Salah paham arsitektur</strong> — mengira Command Deck adalah mesin penagihan, atau mengira PC ini
+   server 24/7. Pagar: dokumen ini §1 dan §6.3; produk berbayar jalan di server, bukan di PC kantor.</li>
+</ol>
+<hr />
+<h2 id="9-faq">9. FAQ</h2>
+<p><strong>Q: Kenapa bot read-only, bukan bisa order juga?</strong>
+Karena WhatsApp/Telegram bukan tempat yang tepat untuk aksi menulis uang: tidak ada audit trail
+kuat, mudah salah kirim, dan memperluas permukaan serangan. Baca = aman; tulis = tetap lewat
+control plane + git.</p>
+<p><strong>Q: Bot baca <code>data/control.db</code> langsung — aman?</strong>
+Aman: koneksi dibuka <code>mode=ro</code> — SQLite menolak tulisan secara fisik. Tidak ada skenario di mana
+bot mengubah data.</p>
+<p><strong>Q: Bisakah bot dikirim perintah tulis oleh orang yang punya akses HP saya?</strong>
+Bisa saja secara fisik, tapi tetap ditolak: chat ID diverifikasi dan perintah tulis memang tidak
+pernah diimplementasi. Lapisan kedua: kunci admin tidak pernah dikirim ke bot.</p>
+<p><strong>Q: Control plane hidup atau tidak saat bot jalan?</strong>
+Bot tidak tergantung padanya — bot baca DB langsung. Control plane hidup hanya menambah data
+"segarnya" jawaban (mis. metrik). Deck dan timer kesehatan berjalan sendiri.</p>
+<p><strong>Q: Kalau mau upgrade ke VPS nanti?</strong>
+Jalankan <code>scripts/sdb_tg_bot.py</code> yang sama di VPS; arahkan <code>SDB_DB_PATH</code> ke salinan DB atau SSH
+tunnel ke PC. Tidak ada perubahan kode.</p>
+<hr />
+<p><em>Dokumen ini bagian dari ekosistem SDB v0.7.2. Bila perilaku sistem berbeda dari tulisan di sini,
+yang benar adalah kode dan tesnya.</em></p>
+<div class="foot">Panduan pemakaian pribadi SDB: Command Deck lokal, shortcut desktop, control plane, dan bot Telegram read-only.</div>
+</main>
+</div>
+</body>
+</html>

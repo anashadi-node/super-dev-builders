@@ -2,6 +2,17 @@
 
 Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/) dan [SemVer](https://semver.org/lang/id/).
 
+## [0.7.1] — 2026-10-29
+
+### Ditambahkan
+
+- `POST /v1/admin/tenants/<id>/status` — admin dapat menonaktifkan/mengaktifkan tenant lewat HTTP
+  (sebelumnya `Store.set_status` hanya bisa dipanggil dari Python, tidak layak untuk operasi 24/7).
+  Kunci tenant tidak bisa mengubah status sendiri; status tak sah → `400 invalid_status`.
+- `docs/TUTORIAL_PENGGUNAAN.md` — panduan pemakaian lengkap (21 bagian, semua skenario dan kode galat).
+
+Data pendukung: 401 tes (sebelumnya 396), 5 tes baru untuk rute status; make check RC=0.
+
 ## [0.7.0] — 2026-10-29
 
 Fase 2c: pembatas laju per tenant, metrik Prometheus, dan pembatasan percobaan PIN dashboard.

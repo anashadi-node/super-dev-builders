@@ -27,6 +27,7 @@ JOB_COMPLETE_RE = re.compile(r"^/v1/jobs/([A-Za-z0-9_]+)/complete$")
 JOB_CANCEL_RE = re.compile(r"^/v1/jobs/([A-Za-z0-9_]+)/cancel$")
 JOB_FINISH_RE = re.compile(r"^/v1/jobs/([A-Za-z0-9_]+)/finish$")
 JOB_RE = re.compile(r"^/v1/jobs/([A-Za-z0-9_]+)$")
+TENANT_STATUS_RE = re.compile(r"^/v1/admin/tenants/([A-Za-z0-9_]+)/status$")
 MAX_BODY = 256 * 1024
 SOCKET_TIMEOUT = 30  # detik; klien lambat (slowloris) tidak boleh menahan thread selamanya
 
@@ -198,6 +199,14 @@ class Api:
             inv = self.store.billing.issue_invoice(tid, body.get("period_start", ""), body.get("period_end", ""))
             return (200 if inv.get("replayed") else 201), {"invoice": inv}
 
+        m = TENANT_STATUS_RE.match(path)
+        if method == "POST" and m:
+            # Tanpa rute ini admin harus masuk lewat Python untuk menonaktifkan tenant penyalah guna —
+            # tidak dapat diterima untuk operasi produksi 24/7.
+            self._admin(h)
+            tenant = self.store.set_status(m.group(1), body.get("status", ""))
+            return 200, {"tenant": tenant}
+
         if method == "POST" and path == "/v1/credits/topup":
             self._admin(h)
             return 201, {"entry": self.store.billing.topup(
@@ -225,7 +234,8 @@ class Api:
 
 def _route_class(path: str) -> str:
     """Normalisasi path ke templat rute: label metrik tidak boleh meledak per job_id (kardinalitas)."""
-    for rx, template in ((JOB_ARTIFACTS_RE, "/v1/jobs/:id/artifacts"), (JOB_HEARTBEAT_RE, "/v1/jobs/:id/heartbeat"),
+    for rx, template in ((TENANT_STATUS_RE, "/v1/admin/tenants/:id/status"),
+                         (JOB_ARTIFACTS_RE, "/v1/jobs/:id/artifacts"), (JOB_HEARTBEAT_RE, "/v1/jobs/:id/heartbeat"),
                          (JOB_COMPLETE_RE, "/v1/jobs/:id/complete"), (JOB_CANCEL_RE, "/v1/jobs/:id/cancel"),
                          (JOB_FINISH_RE, "/v1/jobs/:id/finish"), (JOB_RE, "/v1/jobs/:id")):
         if rx.match(path):

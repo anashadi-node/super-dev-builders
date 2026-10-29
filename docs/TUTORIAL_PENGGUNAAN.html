@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panduan Lengkap SDB v0.7.1 — Cara Pakai yang Baik dan Benar</title>
+<meta name="description" content="Panduan penggunaan ekosistem SDB v0.7.1: admin, tenant, worker, penagihan, metrik, keamanan, dan semua kemungkinan galat.">
+<style>
+:root{
+  --bg:#ffffff; --fg:#16181d; --muted:#5b6472; --line:#e3e7ee;
+  --accent:#1e5fbf; --accent-soft:#eef4ff; --warn:#8a5a00; --warn-bg:#fff8e6;
+  --code-bg:#f6f8fb; --ok:#0f6b3f; --ok-bg:#eefaf2;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; color:var(--fg); background:var(--bg);
+  font:16px/1.72 -apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1120px;margin:0 auto;padding:0 28px 96px}
+header.hero{
+  border-bottom:1px solid var(--line); margin-bottom:36px; padding:56px 0 28px;
+  background:linear-gradient(180deg,var(--accent-soft),transparent);
+}
+.hero .kicker{color:var(--accent);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:12px}
+.hero h1{font-size:clamp(26px,4vw,40px);line-height:1.2;margin:10px 0 12px;letter-spacing:-.02em}
+.hero p{margin:0;color:var(--muted);max-width:70ch}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.badge{font-size:12.5px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);background:#fff}
+.layout{display:grid;grid-template-columns:266px minmax(0,1fr);gap:44px;align-items:start}
+nav.toc{position:sticky;top:18px;max-height:calc(100vh - 36px);overflow:auto;border-right:1px solid var(--line);padding-right:14px}
+nav.toc .toc-title{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:10px}
+nav.toc ul{list-style:none;margin:0;padding:0;font-size:13.5px;line-height:1.45}
+nav.toc ul ul{margin:4px 0 8px 12px;border-left:1px solid var(--line);padding-left:10px}
+nav.toc li{margin:6px 0}
+nav.toc a{color:var(--muted);text-decoration:none;display:block;padding:2px 4px;border-radius:4px}
+nav.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+main{min-width:0}
+h1,h2,h3,h4{line-height:1.28;letter-spacing:-.015em}
+h2{font-size:26px;margin:46px 0 14px;padding-top:14px;border-top:1px solid var(--line)}
+h3{font-size:19.5px;margin:30px 0 10px}
+h4{font-size:16.5px;margin:22px 0 8px}
+p{margin:12px 0}
+a{color:var(--accent)}
+ul,ol{padding-left:22px}
+li{margin:6px 0}
+strong{font-weight:650}
+hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+code{font-family:ui-monospace,SFMono-Regular,"JetBrains Mono",Menlo,Consolas,monospace;font-size:13.6px;
+  background:var(--code-bg);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+pre{background:var(--code-bg);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow:auto;line-height:1.55}
+pre code{background:none;border:0;padding:0;font-size:13.2px;white-space:pre}
+blockquote{margin:18px 0;padding:14px 18px;border-left:4px solid var(--warn);background:var(--warn-bg);color:#3a2b00;border-radius:0 8px 8px 0}
+blockquote p{margin:6px 0}
+.table-wrap{overflow:auto;margin:18px 0;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:14.2px}
+th,td{padding:10px 13px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:#f8fafc;font-weight:650;white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:#fbfcfe}
+dl{margin:14px 0} dt{font-weight:650;margin-top:10px} dd{margin:4px 0 0 18px;color:var(--muted)}
+.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13.5px}
+.toc-inline{border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin:18px 0 26px;background:#fbfcfe}
+.toc-inline .toc-title{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:8px}
+.toc-inline ul{list-style:none;margin:0;padding:0;columns:2;column-gap:28px;font-size:13.8px}
+.toc-inline ul ul{columns:1;margin:2px 0 6px 12px;border-left:1px solid var(--line);padding-left:10px}
+.toc-inline a{color:var(--fg);text-decoration:none}
+.toc-inline a:hover{color:var(--accent)}
+@media print{
+  nav.toc{display:none}
+  .layout{display:block}
+  header.hero{background:none;padding-top:0}
+  body{font-size:11.2pt;line-height:1.5}
+  h2{page-break-after:avoid;margin-top:22px}
+  h3{page-break-after:avoid}
+  pre,table,blockquote{page-break-inside:avoid}
+  a{color:#000;text-decoration:none}
+  .wrap{max-width:none;padding:0}
+  @page{size:A4;margin:16mm 14mm}
+}
+@media (max-width:900px){
+  .layout{display:block}
+  nav.toc{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--line);padding:0 0 14px;margin-bottom:22px}
+}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <div class="kicker">Super Dev Builders · Dokumentasi Pengguna</div>
+  <h1>Panduan Lengkap SDB v0.7.1 — Cara Pakai yang Baik dan Benar</h1>
+  <p>Semua skenario pemakaian: hari pertama sebagai admin, membuat dan memantau job, menjalankan worker,
+     alur uang (hold → tagih → lepas), invoice bulanan, pemulihan setelah kegagalan, batas laju, metrik,
+     isolasi antar tenant, migrasi &amp; cadangan, sampai daftar lengkap kode galat.</p>
+  <div class="badges">
+    <span class="badge">v0.7.1</span><span class="badge">401 tes</span>
+    <span class="badge">21 bagian</span><span class="badge">tanpa dependensi runtime</span>
+  </div>
+</div></header>
+<div class="wrap layout">
+<nav class="toc"><div class="toc-title">Daftar Isi</div><div class="toc">
+<ul>
+<li><a href="#daftar-isi">Daftar Isi</a></li>
+<li><a href="#1-apa-itu-sdb">1. Apa itu SDB</a></li>
+<li><a href="#2-peta-arsitektur">2. Peta arsitektur</a></li>
+<li><a href="#3-prasyarat-dan-pemasangan">3. Prasyarat dan pemasangan</a></li>
+<li><a href="#4-konfigurasi-dan-variabel-lingkungan">4. Konfigurasi dan variabel lingkungan</a></li>
+<li><a href="#5-menjalankan-control-plane">5. Menjalankan control plane</a></li>
+<li><a href="#6-skenario-a-hari-pertama-sebagai-admin">6. Skenario A — Hari pertama sebagai admin</a><ul>
+<li><a href="#a1-membuat-tenant">A1. Membuat tenant</a></li>
+<li><a href="#a2-mengubah-status-tenant">A2. Mengubah status tenant</a></li>
+<li><a href="#a3-menambah-kredit-topup">A3. Menambah kredit (topup)</a></li>
+<li><a href="#a4-melihat-pendapatan-agregat">A4. Melihat pendapatan agregat</a></li>
+</ul>
+</li>
+<li><a href="#7-skenario-b-tenant-membuat-job">7. Skenario B — Tenant membuat job</a><ul>
+<li><a href="#b1-membuat-job">B1. Membuat job</a></li>
+<li><a href="#b2-melihat-status-job">B2. Melihat status job</a></li>
+<li><a href="#b3-melampirkan-artefak">B3. Melampirkan artefak</a></li>
+</ul>
+</li>
+<li><a href="#8-skenario-c-worker-mengerjakan-job">8. Skenario C — Worker mengerjakan job</a><ul>
+<li><a href="#c1-menjalankan-worker">C1. Menjalankan worker</a></li>
+<li><a href="#c2-protokol-yang-dijalankan-worker">C2. Protokol yang dijalankan worker</a></li>
+<li><a href="#c3-klaim-ganda-dicegah">C3. Klaim ganda dicegah</a></li>
+</ul>
+</li>
+<li><a href="#9-skenario-d-uang-hold-tagih-lepas-refund">9. Skenario D — Uang: hold, tagih, lepas, refund</a></li>
+<li><a href="#10-skenario-e-bulan-pertama-usage-invoice-pendapatan">10. Skenario E — Bulan pertama: usage, invoice, pendapatan</a><ul>
+<li><a href="#e1-melihat-pemakaian">E1. Melihat pemakaian</a></li>
+<li><a href="#e2-menerbitkan-invoice-admin">E2. Menerbitkan invoice (admin)</a></li>
+<li><a href="#e3-rekonsiliasi-bulanan-rutinitas-yang-disarankan">E3. Rekonsiliasi bulanan (rutinitas yang disarankan)</a></li>
+</ul>
+</li>
+<li><a href="#11-skenario-f-pembatalan-kegagalan-dan-pemulihan">11. Skenario F — Pembatalan, kegagalan, dan pemulihan</a></li>
+<li><a href="#12-skenario-g-nyaman-tapi-aman-idempotensi-retry">12. Skenario G — Nyaman tapi aman: idempotensi &amp; retry</a></li>
+<li><a href="#13-skenario-h-batas-laju-dan-kuota">13. Skenario H — Batas laju dan kuota</a></li>
+<li><a href="#14-skenario-i-metrik-dan-pemantauan">14. Skenario I — Metrik dan pemantauan</a></li>
+<li><a href="#15-skenario-j-dashboard-workspace-agar-tidak-salah-pakai">15. Skenario J — Dashboard Workspace (agar tidak salah pakai)</a></li>
+<li><a href="#16-skenario-k-isolasi-antar-tenant">16. Skenario K — Isolasi antar tenant</a></li>
+<li><a href="#17-skenario-l-migrasi-cadangan-pemulihan">17. Skenario L — Migrasi, cadangan, pemulihan</a><ul>
+<li><a href="#migrasi">Migrasi</a></li>
+<li><a href="#cadangan">Cadangan</a></li>
+<li><a href="#pemulihan">Pemulihan</a></li>
+</ul>
+</li>
+<li><a href="#18-semua-kemungkinan-galat">18. Semua kemungkinan galat</a></li>
+<li><a href="#19-daftar-periksa-keamanan-sebelum-online">19. Daftar periksa keamanan sebelum online</a></li>
+<li><a href="#20-pertanyaan-yang-sering-diajukan">20. Pertanyaan yang sering diajukan</a></li>
+<li><a href="#21-lampiran-contoh-skrip-klien-python">21. Lampiran: contoh skrip klien Python</a></li>
+</ul>
+</div>
+</nav>
+<main>
+<p>Dokumen ini ditulis untuk tiga pembaca sekaligus: <strong>pemilik platform</strong> (admin), <strong>pengguna</strong> (tenant yang
+membeli kapasitas), dan <strong>operator pekerja</strong> (worker). Setiap skenario memuat langkah, contoh perintah
+nyata, hasil yang diharapkan, dan apa yang harus dilakukan bila hasilnya berbeda.</p>
+<blockquote>
+<p>Versi yang didokumentasikan: <strong>v0.7.1</strong> (401 tes).
+Semua contoh memakai <code>http://127.0.0.1:8088</code> dan <code>data/control.db</code>; ganti bila port/nama berkas berbeda.</p>
+</blockquote>
+<hr />
+<h2 id="daftar-isi">Daftar Isi</h2>
+<div class="toc-inline"><div class="toc-title">Daftar Isi</div><div class="toc">
+<ul>
+<li><a href="#daftar-isi">Daftar Isi</a></li>
+<li><a href="#1-apa-itu-sdb">1. Apa itu SDB</a></li>
+<li><a href="#2-peta-arsitektur">2. Peta arsitektur</a></li>
+<li><a href="#3-prasyarat-dan-pemasangan">3. Prasyarat dan pemasangan</a></li>
+<li><a href="#4-konfigurasi-dan-variabel-lingkungan">4. Konfigurasi dan variabel lingkungan</a></li>
+<li><a href="#5-menjalankan-control-plane">5. Menjalankan control plane</a></li>
+<li><a href="#6-skenario-a-hari-pertama-sebagai-admin">6. Skenario A — Hari pertama sebagai admin</a><ul>
+<li><a href="#a1-membuat-tenant">A1. Membuat tenant</a></li>
+<li><a href="#a2-mengubah-status-tenant">A2. Mengubah status tenant</a></li>
+<li><a href="#a3-menambah-kredit-topup">A3. Menambah kredit (topup)</a></li>
+<li><a href="#a4-melihat-pendapatan-agregat">A4. Melihat pendapatan agregat</a></li>
+</ul>
+</li>
+<li><a href="#7-skenario-b-tenant-membuat-job">7. Skenario B — Tenant membuat job</a><ul>
+<li><a href="#b1-membuat-job">B1. Membuat job</a></li>
+<li><a href="#b2-melihat-status-job">B2. Melihat status job</a></li>
+<li><a href="#b3-melampirkan-artefak">B3. Melampirkan artefak</a></li>
+</ul>
+</li>
+<li><a href="#8-skenario-c-worker-mengerjakan-job">8. Skenario C — Worker mengerjakan job</a><ul>
+<li><a href="#c1-menjalankan-worker">C1. Menjalankan worker</a></li>
+<li><a href="#c2-protokol-yang-dijalankan-worker">C2. Protokol yang dijalankan worker</a></li>
+<li><a href="#c3-klaim-ganda-dicegah">C3. Klaim ganda dicegah</a></li>
+</ul>
+</li>
+<li><a href="#9-skenario-d-uang-hold-tagih-lepas-refund">9. Skenario D — Uang: hold, tagih, lepas, refund</a></li>
+<li><a href="#10-skenario-e-bulan-pertama-usage-invoice-pendapatan">10. Skenario E — Bulan pertama: usage, invoice, pendapatan</a><ul>
+<li><a href="#e1-melihat-pemakaian">E1. Melihat pemakaian</a></li>
+<li><a href="#e2-menerbitkan-invoice-admin">E2. Menerbitkan invoice (admin)</a></li>
+<li><a href="#e3-rekonsiliasi-bulanan-rutinitas-yang-disarankan">E3. Rekonsiliasi bulanan (rutinitas yang disarankan)</a></li>
+</ul>
+</li>
+<li><a href="#11-skenario-f-pembatalan-kegagalan-dan-pemulihan">11. Skenario F — Pembatalan, kegagalan, dan pemulihan</a></li>
+<li><a href="#12-skenario-g-nyaman-tapi-aman-idempotensi-retry">12. Skenario G — Nyaman tapi aman: idempotensi &amp; retry</a></li>
+<li><a href="#13-skenario-h-batas-laju-dan-kuota">13. Skenario H — Batas laju dan kuota</a></li>
+<li><a href="#14-skenario-i-metrik-dan-pemantauan">14. Skenario I — Metrik dan pemantauan</a></li>
+<li><a href="#15-skenario-j-dashboard-workspace-agar-tidak-salah-pakai">15. Skenario J — Dashboard Workspace (agar tidak salah pakai)</a></li>
+<li><a href="#16-skenario-k-isolasi-antar-tenant">16. Skenario K — Isolasi antar tenant</a></li>
+<li><a href="#17-skenario-l-migrasi-cadangan-pemulihan">17. Skenario L — Migrasi, cadangan, pemulihan</a><ul>
+<li><a href="#migrasi">Migrasi</a></li>
+<li><a href="#cadangan">Cadangan</a></li>
+<li><a href="#pemulihan">Pemulihan</a></li>
+</ul>
+</li>
+<li><a href="#18-semua-kemungkinan-galat">18. Semua kemungkinan galat</a></li>
+<li><a href="#19-daftar-periksa-keamanan-sebelum-online">19. Daftar periksa keamanan sebelum online</a></li>
+<li><a href="#20-pertanyaan-yang-sering-diajukan">20. Pertanyaan yang sering diajukan</a></li>
+<li><a href="#21-lampiran-contoh-skrip-klien-python">21. Lampiran: contoh skrip klien Python</a></li>
+</ul>
+</div>
+</div>
+<hr />
+<h2 id="1-apa-itu-sdb">1. Apa itu SDB</h2>
+<p>SDB (Super Dev Builders) adalah <strong>platform pekerjaan berbasis kapasitas</strong>: pelanggan mengirim pekerjaan
+(job), worker menjalankannya, dan pemakaian token ditagih dari saldo prabayar pelanggan. Yang dijual bukan
+"langganan software" tetapi <strong>eksekusi yang terukur</strong>: setiap job punya anggaran token dan waktu, setiap
+rupiah/token tercatat di buku besar ber-rantai hash.</p>
+<p>Tiga janji yang dijaga oleh kode, bukan oleh janji pemasaran:</p>
+<ol>
+<li><strong>Uang tidak bisa hilang diam-diam.</strong> Setiap perubahan saldo adalah baris buku besar; baris baru
+   menyimpan hash baris sebelumnya, jadi penghapusan/perubahan baris lama terdeteksi.</li>
+<li><strong>Satu tenant tidak bisa membaca atau menagih tenant lain.</strong> Kunci API terikat ke satu tenant, dan
+   alamat artefak wajib berada di ruang tenant itu sendiri.</li>
+<li><strong>Pekerjaan yang tidak selesai tidak ditagih penuh.</strong> Saldo ditahan (hold) saat job dibuat, lalu
+   ditagih sesuai pemakaian nyata; sisa hold dilepas.</li>
+</ol>
+<hr />
+<h2 id="2-peta-arsitektur">2. Peta arsitektur</h2>
+<pre><code>   klien tenant ─── HTTP ──┐
+                           ├──► Control Plane (127.0.0.1:8088, stdlib)
+   worker ─────── HTTP ────┤       ├── Store (SQLite)  ── tenants, jobs, artifacts, ledger, invoices
+   admin ──────── HTTP ────┘       ├── Billing        ── harga, hold/settle, rantai hash
+                                   └── Metrics        ── /metrics (Prometheus) + RateLimiter
+   operator ─── browser ──► Dashboard Workspace (127.0.0.1:8484, PIN + X-SDB-Token)
+</code></pre>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Komponen</th>
+<th>Berkas</th>
+<th>Tanggung jawab</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Control plane</td>
+<td><code>sdb_platform/control_plane/app.py</code></td>
+<td>16 rute HTTP, autentikasi 3 peran (tenant/worker/admin)</td>
+</tr>
+<tr>
+<td>Store</td>
+<td><code>sdb_platform/control_plane/store.py</code></td>
+<td>skema, transaksi, kuota, status job, artefak</td>
+</tr>
+<tr>
+<td>Billing</td>
+<td><code>sdb_platform/control_plane/billing.py</code></td>
+<td>harga per plan, hold/settle/refund, invoice, verifikasi rantai</td>
+</tr>
+<tr>
+<td>Metrics</td>
+<td><code>sdb_platform/control_plane/metrics.py</code></td>
+<td>penghitung Prometheus + token bucket per tenant</td>
+</tr>
+<tr>
+<td>Worker</td>
+<td><code>sdb_platform/runtime/worker.py</code></td>
+<td>klaim job ber-lease, heartbeat, eksekusi, lapor hasil</td>
+</tr>
+<tr>
+<td>Dashboard</td>
+<td><code>dashboard/server.py</code>, <code>dashboard/ws_api.py</code></td>
+<td>Workspace lokal :8484 (bukan bagian penagihan)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Rute control plane:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Metode</th>
+<th>Rute</th>
+<th>Peran</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/healthz</code></td>
+<td>publik (denyut)</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/metrics</code></td>
+<td>admin</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/v1/tenants</code></td>
+<td>admin (buat tenant + kunci)</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/v1/admin/tenants/&lt;id&gt;/status</code></td>
+<td>admin (aktif / suspend / hapus)</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/v1/credits/topup</code></td>
+<td>admin</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/v1/admin/invoices</code></td>
+<td>admin</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/v1/admin/revenue</code></td>
+<td>admin</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/v1/jobs</code> · GET <code>/v1/jobs/&lt;id&gt;</code></td>
+<td>tenant</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/v1/jobs/&lt;id&gt;/cancel</code> · <code>/artifacts</code></td>
+<td>tenant</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/v1/usage</code> · <code>/v1/billing</code> · <code>/v1/ledger</code> · <code>/v1/invoices</code></td>
+<td>tenant</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/v1/worker/claim</code></td>
+<td>worker</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/v1/jobs/&lt;id&gt;/heartbeat</code> · <code>/complete</code></td>
+<td>worker</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Penting:</strong> dashboard adalah alat kerja operator (ide → diskusi → draft), <strong>bukan</strong> antrean job SDB.
+Job yang ditagih selalu melalui control plane :8088.</p>
+<hr />
+<h2 id="3-prasyarat-dan-pemasangan">3. Prasyarat dan pemasangan</h2>
+<p>Kebutuhan: Linux, Python <strong>3.10+</strong>, <code>make</code>, <code>git</code>. Tidak ada dependensi runtime pihak ketiga untuk
+control plane, worker, dan metrik (seluruhnya stdlib).</p>
+<pre><code class="language-bash">cd ~/super-dev-builders
+python3 -V                       # harus &gt;= 3.10
+make doctor                      # pemeriksaan lingkungan
+make test                        # seluruh tes harus PASS
+make check                       # lint + tes + drift + hygiene + pack
+</code></pre>
+<p>Bila memakai paket rilis:</p>
+<pre><code class="language-bash">tar xzf sdb-0.7.0.tar.gz &amp;&amp; cd sdb-0.7.0
+python3 -m venv .venv &amp;&amp; . .venv/bin/activate &amp;&amp; pip install -e .
+</code></pre>
+<p>Hasil yang diharapkan: <code>make check</code> berakhir tanpa galat dan baris terakhir memuat <code>PASS</code>.</p>
+<p>Bila gagal: jalankan <code>make test</code> sendiri untuk melihat nama tes yang merah. Jangan lanjut ke produksi
+sebelum hijau — kode yang tidak lulus tesnya tidak boleh melayani pelanggan.</p>
+<hr />
+<h2 id="4-konfigurasi-dan-variabel-lingkungan">4. Konfigurasi dan variabel lingkungan</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Variabel</th>
+<th>Wajib</th>
+<th>Arti</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SDB_ADMIN_KEY</code></td>
+<td>ya (server)</td>
+<td>kunci admin ≥ 24 karakter</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>SDB_WORKER_KEY</code></td>
+<td>untuk worker</td>
+<td>kunci worker ≥ 24 karakter; tanpa ini endpoint worker → 503</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>SDB_RATE_PER_MIN</code></td>
+<td>tidak</td>
+<td>jatah laju default per tenant</td>
+<td><code>600</code></td>
+</tr>
+<tr>
+<td><code>SDB_ALLOW_ECHO_EXECUTOR</code></td>
+<td>hanya uji</td>
+<td>izinkan executor <code>echo</code> (menagih token fiktif)</td>
+<td>tidak aktif</td>
+</tr>
+</tbody>
+</table></div>
+<pre><code class="language-bash">export SDB_ADMIN_KEY=$(python3 -c 'import secrets;print(secrets.token_urlsafe(32))')
+export SDB_WORKER_KEY=$(python3 -c 'import secrets;print(secrets.token_urlsafe(32))')
+</code></pre>
+<p>Aturan keras:</p>
+<ul>
+<li>Jangan menyimpan kunci di berkas yang masuk git. Pakai <code>.env</code> (di-<code>.gitignore</code>) atau <code>systemd
+  ExecStart</code> dengan <code>EnvironmentFile=</code> ber-mode <code>600</code>.</li>
+<li>Kunci yang pernah tampil di layar/log/dokumen dianggap <strong>bocor</strong> dan harus diganti
+  (buat tenant/kunci baru, cabut yang lama).</li>
+<li>Jangan cetak kunci di laporan, tiket, atau chat.</li>
+</ul>
+<hr />
+<h2 id="5-menjalankan-control-plane">5. Menjalankan control plane</h2>
+<pre><code class="language-bash">make control-plane                      # memakai data/control.db, port 8088
+# atau eksplisit:
+python3 -m sdb_platform.control_plane.app --db data/control.db --host 127.0.0.1 --port 8088
+</code></pre>
+<p>Pemeriksaan denyut:</p>
+<pre><code class="language-bash">curl -s http://127.0.0.1:8088/healthz
+# {&quot;status&quot;: &quot;ok&quot;}
+</code></pre>
+<p>Untuk produksi: jalankan di belakang reverse proxy ber-TLS, dengarkan hanya <code>127.0.0.1</code> atau soket
+internal, dan pasang unit <code>systemd</code> agar hidup lagi setelah reboot. Contoh unit:</p>
+<pre><code class="language-ini">[Unit]
+Description=SDB control plane
+After=network.target
+
+[Service]
+WorkingDirectory=/home/anashadi/super-dev-builders
+EnvironmentFile=/home/anashadi/.config/sdb/control.env
+ExecStart=/home/anashadi/super-dev-builders/.venv/bin/python -m sdb_platform.control_plane.app --db /home/anashadi/super-dev-builders/data/control.db --host 127.0.0.1 --port 8088
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+</code></pre>
+<hr />
+<h2 id="6-skenario-a-hari-pertama-sebagai-admin">6. Skenario A — Hari pertama sebagai admin</h2>
+<h3 id="a1-membuat-tenant">A1. Membuat tenant</h3>
+<pre><code class="language-bash">curl -s -X POST http://127.0.0.1:8088/v1/tenants \
+  -H &quot;X-Admin-Key: $SDB_ADMIN_KEY&quot; -H &quot;Content-Type: application/json&quot; \
+  -d '{&quot;plan&quot;:&quot;pro&quot;,&quot;name&quot;:&quot;Toko Maju&quot;,&quot;isolation&quot;:&quot;pool&quot;}'
+</code></pre>
+<p>Jawaban (dipotong):</p>
+<pre><code class="language-json">{&quot;tenant&quot;: {&quot;tenant_id&quot;: &quot;01J...&quot;, &quot;plan&quot;: &quot;pro&quot;, &quot;status&quot;: &quot;active&quot;,
+            &quot;jobs_per_month&quot;: ..., &quot;tokens_per_month&quot;: ..., &quot;storage_gb&quot;: ...},
+ &quot;api_key&quot;: &quot;sdb_...&quot;}
+</code></pre>
+<p><strong><code>api_key</code> hanya muncul sekali di respons ini.</strong> Simpan ke pengelola rahasia; jangan di chat/git.
+Kredit uji otomatis: starter 5 μUSD, pro 25 μUSD, team 100 μUSD, enterprise 0.</p>
+<p>Plan dan harganya (μUSD per 1 juta token; 1 USD = 1.000.000 μUSD):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Plan</th>
+<th>Harga / 1 juta token</th>
+<th>Kredit uji</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>starter</td>
+<td>2,00 USD</td>
+<td>5 μUSD</td>
+</tr>
+<tr>
+<td>pro</td>
+<td>1,60 USD</td>
+<td>25 μUSD</td>
+</tr>
+<tr>
+<td>team</td>
+<td>1,20 USD</td>
+<td>100 μUSD</td>
+</tr>
+<tr>
+<td>enterprise</td>
+<td>1,00 USD</td>
+<td>0</td>
+</tr>
+</tbody>
+</table></div>
+<p>Batasan kuota bulanan default ditentukan plan; dapat ditimpa saat membuat tenant:</p>
+<pre><code class="language-bash">-d '{&quot;plan&quot;:&quot;pro&quot;,&quot;limits&quot;:{&quot;jobs_per_month&quot;:500,&quot;tokens_per_month&quot;:50000000,
+     &quot;storage_gb&quot;:20,&quot;rate_per_min&quot;:1200}}'
+</code></pre>
+<p><code>rate_per_min</code> (1..100000) mengatur jatah laju tenant itu; tanpa nilai → <code>SDB_RATE_PER_MIN</code>.</p>
+<h3 id="a2-mengubah-status-tenant">A2. Mengubah status tenant</h3>
+<pre><code class="language-bash">curl -s -X POST http://127.0.0.1:8088/v1/admin/tenants/01J.../status \
+  -H &quot;X-Admin-Key: $SDB_ADMIN_KEY&quot; -H &quot;Content-Type: application/json&quot; \
+  -d '{&quot;status&quot;:&quot;suspended&quot;}'
+</code></pre>
+<ul>
+<li><code>suspended</code> → job baru ditolak, <strong>worker tidak lagi mengklaim</strong> job tenant itu (biaya berhenti).</li>
+<li><code>deleted</code> → antrean ditutup dan kredit yang ditahan dilepas.</li>
+</ul>
+<h3 id="a3-menambah-kredit-topup">A3. Menambah kredit (topup)</h3>
+<pre><code class="language-bash">curl -s -X POST http://127.0.0.1:8088/v1/credits/topup -H &quot;X-Admin-Key: $SDB_ADMIN_KEY&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d '{&quot;tenant_id&quot;:&quot;01J...&quot;,&quot;amount_microusd&quot;:50000000,&quot;memo&quot;:&quot;topup-transfer-2026-10&quot;}'
+</code></pre>
+<p><code>50.000.000 μUSD</code> = 50 USD. <code>memo</code> wajib dan berguna saat merekonsiliasi dengan mutasi bank.</p>
+<h3 id="a4-melihat-pendapatan-agregat">A4. Melihat pendapatan agregat</h3>
+<pre><code class="language-bash">curl -s http://127.0.0.1:8088/v1/admin/revenue -H &quot;X-Admin-Key: $SDB_ADMIN_KEY&quot;
+</code></pre>
+<p>Isinya total tagihan (<code>charge</code>), topup, refund, dan saldo agregat seluruh tenant — bahan laporan bulanan.</p>
+<hr />
+<h2 id="7-skenario-b-tenant-membuat-job">7. Skenario B — Tenant membuat job</h2>
+<h3 id="b1-membuat-job">B1. Membuat job</h3>
+<pre><code class="language-bash">curl -s -X POST http://127.0.0.1:8088/v1/jobs \
+  -H &quot;X-API-Key: $SDB_TENANT_KEY&quot; -H &quot;Content-Type: application/json&quot; \
+  -d '{
+    &quot;type&quot;: &quot;recon&quot;,
+    &quot;pack&quot;: {&quot;id&quot;: &quot;sdb-recon&quot;, &quot;version&quot;: &quot;1.0.0&quot;},
+    &quot;target_ref&quot;: &quot;artifact://01J.../targets/example.com.txt&quot;,
+    &quot;budget&quot;: {&quot;tokens&quot;: 5000, &quot;seconds&quot;: 600},
+    &quot;idempotency_key&quot;: &quot;recon-2026-10-29-0001&quot;
+  }'
+</code></pre>
+<p>Jawaban: HTTP <code>201</code> dengan <code>{"job": {...}, "replayed": false}</code>.</p>
+<p>Aturan bidang:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Bidang</th>
+<th>Wajib</th>
+<th>Aturan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>type</code></td>
+<td>ya</td>
+<td>teks pendek, mis. <code>recon</code>, <code>review</code>, <code>security</code></td>
+</tr>
+<tr>
+<td><code>pack</code></td>
+<td>ya</td>
+<td>objek berisi <code>id</code> dan <code>version</code></td>
+</tr>
+<tr>
+<td><code>target_ref</code></td>
+<td>ya</td>
+<td>alamat target di ruang tenant (<code>artifact://&lt;tenant_id&gt;/…</code> atau <code>s3://&lt;bucket&gt;/&lt;tenant_id&gt;/…</code>)</td>
+</tr>
+<tr>
+<td><code>budget.tokens</code></td>
+<td>ya</td>
+<td>1.000 … 2.000.000</td>
+</tr>
+<tr>
+<td><code>budget.seconds</code></td>
+<td>ya</td>
+<td>60 … 14.400 (4 jam)</td>
+</tr>
+<tr>
+<td><code>idempotency_key</code></td>
+<td>ya</td>
+<td>8 … 128 karakter, unik per tenant</td>
+</tr>
+</tbody>
+</table></div>
+<p>Efek uang saat dibuat: saldo sebesar <strong>anggaran token</strong> ditahan (hold) dari kredit tenant. Bila kredit
+kurang → <code>402 insufficient_credit</code>; bila kuota bulanan habis → <code>402 quota_*_exceeded</code>.</p>
+<h3 id="b2-melihat-status-job">B2. Melihat status job</h3>
+<pre><code class="language-bash">curl -s http://127.0.0.1:8088/v1/jobs/01J... -H &quot;X-API-Key: $SDB_TENANT_KEY&quot;
+</code></pre>
+<p>Status yang mungkin: <code>queued</code>, <code>running</code>, <code>succeeded</code>, <code>failed</code>, <code>blocked</code>, <code>budget_exceeded</code>,
+<code>cancelled</code>.</p>
+<h3 id="b3-melampirkan-artefak">B3. Melampirkan artefak</h3>
+<pre><code class="language-bash">curl -s -X POST http://127.0.0.1:8088/v1/jobs/01J.../artifacts \
+  -H &quot;X-API-Key: $SDB_TENANT_KEY&quot; -H &quot;Content-Type: application/json&quot; \
+  -d '{&quot;kind&quot;:&quot;report&quot;,&quot;sha256&quot;:&quot;&lt;64 hex&gt;&quot;,&quot;size&quot;:18432,
+       &quot;redaction_status&quot;:&quot;redacted&quot;,&quot;retention_until&quot;:&quot;2026-12-31&quot;,
+       &quot;uri&quot;:&quot;artifact://01J.../jobs/01J.../report.md&quot;,&quot;media_type&quot;:&quot;text/markdown&quot;}'
+</code></pre>
+<ul>
+<li><code>uri</code> <strong>wajib</strong> memuat <code>&lt;tenant_id&gt;</code> sendiri; <code>..</code> ditolak.</li>
+<li><code>sha256</code> 64 heksadesimal huruf kecil; <code>size</code> positif.</li>
+<li><code>retention_until</code> tanggal ISO di masa depan (disimpan sebagai UTC).</li>
+</ul>
+<hr />
+<h2 id="8-skenario-c-worker-mengerjakan-job">8. Skenario C — Worker mengerjakan job</h2>
+<h3 id="c1-menjalankan-worker">C1. Menjalankan worker</h3>
+<pre><code class="language-bash">export SDB_WORKER_KEY=...      # &gt;= 24 karakter, sama dengan kunci yang dipakai server
+python3 -m sdb_platform.runtime.worker --db data/control.db \
+  --worker-id worker-1 --executor echo --once
+</code></pre>
+<ul>
+<li><code>--executor</code> <strong>wajib</strong> (pilihan saat ini: <code>echo</code>). <code>echo</code> hanya untuk uji: butuh
+  <code>SDB_ALLOW_ECHO_EXECUTOR=1</code>, dan <strong>menagih token</strong> atas pekerjaan yang tidak nyata — jangan dipakai
+  pada tenant berbayar.</li>
+<li>Tanpa <code>--once</code>, worker berputar terus dengan jeda <code>--poll</code> (default 2 detik).</li>
+<li><code>--lease-seconds</code> default 120. Job panjang mendapat heartbeat otomatis (interval = lease/3), jadi job
+  sampai 4 jam tidak kehilangan lease.</li>
+</ul>
+<h3 id="c2-protokol-yang-dijalankan-worker">C2. Protokol yang dijalankan worker</h3>
+<pre><code>POST /v1/worker/claim  {&quot;worker_id&quot;:&quot;worker-1&quot;,&quot;lease_seconds&quot;:120}   -&gt; job | null
+   kerjakan …
+POST /v1/jobs/&lt;id&gt;/heartbeat {&quot;worker_id&quot;:&quot;worker-1&quot;,&quot;lease_seconds&quot;:120}   (berkala)
+POST /v1/jobs/&lt;id&gt;/complete  {&quot;worker_id&quot;:&quot;worker-1&quot;,&quot;status&quot;:&quot;succeeded&quot;,
+                              &quot;tokens_used&quot;:1500,&quot;gate_verdict&quot;:{...},&quot;error&quot;:null}
+</code></pre>
+<ul>
+<li><code>tokens_used</code> <strong>harus</strong> ≤ anggaran; bila lebih, status akhir otomatis <code>budget_exceeded</code> dan yang
+  ditagih hanya sebesar anggaran.</li>
+<li><code>status</code> penutup yang sah: <code>succeeded</code>, <code>failed</code>, <code>blocked</code>, <code>budget_exceeded</code>, <code>cancelled</code>.
+  <code>queued</code>/<code>running</code> <strong>ditolak</strong> (<code>400 invalid_status</code>) — inilah yang dulu membuat job bisa dikerjakan
+  ulang gratis.</li>
+<li><code>gate_verdict</code> bila ada harus objek; <code>error</code> berupa teks.</li>
+<li>Bila worker mati di tengah jalan, lease habis → job kembali <code>queued</code> dan bisa diklaim worker lain.
+  Bila job dibatalkan tenant dan worker tidak pernah kembali, reaper menutupnya sebagai <code>cancelled</code>.</li>
+</ul>
+<h3 id="c3-klaim-ganda-dicegah">C3. Klaim ganda dicegah</h3>
+<p><code>/complete</code> hanya diterima dari <strong>worker pemegang lease</strong>. Worker lambat yang mencoba menutup job yang
+sudah diambil worker lain mendapat <code>409 lease_lost</code>.</p>
+<hr />
+<h2 id="9-skenario-d-uang-hold-tagih-lepas-refund">9. Skenario D — Uang: hold, tagih, lepas, refund</h2>
+<p>Alur satu job:</p>
+<pre><code>create  → hold = harga(budget.tokens)          (saldo: kredit - hold)
+finish  → charge = harga(tokens_used)          (hold dilepas penuh, kredit berkurang charge)
+        → release = hold - charge  (bila ada sisa)
+</code></pre>
+<p>Contoh angka nyata (plan pro, 1,6 μUSD per 1.000 token):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Langkah</th>
+<th>Peristiwa</th>
+<th>Saldo kredit</th>
+<th>Ditahan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>awal</td>
+<td>topup 50.000.000</td>
+<td>50.000.000</td>
+<td>0</td>
+</tr>
+<tr>
+<td>create</td>
+<td>budget 5.000 token = 8.000</td>
+<td>50.000.000</td>
+<td>8.000</td>
+</tr>
+<tr>
+<td>finish</td>
+<td>tokens_used 1.518 → 2.429</td>
+<td>49.997.571</td>
+<td>0</td>
+</tr>
+</tbody>
+</table></div>
+<p>Pembulatan <strong>ke atas</strong>, jadi tidak ada token gratis karena pembulatan.</p>
+<p>Kasus khusus yang sudah ditangani kode:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Kejadian</th>
+<th>Perilaku</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Job dibatalkan setelah kerja berjalan</td>
+<td>ditagih sesuai <code>tokens_used</code> yang dilaporkan</td>
+</tr>
+<tr>
+<td>Job dibatalkan sebelum kerja</td>
+<td>hold dilepas penuh, tagihan 0</td>
+</tr>
+<tr>
+<td><code>tokens_used</code> &gt; anggaran</td>
+<td>ditagih sebesar anggaran, status <code>budget_exceeded</code></td>
+</tr>
+<tr>
+<td>Worker hilang setelah klaim</td>
+<td>lease habis → job kembali antre; tidak ada tagihan ganda</td>
+</tr>
+<tr>
+<td>Refund oleh admin</td>
+<td>baris <code>refund</code> dengan <code>memo</code> wajib; atomik</td>
+</tr>
+</tbody>
+</table></div>
+<p>Cek buku besar tenant:</p>
+<pre><code class="language-bash">curl -s &quot;http://127.0.0.1:8088/v1/ledger?limit=50&quot; -H &quot;X-API-Key: $SDB_TENANT_KEY&quot;
+curl -s http://127.0.0.1:8088/v1/billing -H &quot;X-API-Key: $SDB_TENANT_KEY&quot;
+</code></pre>
+<p>Verifikasi rantai (deteksi perubahan baris lama):</p>
+<pre><code class="language-bash">python3 -c &quot;
+from sdb_platform.control_plane.store import Store
+s = Store('data/control.db')
+print(s.billing.verify_chain('01J...'))&quot;
+# {'ok': True, 'entries': 42, 'balance': 49997571, 'held': 0}
+</code></pre>
+<hr />
+<h2 id="10-skenario-e-bulan-pertama-usage-invoice-pendapatan">10. Skenario E — Bulan pertama: usage, invoice, pendapatan</h2>
+<h3 id="e1-melihat-pemakaian">E1. Melihat pemakaian</h3>
+<pre><code class="language-bash">curl -s http://127.0.0.1:8088/v1/usage -H &quot;X-API-Key: $SDB_TENANT_KEY&quot;
+</code></pre>
+<p>Berisi pemakaian job/token/storage bulan berjalan dibanding kuota plan.</p>
+<h3 id="e2-menerbitkan-invoice-admin">E2. Menerbitkan invoice (admin)</h3>
+<pre><code class="language-bash">curl -s -X POST http://127.0.0.1:8088/v1/admin/invoices -H &quot;X-Admin-Key: $SDB_ADMIN_KEY&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d '{&quot;tenant_id&quot;:&quot;01J...&quot;,&quot;period_start&quot;:&quot;2026-10-01&quot;,&quot;period_end&quot;:&quot;2026-10-31&quot;}'
+</code></pre>
+<p>Aturan yang ditegakkan:</p>
+<ul>
+<li><code>period_start</code> &lt; <code>period_end</code>, format ISO-8601; periode <strong>wajib sudah tertutup</strong> (tidak boleh
+  menagih periode yang belum selesai).</li>
+<li><strong>Tidak boleh tumpang-tindih</strong> dengan invoice lain tenant yang sama → <code>409 invoice_period_overlap</code>.
+  (Dulu dua invoice bertumpuk menagih biaya yang sama dua kali.)</li>
+<li>Invoice diterbitkan admin, bukan tenant — mencegah tenant "memesan" periode aneh yang membuat invoice
+  resmi bulanan tertolak.</li>
+</ul>
+<p>Tenant melihat daftarnya: <code>GET /v1/invoices</code>.</p>
+<h3 id="e3-rekonsiliasi-bulanan-rutinitas-yang-disarankan">E3. Rekonsiliasi bulanan (rutinitas yang disarankan)</h3>
+<ol>
+<li><code>GET /v1/admin/revenue</code> → total tagihan, topup, refund.</li>
+<li>Bandingkan dengan mutasi bank/penyedia pembayaran untuk kolom topup.</li>
+<li>Untuk tiap tenant besar: <code>verify_chain</code> harus <code>ok: true</code>.</li>
+<li>Simpan salinan <code>data/control.db</code> (lihat §17) sebelum dan sesudah penutupan bulan.</li>
+</ol>
+<hr />
+<h2 id="11-skenario-f-pembatalan-kegagalan-dan-pemulihan">11. Skenario F — Pembatalan, kegagalan, dan pemulihan</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Situasi</th>
+<th>Yang harus dilakukan</th>
+<th>Hasil</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tenant ingin membatalkan</td>
+<td><code>POST /v1/jobs/&lt;id&gt;/cancel</code></td>
+<td>bila belum dikerjakan: hold dilepas, status <code>cancelled</code>; bila sudah berjalan: ditagih pemakaian</td>
+</tr>
+<tr>
+<td>Ingin menutup job dari sisi tenant</td>
+<td><strong>tidak bisa</strong> (dulu bisa — itulah cacatnya) → <code>410 endpoint_removed</code></td>
+<td>pakai <code>/cancel</code>, atau tunggu worker</td>
+</tr>
+<tr>
+<td>Worker mati saat job berjalan</td>
+<td>tidak ada aksi manual</td>
+<td>lease habis → <code>queued</code> → worker lain klaim</td>
+</tr>
+<tr>
+<td>Job macet <code>queued</code> setelah batal</td>
+<td>tidak ada aksi manual</td>
+<td>reaper menutup <code>cancelled</code> + lepas hold</td>
+</tr>
+<tr>
+<td>Hasil pekerjaan salah, ingin ulang</td>
+<td>buat job baru dengan <code>idempotency_key</code> <strong>baru</strong></td>
+<td>job lama tetap tercatat (jejak audit)</td>
+</tr>
+<tr>
+<td>Worker melaporkan gagal</td>
+<td>kirim <code>status:"failed"</code> + <code>error</code></td>
+<td>ditagih pemakaian nyata (bukan anggaran penuh)</td>
+</tr>
+<tr>
+<td>Gate menolak hasil</td>
+<td><code>status:"blocked"</code> + <code>gate_verdict</code></td>
+<td>ditagih pemakaian; keputusan tercatat</td>
+</tr>
+</tbody>
+</table></div>
+<p>Contoh pembatalan:</p>
+<pre><code class="language-bash">curl -s -X POST http://127.0.0.1:8088/v1/jobs/01J.../cancel -H &quot;X-API-Key: $SDB_TENANT_KEY&quot;
+</code></pre>
+<hr />
+<h2 id="12-skenario-g-nyaman-tapi-aman-idempotensi-retry">12. Skenario G — Nyaman tapi aman: idempotensi &amp; retry</h2>
+<p>Jaringan gagal setelah server memproses permintaan? Klien <strong>wajib</strong> mengulang dengan
+<code>idempotency_key</code> yang sama:</p>
+<ul>
+<li>Key sama + isi sama → <code>200</code> dengan <code>"replayed": true</code> dan job yang sama (tidak ada hold baru).</li>
+<li>Key sama + isi <strong>berbeda</strong> → <code>409 idempotency_conflict</code> (dulu diam-diam mengembalikan job lain).</li>
+</ul>
+<p>Pola klien yang benar:</p>
+<pre><code class="language-python">key = f&quot;recon-{task_id}&quot;          # stabil untuk satu niat, bukan acak per percobaan
+for percobaan in range(5):
+    try:
+        r = post(&quot;/v1/jobs&quot;, {...}, key=key)
+        break
+    except (TimeoutError, HTTPError) as e:
+        if isinstance(e, HTTPError) and e.code == 409:
+            raise                                     # isi berubah: perbaiki kode, jangan ulangi
+        time.sleep(2 ** percobaan)                    # 2,4,8,16 detik
+</code></pre>
+<p>Aturan retry:</p>
+<ul>
+<li>Retry hanya untuk galat <strong>sementara</strong>: timeout, 429 (hormati <code>Retry-After</code>), 5xx.</li>
+<li>Jangan retry 400/401/402/409/410 — itu keputusan, bukan gangguan.</li>
+</ul>
+<hr />
+<h2 id="13-skenario-h-batas-laju-dan-kuota">13. Skenario H — Batas laju dan kuota</h2>
+<p>Tiga pagar berbeda, jangan tertukar:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Pagar</th>
+<th>Kapan aktif</th>
+<th>Jawaban</th>
+<th>Tindakan klien</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Laju per tenant</td>
+<td>terlalu banyak permintaan/menit</td>
+<td><code>429 rate_limited</code> + <code>Retry-After</code></td>
+<td>tunggu <code>Retry-After</code>, turunkan laju</td>
+</tr>
+<tr>
+<td>Kuota kuota bulanan</td>
+<td>job/token/storage bulan ini habis</td>
+<td><code>402 quota_jobs_exceeded</code> dll.</td>
+<td>upgrade plan / tunggu bulan berikut</td>
+</tr>
+<tr>
+<td>Kredit</td>
+<td>saldo &lt; anggaran job</td>
+<td><code>402 insufficient_credit</code></td>
+<td>topup</td>
+</tr>
+</tbody>
+</table></div>
+<p>Jatah default 600 permintaan/menit per tenant; burst 2 detik pertama lebih longgar (kapasitas 2×laju).
+Atur per tenant saat pembuatan, atau ubah bawaan server dengan <code>SDB_RATE_PER_MIN</code>.</p>
+<p>Ukur kebutuhan sebelum menaikkan: satu klien sehat jarang melewati 60 permintaan/menit. Bila sering
+kena 429, biasanya ada loop tanpa jeda — perbaiki klien dulu.</p>
+<hr />
+<h2 id="14-skenario-i-metrik-dan-pemantauan">14. Skenario I — Metrik dan pemantauan</h2>
+<pre><code class="language-bash">curl -s http://127.0.0.1:8088/metrics -H &quot;X-Admin-Key: $SDB_ADMIN_KEY&quot; | head -20
+</code></pre>
+<p>Keluaran (format Prometheus):</p>
+<pre><code># TYPE sdb_http_requests_total counter
+sdb_http_requests_total{method=&quot;GET&quot;,route=&quot;/v1/usage&quot;,status=&quot;200&quot;} 12
+sdb_http_requests_total{method=&quot;POST&quot;,route=&quot;/v1/jobs&quot;,status=&quot;201&quot;} 4
+# TYPE sdb_jobs_created_total counter
+sdb_jobs_created_total{type=&quot;recon&quot;} 4
+# TYPE sdb_jobs_completed_total counter
+sdb_jobs_completed_total{status=&quot;succeeded&quot;} 3
+# TYPE sdb_tokens_used_total counter
+sdb_tokens_used_total 1518
+# TYPE sdb_uptime_seconds gauge
+sdb_uptime_seconds 812.4
+</code></pre>
+<p><code>prometheus.yml</code>:</p>
+<pre><code class="language-yaml">scrape_configs:
+  - job_name: sdb
+    scheme: http
+    authorization:
+      type: Bearer            # bila memakai proxy yang menambahkan header; atau pakai header khusus di bawah
+    static_configs:
+      - targets: [&quot;127.0.0.1:8088&quot;]
+    metrics_path: /metrics
+</code></pre>
+<p>Karena <code>/metrics</code> memerlukan header <code>X-Admin-Key</code>, cara paling aman adalah menyisipkannya di reverse
+proxy internal (jangan menaruh kunci admin di berkas konfigurasi Prometheus yang terbaca banyak orang).</p>
+<p>Ambang peringatan yang disarankan:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Metrik</th>
+<th>Peringatan</th>
+<th>Artinya</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sdb_rate_limited_total</code> naik terus</td>
+<td>&gt; 5% permintaan</td>
+<td>klien looping atau jatah terlalu kecil</td>
+</tr>
+<tr>
+<td><code>sdb_jobs_completed_total{status="failed"}</code></td>
+<td>&gt; 20% dalam 1 jam</td>
+<td>executor/pekerjaan bermasalah</td>
+</tr>
+<tr>
+<td><code>sdb_http_requests_total{status="500"}</code></td>
+<td>&gt; 0</td>
+<td>bug; periksa stderr server</td>
+</tr>
+<tr>
+<td><code>sdb_uptime_seconds</code> turun</td>
+<td>restart tak terduga</td>
+<td>periksa <code>systemctl</code>/OOM</td>
+</tr>
+</tbody>
+</table></div>
+<p>Catatan jujur: penghitung disimpan di memori proses — hilang saat restart dan tidak dijumlah antar
+instance.</p>
+<hr />
+<h2 id="15-skenario-j-dashboard-workspace-agar-tidak-salah-pakai">15. Skenario J — Dashboard Workspace (agar tidak salah pakai)</h2>
+<p>Dashboard <code>:8484</code> adalah <strong>kantor kerja operator</strong>: menulis ide, berdiskusi dengan agen, membuat draft
+intake Gate #0, lalu menyerahkan tahap build/test/scan/deploy ke terminal. Ia <strong>bukan</strong> tempat job
+penagihan berjalan.</p>
+<pre><code class="language-bash">systemctl --user status sdb-command-deck     # layanan
+python3 dashboard/server.py --show-token     # PIN untuk perangkat lain
+python3 dashboard/server.py --health-check   # probe kesehatan (dashboard/state/health.json)
+curl -s -o /dev/null -w &quot;%{http_code}\n&quot; http://127.0.0.1:8484/     # 200 = UI terlayani
+</code></pre>
+<p>Aturan pakai:</p>
+<ul>
+<li>Buka dari PC server (127.0.0.1) untuk melihat PIN; PIN hanya diberikan ke klien lokal.</li>
+<li>Setiap panggilan <code>/api/ws/*</code> wajib header <code>X-SDB-Token</code>.</li>
+<li>Lebih dari 30 kegagalan token per IP dalam 60 detik → <code>429</code> (sejak v0.7.1).</li>
+<li>Data di <code>~/sdb-workspace/</code> (projects.json, chats/, stages/) — <strong>bukan</strong> di git.</li>
+<li>Tahap 07–16 hanya menghasilkan <code>*.brief.md</code>; eksekusi tetap manual dengan bukti segar.</li>
+</ul>
+<p>Kesalahan umum: mengira "Approve" di dashboard berarti pekerjaan sudah dijalankan. Yang terjadi adalah
+draft diterima; eksekusi tetap di terminal.</p>
+<hr />
+<h2 id="16-skenario-k-isolasi-antar-tenant">16. Skenario K — Isolasi antar tenant</h2>
+<p>Uji cepat bahwa isolasi benar-benar berlaku (lakukan di lingkungan uji, bukan produksi):</p>
+<pre><code class="language-bash"># 1) tenant B mencoba membaca job tenant A
+curl -s -o /dev/null -w &quot;%{http_code}\n&quot; http://127.0.0.1:8088/v1/jobs/&lt;job_A&gt; -H &quot;X-API-Key: $KEY_B&quot;
+# harapan: 404 job_not_found (bukan 403 yang membocorkan keberadaan)
+
+# 2) tenant B mencoba menaruh artefak di ruang A
+curl -s -X POST http://127.0.0.1:8088/v1/jobs/&lt;job_B&gt;/artifacts -H &quot;X-API-Key: $KEY_B&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d '{&quot;kind&quot;:&quot;report&quot;,&quot;sha256&quot;:&quot;'$(printf 'a%.0s' {1..64})'&quot;,&quot;size&quot;:10,
+       &quot;redaction_status&quot;:&quot;redacted&quot;,&quot;retention_until&quot;:&quot;2026-12-31&quot;,
+       &quot;uri&quot;:&quot;artifact://&lt;tenant_A&gt;/curian.txt&quot;,&quot;media_type&quot;:&quot;text/plain&quot;}'
+# harapan: 400 invalid_uri
+</code></pre>
+<p>Isolasi bukan hanya soal kunci: <code>uri</code> artefak, kepemilikan lease, dan kepemilikan job semuanya diperiksa
+di dalam transaksi, bukan di lapisan tampilan.</p>
+<hr />
+<h2 id="17-skenario-l-migrasi-cadangan-pemulihan">17. Skenario L — Migrasi, cadangan, pemulihan</h2>
+<h3 id="migrasi">Migrasi</h3>
+<p>Membuka DB lama dengan kode baru melakukan migrasi otomatis dan <strong>tidak menulis ulang baris lama</strong>:</p>
+<ul>
+<li>v0.4.0 → v0.5.0: kolom-kolom billing awal.</li>
+<li>v0.5.0 → v0.6.0: <code>ledger.hv</code> (versi hash), indeks <code>idx_jobs_status</code>, <code>idx_charges_tenant</code>.</li>
+<li>v0.6.0 → v0.7.1: <code>tenants.rate_per_min</code>.</li>
+</ul>
+<p>Prosedur aman:</p>
+<pre><code class="language-bash">cp data/control.db data/control.db.bak-$(date +%Y%m%d-%H%M)
+python3 -c &quot;from sdb_platform.control_plane.store import Store; Store('data/control.db')&quot;
+python3 -c &quot;
+from sdb_platform.control_plane.store import Store
+s=Store('data/control.db')
+for t in s.db.execute('SELECT tenant_id FROM tenants'):
+    r=s.billing.verify_chain(t['tenant_id'])
+    print(t['tenant_id'], r['ok'], r['entries'], r['balance'])&quot;
+</code></pre>
+<h3 id="cadangan">Cadangan</h3>
+<pre><code class="language-bash">sqlite3 data/control.db &quot;.backup 'backup-$(date +%F).db'&quot;     # konsisten walau server hidup
+</code></pre>
+<p>Simpan juga salinan <code>control.db</code> <strong>sebelum</strong> setiap rilis baru; DB adalah sumber kebenaran uang.</p>
+<h3 id="pemulihan">Pemulihan</h3>
+<ol>
+<li>Hentikan server.</li>
+<li>Ganti <code>data/control.db</code> dengan cadangan.</li>
+<li>Jalankan server, cek <code>/healthz</code>, lalu <code>verify_chain</code> semua tenant.</li>
+<li>Cocokkan total kredit dengan laporan terakhir.</li>
+</ol>
+<p>Bila <code>verify_chain</code> gagal: <strong>jangan</strong> menambal hash. Pulihkan dari cadangan; kegagalan rantai berarti ada
+baris yang diubah di luar aplikasi.</p>
+<hr />
+<h2 id="18-semua-kemungkinan-galat">18. Semua kemungkinan galat</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>HTTP</th>
+<th><code>code</code></th>
+<th>Arti</th>
+<th>Tindakan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>400</td>
+<td><code>invalid_json</code></td>
+<td>body bukan JSON sah</td>
+<td>perbaiki body</td>
+</tr>
+<tr>
+<td>400</td>
+<td><code>invalid_budget</code></td>
+<td>tokens/seconds di luar batas</td>
+<td>1000..2.000.000 token, 60..14.400 detik</td>
+</tr>
+<tr>
+<td>400</td>
+<td><code>invalid_idempotency_key</code></td>
+<td>panjang &lt; 8 atau &gt; 128</td>
+<td>pakai kunci stabil 8–128 karakter</td>
+</tr>
+<tr>
+<td>400</td>
+<td><code>invalid_uri</code></td>
+<td><code>uri</code> keluar ruang tenant / <code>..</code></td>
+<td>pakai <code>&lt;tenant_id&gt;</code> sendiri</td>
+</tr>
+<tr>
+<td>400</td>
+<td><code>invalid_status</code></td>
+<td>status penutup tidak sah</td>
+<td>pakai salah satu status penutup</td>
+</tr>
+<tr>
+<td>400</td>
+<td><code>invalid_gate_verdict</code></td>
+<td><code>gate_verdict</code> bukan objek</td>
+<td>kirim objek atau <code>null</code></td>
+</tr>
+<tr>
+<td>400</td>
+<td><code>invalid_lease</code> / <code>lease_seconds</code></td>
+<td>lease di luar 10..3600</td>
+<td>10..3600</td>
+</tr>
+<tr>
+<td>400</td>
+<td><code>invalid_worker</code></td>
+<td><code>worker_id</code> kosong</td>
+<td>kirim <code>worker_id</code></td>
+</tr>
+<tr>
+<td>400</td>
+<td><code>invalid_redaction</code> / <code>invalid_retention</code></td>
+<td>metadata artefak cacat</td>
+<td>ISO-8601 masa depan, status redaksi sah</td>
+</tr>
+<tr>
+<td>400</td>
+<td><code>weak_key</code></td>
+<td>kunci &lt; 24 karakter</td>
+<td>buat kunci acak ≥ 24</td>
+</tr>
+<tr>
+<td>400</td>
+<td><code>invalid_limits</code></td>
+<td>batas plan bukan int positif</td>
+<td>perbaiki nilai</td>
+</tr>
+<tr>
+<td>413</td>
+<td><code>body_too_large</code></td>
+<td>body &gt; 256 KB</td>
+<td>kirim lebih kecil</td>
+</tr>
+<tr>
+<td>401</td>
+<td><code>unauthorized</code></td>
+<td>kunci salah/kosong</td>
+<td>periksa header</td>
+</tr>
+<tr>
+<td>402</td>
+<td><code>insufficient_credit</code></td>
+<td>saldo &lt; anggaran</td>
+<td>topup</td>
+</tr>
+<tr>
+<td>402</td>
+<td><code>quota_jobs_exceeded</code> / <code>quota_tokens_exceeded</code> / <code>quota_storage_exceeded</code></td>
+<td>kuota bulanan habis</td>
+<td>upgrade/tunggu bulan baru</td>
+</tr>
+<tr>
+<td>404</td>
+<td><code>job_not_found</code></td>
+<td>job tidak ada <strong>atau</strong> milik tenant lain</td>
+<td>periksa id</td>
+</tr>
+<tr>
+<td>404</td>
+<td><code>tenant_not_found</code></td>
+<td>tenant tidak ada</td>
+<td>periksa id</td>
+</tr>
+<tr>
+<td>404</td>
+<td><code>invoice_not_found</code></td>
+<td>invoice tidak ada</td>
+<td>periksa id</td>
+</tr>
+<tr>
+<td>409</td>
+<td><code>idempotency_conflict</code></td>
+<td>kunci sama, isi beda</td>
+<td>pakai kunci baru untuk niat baru</td>
+</tr>
+<tr>
+<td>409</td>
+<td><code>key_exists</code></td>
+<td>kunci API sudah dipakai</td>
+<td>buat kunci lain</td>
+</tr>
+<tr>
+<td>409</td>
+<td><code>lease_lost</code></td>
+<td>bukan pemegang lease</td>
+<td>hentikan; job sudah diambil worker lain</td>
+</tr>
+<tr>
+<td>409</td>
+<td><code>lease_owner</code></td>
+<td>lease milik worker lain</td>
+<td>sama seperti di atas</td>
+</tr>
+<tr>
+<td>409</td>
+<td><code>invoice_period_overlap</code></td>
+<td>periode bertumpuk</td>
+<td>pakai periode lain</td>
+</tr>
+<tr>
+<td>410</td>
+<td><code>endpoint_removed</code></td>
+<td><code>/finish</code> dihapus</td>
+<td>pakai <code>/cancel</code> (tenant) atau <code>/complete</code> (worker)</td>
+</tr>
+<tr>
+<td>400</td>
+<td><code>invalid_period</code></td>
+<td>periode invoice tidak sah atau belum berakhir</td>
+<td>pakai tanggal ISO, periode yang sudah lewat</td>
+</tr>
+<tr>
+<td>429</td>
+<td><code>rate_limited</code></td>
+<td>jatah laju habis</td>
+<td>tunggu <code>Retry-After</code></td>
+</tr>
+<tr>
+<td>500</td>
+<td><code>internal_error</code></td>
+<td>bug</td>
+<td>periksa stderr server; laporkan dengan waktu &amp; rute</td>
+</tr>
+<tr>
+<td>503</td>
+<td><code>worker_disabled</code></td>
+<td><code>SDB_WORKER_KEY</code> tidak diset</td>
+<td>set di server</td>
+</tr>
+</tbody>
+</table></div>
+<p>Prinsip: <code>404</code> dipakai untuk "tidak ada <strong>atau</strong> bukan milikmu" agar keberadaan job tenant lain tidak
+bocor.</p>
+<hr />
+<h2 id="19-daftar-periksa-keamanan-sebelum-online">19. Daftar periksa keamanan sebelum online</h2>
+<ul>
+<li>[ ] Control plane <strong>tidak</strong> mendengarkan <code>0.0.0.0</code> tanpa TLS; pakai reverse proxy + sertifikat.</li>
+<li>[ ] <code>SDB_ADMIN_KEY</code>, <code>SDB_WORKER_KEY</code>, kunci tenant disimpan di berkas <code>600</code> atau pengelola rahasia.</li>
+<li>[ ] <code>/metrics</code> tidak terbuka ke internet (butuh header admin).</li>
+<li>[ ] Dashboard hanya di LAN/loopback; PIN tidak dibagikan lewat chat.</li>
+<li>[ ] <code>.env</code> tidak masuk git (<code>git check-ignore .env</code> harus mengonfirmasi).</li>
+<li>[ ] Cadangan <code>control.db</code> harian + <code>verify_chain</code> mingguan.</li>
+<li>[ ] Log tidak memuat kunci/header/body (server hanya mencatat metode + rute saat 500).</li>
+<li>[ ] Rotasi kunci bila ada keraguan kebocoran; cabut kunci lama (<code>api_keys</code> dihapus, tenant tetap).</li>
+</ul>
+<hr />
+<h2 id="20-pertanyaan-yang-sering-diajukan">20. Pertanyaan yang sering diajukan</h2>
+<p><strong>Apakah satu job bisa ditagih dua kali?</strong>
+Tidak. Hold dibuat sekali di transaksi pembuatan; penutupan job memakai transaksi yang sama untuk
+melepas hold dan menagih pemakaian. Penutupan ganda ditolak.</p>
+<p><strong>Bisakah tenant menghapus jejak tagihan?</strong>
+Tidak. Buku besar ber-rantai hash; baris diubah → <code>verify_chain</code> gagal. Baris lama tidak pernah ditulis
+ulang oleh migrasi.</p>
+<p><strong>Bagaimana kalau worker crash di tengah job?</strong>
+Lease habis (default 120 detik) → job kembali <code>queued</code>. Tidak ada tagihan ganda karena penagihan hanya
+terjadi saat penutupan yang sah.</p>
+<p><strong>Kenapa tenant tidak bisa menutup job sendiri?</strong>
+Karena itu membuat pekerjaan gratis: tenant bisa "menutup" job yang sedang dikerjakan worker. Sekarang
+tenant hanya bisa membatalkan, dan pembatalan setelah kerja berjalan tetap ditagih.</p>
+<p><strong>Apakah metrik bisa dipercaya setelah restart?</strong>
+Tidak untuk total jangka panjang — penghitung di memori. Untuk angka permanen, pakai buku besar/invoice.</p>
+<p><strong>Berapa lama artefak disimpan?</strong>
+Sesuai <code>retention_until</code> yang dicatat saat pendaftaran artefak; penghapusan fisik mengikuti kebijakan
+penyimpanan yang Anda tetapkan (belum otomatis di v0.7.1).</p>
+<hr />
+<h2 id="21-lampiran-contoh-skrip-klien-python">21. Lampiran: contoh skrip klien Python</h2>
+<pre><code class="language-python">&quot;&quot;&quot;Klien minimal SDB: buat job, tunggu selesai, cetak tagihan. Hanya stdlib.&quot;&quot;&quot;
+import json, time, urllib.error, urllib.request
+
+BASE = &quot;http://127.0.0.1:8088&quot;
+KEY = &quot;kunci-tenant-anda-yang-panjang&quot;
+
+def call(method, path, body=None, tries=4):
+    data = json.dumps(body).encode() if body is not None else None
+    for n in range(tries):
+        req = urllib.request.Request(BASE + path, data=data, method=method,
+                                     headers={&quot;X-API-Key&quot;: KEY, &quot;Content-Type&quot;: &quot;application/json&quot;})
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                return json.loads(r.read() or b&quot;{}&quot;)
+        except urllib.error.HTTPError as e:
+            payload = json.loads(e.read() or b&quot;{}&quot;)
+            code = payload.get(&quot;error&quot;, {}).get(&quot;code&quot;, &quot;&quot;)
+            if e.code == 429 and n &lt; tries - 1:
+                time.sleep(int(e.headers.get(&quot;Retry-After&quot;, &quot;2&quot;)))
+                continue
+            raise SystemExit(f&quot;{e.code} {code}: {payload}&quot;)
+        except TimeoutError:
+            if n == tries - 1:
+                raise
+            time.sleep(2 ** n)
+
+job = call(&quot;POST&quot;, &quot;/v1/jobs&quot;, {
+    &quot;type&quot;: &quot;recon&quot;, &quot;pack&quot;: {&quot;id&quot;: &quot;sdb-recon&quot;, &quot;version&quot;: &quot;1.0.0&quot;},
+    &quot;target_ref&quot;: &quot;artifact://&lt;tenant_id&gt;/targets/contoh.txt&quot;,
+    &quot;budget&quot;: {&quot;tokens&quot;: 5000, &quot;seconds&quot;: 600},
+    &quot;idempotency_key&quot;: &quot;contoh-2026-10-29-01&quot;})
+print(&quot;job:&quot;, job[&quot;job&quot;][&quot;job_id&quot;], &quot;replayed:&quot;, job[&quot;replayed&quot;])
+
+for _ in range(120):                      # tunggu maksimal ~10 menit
+    st = call(&quot;GET&quot;, f&quot;/v1/jobs/{job['job']['job_id']}&quot;)[&quot;job&quot;]
+    if st[&quot;status&quot;] in (&quot;succeeded&quot;, &quot;failed&quot;, &quot;blocked&quot;, &quot;budget_exceeded&quot;, &quot;cancelled&quot;):
+        break
+    time.sleep(5)
+print(&quot;status:&quot;, st[&quot;status&quot;], &quot;token:&quot;, st.get(&quot;tokens_used&quot;))
+print(&quot;billing:&quot;, call(&quot;GET&quot;, &quot;/v1/billing&quot;))
+</code></pre>
+<hr />
+<p><em>Dokumen ini adalah bagian dari rilis v0.7.1. Bila perilaku sistem berbeda dari yang tertulis di sini,
+yang benar adalah kode dan tesnya — laporkan perbedaannya agar dokumen diperbaiki.</em></p>
+<div class="foot">Dokumentasi ini menyertai rilis SDB v0.7.1. Bila perilaku sistem berbeda dari yang
+tertulis, yang berlaku adalah kode dan tesnya — laporkan perbedaannya agar dokumen diperbaiki.</div>
+</main>
+</div>
+</body>
+</html>

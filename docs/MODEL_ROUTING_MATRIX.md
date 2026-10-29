@@ -25,7 +25,7 @@ Sumber: blueprint §8 (cheap model untuk rutin, strong model untuk arsitektur/de
 | 07 | FRONTEND / BACKEND | D4/D5 | **DeepSeek V4.1 Flash** | Sonnet 5.5 (algoritma/desain sulit) |
 | 08 | CODE REVIEW | D6 | **Sonnet 5.5** (critical/high) · GLM 5.3 Flash (rutin) | Opus 5.5 / GPT-5.6 Sol (sengketa) |
 | 09 | QA / INTEGRATION / E2E | D7 | GLM 5.3 Flash | Sonnet 5.5 (kegagalan sulit ditriase) |
-| 10 | SECURITY | D8 | **Sonnet 5.5** + SAST/dep/secret scan | Opus 5.5 / GPT-5.6 Sol (keputusan kritis) |
+| 10 | SECURITY | D8 | **Opus 5.5** + SAST/dep/secret scan (keputusan Owner 2026-10-30) | GPT-5.6 Sol (cadangan bila Anthropic down) |
 | 11 | CODE AUDIT & ASSURANCE | D9 | **Opus 5.5 / GPT-5.6 Sol (WAJIB)** | — |
 | 12 | RELEASE GATE | D10 + `release_check.py` | **tool deterministik** (+ GLM 5.3 Flash) | — |
 | 13 | HUMAN APPROVAL produksi | (manusia) | — | — |
@@ -44,7 +44,7 @@ Sumber: blueprint §8 (cheap model untuk rutin, strong model untuk arsitektur/de
 | D4/D5 Engineering | implementasi terarah dari spec + test | cheap/mid (strong untuk desain komponen) | mayoritas transformasi; naik kelas saat desain/algoritma sulit |
 | D6 Code Review | diff-first review | strong (critical/high) · mid (rutin) | butuh penalaran lintas file |
 | D7 QA | tulis/jalankan test, triase kegagalan | mid | deterministik, sebagian besar mekanis |
-| D8 Security | triase temuan, exploitability | **strong** | false negative mahal |
+| D8 Security | triase temuan, exploitability | **strong — Opus 5.5 permanen** | false negative mahal; produk multi-tenant berbayar |
 | D9 Audit/Assurance | architecture drift, verdict rilis | **strong (tertinggi)** | verdict sistemik |
 | D10 DevOps | build/deploy/rollback/observability | cheap/mid (strong untuk observability) | prosedural, wajib deterministik |
 | D11 Docs | README/runbook/handover | cheap | volume tulis, risiko rendah |
@@ -113,6 +113,32 @@ cc-orchestrator, cc-devops-docs, sodex, sodex-cex-monitor, alpaca, lokal, pregai
 
 **Aturan tetap.** DeepSeek hanya boleh muncul dengan provider `deepseek` (atau alias `deepseek` yang menunjuk
 sana). Bila platform DeepSeek bermasalah, cadangan memakai keluarga model lain — bukan DeepSeek dari perantara.
+
+## Revisi 5 — 2026-10-30: D8 Security Governor = Opus 5.5 permanen (keputusan Owner)
+
+**Temuan (drift dokumen-vs-config).** Matriks baris "Security | cc-security-governor | Opus 5.5" bertabrakan
+dengan config aktual (`model.default: claude-sonnet-5-5`) dan dengan tabel tahap 10 yang menaruh Sonnet sebagai
+primary. Deck menampilkan config nyata (Sonnet), jadi deck benar dan dokumen menyesatkan: gate keamanan terlihat
+dijaga Opus padahal tidak.
+
+**Keputusan Owner (29-Okt-2026, dipilih eksplisit dari 4 opsi).** `cc-security-governor` = **Opus 5.5 permanen**,
+bukan Sonnet + eskalasi. Alasan: SDB adalah produk berbayar multi-tenant; kelas bug termahal adalah cacat logika
+(IDOR, isolasi tenant, bypass otorisasi, alur pembayaran) yang lolos dari triase model kelas menengah. Trade-off
+yang diterima: biaya dan latensi D8 naik pada setiap task.
+
+**Penerapan.**
+1. `~/.hermes/profiles/cc-security-governor/config.yaml` -> `model.default: claude-opus-5-5` (provider anthropic).
+2. `dashboard/agents.json` `sdb-security.primary` -> `opus-5.5`; cadangan `gpt-5.6-sol`.
+3. Tabel tahap 10 + tabel kelas pekerjaan D8 diperbarui (di atas).
+4. Profil `keamanan` (Penjaga Keamanan/Security Guardian) **tetap Sonnet 5.5** — perannya berbeda: penjaga
+   lintas-ekosistem (config, kredensial, permission, PC), bukan gate kode per-rilis.
+
+**Bukti.** `hermes -p cc-security-governor -z "PONG" --usage-file` -> `model=claude-opus-5-5 provider=anthropic`;
+`/api/state` deck kartu D8 menampilkan Opus 5.5. Backup: `~/.hermes/backup-d8-opus-*`.
+
+**Catatan konflik prinsip.** Prinsip #5 di atas ("eskalasi hanya setelah kegagalan nyata") dilanggar secara sadar
+untuk D8 — ini pengecualian yang diputuskan Owner dengan alasan risiko, bukan kelalaian. Jangan "kembalikan" D8 ke
+Sonnet sebagai optimasi biaya tanpa persetujuan Owner.
 
 ## Aturan biaya
 - Jangan pakai model kuat untuk transformasi mekanis berulang; jangan pakai model lemah untuk verdict keamanan/arsitektur.

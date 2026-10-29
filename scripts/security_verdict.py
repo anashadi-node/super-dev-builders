@@ -45,6 +45,7 @@ def _channel_specs(tools_dir: str) -> list[dict]:
     return [
         {
             "name": "scan-keamanan",
+            "tools_dir": tools_dir,
             "path": os.path.join(tools_dir, "scan-keamanan.sh"),
             "args": ["{project}"],
             "runner": ["/bin/bash"],
@@ -52,12 +53,29 @@ def _channel_specs(tools_dir: str) -> list[dict]:
         },
         {
             "name": "privasi-media",
+            "tools_dir": tools_dir,
             "path": os.path.join(tools_dir, "scan-privasi-media.py"),
             "args": ["{project}"],
             "runner": [sys.executable],
             "arti": "identitas pelanggan pada berkas media yang terlacak git",
         },
     ]
+
+
+def resolve_tools_dir(run_dir: str, explicit: str | None) -> str:
+    """Direktori alat: eksplisit -> <run>/tools -> tools/ bersama di repo.
+
+    Tanpa jalur ketiga, SETIAP run baru jatuh ke BLOCKED karena alat hanya disalin
+    manual ke satu run (terbukti 30 Okt 2026). Urutannya menjaga kompatibilitas:
+    run yang sudah punya tools/ sendiri tetap memakai versinya (bukti lama reproducible).
+    """
+    if explicit:
+        return os.path.abspath(explicit)
+    kandidat = [os.path.join(run_dir, "tools"), repo_path("tools")]
+    for jalur in kandidat:
+        if os.path.isdir(jalur):
+            return jalur
+    return kandidat[0]
 
 
 def run_channel(spec: dict, project: str, log_dir: str, timeout: int) -> dict:
@@ -68,9 +86,12 @@ def run_channel(spec: dict, project: str, log_dir: str, timeout: int) -> dict:
     os.makedirs(log_dir, exist_ok=True)
     log_path = os.path.join(log_dir, f"security-{name}-{time.strftime('%Y%m%d-%H%M%S')}.log")
     cmd = list(spec["runner"]) + [spec["path"]] + [a.format(project=project) for a in spec["args"]]
+    # Alat bersama perlu tahu run mana yang sedang diperiksa: tanpa env ini baseline
+    # risiko dan media terdeteksi tertulis ke tempat yang salah (atau ke direktori skrip).
+    env = {**os.environ, "SDB_RUN_DIR": os.path.dirname(log_dir), "SDB_TOOLS_DIR": spec["tools_dir"]}
     started = time.monotonic()
     try:
-        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, check=False)
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, check=False, env=env)
         code, out, err = proc.returncode, proc.stdout or "", proc.stderr or ""
     except (subprocess.TimeoutExpired, OSError) as exc:
         with open(log_path, "w", encoding="utf-8") as handle:
@@ -114,7 +135,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"FATAL: run dir tidak ada: {run_dir}", file=sys.stderr)
         return 2
 
-    tools_dir = args.tools_dir or os.path.join(run_dir, "tools")
+    tools_dir = resolve_tools_dir(run_dir, args.tools_dir)
     project = args.project or os.path.join(os.path.expanduser("~"), slug or os.path.basename(run_dir))
 
     checks = [run_channel(spec, project, os.path.join(run_dir, "logs"), args.timeout)

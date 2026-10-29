@@ -183,7 +183,9 @@ def test_inti_keamanan_ruff_tidak_bisa_dimatikan_oleh_ruff_toml_proyek():
     skrip = open(sv.repo_path("tools/scan-keamanan.sh"), encoding="utf-8").read()
     assert "--isolated --select S,BLE,E9" in skrip
     assert "ruff-inti" in skrip
-    assert "tidak bisa mematikan" in skrip
+    # Temuan inti tidak boleh berhenti pada "daftar panjang lalu FAIL": wajib ditriase
+    # terhadap baseline ber-alasan supaya temuan sah tidak menenggelamkan temuan baru.
+    assert "triase-sast.py" in skrip and "sast-diterima.json" in skrip
 
 
 def test_cakupan_inti_mengecualikan_artefak_dan_mengizinkan_assert_di_tests():

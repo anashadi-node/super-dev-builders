@@ -44,8 +44,8 @@ def profile_info():
             try:
                 data = load_yaml(py) or {}
                 entry["description"] = (data.get("description") or "")[:160]
-            except Exception:
-                entry["description"] = "<unreadable>"
+            except (OSError, RuntimeError) as exc:
+                entry["description"] = f"<unreadable: {type(exc).__name__}>"
         out[name] = entry
     return out
 
@@ -58,8 +58,8 @@ def cron_summary():
         import json
         with open(path, "r", encoding="utf-8") as fh:
             data = json.load(fh)
-    except Exception:
-        return {"present": True, "error": "unreadable"}
+    except (OSError, ValueError) as exc:
+        return {"present": True, "error": f"unreadable: {type(exc).__name__}"}
     jobs = data if isinstance(data, list) else data.get("jobs", [])
     return {"present": True, "jobs": len(jobs) if hasattr(jobs, "__len__") else None}
 
@@ -71,8 +71,8 @@ def config_summary():
         return {"present": False}
     try:
         data = load_yaml(path) or {}
-    except Exception:
-        return {"present": True, "parsed": False}
+    except (OSError, RuntimeError) as exc:
+        return {"present": True, "parsed": False, "error": type(exc).__name__}
     top = sorted(data.keys()) if isinstance(data, dict) else []
     models = data.get("models") if isinstance(data, dict) else None
     summary = {"present": True, "parsed": True, "top_level_keys": top}

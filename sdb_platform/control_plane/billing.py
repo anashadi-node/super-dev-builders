@@ -68,7 +68,7 @@ def _period(value, field: str) -> str:
     from .store import parse_ts  # impor lokal: hindari siklus modul
     try:
         return parse_ts(value, field).isoformat(timespec="microseconds")
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001 — parse_ts bisa melempar ValueError/TypeError/OverflowError; semuanya = input tak sah -> 400, bukan 500
         raise BillingError(400, f"invalid_{field}", str(exc)) from None
 
 

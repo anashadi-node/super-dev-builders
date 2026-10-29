@@ -88,7 +88,7 @@ def _muat_terlarang(akar: Path) -> list[str]:
         sys.path.insert(0, str(akar))
         from real_system.privacy_scan import TERLARANG  # type: ignore
         return [str(x) for x in TERLARANG]
-    except Exception:
+    except Exception:  # noqa: BLE001 — impor modul proyek; bila gagal, jatuh ke berkas terms (kegagalan akhir tetap exit 2)
         pass
     for kandidat in (akar / "privacy-terms.json", akar / ".sdb" / "privacy-terms.json"):
         if kandidat.is_file():
@@ -317,6 +317,6 @@ if __name__ == "__main__":
         sys.exit(main(sys.argv))
     except SystemExit:
         raise
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 — batas atas CLI: galat apa pun = TAK DIVERIFIKASI + exit 2
         print(f"TAK DIVERIFIKASI: galat tak terduga ({type(e).__name__}: {e}) — fail-closed")
         sys.exit(2)

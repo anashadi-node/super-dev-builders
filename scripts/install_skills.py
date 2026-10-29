@@ -39,7 +39,8 @@ def load_profile_aliases():
             continue
         try:
             data = load_yaml(os.path.join(agent_dir, name)) or {}
-        except Exception:
+        except (OSError, RuntimeError) as exc:
+            print(f"[install_skills] agen {name} dilewati: {exc}", file=sys.stderr)
             continue
         logical, real = data.get("id"), data.get("hermes_profile")
         if logical and real:

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# KANONIK (sejak 30 Okt 2026): toolchain gerbang keamanan SDB untuk SEMUA run/proyek.
-# Salinan lama `scripts/privasi/portal-rt-rw/scan-keamanan.sh` DIBEKUKAN apa adanya,
-# hanya untuk mereproduksi verdict `runs/rt-rw-portal` (18 Okt 2026). Setiap perbaikan
-# alat wajib masuk ke berkas ini; jangan sunting salinan beku itu (drift = alat ganda).
+# KANONIK: satu-satunya toolchain gerbang keamanan SDB, dipakai SEMUA run/proyek.
+# Salinan lama di `scripts/privasi/portal-rt-rw/` DIHAPUS 30 Okt 2026: dua salinan alat
+# = drift yang tak terlihat (perbaikan di sini tidak sampai ke sana). Verdict lama tetap
+# reproducible lewat berkas hasil di `runs/rt-rw-portal/reports/`; riwayat alat di git.
 # Gerbang keamanan (tahap 10): SAST + SBOM + kerentanan + scan rahasia.
 #
 # Alat nyata: semgrep, syft, trivy, ruff. Semua BACA-SAJA atas berkas sumber: tidak
@@ -206,8 +206,22 @@ except Exception:
     print(-1)
 PUB
 )
-  [ "$KODE_INTI" != "0" ] && KODE=1
-  catat ruff-inti "$KODE_INTI" "temuan=$TEMUAN_INTI (S/BLE/E9 dipaksa --isolated; ruff.toml proyek tidak bisa mematikan)"
+  # Temuan inti ditriase terhadap baseline yang beralasan + BERKEDALUWARSA. Yang dituntut
+  # bukan "nol temuan" (mustahil: S603/S310 muncul pada pola yang sah), melainkan "tidak ada
+  # temuan yang belum diputuskan manusia". Baseline hilang/rusak = semua temuan BARU.
+  BASE_SAST="${SDB_SAST_BASELINE:-$PROYEK/tools/sast-diterima.json}"
+  if [ -f "$BASE_SAST" ]; then
+    TRIASE_OUT=$("$PY" "$TOOLS/triase-sast.py" --temuan "$RAW/ruff-inti.json" \
+        --baseline "$BASE_SAST" --akar "$PROYEK" --ringkas "$RAW/sast-triase.txt" 2>&1)
+    KODE_TRIASE=$?
+    printf '%s\n' "$TRIASE_OUT" | sed 's/^/  /' >>"$RINGKASAN.detail"
+  else
+    KODE_TRIASE=1
+    printf 'baru=%s diterima=0 (baseline tidak ada: %s)\n' "$TEMUAN_INTI" "$BASE_SAST" \
+      >"$RAW/sast-triase.txt"
+  fi
+  [ "$KODE_TRIASE" != "0" ] && KODE=1
+  catat ruff-inti "$KODE_TRIASE" "temuan=$TEMUAN_INTI $(cat "$RAW/sast-triase.txt")"
   # Utang GAYA dilaporkan sebagai tren supaya tidak menghilang, TANPA menggagalkan gerbang
   # keamanan (kosmetik bukan risiko rilis). Ditulis ke ringkasan, bukan lewat catat().
   ( cd "$PROYEK" && ruff check --exclude targets --exclude evidence --exclude runs --exclude reconstruction --exclude normalization --exclude screens --exclude trace --exclude dom --select UP,RUF,F,EXE,PL,I,SIM,ISC,FURB,DTZ,RET \
@@ -261,4 +275,9 @@ if [ "$GAGAL" -ne 0 ]; then
   exit 1
 fi
 echo "OK: kelima alat selesai dengan kode keluar 0"
+# PASS tidak boleh menyembunyikan utang: bila ada temuan yang diterima lewat baseline,
+# sebutkan jumlahnya di baris terakhir supaya tidak terbaca sebagai "nol temuan".
+if [ -s "$RAW/sast-triase.txt" ] && ! grep -q "diterima=0 " "$RAW/sast-triase.txt"; then
+  echo "BERSYARAT: $(cat "$RAW/sast-triase.txt")"
+fi
 

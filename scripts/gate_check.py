@@ -235,7 +235,7 @@ def main(argv=None) -> int:
     else:
         try:
             manifest = load_yaml(manifest_path)
-        except Exception as exc:
+        except (OSError, RuntimeError) as exc:
             manifest = None
             result = {
                 "gate": "gate0",

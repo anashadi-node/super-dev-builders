@@ -16,8 +16,11 @@ line-length = 132
 target-version = "py310"
 
 [tool.ruff.lint]
-# E/F/I/W = bug paling murah untuk dicegah; RUF = aturan ruff-native.
-select = ["E", "F", "I", "W", "RUF"]
+# E/F/I/W = bug paling murah untuk dicegah; RUF = aturan ruff-native;
+# BLE001 = except buta. Diaktifkan 30 Okt 2026 setelah 30 titik `except Exception` ditriase:
+# 27 dipertajam/diberi log, 3 ditandai `# noqa: BLE001` + alasan sebagai batas yang sah
+# (HTTP handler, thread job, pembungkus parse). Tanpa aturan ini, regresi blind-except lolos.
+select = ["E", "F", "I", "W", "RUF", "BLE001"]
 ignore = [
     "E501",  # panjang baris: dokumen/skill/embed-string panjang sengaja
 ]

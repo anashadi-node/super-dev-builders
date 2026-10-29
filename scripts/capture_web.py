@@ -44,7 +44,7 @@ def gate0_or_die(target: str, quiet: bool = False) -> int:
         return 2
     try:
         manifest = load_yaml(p) or {}
-    except Exception as exc:
+    except (OSError, RuntimeError) as exc:
         print(f"TOLAK: manifest tidak bisa dibaca: {exc}", file=sys.stderr)
         return 1
     fail, blocked, warn = evaluate(manifest if isinstance(manifest, dict) else {})
@@ -182,14 +182,14 @@ def main(argv=None) -> int:
                             try:
                                 bodies.append({"url": a["url"], "status": a["status"],
                                                "body": page.request.get(a["url"]).json()})
-                            except Exception as exc:
+                            except Exception as exc:  # noqa: BLE001 — penangkapan halaman: galat per-URL direkam ke keluaran
                                 bodies.append({"url": a["url"], "status": a["status"], "error": str(exc)})
                         interaction = {"selector": args.click, "status_text": status_txt, "api_calls": bodies,
                                        "aria_expanded_before": aria_before, "effect": {"dom_len_before": dom_before, "dom_len_after": dom_after,
                                                   "dom_delta": dom_after - dom_before,
                                                   "visible_dialogs": visible_dialogs,
                                                   "aria_expanded_after": page.eval_on_selector(args.click, "e => e.getAttribute('aria-expanded')") if page.query_selector(args.click) else None}}
-                except Exception as exc:
+                except Exception as exc:  # noqa: BLE001 — interaksi browser: galat direkam ke interaction.error
                     interaction = {"selector": args.click, "error": str(exc)}
             result["pages"].append({"path": pth, "url": url, "http_status": resp.status if resp else None,
                                     "interaction": interaction,

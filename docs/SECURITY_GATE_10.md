@@ -57,6 +57,18 @@ mencetak "semua aman" tetapi keluar ≠0 tetap `FAIL`.
 9. **`privacy-terms.json` sengaja gitignored** (berisi nama orang/klien);
    `privacy-terms.example.json` yang dilacak. Tanpa berkas itu, kanal privasi
    `TAK DIVERIFIKASI` — jangan diakali dengan daftar kosong.
+10. **Triase SAST wajib beralasan dan berkedaluwarsa.** `tools/sast-diterima.json`
+    hanya sah bila tiap entri memuat `kode`, `berkas` (pola fnmatch), `sebab`,
+    `pemilik`, `kedaluwarsa`. Entri tanpa salah satunya **diabaikan**. Entri yang
+    lewat tanggal **tidak berlaku** sehingga temuan kembali `BARU`. Temuan pada
+    berkas/kode yang tidak tercantum = `BARU` → gerbang menolak. Yang dituntut bukan
+    "nol temuan" (mustahil untuk S603/S310 pada pola yang sah), melainkan "tidak ada
+    temuan yang belum diputuskan manusia". Perintah manual:
+
+    ```bash
+    python3 tools/triase-sast.py --temuan <run>/reports/raw/ruff-inti.json \
+        --baseline tools/sast-diterima.json --akar .
+    ```
 
 ## 4. Cara menjalankan
 
@@ -85,6 +97,8 @@ akan tertulis di tempat yang salah.
 | Gerbang proyek sendiri gagal selamanya: 43 temuan Pillow 12.3.0 | trivy memindai SBOM **target audit** di `runs/` sebagai dependensi produk | `--skip-dirs` untuk direktori artefak (trivy + ruff) |
 | Repo SDB (config di `pyproject.toml`) dianggap "aturan tidak dipin" | alat hanya menerima berkas bernama `ruff.toml` | terima `ruff.toml`/`.ruff.toml`/`pyproject.toml[tool.ruff]` |
 | 631 temuan `S101` di tests menenggelamkan temuan nyata | `S101` (assert) dianggap temuan di seluruh repo | `--per-file-ignores "tests/*:S101"` |
+| Dua salinan alat (repo `tools/` + `scripts/privasi/portal-rt-rw/`) | perbaikan alat tidak otomatis sampai ke salinan proyek | salinan proyek dihapus; `tools/` satu-satunya sumber |
+| Gerbang mustahil PASS walau temuan sah, dan bisa PASS palsu bila baseline dipakai asal | tidak ada mekanisme triase: pilihan hanya "FAIL selamanya" atau "matikan aturan" | baseline ber-alasan + kedaluwarsa, temuan baru tetap menolak |
 
 Bukti uji: fixtures `/tmp` (backend tanpa media) → `PASS`; fixture dengan `eval(x)` →
 `FAIL`; repo tanpa berkas terlacak → `TAK DIVERIFIKASI`. Semua dijalankan lewat

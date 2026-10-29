@@ -80,7 +80,7 @@ def git(*arga: str) -> str:
         r = subprocess.run(["git", "-C", str(PROYEK), *arga],
                            capture_output=True, text=True, timeout=60)
         return r.stdout.strip()
-    except Exception:
+    except (OSError, subprocess.SubprocessError):
         return ""
 
 

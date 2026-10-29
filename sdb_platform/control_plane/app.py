@@ -300,7 +300,7 @@ def make_handler(api: Api):
                 payload = {"error": {"code": "rate_limited",
                                      "message": "jatah permintaan per menit habis; coba lagi nanti"}}
                 extra = {"Retry-After": str(exc.retry_after)}
-            except Exception as exc:  # ControlPlaneError & BillingError berbagi bentuk status/code/message
+            except Exception as exc:  # noqa: BLE001 — batas HTTP: domain error beragam bentuknya, wajib fail-closed + dicatat operator (lihat else di bawah)
                 if hasattr(exc, "status") and hasattr(exc, "code"):
                     status = exc.status
                     payload = {"error": {"code": exc.code, "message": exc.message}}

@@ -14,6 +14,7 @@ import argparse
 import datetime
 import json
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -22,6 +23,14 @@ from pathlib import Path
 
 import ws_api
 import yaml
+
+# S607: subprocess dengan nama program relatif bisa dibajak PATH; resolusi sekali di sini.
+GIT = shutil.which("git")
+
+
+def _warn(msg: str) -> None:
+    """Kegagalan yang diturunkan ke nilai default TIDAK boleh hilang diam-diam."""
+    print(f"[server] {msg}", file=sys.stderr)
 
 REPO = Path(__file__).resolve().parent.parent  # portabel: bukan path hard-coded mesin ini
 DASH = REPO / "dashboard"
@@ -75,7 +84,8 @@ def read_profile_cfg(dirname):
     p = PROFILES / dirname / "config.yaml"
     try:
         cfg = yaml.safe_load(p.read_text(encoding="utf-8"))
-    except Exception:
+    except (OSError, yaml.YAMLError) as exc:
+        _warn(f"config profil {dirname} tidak terbaca: {type(exc).__name__}: {exc}")
         return None
     m = cfg.get("model") if isinstance(cfg, dict) else None
     m = m if isinstance(m, dict) else {}
@@ -95,17 +105,18 @@ def load_health():
         age = time.time() - float(d.get("ts", 0))
         if age < HEALTH_MAX_AGE_S:
             return d, age
-    except Exception:
-        pass
+    except (OSError, ValueError, TypeError) as exc:
+        _warn(f"health.json diabaikan: {type(exc).__name__}: {exc}")
     return None, None
 
 
 def read_head():
     try:
-        r = subprocess.run(["git", "log", "--oneline", "-1"], cwd=REPO,
+        r = subprocess.run([GIT or "git", "log", "--oneline", "-1"], cwd=REPO,
                            capture_output=True, text=True, timeout=5)
         return r.stdout.strip() or "unknown"
-    except Exception:
+    except (OSError, subprocess.SubprocessError) as exc:
+        _warn(f"git log gagal: {type(exc).__name__}: {exc}")
         return "unknown"
 
 
@@ -117,7 +128,8 @@ def probe_profile(dirname):
         r = subprocess.run([hermes, "-p", dirname, "-z", prompt],
                            capture_output=True, text=True, timeout=90, env=ws_api.hermes_env())
         return r.returncode == 0 and "PONG" in (r.stdout or "")
-    except Exception:
+    except (OSError, subprocess.SubprocessError) as exc:
+        _warn(f"ping profil {dirname} gagal: {type(exc).__name__}: {exc}")
         return False
 
 
@@ -178,8 +190,8 @@ def build_state():
     agents = {}
     try:
         agents = json.loads((DASH / "agents.json").read_text())
-    except Exception:
-        pass
+    except (OSError, ValueError) as exc:
+        _warn(f"agents.json diabaikan: {type(exc).__name__}: {exc}")
     return {
         "generated": datetime.datetime.now().isoformat(timespec="seconds"),
         "head": read_head(),

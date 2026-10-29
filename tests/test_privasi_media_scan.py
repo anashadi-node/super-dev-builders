@@ -16,7 +16,7 @@ from unittest import mock
 
 SCANNER = (
     Path(__file__).resolve().parents[1]
-    / "scripts/privasi/portal-rt-rw/scan-privasi-media.py"
+    / "tools/scan-privasi-media.py"
 )
 
 

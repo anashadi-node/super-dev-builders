@@ -14,6 +14,7 @@ import os
 import re
 import secrets
 import subprocess
+import sys
 import threading
 import time
 import uuid
@@ -167,7 +168,8 @@ def sh(args, cwd, timeout=8):
     try:
         r = subprocess.run(args, cwd=cwd, capture_output=True, text=True, timeout=timeout)
         return r.stdout.strip() if r.returncode == 0 else ""
-    except Exception:
+    except (OSError, subprocess.SubprocessError) as exc:
+        print(f"[ws_api] perintah gagal: {type(exc).__name__}: {exc}", file=sys.stderr)
         return ""
 
 
@@ -214,7 +216,7 @@ def start_job(kind, profile, project, fn):
             job["status"] = "done"
         except subprocess.TimeoutExpired:
             job["status"], job["error"] = "error", "timeout"
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 — batas thread job: kode tugas arbitrer; galat direkam ke job["error"], tidak ditelan
             job["status"], job["error"] = "error", str(e)[:300]
         job["ended"] = now()
         job["secs"] = round(time.time() - job["t0"], 1)
@@ -545,7 +547,7 @@ def handle(h, method, send):
             send(404, {"error": "rute tidak dikenal"})
     except (ValueError, RuntimeError) as e:
         send(400, {"error": str(e)})
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 — batas HTTP: galat apa pun harus jadi 500 + log, bukan mematikan server
         # Jangan kirim str(e) ke klien (bisa memuat path/isi internal); catat lengkap di stderr.
         import sys
         import traceback

@@ -30,8 +30,8 @@ def version_of(cmd, args):
     try:
         out = subprocess.run([cmd, *args], capture_output=True, text=True, timeout=15)
         return (out.stdout or out.stderr).strip().splitlines()[0][:80]
-    except Exception:
-        return "unknown"
+    except (OSError, subprocess.SubprocessError):
+        return "unknown"        # dilaporkan apa adanya di laporan doctor, bukan nilai palsu
 
 
 _IGNORE = ["__pycache__", ".pytest_cache"]
@@ -158,7 +158,7 @@ def main(argv=None) -> int:
                     [candidate, "-c", "import yaml,sys;print('yaml-ok',sys.version.split()[0])"],
                     capture_output=True, text=True, timeout=15)
                 report["host"][f"yaml_in:{candidate}"] = (out.stdout or out.stderr).strip()
-            except Exception:
+            except (OSError, subprocess.SubprocessError):
                 report["host"][f"yaml_in:{candidate}"] = "error"
 
     # profil divisi
@@ -174,7 +174,8 @@ def main(argv=None) -> int:
                 continue
             try:
                 data = load_yaml(os.path.join(agent_dir, name)) or {}
-            except Exception:
+            except (OSError, RuntimeError) as exc:
+                print(f"[doctor] agen {name} dilewati: {exc}", file=sys.stderr)
                 continue
             logical, real = data.get("id"), data.get("hermes_profile")
             if logical and real:

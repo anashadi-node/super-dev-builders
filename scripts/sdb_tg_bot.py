@@ -77,8 +77,8 @@ def cmd_status() -> str:
         with urllib.request.urlopen("http://127.0.0.1:8088/healthz", timeout=3) as r:
             ok = json.loads(r.read()).get("status") == "ok"
         lines.append("control plane :8088 — " + ("HIDUP" if ok else "jawaban aneh"))
-    except Exception:
-        lines.append("control plane :8088 — mati (normal bila tidak dipakai)")
+    except (OSError, ValueError) as exc:  # URLError turunan OSError
+        lines.append(f"control plane :8088 — mati ({type(exc).__name__}): {exc}")
     # kesehatan deck
     hj = DECK_STATE / "health.json"
     if hj.exists():

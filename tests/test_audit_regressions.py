@@ -361,7 +361,7 @@ def test_h25_balapan_idempotensi_lintas_koneksi_jadi_replay(tmp_path):
         try:
             hasil.append(st.create_job(t["tenant_id"], "recon", PACK, "artifact://a/1",
                                        {"tokens": 5000, "seconds": 600}, "balapan-0001"))
-        except Exception as exc:  # pragma: no cover - justru ini yang diuji tidak terjadi
+        except Exception as exc:  # noqa: BLE001 — harness uji: justru galat yang TIDAK boleh terjadi, direkam ke errors
             errors.append(repr(exc))
 
     ths = [threading.Thread(target=mk, args=(x,)) for x in (s1, s2)]

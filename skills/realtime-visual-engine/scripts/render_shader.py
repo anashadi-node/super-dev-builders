@@ -238,7 +238,7 @@ def main() -> int:
                                 "-of", "json", mp4], capture_output=True, text=True, timeout=120)
         try:
             result["ffprobe"] = json.loads(probe.stdout)
-        except Exception:
+        except (ValueError, TypeError):
             result["ffprobe_raw"] = probe.stdout[:400]
     else:
         result["ffmpeg_stderr"] = rc.stderr[:400]

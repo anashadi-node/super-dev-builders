@@ -128,7 +128,7 @@ class Worker:
         except ControlPlaneError as exc:
             # Kegagalan domain (mis. artefak ditolak) tetap harus menutup job, jangan menggantung.
             err = f"{exc.code}: {exc.message}"
-        except Exception as exc:  # executor apa pun tidak boleh mematikan worker
+        except Exception as exc:  # noqa: BLE001 — executor apa pun tidak boleh mematikan worker; traceback dicetak di baris berikut
             err = f"{type(exc).__name__}: {exc}"
             traceback.print_exc(limit=3, file=sys.stderr)
         finally:

@@ -135,7 +135,7 @@ def main() -> int:
             try:
                 health = get_json(base + "/health")
                 break
-            except Exception:
+            except Exception:  # noqa: BLE001 — loop tunggu /health; galat apa pun = coba lagi, batas waktu di luar loop
                 time.sleep(0.5)
         result["ready_seconds"] = round(time.time() - t_start, 2)
         result["health"] = health

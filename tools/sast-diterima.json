@@ -1,0 +1,369 @@
+{
+ "_catatan": "Baseline TRIASE, bukan izin buta. Tiap entri wajib punya sebab + pemilik + kedaluwarsa; entri kedaluwarsa otomatis tidak berlaku sehingga temuan kembali BARU. Perpanjang hanya setelah meninjau ulang kodenya. Temuan pada berkas/kode yang tidak tercantum = BARU -> gerbang menolak.",
+ "aturan": [
+  {
+   "kode": "S108",
+   "berkas": "skills/local-llm-serving/scripts/serve_and_bench.py",
+   "sebab": "berkas/direktori sementara pada jalur uji atau skrip sekali-jalan",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S108",
+   "berkas": "skills/realtime-visual-engine/scripts/render_shader.py",
+   "sebab": "berkas/direktori sementara pada jalur uji atau skrip sekali-jalan",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S108",
+   "berkas": "tests/test_cli_workflow.py",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; berkas/direktori sementara pada jalur uji atau skrip sekali-jalan",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S110",
+   "berkas": "tools/scan-privasi-media.py",
+   "sebab": "except-pass pada jalur opsional; kegagalan terlihat lewat keluaran utama skrip",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S310",
+   "berkas": "scripts/sdb_tg_bot.py",
+   "sebab": "urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan URL dari pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S310",
+   "berkas": "skills/geo-audit/scripts/geo_scan.py",
+   "sebab": "urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan URL dari pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S310",
+   "berkas": "skills/local-llm-serving/scripts/serve_and_bench.py",
+   "sebab": "urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan URL dari pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S310",
+   "berkas": "tests/test_admin_status.py",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan url dari pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S310",
+   "berkas": "tests/test_audit_regressions.py",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan url dari pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S310",
+   "berkas": "tests/test_billing_worker.py",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan url dari pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S310",
+   "berkas": "tests/test_control_plane.py",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan url dari pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S310",
+   "berkas": "tests/test_dashboard_security.py",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan url dari pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S310",
+   "berkas": "tests/test_metrics_ratelimit.py",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan url dari pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S314",
+   "berkas": "skills/geo-audit/scripts/geo_scan.py",
+   "sebab": "XML diurai dari sumber internal/lokal yang disiapkan skrip itu sendiri",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "dashboard/server.py",
+   "sebab": "subprocess memanggil biner absolut (~/.local/bin/hermes) dan git hasil shutil.which; argumen konstanta",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "dashboard/ws_api.py",
+   "sebab": "klien CLI internal dengan daftar argumen konstanta; tanpa shell=True",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "scripts/archive_artifacts.py",
+   "sebab": "subprocess dipanggil dengan daftar argumen tetap dan tanpa shell=True; tidak ada string perintah dari input pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "scripts/build_tutorial.py",
+   "sebab": "subprocess dipanggil dengan daftar argumen tetap dan tanpa shell=True; tidak ada string perintah dari input pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "scripts/doctor.py",
+   "sebab": "subprocess dipanggil dengan daftar argumen tetap dan tanpa shell=True; tidak ada string perintah dari input pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "scripts/privasi/portal-rt-rw/buat-inventaris.py",
+   "sebab": "subprocess dipanggil dengan daftar argumen tetap dan tanpa shell=True; tidak ada string perintah dari input pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "scripts/repo_hygiene.py",
+   "sebab": "subprocess dipanggil dengan daftar argumen tetap dan tanpa shell=True; tidak ada string perintah dari input pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "scripts/sdb.py",
+   "sebab": "subprocess dipanggil dengan daftar argumen tetap dan tanpa shell=True; tidak ada string perintah dari input pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "scripts/security_verdict.py",
+   "sebab": "subprocess dipanggil dengan daftar argumen tetap dan tanpa shell=True; tidak ada string perintah dari input pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "scripts/sync_third_party_skills.py",
+   "sebab": "subprocess dipanggil dengan daftar argumen tetap dan tanpa shell=True; tidak ada string perintah dari input pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "skills/local-llm-serving/scripts/serve_and_bench.py",
+   "sebab": "subprocess dipanggil dengan daftar argumen tetap dan tanpa shell=True; tidak ada string perintah dari input pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "skills/model-hub-provenance/scripts/fetch_gguf.py",
+   "sebab": "subprocess dipanggil dengan daftar argumen tetap dan tanpa shell=True; tidak ada string perintah dari input pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "skills/product-status/scripts/inspect_product.py",
+   "sebab": "subprocess dipanggil dengan daftar argumen tetap dan tanpa shell=True; tidak ada string perintah dari input pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "skills/realtime-visual-engine/scripts/render_shader.py",
+   "sebab": "subprocess dipanggil dengan daftar argumen tetap dan tanpa shell=True; tidak ada string perintah dari input pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "tests/test_deck_boot.py",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; subprocess dipanggil dengan daftar argumen tetap dan tanpa shell=true",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "tests/test_geo_audit.py",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; subprocess dipanggil dengan daftar argumen tetap dan tanpa shell=true",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "tests/test_install_shortcuts.py",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; subprocess dipanggil dengan daftar argumen tetap dan tanpa shell=true",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "tests/test_pack_manifest.py",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; subprocess dipanggil dengan daftar argumen tetap dan tanpa shell=true",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "tests/test_privasi_media_scan.py",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; subprocess dipanggil dengan daftar argumen tetap dan tanpa shell=true",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "tests/test_rea_integration.py",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; subprocess dipanggil dengan daftar argumen tetap dan tanpa shell=true",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "tests/test_registry_third_party.py",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; subprocess dipanggil dengan daftar argumen tetap dan tanpa shell=true",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "tests/test_repo_hygiene.py",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; subprocess dipanggil dengan daftar argumen tetap dan tanpa shell=true",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "tests/test_security_verdict.py",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; subprocess dipanggil dengan daftar argumen tetap dan tanpa shell=true",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "tests/test_triase_sast.py",
+   "sebab": "harness uji menjalankan alat triase sebagai subprocess dengan daftar argumen tetap",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "tools/scan-privasi-media.py",
+   "sebab": "memanggil tesseract/ffmpeg dari PATH dengan daftar argumen; masukan berupa jalur media yang discan",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S607",
+   "berkas": "dashboard/server.py",
+   "sebab": "program relatif sudah diresolusi lewat shutil.which menjadi jalur absolut sebelum dipanggil",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S607",
+   "berkas": "scripts/archive_artifacts.py",
+   "sebab": "nama program diambil dari PATH sistem (git/ffmpeg/tesseract/pip); argumennya konstanta, bukan input pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S607",
+   "berkas": "scripts/build_tutorial.py",
+   "sebab": "nama program diambil dari PATH sistem (git/ffmpeg/tesseract/pip); argumennya konstanta, bukan input pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S607",
+   "berkas": "scripts/privasi/portal-rt-rw/buat-inventaris.py",
+   "sebab": "nama program diambil dari PATH sistem (git/ffmpeg/tesseract/pip); argumennya konstanta, bukan input pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S607",
+   "berkas": "scripts/sync_third_party_skills.py",
+   "sebab": "nama program diambil dari PATH sistem (git/ffmpeg/tesseract/pip); argumennya konstanta, bukan input pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S607",
+   "berkas": "skills/product-status/scripts/inspect_product.py",
+   "sebab": "nama program diambil dari PATH sistem (git/ffmpeg/tesseract/pip); argumennya konstanta, bukan input pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S607",
+   "berkas": "skills/product-status/tests/test_inspect_product.py",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; nama program diambil dari path sistem (git/ffmpeg/tesseract/pip)",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S607",
+   "berkas": "skills/realtime-visual-engine/scripts/render_shader.py",
+   "sebab": "nama program diambil dari PATH sistem (git/ffmpeg/tesseract/pip); argumennya konstanta, bukan input pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S607",
+   "berkas": "tests/test_deck_boot.py",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; nama program diambil dari path sistem (git/ffmpeg/tesseract/pip)",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S607",
+   "berkas": "tests/test_privasi_media_scan.py",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; nama program diambil dari path sistem (git/ffmpeg/tesseract/pip)",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S607",
+   "berkas": "tests/test_repo_hygiene.py",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; nama program diambil dari path sistem (git/ffmpeg/tesseract/pip)",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S607",
+   "berkas": "tests/test_security_verdict.py",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; nama program diambil dari path sistem (git/ffmpeg/tesseract/pip)",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S607",
+   "berkas": "tools/scan-privasi-media.py",
+   "sebab": "tesseract/ffmpeg dari PATH; operator mengendalikan mesin, bukan penyerang",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  }
+ ]
+}

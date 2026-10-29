@@ -2,6 +2,16 @@
 
 Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/) dan [SemVer](https://semver.org/lang/id/).
 
+## [0.7.2] — 2026-10-29
+
+### Perbaikan
+
+- PDF tutorial dikeluarkan dari git: 609 KB melanggar gerbang berkas besar R1 (batas 512 KB).
+  Ditangkap oleh uji kloning segar, bukan oleh `make check` lokal (berkas masih untracked saat itu).
+  HTML (54 KB) dan Markdown tetap dilacak; PDF dibuat ulang lokal.
+- `scripts/build_tutorial.py` + `make docs-tutorial` untuk membangun ulang HTML/PDF dari Markdown.
+
+
 ## [0.7.1] — 2026-10-29
 
 ### Ditambahkan

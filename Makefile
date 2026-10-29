@@ -15,10 +15,17 @@ PY_SYS ?= $(shell \
   elif /usr/bin/python3 -c "import pytest" 2>/dev/null; then echo /usr/bin/python3; \
   else echo python3; fi)
 
+# Dokumen butuh modul `markdown` (docs-only). Interpreter uji (.venv) tidak memilikinya dengan
+# sengaja — paket runtime tetap minim — jadi dicari yang benar-benar bisa `import markdown`.
+PY_DOC ?= $(shell \
+  if python3 -c "import markdown" 2>/dev/null; then echo python3; \
+  elif /usr/bin/python3 -c "import markdown" 2>/dev/null; then echo /usr/bin/python3; \
+  else echo python3; fi)
+
 # TARGET lewat lingkungan (bukan interpolasi make ke shell): nilai ber-kutip/`;`/`$(...)` tetap data.
 export TARGET
 
-.PHONY: help check lint drift doctor inventory test gate-init lint-registry release-check skills-list install-main workflow install-dry-run clean-pyc
+.PHONY: help check lint drift doctor inventory test gate-init lint-registry release-check skills-list install-main workflow install-dry-run clean-pyc docs-tutorial
 
 help:
 	@grep -E "^[a-z-]+:" Makefile | sed "s/:.*//" | column -c 80
@@ -60,6 +67,10 @@ control-plane:
 
 # Aturan penempatan (docs/PETA_STRUKTUR.md §4): tidak ada artefak besar/PII baru di git.
 # Baseline di platform/hygiene-baseline.json mencatat utang lama sebagai WARN.
+# Dokumen tutorial: HTML dilacak, PDF hasil build tidak (melewati gerbang 512 KB di repo_hygiene).
+docs-tutorial:
+	$(PY_DOC) scripts/build_tutorial.py docs/TUTORIAL_PENGGUNAAN.md
+
 hygiene:
 	$(PY_SYS) scripts/repo_hygiene.py
 

@@ -5,6 +5,9 @@ membeli kapasitas), dan **operator pekerja** (worker). Setiap skenario memuat la
 nyata, hasil yang diharapkan, dan apa yang harus dilakukan bila hasilnya berbeda.
 
 > Versi yang didokumentasikan: **v0.7.1** (401 tes).
+> Regenerasi dokumen: `make docs-tutorial` → HTML (dilacak git) dan PDF (tidak dilacak: 600 KB lebih,
+> melewati gerbang 512 KB di `scripts/repo_hygiene.py`).
+
 > Semua contoh memakai `http://127.0.0.1:8088` dan `data/control.db`; ganti bila port/nama berkas berbeda.
 
 ---

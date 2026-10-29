@@ -69,3 +69,6 @@ state/gitleaks-nofilter.toml
 !/verification/INDEX.md
 /normalized/*
 !/normalized/INDEX.md
+
+# PDF hasil build tutorial (regenerasi: lihat docs/TUTORIAL_PENGGUNAAN.md bagian atas)
+docs/TUTORIAL_PENGGUNAAN.pdf

@@ -3,26 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Panduan Lengkap SDB v0.7.1 — Cara Pakai yang Baik dan Benar</title>
-<meta name="description" content="Panduan penggunaan ekosistem SDB v0.7.1: admin, tenant, worker, penagihan, metrik, keamanan, dan semua kemungkinan galat.">
+<title>Panduan Lengkap SDB — Cara Pakai yang Baik dan Benar</title>
+<meta name="description" content="Panduan operasional SDB: admin, tenant, worker, penagihan, metrik, keamanan, dan semua kemungkinan galat.">
 <style>
-:root{
-  --bg:#ffffff; --fg:#16181d; --muted:#5b6472; --line:#e3e7ee;
-  --accent:#1e5fbf; --accent-soft:#eef4ff; --warn:#8a5a00; --warn-bg:#fff8e6;
-  --code-bg:#f6f8fb; --ok:#0f6b3f; --ok-bg:#eefaf2;
-}
+:root{--bg:#fff;--fg:#16181d;--muted:#5b6472;--line:#e3e7ee;--accent:#1e5fbf;--accent-soft:#eef4ff;
+--warn:#8a5a00;--warn-bg:#fff8e6;--code-bg:#f6f8fb}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{
-  margin:0; color:var(--fg); background:var(--bg);
-  font:16px/1.72 -apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
-  -webkit-font-smoothing:antialiased;
-}
+body{margin:0;color:var(--fg);background:var(--bg);
+font:16px/1.72 -apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+-webkit-font-smoothing:antialiased}
 .wrap{max-width:1120px;margin:0 auto;padding:0 28px 96px}
-header.hero{
-  border-bottom:1px solid var(--line); margin-bottom:36px; padding:56px 0 28px;
-  background:linear-gradient(180deg,var(--accent-soft),transparent);
-}
+header.hero{border-bottom:1px solid var(--line);margin-bottom:36px;padding:56px 0 28px;
+background:linear-gradient(180deg,var(--accent-soft),transparent)}
 .hero .kicker{color:var(--accent);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:12px}
 .hero h1{font-size:clamp(26px,4vw,40px);line-height:1.2;margin:10px 0 12px;letter-spacing:-.02em}
 .hero p{margin:0;color:var(--muted);max-width:70ch}
@@ -30,7 +23,8 @@ header.hero{
 .badge{font-size:12.5px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);background:#fff}
 .layout{display:grid;grid-template-columns:266px minmax(0,1fr);gap:44px;align-items:start}
 nav.toc{position:sticky;top:18px;max-height:calc(100vh - 36px);overflow:auto;border-right:1px solid var(--line);padding-right:14px}
-nav.toc .toc-title{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:10px}
+nav.toc .toc-title,.toc-inline .toc-title{font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+color:var(--muted);font-weight:700;margin-bottom:10px}
 nav.toc ul{list-style:none;margin:0;padding:0;font-size:13.5px;line-height:1.45}
 nav.toc ul ul{margin:4px 0 8px 12px;border-left:1px solid var(--line);padding-left:10px}
 nav.toc li{margin:6px 0}
@@ -48,10 +42,11 @@ li{margin:6px 0}
 strong{font-weight:650}
 hr{border:0;border-top:1px solid var(--line);margin:34px 0}
 code{font-family:ui-monospace,SFMono-Regular,"JetBrains Mono",Menlo,Consolas,monospace;font-size:13.6px;
-  background:var(--code-bg);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+background:var(--code-bg);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
 pre{background:var(--code-bg);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow:auto;line-height:1.55}
 pre code{background:none;border:0;padding:0;font-size:13.2px;white-space:pre}
-blockquote{margin:18px 0;padding:14px 18px;border-left:4px solid var(--warn);background:var(--warn-bg);color:#3a2b00;border-radius:0 8px 8px 0}
+blockquote{margin:18px 0;padding:14px 18px;border-left:4px solid var(--warn);background:var(--warn-bg);
+color:#3a2b00;border-radius:0 8px 8px 0}
 blockquote p{margin:6px 0}
 .table-wrap{overflow:auto;margin:18px 0;border:1px solid var(--line);border-radius:10px}
 table{border-collapse:collapse;width:100%;font-size:14.2px}
@@ -59,21 +54,18 @@ th,td{padding:10px 13px;text-align:left;border-bottom:1px solid var(--line);vert
 th{background:#f8fafc;font-weight:650;white-space:nowrap}
 tbody tr:last-child td{border-bottom:0}
 tbody tr:hover{background:#fbfcfe}
-dl{margin:14px 0} dt{font-weight:650;margin-top:10px} dd{margin:4px 0 0 18px;color:var(--muted)}
-.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13.5px}
 .toc-inline{border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin:18px 0 26px;background:#fbfcfe}
-.toc-inline .toc-title{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:8px}
 .toc-inline ul{list-style:none;margin:0;padding:0;columns:2;column-gap:28px;font-size:13.8px}
 .toc-inline ul ul{columns:1;margin:2px 0 6px 12px;border-left:1px solid var(--line);padding-left:10px}
 .toc-inline a{color:var(--fg);text-decoration:none}
 .toc-inline a:hover{color:var(--accent)}
+.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13.5px}
 @media print{
   nav.toc{display:none}
   .layout{display:block}
   header.hero{background:none;padding-top:0}
   body{font-size:11.2pt;line-height:1.5}
-  h2{page-break-after:avoid;margin-top:22px}
-  h3{page-break-after:avoid}
+  h2,h3{page-break-after:avoid;margin-top:22px}
   pre,table,blockquote{page-break-inside:avoid}
   a{color:#000;text-decoration:none}
   .wrap{max-width:none;padding:0}
@@ -81,21 +73,17 @@ dl{margin:14px 0} dt{font-weight:650;margin-top:10px} dd{margin:4px 0 0 18px;col
 }
 @media (max-width:900px){
   .layout{display:block}
-  nav.toc{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--line);padding:0 0 14px;margin-bottom:22px}
+  nav.toc{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--line);
+    padding:0 0 14px;margin-bottom:22px}
 }
 </style>
 </head>
 <body>
 <header class="hero"><div class="wrap">
   <div class="kicker">Super Dev Builders · Dokumentasi Pengguna</div>
-  <h1>Panduan Lengkap SDB v0.7.1 — Cara Pakai yang Baik dan Benar</h1>
-  <p>Semua skenario pemakaian: hari pertama sebagai admin, membuat dan memantau job, menjalankan worker,
-     alur uang (hold → tagih → lepas), invoice bulanan, pemulihan setelah kegagalan, batas laju, metrik,
-     isolasi antar tenant, migrasi &amp; cadangan, sampai daftar lengkap kode galat.</p>
-  <div class="badges">
-    <span class="badge">v0.7.1</span><span class="badge">401 tes</span>
-    <span class="badge">21 bagian</span><span class="badge">tanpa dependensi runtime</span>
-  </div>
+  <h1>Panduan Lengkap SDB — Cara Pakai yang Baik dan Benar</h1>
+  <p>Panduan operasional SDB: admin, tenant, worker, penagihan, metrik, keamanan, dan semua kemungkinan galat.</p>
+  <div class="badges"><span class="badge">dokumentasi</span><span class="badge">tanpa dependensi runtime</span></div>
 </div></header>
 <div class="wrap layout">
 <nav class="toc"><div class="toc-title">Daftar Isi</div><div class="toc">
@@ -157,7 +145,9 @@ membeli kapasitas), dan <strong>operator pekerja</strong> (worker). Setiap skena
 nyata, hasil yang diharapkan, dan apa yang harus dilakukan bila hasilnya berbeda.</p>
 <blockquote>
 <p>Versi yang didokumentasikan: <strong>v0.7.1</strong> (401 tes).
-Semua contoh memakai <code>http://127.0.0.1:8088</code> dan <code>data/control.db</code>; ganti bila port/nama berkas berbeda.</p>
+Regenerasi dokumen: <code>make docs-tutorial</code> → HTML (dilacak git) dan PDF (tidak dilacak: 600 KB lebih,
+melewati gerbang 512 KB di <code>scripts/repo_hygiene.py</code>).</p>
+<p>Semua contoh memakai <code>http://127.0.0.1:8088</code> dan <code>data/control.db</code>; ganti bila port/nama berkas berbeda.</p>
 </blockquote>
 <hr />
 <h2 id="daftar-isi">Daftar Isi</h2>
@@ -1238,8 +1228,7 @@ print(&quot;billing:&quot;, call(&quot;GET&quot;, &quot;/v1/billing&quot;))
 <hr />
 <p><em>Dokumen ini adalah bagian dari rilis v0.7.1. Bila perilaku sistem berbeda dari yang tertulis di sini,
 yang benar adalah kode dan tesnya — laporkan perbedaannya agar dokumen diperbaiki.</em></p>
-<div class="foot">Dokumentasi ini menyertai rilis SDB v0.7.1. Bila perilaku sistem berbeda dari yang
-tertulis, yang berlaku adalah kode dan tesnya — laporkan perbedaannya agar dokumen diperbaiki.</div>
+<div class="foot">Panduan operasional SDB: admin, tenant, worker, penagihan, metrik, keamanan, dan semua kemungkinan galat.</div>
 </main>
 </div>
 </body>

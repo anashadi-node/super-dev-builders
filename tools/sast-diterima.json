@@ -32,63 +32,63 @@
   {
    "kode": "S310",
    "berkas": "scripts/sdb_tg_bot.py",
-   "sebab": "urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan URL dari pengguna",
+   "sebab": "urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan URL dari pengguna — diaudit manual 30 Okt 2026: sumber URL & guard loopback/valid_base terbaca; token tak pernah masuk URL yang dicetak",
    "pemilik": "D8",
    "kedaluwarsa": "2027-01-31"
   },
   {
    "kode": "S310",
    "berkas": "skills/geo-audit/scripts/geo_scan.py",
-   "sebab": "urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan URL dari pengguna",
+   "sebab": "urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan URL dari pengguna — diaudit manual 30 Okt 2026: sumber URL & guard loopback/valid_base terbaca; token tak pernah masuk URL yang dicetak",
    "pemilik": "D8",
    "kedaluwarsa": "2027-01-31"
   },
   {
    "kode": "S310",
    "berkas": "skills/local-llm-serving/scripts/serve_and_bench.py",
-   "sebab": "urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan URL dari pengguna",
+   "sebab": "urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan URL dari pengguna — diaudit manual 30 Okt 2026: sumber URL & guard loopback/valid_base terbaca; token tak pernah masuk URL yang dicetak",
    "pemilik": "D8",
    "kedaluwarsa": "2027-01-31"
   },
   {
    "kode": "S310",
    "berkas": "tests/test_admin_status.py",
-   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan url dari pengguna",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan url dari pengguna — diaudit manual 30 Okt 2026: sumber URL & guard loopback/valid_base terbaca; token tak pernah masuk URL yang dicetak",
    "pemilik": "D8",
    "kedaluwarsa": "2027-01-31"
   },
   {
    "kode": "S310",
    "berkas": "tests/test_audit_regressions.py",
-   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan url dari pengguna",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan url dari pengguna — diaudit manual 30 Okt 2026: sumber URL & guard loopback/valid_base terbaca; token tak pernah masuk URL yang dicetak",
    "pemilik": "D8",
    "kedaluwarsa": "2027-01-31"
   },
   {
    "kode": "S310",
    "berkas": "tests/test_billing_worker.py",
-   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan url dari pengguna",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan url dari pengguna — diaudit manual 30 Okt 2026: sumber URL & guard loopback/valid_base terbaca; token tak pernah masuk URL yang dicetak",
    "pemilik": "D8",
    "kedaluwarsa": "2027-01-31"
   },
   {
    "kode": "S310",
    "berkas": "tests/test_control_plane.py",
-   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan url dari pengguna",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan url dari pengguna — diaudit manual 30 Okt 2026: sumber URL & guard loopback/valid_base terbaca; token tak pernah masuk URL yang dicetak",
    "pemilik": "D8",
    "kedaluwarsa": "2027-01-31"
   },
   {
    "kode": "S310",
    "berkas": "tests/test_dashboard_security.py",
-   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan url dari pengguna",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan url dari pengguna — diaudit manual 30 Okt 2026: sumber URL & guard loopback/valid_base terbaca; token tak pernah masuk URL yang dicetak",
    "pemilik": "D8",
    "kedaluwarsa": "2027-01-31"
   },
   {
    "kode": "S310",
    "berkas": "tests/test_metrics_ratelimit.py",
-   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan url dari pengguna",
+   "sebab": "harness uji: server/klien loopback dan pemanggilan CLI lokal; urlopen/urlretrieve ke host loopback/internal yang ditetapkan skrip, bukan url dari pengguna — diaudit manual 30 Okt 2026: sumber URL & guard loopback/valid_base terbaca; token tak pernah masuk URL yang dicetak",
    "pemilik": "D8",
    "kedaluwarsa": "2027-01-31"
   },

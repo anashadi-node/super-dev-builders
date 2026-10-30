@@ -37,8 +37,20 @@ def sh(args: list[str]) -> str:
 
 
 def tracked_files(root: str) -> list[str]:
-    out = sh(["git", "-C", root, "ls-files", "-z"])
-    return [p for p in out.split("\0") if p]
+    """Berkas yang DIKENAI gerbang: terlacak + belum-terlacak-tapi-tidak-diabaikan.
+
+    Kenapa tidak `git ls-files` saja (kegagalan CI 30 Okt 2026): berkas baru yang
+    belum di-`git add` tidak terlihat, jadi gerbang lokal PASS sementara CI (yang
+    melihat berkas sudah ter-commit) FAIL. Gerbang harus menilai apa yang AKAN
+    masuk commit, bukan hanya yang sudah masuk.
+    """
+    out = sh(["git", "-C", root, "ls-files", "-co", "--exclude-standard", "-z"])
+    seen, files = set(), []
+    for p in out.split("\0"):
+        if p and p not in seen:
+            seen.add(p)
+            files.append(p)
+    return files
 
 
 def load_baseline(root: str) -> dict:
@@ -134,7 +146,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.json:
         print(json.dumps(result, indent=1))
     else:
-        print(f"hygiene: {result['checked']} berkas ter-lacak")
+        print(f"hygiene: {result['checked']} berkas dinilai (terlacak + baru-belum-commit)")
         for f in result["fails"]:
             print(f"  FAIL {f['rule']:18s} {f['path']} — {f['detail']}")
         for w in result["warns"]:

@@ -77,6 +77,22 @@ def test_email_baru_di_artefak_ditolak(tmp_path):
     assert "R3_pii" in _rules(res)
 
 
+def test_berkas_belum_commit_tetap_dinilai(tmp_path):
+    """Regresi 30 Okt 2026: gerbang lokal PASS, CI FAIL karena `git ls-files` saja.
+
+    Berkas baru tanpa `git add` tetap masuk commit berikutnya, jadi gerbang WAJIB
+    menilainya — kalau tidak, hasil lokal dan CI berbeda untuk isi yang sama.
+    """
+    root = _make_repo(tmp_path, {"LICENSE": "x"})
+    baru = os.path.join(root, "catatan", "baru.txt")
+    os.makedirs(os.path.dirname(baru), exist_ok=True)
+    with open(baru, "w", encoding="utf-8") as fh:
+        fh.write("kontak: " + EMAIL_PELANGGAN + "\n")
+    rc, res = _run(root)
+    assert rc == 1, res
+    assert "R3_pii" in _rules(res)
+
+
 def test_email_teknis_tidak_dianggap_pii(tmp_path):
     root = _make_repo(tmp_path, {
         "runs/x/sbom.json": '{"pkg": "click@8.6.0.dev"}\n',

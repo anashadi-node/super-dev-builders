@@ -9,6 +9,7 @@ Yang dijaga di sini adalah sifat KESELAMATAN skrip, bukan sekadar bentuk keluara
 """
 import json
 import os
+import shutil
 import stat
 import subprocess
 import sys
@@ -157,7 +158,15 @@ def test_privasi_media_repo_tanpa_berkas_terlacak_tetap_tak_diverifikasi(tmp_pat
 
 
 def test_privasi_media_tanpa_daftar_larangan_fail_closed(tmp_path):
-    """Daftar larangan kosong-tak-dikonfigurasi tidak boleh menghasilkan 'BERSIH'."""
+    """Daftar larangan kosong-tak-dikonfigurasi tidak boleh menghasilkan 'BERSIH'.
+
+    Prasyarat: tesseract. Tanpa itu alat menolak lebih awal (juga fail-closed) dan
+    pesan yang diuji tidak pernah tercapai — itu keterbatasan lingkungan, bukan
+    kelalaian gerbang. Di CI tesseract dipasang eksplisit (lihat .github/workflows/ci.yml),
+    jadi jalur ini benar-benar dijalankan di sana.
+    """
+    if not shutil.which("tesseract"):
+        pytest.skip("tesseract tidak terpasang — jalur media tidak dapat diuji di host ini")
     project = tmp_path / "tanpa-terms"
     (project / "src").mkdir(parents=True)
     (project / "src" / "app.py").write_text("print(1)\n", encoding="utf-8")

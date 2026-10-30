@@ -51,7 +51,9 @@ def test_g1_tolak_rahasia_dan_email():
     with tempfile.TemporaryDirectory() as td:
         p = pathlib.Path(td) / "SPEC.md"
         kunci_palsu = "AKIA" + "ABCDEFGHIJKLMNOP"  # dirangkai agar pemindai statis tidak menandai berkas uji
-        p.write_text(f"# S\n\n- Kunci contoh: {kunci_palsu} dan hubungi a@b.co.id [E1 · observasi]\n")
+        # Email juga dirangkai runtime: gerbang higiene repo (R3_pii) memindai berkas uji ini.
+        surel = "a" + "@" + "b" + ".co.id"
+        p.write_text(f"# S\n\n- Kunci contoh: {kunci_palsu} dan hubungi {surel} [E1 · observasi]\n")
         r = run(G1, p)
         assert r.returncode == 1
         assert "rahasia" in r.stdout

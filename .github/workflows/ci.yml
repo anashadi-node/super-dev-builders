@@ -51,6 +51,17 @@ jobs:
       - name: Narasi lingkungan (bukti yang bisa dibaca)
         run: python -V && python -m pytest --version
 
+      # PRASYARAT, bukan hiasan: sebagian uji keamanan menguji kanal media (OCR).
+      # Tanpa tesseract, alat menolak lebih awal (fail-closed) dan uji yang mengharapkan
+      # pesan spesifik tidak pernah tercapai -> CI merah berhari-hari (30 Okt 2026).
+      - name: Pasang alat kanal media (tesseract)
+        run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends tesseract-ocr && tesseract --version | head -1
+
+      # Paritas lokal<->CI: cetak berapa berkas yang akan dinilai gerbang higiene,
+      # supaya selisih "lokal PASS, CI FAIL" langsung terlihat di log.
+      - name: Paritas berkas yang dinilai gerbang
+        run: echo "dinilai=$(git ls-files -co --exclude-standard | wc -l)" && git status --porcelain | head -20
+
       - name: Lint (ruff check scripts tests skills)
         run: make lint
 
@@ -65,3 +76,6 @@ jobs:
 
       - name: Higiene artefak (ukuran, PII, jenis berkas)
         run: make hygiene
+
+      - name: Manifest paket per divisi (hash + lisensi)
+        run: make packs

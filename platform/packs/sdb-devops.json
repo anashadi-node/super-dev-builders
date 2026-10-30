@@ -27,7 +27,7 @@
   {
    "id": "ci-cd-release-gate",
    "path": "skills/ci-cd-release-gate",
-   "sha256": "27b878816be9062b528546a3fb43b573e5050d7bac5556f73c4e0dc8ecdc0832",
+   "sha256": "73830fe099055054d3caafdd351811690a544304512c60cd6a515e3199c017fe",
    "license": "BUSL-1.1"
   },
   {

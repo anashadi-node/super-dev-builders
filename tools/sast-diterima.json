@@ -378,6 +378,20 @@
    "sebab": "subprocess dengan argv TETAP (interpreter + alat repo + path temporer); tidak ada input tak tepercaya",
    "pemilik": "D7",
    "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "scripts/ci_watch.py",
+   "sebab": "subprocess dengan argv TETAP (path absolut hasil shutil.which + argumen literal); nama repo divalidasi regex ^owner/repo$ sebelum dipakai",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S310",
+   "berkas": "scripts/ci_watch.py",
+   "sebab": "urlopen hanya ke https://api.telegram.org setelah skema+host diperiksa; token tidak dicetak, galat dilaporkan tanpa URL",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
   }
  ]
 }

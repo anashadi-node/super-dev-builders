@@ -78,6 +78,18 @@ python3 scripts/install_skills.py --profile sdb-builder
 python3 -m pytest tests -q                    # test suite skrip
 ```
 
+## Penjaga CI (kegagalan tidak boleh jadi latar belakang)
+```bash
+python3 scripts/ci_watch.py --status          # ringkasan 30 run terakhir
+python3 scripts/ci_watch.py                   # laporkan kegagalan BARU saja
+python3 scripts/ci_watch.py --dry-run         # periksa tanpa menulis state
+```
+Dijadwalkan tiap 3 jam oleh `sdb-ci-watch.timer` (unit di `ops/systemd/`). Aturan mainnya:
+hanya kegagalan **baru** yang dikirim (state = memori, idempoten), dan bila `gh` tidak bisa
+dipakai hasilnya **exit 2 "GAGAL MEMERIKSA"** — bukan "hijau". Kanal: Telegram
+(`SDB_TG_BOT_TOKEN`/`SDB_TG_CHAT_ID`, fallback ke bot yang sudah ada) + catatan JSONL di
+`~/.local/state/sdb/ci-watch/alerts.jsonl`, sehingga bukti tetap ada walau jaringan mati.
+
 ## Aturan yang tidak bisa dinegosiasikan
 1. Tidak ada deep scan tanpa `authorization.yaml` berstatus PASS (Gate #0).
 2. Tidak ada bypass auth / CAPTCHA / anti-bot / paywall / DRM / licensing / pinning / access control.

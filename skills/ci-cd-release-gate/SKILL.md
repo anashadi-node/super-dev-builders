@@ -107,6 +107,16 @@ Semua gate punya exit criteria; tidak ada gate "kira-kira lulus".
    lokal vs runner langsung terbaca di log; (d) uji yang butuh alat host memakai `skip`
    beralasan bila alat tidak ada, JANGAN `xfail`/hapus — dan pastikan CI-lah yang
    menjalankan jalur aslinya.
+10. **Gerbang yang tidak pernah sampai ke manusia bukan gerbang.** CI merah 30 Okt 2026
+   bertahan berhari-hari (5 run berturut) bukan karena gerbangnya lemah, tetapi karena
+   hasilnya hanya masuk surel yang tak dibaca. Wajib ada alarm yang: (a) **idempoten** —
+   state menyimpan run yang sudah dilaporkan, satu kegagalan dikirim sekali; (b) **gagal-closed** —
+   bila pemeriksa tidak bisa jalan (`gh` hilang, kuota habis, JSON rusak) hasilnya
+   "GAGAL MEMERIKSA" (exit 2), bukan "hijau"; (c) **punya bukti lokal** — setiap kejadian
+   ditulis ke JSONL sehingga tidak bergantung kanal jaringan; (d) melaporkan keadaan merah
+   yang sedang berlangsung saat pemasangan pertama, tetapi tidak membanjiri dengan
+   kegagalan historis. Kontrol negatifnya: pemanggilan kedua tidak boleh mengirim ulang,
+   dan pemeriksa yang rusak tidak boleh menghasilkan "BERSIH".
 - Tidak ada `--force`, `--no-verify`, atau bypass gate. Tidak ada auto-approve untuk aksi destruktif/
   publikasi/produksi.
 - Credential hanya lewat secret store; tanpa secret di log/artefak.

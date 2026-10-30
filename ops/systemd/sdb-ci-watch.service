@@ -1,0 +1,15 @@
+[Unit]
+Description=SDB penjaga CI — laporkan kegagalan GitHub Actions yang baru
+Documentation=file:%h/super-dev-builders/scripts/ci_watch.py
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/super-dev-builders
+ExecStart=/usr/bin/python3 scripts/ci_watch.py
+# 0 = bersih, 1 = ada kegagalan baru (SUDAH dilaporkan lewat Telegram/berkas).
+# Keduanya hasil normal; hanya exit 2 (pemeriksaan gagal) yang menandai unit gagal,
+# supaya status unit tidak "merah" berulang hanya karena CI memang sedang merah.
+SuccessExitStatus=0 1
+TimeoutStartSec=180

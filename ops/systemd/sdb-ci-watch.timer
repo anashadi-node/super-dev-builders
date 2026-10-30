@@ -1,0 +1,11 @@
+[Unit]
+Description=Tiap 3 jam: periksa CI GitHub super-dev-builders
+
+[Timer]
+OnCalendar=*-*-* 00/3:07:00
+RandomizedDelaySec=120
+Persistent=true
+Unit=sdb-ci-watch.service
+
+[Install]
+WantedBy=timers.target

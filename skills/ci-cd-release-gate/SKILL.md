@@ -89,6 +89,24 @@ Semua gate punya exit criteria; tidak ada gate "kira-kira lulus".
    serialkan dengan `fcntl.flock` (cegah balapan `__pycache__` antar-instance -> `ModuleNotFoundError:
    sdb_common` intermiten), set `sys.dont_write_bytecode = True`, dan tulis ulang HANYA bila
    tanda-tangan substantif berubah (sisanya "TIDAK BERUBAH").
+8. **Gerbang wajib menilai himpunan yang AKAN di-commit, bukan yang sudah ter-commit.**
+   Pemindai berbasis `git ls-files` saja buta terhadap berkas baru yang belum `git add`:
+   lokal PASS, CI FAIL untuk isi yang sama (nyata 30 Okt 2026 — email uji di berkas baru).
+   Aturannya: `git ls-files -co --exclude-standard` (terlacak + baru, hormati `.gitignore`),
+   artefak run masuk `.gitignore`, dan **buktikan dengan uji negatif**: berkas belum-commit
+   berisi pelanggaran HARUS membuat gerbang lokal FAIL. Berkas baru = kandidat commit,
+   jadi menunggu `git add` berarti menilai setelah terlambat.
+9. **Paritas CI = daftar prasyarat + daftar langkah, diuji mesin — bukan diingat manusia.**
+   Uji keamanan yang bergantung alat host (mis. `tesseract` untuk kanal media) akan merah
+   berhari-hari bila image runner tidak memasangnya, tanpa ada kode yang berubah. Karena itu:
+   (a) prasyarat dideklarasikan sekali di skrip (`perlu = [...]`), dipasang eksplisit di
+   workflow, dan ada tes yang mem-parse workflow untuk memastikan setiap nama muncul di
+   baris `apt-get install`; (b) setiap langkah `make check` lokal juga ada di CI — diuji
+   dengan tes yang sama (temuan nyata: `make packs` tidak pernah jalan di CI); (c) langkah CI
+   mencetak `git ls-files -co --exclude-standard | wc -l` supaya selisih himpunan berkas
+   lokal vs runner langsung terbaca di log; (d) uji yang butuh alat host memakai `skip`
+   beralasan bila alat tidak ada, JANGAN `xfail`/hapus — dan pastikan CI-lah yang
+   menjalankan jalur aslinya.
 - Tidak ada `--force`, `--no-verify`, atau bypass gate. Tidak ada auto-approve untuk aksi destruktif/
   publikasi/produksi.
 - Credential hanya lewat secret store; tanpa secret di log/artefak.

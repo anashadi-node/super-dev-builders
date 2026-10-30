@@ -135,3 +135,31 @@ def test_gh_tidak_terpasang_exit_2(tmp_path):
     rc, isi, _ = _main(tmp_path, [], ambil=hilang)
     assert rc == 2
     assert isi[0]["jenis"] == "pemeriksaan_gagal"
+
+
+def test_state_rusak_tidak_membanjiri_riwayat(tmp_path):
+    """State rusak -> baseline, bukan kirim 3 kegagalan lama sekaligus."""
+    state = tmp_path / "state.json"
+    state.write_text("{rusak", encoding="utf-8")
+    runs = [_run(31, "success", waktu="2026-10-30T04:00:00Z"),
+            _run(30, "failure", waktu="2026-10-30T02:00:00Z"),
+            _run(29, "failure", waktu="2026-10-30T01:00:00Z")]
+    rc, isi, _ = _main(tmp_path, runs)
+    assert rc == 0 and isi == []
+
+
+def test_telegram_gagal_diulang_hingga_3_kali(tmp_path):
+    """Alarm yang gagal terkirim harus dicoba ulang, bukan hilang diam-diam."""
+    runs = [_run(41, "failure")]
+    def gagal_kirim(*_a):
+        return False
+
+    assert _main(tmp_path, runs, kred=lambda: ("t", "c"), kirim=gagal_kirim)[0] == 1
+    rc2, isi2, _ = _main(tmp_path, runs, kred=lambda: ("t", "c"), kirim=gagal_kirim)
+    assert rc2 == 1, "percobaan ke-2 harus mengirim ulang"
+    assert isi2[-1]["percobaan"] == 2
+    rc3, isi3, _ = _main(tmp_path, runs, kred=lambda: ("t", "c"), kirim=gagal_kirim)
+    assert rc3 == 1 and isi3[-1]["menyerah"] == ["41"]
+    rc4, isi4, _ = _main(tmp_path, runs, kred=lambda: ("t", "c"), kirim=gagal_kirim)
+    assert rc4 == 0, "setelah 3 percobaan berhenti mengulang (tidak spam selamanya)"
+    assert len(isi4) == 3

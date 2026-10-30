@@ -41,7 +41,7 @@ STATE_DEFAULT = Path("~/.local/state/sdb/ci-watch/state.json").expanduser()
 ALERT_DEFAULT = Path("~/.local/state/sdb/ci-watch/alerts.jsonl").expanduser()
 ENV_SDB = Path("~/.config/sdb/control.env").expanduser()
 ENV_ANANTARA = Path("~/anantara-sakti/.env").expanduser()
-POLA_REPO = re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$")
+POLA_REPO = re.compile(r"^[A-Za-z0-9_-][A-Za-z0-9_.-]*/[A-Za-z0-9_-][A-Za-z0-9_.-]*$")
 
 
 def _bin(nama: str) -> str:
@@ -209,6 +209,8 @@ def main(argv: list[str] | None = None, ambil=ambil_runs, kred=kredensial,
     state_path, alert_path = Path(a.state), Path(a.alert_file)
     state = muat_state(state_path)
     sudah = state["sudah"]
+    belum = state.setdefault("belum_terkirim", {})
+    rusak = bool(state.get("rusak"))
 
     try:
         repo = a.repo or repo_dari_git()
@@ -225,7 +227,8 @@ def main(argv: list[str] | None = None, ambil=ambil_runs, kred=kredensial,
         print(f"repo={repo} run={len(runs)}\n{ringkas_status(runs)}")
         return 0
 
-    pertama_kali = not sudah and not state.get("rusak")
+    # Baseline berlaku saat state kosong MAUPUN rusak: jangan membanjiri riwayat lama.
+    pertama_kali = not sudah
     baru = pilih_baru(runs, sudah)
 
     if pertama_kali:
@@ -234,9 +237,10 @@ def main(argv: list[str] | None = None, ambil=ambil_runs, kred=kredensial,
         terbaru = max(runs, key=lambda r: str(r.get("createdAt") or ""), default=None)
         baru = [terbaru] if terbaru and gagal(terbaru) else []
 
+    id_baru = {kunci(r) for r in baru}
     for r in runs:
         k = kunci(r)
-        if k and k not in sudah:
+        if k and k not in sudah and k not in id_baru:
             sudah[k] = {"conclusion": r.get("conclusion"), "waktu": r.get("createdAt"),
                         "judul": (r.get("displayTitle") or "")[:90]}
 
@@ -244,18 +248,39 @@ def main(argv: list[str] | None = None, ambil=ambil_runs, kred=kredensial,
         if not a.dry_run:
             state.update({"diperiksa": _iso(), "repo": repo, "rusak": False})
             simpan_state(state_path, state)
-        print(f"BERSIH: tidak ada kegagalan baru ({len(runs)} run diperiksa, {len(sudah)} tercatat)")
+        catatan = "state rusak -> riwayat di-reset, " if rusak else ""
+        print(f"BERSIH: tidak ada kegagalan baru ({catatan}{len(runs)} run diperiksa, {len(sudah)} tercatat)")
         return 0
 
-    pesan = format_pesan(baru, "CI GAGAL (baru)")
-    kanal = "berkas"
+    judul = "CI GAGAL (baru)" + (" · state rusak, riwayat di-reset" if rusak else "")
+    pesan = format_pesan(baru, judul)
     k = kred()
-    if k and kirim(pesan, *k):
-        kanal = "telegram+berkas"
-    elif k:
-        kanal = "berkas (telegram gagal)"
+    terkirim = bool(k and kirim(pesan, *k))
+    kanal = "telegram+berkas" if terkirim else ("berkas (telegram gagal)" if k else "berkas")
 
+    # Bila kanal manusia (Telegram) gagal, JANGAN tandai sudah-terkirim: coba lagi pada
+    # putaran berikutnya (maks 3x), karena alarm yang hilang diam-diam sama saja dengan
+    # tidak punya alarm. Berkas JSONL tetap ditulis setiap percobaan.
+    menyerah: list[str] = []
+    for r in baru:
+        k_id = kunci(r)
+        if terkirim or not k:
+            belum.pop(k_id, None)
+            sudah[k_id] = {"conclusion": r.get("conclusion"), "waktu": r.get("createdAt"),
+                           "judul": (r.get("displayTitle") or "")[:90]}
+        else:
+            n = int(belum.get(k_id, 0)) + 1
+            if n >= 3:
+                sudah[k_id] = {"conclusion": r.get("conclusion"), "waktu": r.get("createdAt"),
+                               "judul": (r.get("displayTitle") or "")[:90]}
+                belum.pop(k_id, None)
+                menyerah.append(k_id)
+            else:
+                belum[k_id] = n
+
+    percobaan = max((int(belum.get(kunci(r), 0)) for r in baru), default=0)
     kejadian = {"waktu": _iso(), "jenis": "ci_gagal", "repo": repo, "kanal": kanal,
+                "percobaan": percobaan, "menyerah": menyerah,
                 "runs": [{"id": kunci(r), "conclusion": r.get("conclusion"), "judul": r.get("displayTitle"),
                           "cabang": r.get("headBranch"), "url": r.get("url"), "waktu": r.get("createdAt")}
                          for r in baru]}
@@ -264,7 +289,8 @@ def main(argv: list[str] | None = None, ambil=ambil_runs, kred=kredensial,
         state.update({"diperiksa": _iso(), "repo": repo, "rusak": False})
         simpan_state(state_path, state)
     print(pesan)
-    print(f"kanal={kanal} dicatat={alert_path}")
+    print(f"kanal={kanal} percobaan={percobaan} dicatat={alert_path}"
+          + (f" MENYERAH={menyerah}" if menyerah else ""))
     return 1
 
 

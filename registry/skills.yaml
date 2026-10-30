@@ -15,11 +15,15 @@ pipeline_required: [source_trust_check, pin_revision, hermes_native_scan, manual
 # CATATAN AKURASI (ditemukan saat audit T11-1): komentar di baris atas berjumlah
 #   (21 + 6 + 2) = 29, BUKAN 37 -> rincian angka lama TIDAK dapat diverifikasi dari komentar itu
 #   sendiri. Rincian rinci 38 belum dikonfirmasi Owner; yang dikonfirmasi hanya TOTAL = 38.
-approved_custom_count: 39
+approved_custom_count: 40
 # 2026-10-26 — Owner via chat: 38 -> 39.
 #   Sebab: integrasi REA (order: "integrasikan Repo GitHub REA ke dalam Divisi SDB, audit scan
 #   analisa mendalam terlebih dahulu") menambah 1 custom skill `rea-reverse-engineering` yang
 #   ditulis sendiri (MIT SDB) — bukan salinan skill upstream. Audit: reports/REA_AUDIT_20261026.md.
+# 2026-10-30 — Owner via chat (2 PRD: PRD_Super_Dev_Builders.html + Super_Dev_Builders_REA_Replica_Master_PRD.html):
+#   39 -> 40. Sebab: kolaborasi REA × replica-skill menambah 1 custom skill `replica-skill-pipeline`
+#   (MIT SDB, ditulis sendiri) sebagai jembatan Zona B; upstream replica-skill di-vendor terpin
+#   integrations/replica-skill/ (77c9436, audit PINNED.md). Kebijakan: governance/policies/clone-policy.md.
 # 2026-10-06: +7 adopsi PLANORA (kit perencanaan produk) — audit keamanan 65 file LULUS
 # (nol network/eval/symlink/secret; test upstream 39/39 PASS; laporan: reports/planora_audit_20261006.md).
 # Sumber: /home/anashadi/Documents/starter-clean-v1.4/starter-clean (.agents/skills, lisensi MIT).
@@ -256,6 +260,15 @@ custom:
     upstream: "morluto/rea — rea-agents@6.8.0 (MIT), audit reports/REA_AUDIT_20261026.md"
     gate: "Gate #0 PASS wajib untuk setiap target; tier T0-T3, T2/T3 butuh approval per aksi; MCP 229 tool TIDAK didaftarkan (3,79 MB skema)"
     evidence: reports/REA_AUDIT_20261026.md
+  - id: replica-skill-pipeline
+    status: ADD
+    divisions: [D3, D7]
+    profiles: [sdb-architect, sdb-reviewer]
+    path: skills/replica-skill-pipeline
+    note: "D4/D5 (builder) mematuhi aturan yang sama via governance/policies/clone-policy.md; skill sengaja TIDAK masuk pack sdb-builder agar batas ADR-0003 (<=25/peran) tidak terlampaui tanpa kurasi Owner."
+    upstream: "Jakeschincariol/replica-skill — pinned commit 77c9436 (MIT), vendored integrations/replica-skill/, audit 30 Okt 2026: 57 test PASS, 0 network sink"
+    gate: "Gate #0 PASS + SPEC lolos G1 wajib sebelum membangun; G2 metrik (paritas>=90%, kontras>=4.5:1, 100% berbukti); G3 rilis butuh approval manusia"
+    evidence: integrations/replica-skill/PINNED.md
 third_party:
   - repo: obra/superpowers
     url: https://github.com/obra/superpowers

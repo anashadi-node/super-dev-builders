@@ -177,7 +177,11 @@ echo "=== 4/5 ruff (keamanan pola — konfigurasi DIPIN di dalam repo) ==="
 # alasan (terbukti 30 Okt 2026 pada repo SDB sendiri). Yang wajib: konfigurasi ada di repo.
 if [ -f "$PROYEK/ruff.toml" ] || [ -f "$PROYEK/.ruff.toml" ] \
    || { [ -f "$PROYEK/pyproject.toml" ] && grep -q "^\[tool\.ruff" "$PROYEK/pyproject.toml"; }; then
-  ( cd "$PROYEK" && ruff check --exclude targets --exclude evidence --exclude runs --exclude reconstruction --exclude normalization --exclude screens --exclude trace --exclude dom --output-format=json . >"$RAW/ruff.json" 2>"$RAW/ruff.err" )
+  # PENGECUALIAN integrations/: kode VENDOR TER-PIN (replica-skill 77c9436, rea-6.8.0)
+  # tidak boleh diubah — mengubahnya merusak hash pin. Temuan gaya di sana bukan temuan
+  # keamanan, dan ruff-inti (S/BLE/E9) di bawah TETAP memindai integrations/ (hasil:
+  # 0 temuan keamanan, diverifikasi 30 Okt 2026). Jadi yang dikecualikan hanya gaya.
+  ( cd "$PROYEK" && ruff check --exclude targets --exclude evidence --exclude runs --exclude reconstruction --exclude normalization --exclude screens --exclude trace --exclude dom --exclude integrations --output-format=json . >"$RAW/ruff.json" 2>"$RAW/ruff.err" )
   KODE=$?
   TEMUAN=$("$PY" - "$RAW/ruff.json" <<'PUB'
 import json,sys

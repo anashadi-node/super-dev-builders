@@ -15,7 +15,7 @@
  "source": {
   "registry_version": "2.2.0",
   "registry_updated": "2026-10-11",
-  "skill_count": 8
+  "skill_count": 9
  },
  "skills": [
   {
@@ -51,7 +51,7 @@
   {
    "id": "rea-reverse-engineering",
    "path": "skills/rea-reverse-engineering",
-   "sha256": "57fd0b49b49f827c605d2d3f6685d3df86344abb0e908d66a19ee4122d7eaa81",
+   "sha256": "5b852dc8e860a23279d5e6400cfa1e5eeabc26dd8bc66f9c4122df57a4b29ae2",
    "license": "BUSL-1.1"
   },
   {
@@ -59,6 +59,12 @@
    "path": "skills/reconstruction-fidelity",
    "sha256": "0500d60a0e218398fab61fdf1793cbfc387121b293f37856d4564c4bc2f37526",
    "license": "BUSL-1.1"
+  },
+  {
+   "id": "replica-skill-pipeline",
+   "path": "skills/replica-skill-pipeline",
+   "sha256": "71847c14b74f54a04cfc2d9523fa3a288aa3694ccafc290f6c65907ab1e5f023",
+   "license": "MIT"
   },
   {
    "id": "test-pyramid-and-risk",

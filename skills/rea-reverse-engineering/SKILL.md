@@ -164,3 +164,9 @@ Rollback: `rm -rf ~/.hermes/tools/rea-6.8.0` + revert commit integrasi.
 - Gate: `skills/reconstruction-scope-gate`, `scripts/gate_check.py`
 - Evidence: `docs/EVIDENCE_TAXONOMY.md`, `docs/EVIDENCE_SCHEMA.md`
 - Pipeline supply-chain: `docs/SECURITY_SUPPLY_CHAIN.md`
+- **PRD acuan utama Owner (30 Okt 2026)**:
+  - `PRD_Super_Dev_Builders.html` — pipeline F0–F8, gerbang G0–G3, kelas A–D, eksperimen E1–E7;
+  - `Super_Dev_Builders_REA_Replica_Master_PRD.html` — gate G0–G4, threat model, benchmark A/B/C;
+  - kebijakan mengikat: `governance/policies/clone-policy.md`.
+- **Replica Skills (Zona B)**: `integrations/replica-skill/` (pinned 77c9436) — skill
+  `replica-skill-pipeline` memetakan helper-nya ke divisi SDB.

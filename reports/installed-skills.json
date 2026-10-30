@@ -1,5 +1,5 @@
 {
-  "at": "2026-10-30T06:18:50+0700",
+  "at": "2026-10-30T09:38:29+0700",
   "uninstall": false,
   "operations": [
     {
@@ -235,6 +235,12 @@
       "skill": "rea-reverse-engineering",
       "profile": "main",
       "path": "/home/anashadi/.hermes/skills/super-dev-builders/rea-reverse-engineering"
+    },
+    {
+      "action": "install",
+      "skill": "replica-skill-pipeline",
+      "profile": "main",
+      "path": "/home/anashadi/.hermes/skills/super-dev-builders/replica-skill-pipeline"
     }
   ],
   "missing_profiles": []

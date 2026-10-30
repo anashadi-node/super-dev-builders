@@ -364,6 +364,13 @@
    "sebab": "tesseract/ffmpeg dari PATH; operator mengendalikan mesin, bukan penyerang",
    "pemilik": "D8",
    "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "tests/test_replica_integration.py",
+   "sebab": "harness uji: memanggil helper vendored replica-skill (parity.py) dengan daftar argumen tanpa shell=True, argv literal dari sys.executable + path repo; tidak ada input pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
   }
  ]
 }

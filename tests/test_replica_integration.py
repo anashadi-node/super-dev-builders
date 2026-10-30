@@ -30,7 +30,9 @@ SDB_ADDED = {"PINNED.md"}
 def _tree_hash() -> str:
     files = sorted(
         p for p in VENDOR.rglob("*")
-        if p.is_file() and p.relative_to(VENDOR).as_posix() not in SDB_ADDED
+        if p.is_file()
+        and p.relative_to(VENDOR).as_posix() not in SDB_ADDED
+        and "__pycache__" not in p.relative_to(VENDOR).as_posix()
     )
     h = hashlib.sha256()
     for p in sorted(files, key=lambda x: x.relative_to(VENDOR).as_posix()):

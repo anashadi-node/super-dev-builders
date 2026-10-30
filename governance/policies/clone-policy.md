@@ -74,12 +74,16 @@ Sebelum deploy apapun:
 
 ## 7. Utang yang diakui jujur (belum dibangun)
 
-- [ ] `audit-log.jsonl` append-only per panggilan tool (PRD #1 bagian 7).
-- [ ] Pemindai G1 otomatis (spesifikasi teks-only) — saat ini review manual.
-- [ ] Pembanding SHA-256 aset otomatis di G3 — saat ini prosedur manual.
+- [x] Pemindai G1 otomatis — `tools/gerbang-spec.py` (fail-closed: exit 2 bila alat/berkas
+      bermasalah; 0 klaim = GAGAL). Uji negatif: `tests/test_gerbang_g1.py`.
+- [x] `audit-log.jsonl` append-only berantai hash — `tools/audit-log.py append|verify`
+      (append ditolak bila rantai terakhir rusak; exit 2).
+- [ ] Pemindai G3 otomatis (hash aset, string ≥40 char, rahasia) — saat ini prosedur manual.
 - [ ] Uji canary tiap sesi Zona A.
-- [ ] Benchmark E1-E7 (recall 90%, presisi 95%, injection 0/50) sebelum dipakai target nyata.
-- [ ] Benchmark A/B/C: Replica-only vs REA+Replica vs baseline (min. 3 run per fixture).
+- [x] Benchmark E1 pilot — `reports/BENCHMARK_E1_20261030.md`: 3 target? TIDAK: n=1 target,
+      10 fitur, 3 run; paritas spec 1,00 vs kontrol 0,20 (Δ +0,80). **Masih pilot**, belum
+      memenuhi syarat PRD (≥30 fitur, pembangun independen, beberapa target).
+- [ ] Benchmark E1 skala penuh + A/B/C (≥3 target, ≥30 fitur, pembangun independen).
 
-Semua utang tidak menghalangi penggunaan pada target kelas A milik sendiri,
-tetapi WAJIB ditutup sebelum target pihak ketiga kelas B/C.
+Aturan: utang terbuka WAJIB ditutup sebelum target pihak ketiga kelas B/C. Untuk target
+kelas A milik sendiri, pipeline boleh dipakai sekarang dengan review manusia.

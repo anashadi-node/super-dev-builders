@@ -1,0 +1,7 @@
+{
+ "spec": "reconstruction/e1-app/SPEC.md",
+ "sha256": "c57768cf1b6fb5625e7c1795287593db34f9e08e0b784063c0b13dafff884310",
+ "claims": 22,
+ "verdict": "PASS",
+ "violations": []
+}

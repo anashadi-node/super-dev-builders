@@ -371,6 +371,13 @@
    "sebab": "harness uji: memanggil helper vendored replica-skill (parity.py) dengan daftar argumen tanpa shell=True, argv literal dari sys.executable + path repo; tidak ada input pengguna",
    "pemilik": "D8",
    "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "tests/test_gerbang_g1.py",
+   "sebab": "subprocess dengan argv TETAP (interpreter + alat repo + path temporer); tidak ada input tak tepercaya",
+   "pemilik": "D7",
+   "kedaluwarsa": "2027-01-31"
   }
  ]
 }

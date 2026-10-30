@@ -69,7 +69,7 @@
   {
    "id": "replica-skill-pipeline",
    "path": "skills/replica-skill-pipeline",
-   "sha256": "71847c14b74f54a04cfc2d9523fa3a288aa3694ccafc290f6c65907ab1e5f023",
+   "sha256": "8562541442d2436f1b5ab2ee6c3d7e72571c46fa2ad73a5b4789dedbefa899cd",
    "license": "MIT"
   },
   {

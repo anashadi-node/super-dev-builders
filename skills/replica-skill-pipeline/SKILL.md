@@ -34,10 +34,13 @@ MIT, 57 test upstream PASS, 0 network sink — audit 30 Okt 2026).
 ## Prasyarat WAJIB sebelum membangun
 
 1. Gate #0 PASS: `scripts/gate_check.py --target <slug>` (kelas A/B/C — kelas D STOP).
-2. Spesifikasi ada dan lolos firewall G1: `reconstruction/<target>/SPEC.md` +
-   `FEATURE_MATRIX.md` (dari skill `reconstruction-spec`) — teks perilaku + Evidence ID +
-   label observasi/inferensi/tidak-diketahui. **Tanpa SPEC lolos G1, tidak ada pembangunan.**
-3. Builder TIDAK PERNAH membuka `evidence/<target>/` mentah. Kalau butuh klarifikasi
+2. Spesifikasi lolos firewall G1 — **wajib mesin, bukan mata**:
+   `python3 tools/gerbang-spec.py reconstruction/<slug>/SPEC.md --verdict reports/<slug>/g1-verdict.json`
+   (exit 0 = PASS; exit 1 = perbaiki SPEC; exit 2 = alat rusak → STOP, jangan anggap lolos).
+3. Catat tiap panggilan alat ke audit log berantai:
+   `python3 tools/audit-log.py append --log audit/audit-log.jsonl --actor D4 --tool <alat> --target <slug> --action <aksi> --result <ok|gagal>`
+   Verifikasi sebelum rilis: `python3 tools/audit-log.py verify --log audit/audit-log.jsonl`.
+4. Builder TIDAK PERNAH membuka `evidence/<target>/` mentah. Kalau butuh klarifikasi
    perilaku → kembali ke D1/D3, jangan intip bukti.
 
 ## Pemetaan fase PRD → helper upstream

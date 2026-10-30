@@ -1,0 +1,11 @@
+{
+  "gate": "gate0",
+  "verdict": "PASS",
+  "checked_at": "2026-10-30T10:10:21+0700",
+  "manifest": "/home/anashadi/super-dev-builders/evidence/e1-app/authorization.yaml",
+  "target": "e1-app",
+  "mode": "A",
+  "fail": [],
+  "blocked": [],
+  "warn": []
+}

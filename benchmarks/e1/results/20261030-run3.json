@@ -1,0 +1,179 @@
+{
+ "target": {
+  "base": "http://127.0.0.1:8110",
+  "passed": 10,
+  "total": 10,
+  "detail": [
+   {
+    "id": "F01",
+    "pass": true,
+    "note": "200 {'status': 'ok'}"
+   },
+   {
+    "id": "F02",
+    "pass": true,
+    "note": "ids=[1, 2, 3] bool=True"
+   },
+   {
+    "id": "F03",
+    "pass": true,
+    "note": "201 {'id': 14, 'name': 'uji-f03', 'completed': False}"
+   },
+   {
+    "id": "F04",
+    "pass": true,
+    "note": "200/404"
+   },
+   {
+    "id": "F05",
+    "pass": true,
+    "note": "200/401"
+   },
+   {
+    "id": "F06",
+    "pass": true,
+    "note": "204 body=None ulang=404"
+   },
+   {
+    "id": "F07",
+    "pass": true,
+    "note": "200/401"
+   },
+   {
+    "id": "F08",
+    "pass": true,
+    "note": "422 {'error': 'name wajib diisi'}"
+   },
+   {
+    "id": "F09",
+    "pass": true,
+    "note": "200 [{'id': 2, 'name': 'tulis laporan', 'completed': True}]"
+   },
+   {
+    "id": "F10",
+    "pass": true,
+    "note": "true=1 false=2"
+   }
+  ]
+ },
+ "replica_spec": {
+  "base": "http://127.0.0.1:8111",
+  "passed": 10,
+  "total": 10,
+  "detail": [
+   {
+    "id": "F01",
+    "pass": true,
+    "note": "200 {'status': 'ok'}"
+   },
+   {
+    "id": "F02",
+    "pass": true,
+    "note": "ids=[1, 2, 3] bool=True"
+   },
+   {
+    "id": "F03",
+    "pass": true,
+    "note": "201 {'id': 13, 'name': 'uji-f03', 'completed': False}"
+   },
+   {
+    "id": "F04",
+    "pass": true,
+    "note": "200/404"
+   },
+   {
+    "id": "F05",
+    "pass": true,
+    "note": "200/401"
+   },
+   {
+    "id": "F06",
+    "pass": true,
+    "note": "204 body=None ulang=404"
+   },
+   {
+    "id": "F07",
+    "pass": true,
+    "note": "200/401"
+   },
+   {
+    "id": "F08",
+    "pass": true,
+    "note": "422 {'error': 'name wajib diisi'}"
+   },
+   {
+    "id": "F09",
+    "pass": true,
+    "note": "200 [{'id': 2, 'name': 'contoh dua', 'completed': True}]"
+   },
+   {
+    "id": "F10",
+    "pass": true,
+    "note": "true=1 false=2"
+   }
+  ]
+ },
+ "kontrol_naif": {
+  "base": "http://127.0.0.1:8112",
+  "passed": 2,
+  "total": 10,
+  "detail": [
+   {
+    "id": "F01",
+    "pass": true,
+    "note": "200 {'status': 'ok'}"
+   },
+   {
+    "id": "F02",
+    "pass": true,
+    "note": "ids=[1, 2, 3, 4, 5] bool=True"
+   },
+   {
+    "id": "F03",
+    "pass": false,
+    "note": "200 {'id': 13, 'name': 'uji-f03', 'completed': False}"
+   },
+   {
+    "id": "F04",
+    "pass": false,
+    "note": "200/404"
+   },
+   {
+    "id": "F05",
+    "pass": false,
+    "note": "buat gagal 200"
+   },
+   {
+    "id": "F06",
+    "pass": false,
+    "note": "buat gagal 200"
+   },
+   {
+    "id": "F07",
+    "pass": false,
+    "note": "200/401"
+   },
+   {
+    "id": "F08",
+    "pass": false,
+    "note": "200 {'id': 15, 'name': '   ', 'completed': False}"
+   },
+   {
+    "id": "F09",
+    "pass": false,
+    "note": "200 [{'id': 1, 'name': 'satu', 'completed': False}, {'id': 2, 'name': 'dua', 'completed': True}, {'id': 3, 'name': 'tiga', 'completed': False}, {'id': 4, 'name': 'uji-f05-a', 'completed': False}, {'id': 5, 'name': 'uji-f06', 'completed': False}, {'id': 6, 'name': '   ', 'completed': False}, {'id': 7, 'name': 'uji-f05-a', 'completed': False}, {'id': 8, 'name': 'uji-f06', 'completed': False}, {'id': 9, 'name': '   ', 'completed': False}, {'id': 10, 'name': 'uji-f05-a', 'completed': False}, {'id': 11, 'name': 'uji-f06', 'completed': False}, {'id': 12, 'name': '   ', 'completed': False}, {'id': 13, 'name': 'uji-f05-a', 'completed': False}, {'id': 14, 'name': 'uji-f06', 'completed': False}, {'id': 15, 'name': '   ', 'completed': False}]"
+   },
+   {
+    "id": "F10",
+    "pass": false,
+    "note": "true=15 false=15"
+   }
+  ]
+ },
+ "metrik": {
+  "recall_replika": 1.0,
+  "presisi_spec": 1.0,
+  "paritas_kontrol": 0.2,
+  "delta_spec_minus_kontrol": 0.8
+ }
+}

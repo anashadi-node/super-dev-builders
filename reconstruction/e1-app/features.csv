@@ -1,0 +1,11 @@
+feature,area,priority,original,clone,notes
+F01 health endpoint,ops,must,yes,no,GET /health 200 status ok
+F02 list items,read,must,yes,no,GET /api/items larik
+F03 create item,write,must,yes,no,POST /api/items 201 butuh token
+F04 get item,read,must,yes,no,GET /api/items/{id} 200 atau 404
+F05 update item,write,must,yes,no,PATCH 200 medan terkirim saja
+F06 delete item,write,must,yes,no,DELETE 204
+F07 login, auth,must,yes,no,POST /api/login 200 token 401 salah
+F08 validasi nama,write,must,yes,no,422 name wajib diisi
+F09 paginasi,read,should,yes,no,limit dan offset
+F10 filter completed,read,should,yes,no,completed true atau false

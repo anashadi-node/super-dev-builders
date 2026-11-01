@@ -46,6 +46,32 @@ berpindah drawer tidak menghilangkan tulisan yang belum dikirim.
 **Batas jujur:** menekan Simpan **tidak** menjalankan agen. Ia menulis masukan
 ke disk. Menjalankan tahap tetap lewat runner (`python3 scripts/workflow_run.py`).
 
+## Dari Intake ke tahap (runner)
+
+Kiriman tidak berguna kalau agen harus menyalin ulang. Ada satu perintah untuk
+menautkannya:
+
+```bash
+python3 scripts/workflow_run.py --list-intakes                     # lihat kiriman
+python3 scripts/workflow_run.py <target> --intake latest            # tautkan konteks
+python3 scripts/workflow_run.py <target> --intake latest --as 01    # + isi requirements.md
+```
+
+Yang terjadi:
+
+1. `runs/<target>/docs/intake-<id>.md` ditulis — brief **verbatim**, tabel
+   lampiran dengan **path absolut** + sha256, dan daftar link. Ini yang dibaca
+   agen pada tahap mana pun, tanpa perlu akses ke folder intake.
+2. `runs/<target>/CONTEXT.md` menunjuk kiriman terbaru (blok idempoten —
+   dijalankan sepuluh kali pun tetap satu blok).
+3. `--as 01` mengisi `runs/<target>/requirements.md` **hanya bila belum ada**,
+   dengan header `<!-- dibuat otomatis dari intake … — BELUM ditinjau manusia -->`.
+   Tidak pernah menimpa requirements yang sudah ditulis manusia.
+
+`--as` sengaja hanya menerima tahap **01**. Brief bukan pengganti ADR (04),
+plan (06), review (08), atau log tes (09) — mengisi artefak itu dari brief akan
+menghasilkan bukti palsu. Tahap lain harus dikerjakan tool/agen yang sebenarnya.
+
 ## Batas & keamanan
 
 - Maks **25 MB per file**, **40 file** per kiriman, total **400 MB**.

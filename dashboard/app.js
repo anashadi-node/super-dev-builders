@@ -843,6 +843,14 @@
           <button type="button" data-ik-dl="${esc(f.stored)}" aria-label="Unduh ${esc(f.name)}">⇩</button>
         </div>`).join("")}</div>` : `<p class="mission">Tidak ada lampiran.</p>`}
 
+        <h4>Jadikan konteks tahap</h4>
+        <pre class="ik-brief on" data-ik-cmd>python3 scripts/workflow_run.py ${esc(j.target || "TARGET")} --intake ${esc(j.id || id)}
+python3 scripts/workflow_run.py ${esc(j.target || "TARGET")} --intake ${esc(j.id || id)} --as 01</pre>
+        <p class="ik-note">Baris 2 juga mengisi <code>requirements.md</code> — hanya bila belum ada, ditandai “belum ditinjau”.</p>
+        <div class="ik-ok-act">
+          <button type="button" data-ik-copy-cmd>Salin perintah</button>
+        </div>
+
         <h4>Folder</h4>
         <p class="src">~/sdb-workspace/intake/${esc(j.id || id)}/</p>
         <div class="ik-ok-act">
@@ -1138,6 +1146,10 @@
     if (t.closest("[data-ik-send]")) return ikSend();
     const cp = t.closest("[data-ik-copy]");
     if (cp) return copyText(`~/sdb-workspace/intake/${cp.dataset.ikCopy}`);
+    if (t.closest("[data-ik-copy-cmd]")) {
+      const pre = document.querySelector("[data-ik-cmd]");
+      if (pre) return copyText(pre.textContent.trim());
+    }
     const sh = t.closest("[data-ik-show]");
     if (sh) {
       if (S.view === "intake") { openIntakeCard(sh.dataset.ikShow); return; }

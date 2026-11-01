@@ -20,6 +20,7 @@ import datetime
 import hashlib
 import hmac
 import json
+import os
 import re
 import secrets
 import shutil
@@ -31,7 +32,7 @@ from urllib.parse import parse_qs, urlparse
 
 import ws_api
 
-ROOT = Path.home() / "sdb-workspace" / "intake"
+ROOT = Path(os.environ.get("SDB_INTAKE_ROOT") or (Path.home() / "sdb-workspace" / "intake"))
 MAX_FILE = 25 * 1024 * 1024        # 25 MB per file
 MAX_TOTAL = 400 * 1024 * 1024      # 400 MB total satu intake
 MAX_FILES = 40

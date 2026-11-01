@@ -511,6 +511,411 @@
       </div>`;
   }
 
+  /* ------------------------------------------------------------- intake */
+  /* Kanal input per skenario. Satu panel = teks bebas + link + lampiran.
+   * Penyimpanan nyata: ~/sdb-workspace/intake/<id>/{meta.json,brief.md,files/}
+   * Tidak ada klaim "menjalankan agen" — ini hanya menulis masukan ke disk. */
+
+  const IK = { token: null, local: false, scope: null, ctx: null, files: [], links: [],
+               busy: false, list: null, listErr: null };
+
+  const ikBytes = (n) => (n < 1024 ? `${n} B` : n < 1048576 ? `${(n / 1024).toFixed(1)} KB` : `${(n / 1048576).toFixed(2)} MB`);
+  const ikExt = (n) => (String(n).split(".").pop() || "").toLowerCase();
+  const IK_KIND = {
+    png: "img", jpg: "img", jpeg: "img", gif: "img", webp: "img", svg: "img", bmp: "img",
+    pdf: "pdf", doc: "doc", docx: "doc", odt: "doc", rtf: "doc",
+    md: "text", txt: "text", csv: "text", json: "text", yaml: "text", yml: "text", log: "text",
+    html: "web", htm: "web", css: "web", js: "web", ts: "web", tsx: "web", jsx: "web", vue: "web",
+    zip: "zip", gz: "zip", tar: "zip", "7z": "zip", rar: "zip",
+  };
+  const ikGlyph = (n) => ({ img: "▣", pdf: "▤", doc: "▤", text: "≡", web: "❮❯", zip: "▩" }[IK_KIND[ikExt(n)] || ""] || "▢");
+
+  function ikDraft(scope) {
+    try {
+      const d = JSON.parse(localStorage.getItem("sdb.ik." + scope) || "null");
+      return { text: d && typeof d.text === "string" ? d.text : "",
+               links: d && Array.isArray(d.links) ? d.links.slice(0, 20) : [] };
+    } catch { return { text: "", links: [] }; }
+  }
+  function ikStore(scope, d) {
+    try { localStorage.setItem("sdb.ik." + scope, JSON.stringify(d)); } catch { /* kuota penuh: draf tetap di layar */ }
+  }
+
+  async function ikAuth() {
+    try {
+      const r = await fetch("/api/ws/whoami", { cache: "no-store" });
+      if (!r.ok) return;
+      const j = await r.json();
+      IK.local = !!j.local;
+      if (j.token) IK.token = j.token;
+    } catch { /* offline: PIN manual tetap bisa diisi */ }
+  }
+
+  /* Token lokal baru diketahui setelah fetch; buang kolom PIN bila sudah ada. */
+  function ikSyncAuth() {
+    if (!IK.token) return;
+    const body = $("dBody");
+    if (!body) return;
+    const pin = body.querySelector("[data-ik-pin]");
+    if (!pin) return;
+    const lab = pin.previousElementSibling;
+    pin.remove();
+    if (lab && lab.classList.contains("ik-lab")) lab.remove();
+  }
+
+  function ikPanel(ctx) {
+    return `<section class="ik" data-ik="${esc(ctx.scope)}">
+      <div class="ik-hd">
+        <span class="ik-ic" aria-hidden="true">＋</span>
+        <span class="ik-tt"><b>Brief &amp; lampiran</b><span>${esc(ctx.hint)}</span></span>
+        <span class="ik-tag">input</span>
+      </div>
+
+      <label class="ik-lab" for="ikText">Apa yang ingin dibuat / diubah</label>
+      <textarea id="ikText" class="ik-ta" data-ik-text rows="4"
+        placeholder="Contoh: Buat ulang landing page ini dengan Next.js + Tailwind, tanpa menyalin aset. Ganti logo &amp; copy dengan milik sendiri."></textarea>
+      <div class="ik-meta"><span data-ik-count>0</span> karakter · draf tersimpan otomatis di browser ini</div>
+
+      <label class="ik-lab" for="ikLink">Contoh / referensi — tempel link, tekan Enter</label>
+      <div class="ik-linkrow">
+        <input id="ikLink" class="ik-in" data-ik-link type="url" inputmode="url" autocomplete="off" spellcheck="false"
+          placeholder="https://contoh.com/halaman-yang-ingin-ditiru">
+        <button class="ik-add" type="button" data-ik-add>Tambah</button>
+      </div>
+      <div class="ik-chips" data-ik-links></div>
+
+      <label class="ik-lab">Lampiran</label>
+      <div class="ik-drop" data-ik-drop tabindex="0" role="button" aria-label="Tambah lampiran file">
+        <span class="ik-dg" aria-hidden="true">⬆</span>
+        <b>Tarik file ke sini, atau klik untuk memilih</b>
+        <span>gambar · html · md · doc/docx · pdf · zip · apa pun</span>
+        <em>Maks 25 MB per file · 40 file per kiriman</em>
+        <input type="file" data-ik-file multiple hidden>
+      </div>
+      <div class="ik-files" data-ik-files></div>
+
+      <div class="ik-prog" data-ik-prog hidden><i></i><span></span></div>
+
+      ${IK.token ? "" : `<label class="ik-lab" for="ikPin">PIN akses</label>
+      <input id="ikPin" class="ik-in ik-pinfield" data-ik-pin type="password" autocomplete="off"
+        placeholder="PIN 12 karakter">`}
+
+      <div class="ik-foot">
+        <button class="ik-send" type="button" data-ik-send>Simpan ke Intake</button>
+        <span class="ik-note" data-ik-note>Ditulis ke ~/sdb-workspace/intake/ — bukan menjalankan agen.</span>
+      </div>
+      <div class="ik-out" data-ik-out></div>
+    </section>`;
+  }
+
+  function ikMount(ctx) {
+    IK.ctx = ctx;
+    const body = $("dBody");
+    const host = body.querySelector(".ik");
+    if (!host) return;
+    const same = IK.scope === ctx.scope;
+    const d = ikDraft(ctx.scope);
+    if (!same) { IK.scope = ctx.scope; IK.files = []; IK.links = d.links; }
+    host.querySelector("[data-ik-text]").value = d.text;
+    ikSyncAuth();
+    ikPaint();
+  }
+
+  function ikPaint() {
+    const body = $("dBody");
+    const ta = body.querySelector("[data-ik-text]");
+    if (!ta) return;
+    const cnt = body.querySelector("[data-ik-count]");
+    if (cnt) cnt.textContent = ta.value.trim().length;
+
+    const lk = body.querySelector("[data-ik-links]");
+    if (lk) {
+      lk.innerHTML = IK.links.length
+        ? IK.links.map((u, i) => `<span class="ik-chip"><a href="${esc(u)}" target="_blank" rel="noopener noreferrer nofollow">${esc(u.replace(/^https?:\/\//i, "").slice(0, 46))}</a><button type="button" data-ik-rmlink="${i}" aria-label="Hapus link">✕</button></span>`).join("")
+        : `<span class="ik-chips-empty">Belum ada link.</span>`;
+    }
+
+    const fl = body.querySelector("[data-ik-files]");
+    if (fl) {
+      fl.innerHTML = IK.files.map((f, i) => `<div class="ik-file">
+        <span class="ik-fg k-${IK_KIND[ikExt(f.name)] || "other"}">${ikGlyph(f.name)}</span>
+        <span class="ik-fn"><b title="${esc(f.name)}">${esc(f.name)}</b><span>${ikBytes(f.size)}${f.type ? " · " + esc(String(f.type).split("/")[0]) : ""}</span></span>
+        <button type="button" data-ik-rmfile="${i}" aria-label="Hapus ${esc(f.name)}">✕</button>
+      </div>`).join("");
+    }
+
+    const btn = body.querySelector("[data-ik-send]");
+    if (btn) { btn.disabled = IK.busy; btn.textContent = IK.busy ? "Mengirim…" : "Simpan ke Intake"; }
+
+    const note = body.querySelector("[data-ik-note]");
+    if (note && !IK.busy) {
+      const total = IK.files.reduce((a, f) => a + f.size, 0);
+      note.textContent = IK.files.length
+        ? `${IK.files.length} file · ${ikBytes(total)} — ditulis ke ~/sdb-workspace/intake/`
+        : "Ditulis ke ~/sdb-workspace/intake/ — bukan menjalankan agen.";
+    }
+  }
+
+  function ikAddFiles(list) {
+    if (!list || !list.length) return;
+    const errs = [];
+    for (const f of list) {
+      if (f.size > 25 * 1024 * 1024) { errs.push(`${f.name}: lebih dari 25 MB`); continue; }
+      if (IK.files.length >= 40) { errs.push("maksimum 40 file per kiriman"); break; }
+      if (IK.files.some((x) => x.name === f.name && x.size === f.size)) continue;
+      IK.files.push(f);
+    }
+    if (errs.length) toast(errs[0]);
+    ikPaint();
+  }
+
+  function ikAddLink() {
+    const inp = $("dBody").querySelector("[data-ik-link]");
+    if (!inp) return;
+    let v = inp.value.trim();
+    if (!v) return;
+    if (!/^https?:\/\//i.test(v) && /^[\w.-]+\.[a-z]{2,}(\/|$)/i.test(v)) v = "https://" + v;
+    if (!/^https?:\/\/\S+$/i.test(v)) return toast("Link harus http:// atau https://");
+    if (IK.links.includes(v)) { inp.value = ""; return toast("Link sudah ada"); }
+    if (IK.links.length >= 20) return toast("Maksimum 20 link");
+    IK.links.push(v);
+    inp.value = "";
+    const ta = $("dBody").querySelector("[data-ik-text]");
+    ikStore(IK.scope, { text: ta ? ta.value : "", links: IK.links });
+    ikPaint();
+  }
+
+  function ikUpload(id, file, onp) {
+    return new Promise((res, rej) => {
+      const x = new XMLHttpRequest();
+      x.open("POST", `/api/inbox/file?id=${encodeURIComponent(id)}&name=${encodeURIComponent(file.name)}`);
+      x.setRequestHeader("X-SDB-Token", IK.token);
+      x.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+      x.upload.onprogress = (e) => { if (e.lengthComputable && onp) onp(e.loaded / e.total); };
+      x.onload = () => {
+        let j = {};
+        try { j = JSON.parse(x.responseText); } catch { /* balasan bukan JSON */ }
+        if (x.status >= 200 && x.status < 300) res(j);
+        else rej(new Error(j.error || `HTTP ${x.status}`));
+      };
+      x.onerror = () => rej(new Error("jaringan gagal"));
+      x.send(file);
+    });
+  }
+
+  async function ikSend() {
+    if (IK.busy) return;
+    const body = $("dBody");
+    const ta = body.querySelector("[data-ik-text]");
+    const pin = body.querySelector("[data-ik-pin]");
+    if (!IK.token && pin && pin.value.trim()) IK.token = pin.value.trim();
+    const text = (ta ? ta.value : "").trim();
+    if (!text && !IK.links.length && !IK.files.length) return toast("Isi brief, link, atau lampiran dulu");
+    if (!IK.token) return toast("PIN akses belum diisi");
+
+    const ctx = IK.ctx || {};
+    IK.busy = true;
+    ikPaint();
+    const prog = body.querySelector("[data-ik-prog]");
+    const bar = prog && prog.querySelector("i");
+    const lab = prog && prog.querySelector("span");
+    const setP = (p, t) => { if (!prog) return; prog.hidden = false; bar.style.width = `${Math.round(p * 100)}%`; lab.textContent = t; };
+
+    try {
+      setP(0.03, "membuat intake…");
+      const r = await fetch("/api/inbox/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-SDB-Token": IK.token },
+        body: JSON.stringify({
+          scen: ctx.scen || "", scen_title: ctx.scenTitle || "", stage: ctx.stage || "",
+          text, links: IK.links, expect_files: IK.files.length,
+        }),
+      });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error || `HTTP ${r.status}`);
+
+      const n = IK.files.length;
+      let done = 0;
+      for (const f of IK.files) {
+        await ikUpload(j.id, f, (p) => setP((done + p) / Math.max(1, n), `mengunggah ${f.name}`));
+        done += 1;
+      }
+      setP(1, "selesai");
+
+      ikStore(IK.scope, { text: "", links: [] });
+      if (ta) ta.value = "";
+      IK.links = []; IK.files = [];
+      ikOut(j.id, j.title);
+      IK.list = null;
+      toast("Brief tersimpan di Intake");
+    } catch (e) {
+      toast(String(e.message || e).slice(0, 90));
+      const note = body.querySelector("[data-ik-note]");
+      if (note) note.textContent = `Gagal: ${e.message}`;
+    } finally {
+      IK.busy = false;
+      ikPaint();
+      setTimeout(() => { if (prog) prog.hidden = true; }, 900);
+    }
+  }
+
+  function ikOut(id, title) {
+    const o = $("dBody").querySelector("[data-ik-out]");
+    if (!o) return;
+    o.innerHTML = `<div class="ik-ok">
+      <div class="ik-ok-hd"><span aria-hidden="true">✓</span><b>Tersimpan</b><code>${esc(id)}</code></div>
+      <p>${esc(String(title || "").slice(0, 120))}</p>
+      <dl>
+        <dt>Folder</dt><dd>~/sdb-workspace/intake/${esc(id)}/</dd>
+        <dt>Isi</dt><dd>brief.md · meta.json · files/</dd>
+      </dl>
+      <div class="ik-ok-act">
+        <button type="button" data-ik-copy="${esc(id)}">Salin path</button>
+        <button type="button" data-ik-show="${esc(id)}">Lihat brief.md</button>
+      </div>
+      <pre class="ik-brief" hidden></pre>
+    </div>`;
+  }
+
+  async function ikShowBrief(id) {
+    const pre = $("dBody").querySelector(".ik-brief");
+    if (!pre) return;
+    if (!pre.hidden) { pre.hidden = true; return; }
+    pre.hidden = false;
+    pre.textContent = "memuat…";
+    try {
+      const r = await fetch(`/api/inbox/get?id=${encodeURIComponent(id)}`, { cache: "no-store", headers: { "X-SDB-Token": IK.token } });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error || `HTTP ${r.status}`);
+      pre.textContent = j.brief || "(brief kosong)";
+    } catch (e) { pre.textContent = `Gagal: ${e.message}`; }
+  }
+
+  async function ikLoadList() {
+    IK.listErr = null;
+    if (!IK.token) await ikAuth();
+    try {
+      const r = await fetch("/api/inbox/list", { cache: "no-store", headers: IK.token ? { "X-SDB-Token": IK.token } : {} });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error || `HTTP ${r.status}`);
+      IK.list = Array.isArray(j.items) ? j.items : [];
+    } catch (e) {
+      IK.listErr = `Tidak bisa memuat Intake: ${e.message}`;
+      IK.list = null;
+    }
+    const n = $("nIntake");
+    if (n) n.textContent = IK.list ? String(IK.list.length) : "";
+  }
+
+  async function openIntakeCard(id) {
+    if (!/^\d{8}-\d{6}-[a-z0-9]{6}$/.test(id)) return;
+    $("dEyebrow").textContent = "Intake";
+    $("dTitle").textContent = "memuat…";
+    $("dBody").innerHTML = `<div class="skel" style="height:120px"></div>`;
+    show(`intake:${id}`);
+    try {
+      const r = await fetch(`/api/inbox/get?id=${encodeURIComponent(id)}`, { cache: "no-store", headers: { "X-SDB-Token": IK.token } });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error || `HTTP ${r.status}`);
+      $("dTitle").textContent = j.title || id;
+      const files = Array.isArray(j.files) ? j.files : [];
+      const links = Array.isArray(j.links) ? j.links : [];
+      $("dBody").innerHTML = `
+        <h4>Ringkasan</h4>
+        <dl class="kv">
+          <dt>Intake</dt><dd>${esc(j.id || id)}</dd>
+          <dt>Dibuat</dt><dd>${esc(String(j.created || "").replace("T", " "))}</dd>
+          <dt>Skenario</dt><dd>${esc(j.scen || "—")} ${esc(j.scen_title || "")}</dd>
+          <dt>Tahap</dt><dd>${esc(j.stage || "—")}</dd>
+          <dt>Target</dt><dd>${esc(j.target || "—")}</dd>
+        </dl>
+
+        <h4>Brief</h4>
+        <pre class="ik-brief on">${esc(j.brief || "(kosong)")}</pre>
+
+        <h4>Link (${links.length})</h4>
+        ${links.length ? `<div class="ik-chips">${links.map((u) => `<span class="ik-chip"><a href="${esc(u)}" target="_blank" rel="noopener noreferrer nofollow">${esc(u.replace(/^https?:\/\//i, "").slice(0, 46))}</a></span>`).join("")}</div>` : `<p class="mission">Tidak ada link.</p>`}
+
+        <h4>Lampiran (${files.length})</h4>
+        ${files.length ? `<div class="ik-files on">${files.map((f) => `<div class="ik-file">
+          <span class="ik-fg k-${IK_KIND[ikExt(f.name)] || "other"}">${ikGlyph(f.name)}</span>
+          <span class="ik-fn"><b>${esc(f.name)}</b><span>${ikBytes(Number(f.size) || 0)} · sha256 ${esc(String(f.sha256 || "").slice(0, 12))}</span></span>
+          <button type="button" data-ik-dl="${esc(f.stored)}" aria-label="Unduh ${esc(f.name)}">⇩</button>
+        </div>`).join("")}</div>` : `<p class="mission">Tidak ada lampiran.</p>`}
+
+        <h4>Folder</h4>
+        <p class="src">~/sdb-workspace/intake/${esc(j.id || id)}/</p>
+        <div class="ik-ok-act">
+          <button type="button" data-ik-copy="${esc(j.id || id)}">Salin path</button>
+          <button type="button" class="danger" data-ik-del="${esc(j.id || id)}">Hapus kiriman ini</button>
+        </div>`;
+    } catch (e) {
+      $("dTitle").textContent = "Gagal memuat intake";
+      $("dBody").innerHTML = `<div class="empty">${esc(String(e.message || e))}</div>`;
+    }
+  }
+
+  async function ikDownload(id, name) {
+    try {
+      const r = await fetch(`/api/inbox/download?id=${encodeURIComponent(id)}&name=${encodeURIComponent(name)}`,
+        { headers: { "X-SDB-Token": IK.token } });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const b = await r.blob();
+      const u = URL.createObjectURL(b);
+      const a = document.createElement("a");
+      a.href = u;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(u), 4000);
+    } catch (e) { toast(`Gagal mengunduh: ${e.message}`); }
+  }
+
+  async function ikDelete(id) {
+    if (!window.confirm(`Hapus kiriman ${id} beserta semua lampirannya? Tindakan ini permanen.`)) return;
+    try {
+      const r = await fetch("/api/inbox/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-SDB-Token": IK.token },
+        body: JSON.stringify({ id }),
+      });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error || `HTTP ${r.status}`);
+      close();
+      IK.list = null;
+      if (S.view === "intake") ikLoadList().then(() => { if (S.view === "intake") render(); });
+      toast("Kiriman dihapus");
+    } catch (e) { toast(`Gagal menghapus: ${e.message}`); }
+  }
+
+  function viewIntake() {
+    const root = `<span class="chip">~/sdb-workspace/intake</span>`;
+    if (IK.listErr) return shel("Intake", "gagal memuat", root) + `<div class="empty">${esc(IK.listErr)}</div>`;
+    if (!IK.list) return shel("Intake", "memuat…", root) + `<div class="skel"></div>`;
+    if (!IK.list.length) {
+      return shel("Intake", "belum ada kiriman", root) +
+        `<div class="empty">Belum ada brief. Buka kartu skenario mana pun → panel “Brief &amp; lampiran” di paling atas, atau tekan tombol di bawah.<br><br>
+         <button class="quick-btn" type="button" data-scen="A">Buka skenario A</button></div>`;
+    }
+    return shel("Intake", `${IK.list.length} kiriman terakhir`, root) +
+      `<div class="grid cards">${IK.list.map((it) => `<article class="card ikcard">
+        <div class="hd">
+          <span class="avatar alt">${esc((it.scen || "·").slice(0, 3))}</span>
+          <span class="who"><b>${esc(it.title || it.id)}</b><span>${esc(String(it.created || "").replace("T", " "))}</span></span>
+        </div>
+        <p class="mission">${esc(it.text || "(hanya lampiran/link)")}</p>
+        <div class="chips">
+          <span class="chip">${it.n_files} file</span>
+          <span class="chip">${ikBytes(it.bytes)}</span>
+          ${it.stage ? `<span class="chip d">tahap ${esc(it.stage)}</span>` : ""}
+          ${it.links.length ? `<span class="chip">${it.links.length} link</span>` : ""}
+        </div>
+        <p class="src">${esc(it.id)}</p>
+        <div class="ik-ok-act"><button type="button" data-ik-show="${esc(it.id)}">Lihat brief.md</button></div>
+      </article>`).join("")}</div>`;
+  }
+
   /* ------------------------------------------------------------- drawer */
 
   function rail(sc) {
@@ -526,10 +931,14 @@
   function openScen(key) {
     const sc = SCEN_BY[key];
     if (!sc) return;
+    const ctx = { scope: `scen:${sc.key}`, scen: sc.key, scenTitle: sc.title, stage: "",
+                  hint: "Tulis maksud Anda di sini — jadi konteks tahap 01." };
     $("dEyebrow").textContent = `Skenario ${sc.key} · risiko ${sc.risk} (penilaian deck)`;
     $("dTitle").textContent = sc.title;
     const owners = scenOwners(sc);
     $("dBody").innerHTML = `
+      ${ikPanel(ctx)}
+
       <h4>Kapan dipakai</h4>
       <p>${esc(sc.when)}</p>
 
@@ -565,15 +974,19 @@
 
       <p class="src">Sumber: docs/WORKFLOW_SKENARIO.md §5 (${esc(sc.key)}), §6, §7.</p>`;
     show(sc.key);
+    ikMount(ctx);
   }
 
   function openStage(code) {
     const s = STAGE_BY[code];
     if (!s) return;
+    const ctx = { scope: `stage:${s.c}`, scen: "", scenTitle: "", stage: s.c,
+                  hint: `Catatan untuk tahap ${s.c} — ${s.n}.` };
     const tr = trimmedBy(code);
     $("dEyebrow").textContent = `Tahap ${s.c}`;
     $("dTitle").textContent = s.n;
     $("dBody").innerHTML = `
+      ${ikPanel(ctx)}
       <h4>Pemilik</h4>
       <p class="chips"><span class="chip">${esc(s.d)}</span> ${esc(DIV_BY[s.d] ? DIV_BY[s.d].name : "")}</p>
       <h4>Alat</h4>
@@ -585,12 +998,15 @@
       <p class="chips">${SCEN.filter((x) => x.keep.some((k) => k.c === code)).map((x) => `<span class="chip keep">${esc(x.key)}</span>`).join("") || "—"}</p>
       <p class="src">Sumber: docs/WORKFLOW_SKENARIO.md §1, §6.</p>`;
     show(`stage:${code}`);
+    ikMount(ctx);
   }
 
   function show(tag) {
     S.opened = tag;
     S.focusBack = document.activeElement;
-    const hash = tag.startsWith("stage:") ? `#alur/${tag.slice(6)}` : `#skenario/${tag}`;
+    const hash = tag.startsWith("stage:") ? `#alur/${tag.slice(6)}`
+      : tag.startsWith("intake:") ? `#intake/${tag.slice(7)}`
+        : `#skenario/${tag}`;
     if (location.hash !== hash) history.replaceState(null, "", hash);
     const d = $("drawer");
     d.hidden = false;
@@ -639,7 +1055,7 @@
 
   /* --------------------------------------------------------------- render */
 
-  const VIEWS = { skenario: viewScen, divisi: viewDiv, agen: viewAgen, alur: viewAlur, kebijakan: viewPolicy };
+  const VIEWS = { skenario: viewScen, divisi: viewDiv, agen: viewAgen, alur: viewAlur, intake: viewIntake, kebijakan: viewPolicy };
 
   function render() {
     kpis();
@@ -654,6 +1070,10 @@
     if (push && location.hash !== `#${v}`) history.replaceState(null, "", `#${v}`);
     render();
     window.scrollTo({ top: 0, behavior: "smooth" });
+    if (v === "intake") {
+      if (!IK.token) ikAuth().then(() => ikLoadList().then(() => { if (S.view === "intake") render(); }));
+      else ikLoadList().then(() => { if (S.view === "intake") render(); });
+    }
   }
 
   /* ---------------------------------------------------------------- wire */
@@ -685,6 +1105,96 @@
 
   $("drawer").addEventListener("click", (e) => { if (e.target.closest("[data-close]")) close(); });
 
+  /* ── intake: satu handler untuk ketik, link, dan file ─────────────── */
+
+  $("dBody").addEventListener("input", (e) => {
+    const ta = e.target.closest("[data-ik-text]");
+    if (!ta) return;
+    ikStore(IK.scope, { text: ta.value, links: IK.links });
+    ikPaint();
+  });
+
+  $("dBody").addEventListener("keydown", (e) => {
+    if (e.target.matches("[data-ik-link]") && e.key === "Enter") { e.preventDefault(); ikAddLink(); }
+  });
+
+  $("dBody").addEventListener("click", (e) => {
+    const t = e.target;
+    if (t.closest("[data-ik-add]")) return ikAddLink();
+    const rl = t.closest("[data-ik-rmlink]");
+    if (rl) {
+      IK.links.splice(Number(rl.dataset.ikRmlink), 1);
+      const ta = $("dBody").querySelector("[data-ik-text]");
+      ikStore(IK.scope, { text: ta ? ta.value : "", links: IK.links });
+      return ikPaint();
+    }
+    const rf = t.closest("[data-ik-rmfile]");
+    if (rf) { IK.files.splice(Number(rf.dataset.ikRmfile), 1); return ikPaint(); }
+    if (t.closest("[data-ik-drop]")) {
+      const inp = $("dBody").querySelector("[data-ik-file]");
+      if (inp && t.tagName !== "INPUT") inp.click();
+      return;
+    }
+    if (t.closest("[data-ik-send]")) return ikSend();
+    const cp = t.closest("[data-ik-copy]");
+    if (cp) return copyText(`~/sdb-workspace/intake/${cp.dataset.ikCopy}`);
+    const sh = t.closest("[data-ik-show]");
+    if (sh) {
+      if (S.view === "intake") { openIntakeCard(sh.dataset.ikShow); return; }
+      return ikShowBrief(sh.dataset.ikShow);
+    }
+    const dl = t.closest("[data-ik-dl]");
+    if (dl) {
+      const m = /^(\d{8}-\d{6}-[a-z0-9]{6})$/.exec((S.opened || "").replace(/^intake:/, ""));
+      if (m) ikDownload(m[1], dl.dataset.ikDl);
+      return;
+    }
+    const del = t.closest("[data-ik-del]");
+    if (del) return ikDelete(del.dataset.ikDel);
+  });
+
+  $("dBody").addEventListener("change", (e) => {
+    if (!e.target.matches("[data-ik-file]")) return;
+    ikAddFiles(e.target.files);
+    e.target.value = "";
+  });
+
+  ["dragenter", "dragover"].forEach((ev) =>
+    $("dBody").addEventListener(ev, (e) => {
+      const d = e.target.closest("[data-ik-drop]");
+      if (!d) return;
+      e.preventDefault();
+      d.classList.add("over");
+    }));
+
+  $("dBody").addEventListener("dragleave", (e) => {
+    const d = e.target.closest("[data-ik-drop]");
+    if (d) d.classList.remove("over");
+  });
+
+  $("dBody").addEventListener("drop", (e) => {
+    const d = e.target.closest("[data-ik-drop]");
+    if (!d) return;
+    e.preventDefault();
+    d.classList.remove("over");
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) ikAddFiles(e.dataTransfer.files);
+  });
+
+  $("dBody").addEventListener("paste", (e) => {
+    if (!e.target.matches("[data-ik-text]")) return;
+    const f = e.clipboardData && e.clipboardData.files;
+    if (f && f.length) ikAddFiles(f);   // tempel gambar langsung jadi lampiran
+  });
+
+  /* Kartu di tab Intake hidup di #view, bukan di drawer. */
+  $("view").addEventListener("click", (e) => {
+    const sh = e.target.closest("[data-ik-show]");
+    if (!sh) return;
+    e.preventDefault();
+    const go = () => openIntakeCard(sh.dataset.ikShow);
+    if (IK.token) go(); else ikAuth().then(go);
+  });
+
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && S.opened) { e.preventDefault(); close(); return; }
     if (e.key === "/" && document.activeElement !== $("q")) { e.preventDefault(); $("q").focus(); }
@@ -695,6 +1205,18 @@
       if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
       else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
     }
+  });
+
+  /* Deep link yang diketik/diubah di address bar: hash saja tidak me-reload. */
+  window.addEventListener("hashchange", () => {
+    const [hv, hk] = (location.hash || "").replace(/^#/, "").split("/");
+    if (!VIEWS[hv]) return;
+    if (S.view !== hv) { S.view = hv; render(); window.scrollTo({ top: 0 }); }
+    if (hk) {
+      if (hv === "alur") openStage(hk);
+      else if (hv === "intake") ikAuth().then(() => openIntakeCard(hk));
+      else if (SCEN_BY[hk]) openScen(hk);
+    } else if (S.opened) close();
   });
 
   const tick = () => {
@@ -708,11 +1230,15 @@
   const q0 = new URLSearchParams(location.search).get("q");
   if (q0) { S.q = q0; $("q").value = q0; }
 
+  ikAuth().then(ikSyncAuth);
+
   const [hView, hKey] = (location.hash || "").replace(/^#/, "").split("/");
   S.view = VIEWS[hView] ? hView : "skenario";
   render();
+  if (S.view === "intake") ikAuth().then(() => ikLoadList()).then(() => { if (S.view === "intake") render(); });
   if (hKey) {
     if (hView === "alur") openStage(hKey);
+    else if (hView === "intake") { ikAuth().then(() => openIntakeCard(hKey)); }
     else if (SCEN_BY[hKey]) openScen(hKey);
   }
   load();

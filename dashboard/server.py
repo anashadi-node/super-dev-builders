@@ -21,6 +21,7 @@ import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
+import inbox_api
 import ws_api
 import yaml
 
@@ -225,6 +226,8 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_POST(self):
+        if inbox_api.handle(self, "POST", self._send_json):
+            return
         if not ws_api.handle(self, "POST", self._send_json):
             self.send_error(404)
 
@@ -233,6 +236,9 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self, head=False):
         path = self.path.split("?")[0]
+        if not head and path.startswith("/api/inbox"):
+            if inbox_api.handle(self, "GET", self._send_json):
+                return
         if not head and path.startswith("/api/ws/"):
             if ws_api.handle(self, "GET", self._send_json):
                 return

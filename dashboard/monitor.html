@@ -4,83 +4,74 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
-<title>SDB Command Deck — Super Dev Builders</title>
+<title>Command Deck — Super Dev Builders</title>
 <link rel="stylesheet" href="style.css">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E⬡%3C/text%3E%3C/svg%3E">
 </head>
 <body>
-<header class="top">
+<a class="skip" href="#main">Lompat ke konten</a>
+<div class="aura" aria-hidden="true"></div>
+
+<header class="topbar">
   <div class="brand">
-    <span class="hex">⬡</span>
-    <div>
-      <h1>SDB <em>Command Deck</em></h1>
-      <p class="sub">Super Dev Builders — 12 Divisi · 10 Profil · 4 Model</p>
-    </div>
+    <span class="mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#46e6bf" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2.6 20.2 7v10L12 21.4 3.8 17V7z"/><path d="M12 8.2 16 10.4v3.4L12 16l-4-2.2v-3.4z"/>
+      </svg>
+    </span>
+    <span class="brand-txt">
+      <strong>Super Dev Builders</strong>
+      <small>Command Deck</small>
+    </span>
   </div>
-  <div class="top-right">
-    <div class="live" id="live"><b></b><span class="lbl">menyiapkan…</span></div>
-    <div>
-      <div class="clock" id="clock">—</div>
-      <div class="net-hint" id="lan"></div>
-    </div>
+
+  <div class="search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+      <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+    </svg>
+    <input id="q" type="search" autocomplete="off" placeholder="Cari skenario, divisi, agen, gate…" aria-label="Cari di Command Deck">
+    <kbd>/</kbd>
+  </div>
+
+  <div class="meta">
+    <span class="live" id="live"><i aria-hidden="true"></i><span id="liveTxt">menghubungkan…</span></span>
+    <span class="clock" id="clock">--:--</span>
+    <button class="ghost" id="refresh" type="button" aria-label="Muat ulang data" title="Muat ulang data">↻</button>
   </div>
 </header>
 
-<main>
-  <section class="kpis" id="kpis">
-    <div class="kpi skel" style="height:78px"></div>
-    <div class="kpi skel" style="height:78px"></div>
-    <div class="kpi skel" style="height:78px"></div>
-    <div class="kpi skel" style="height:78px"></div>
-    <div class="kpi skel" style="height:78px"></div>
-  </section>
+<nav class="tabs" role="tablist" aria-label="Bagian Command Deck">
+  <button class="tab" role="tab" data-view="skenario" aria-selected="true" aria-controls="view">Skenario <span class="n" id="nScen"></span></button>
+  <button class="tab" role="tab" data-view="divisi" aria-selected="false" aria-controls="view">Divisi <span class="n" id="nDiv"></span></button>
+  <button class="tab" role="tab" data-view="agen" aria-selected="false" aria-controls="view">Agen &amp; Profil <span class="n" id="nAgent"></span></button>
+  <button class="tab" role="tab" data-view="alur" aria-selected="false" aria-controls="view">Alur Tahap <span class="n" id="nStage"></span></button>
+  <button class="tab" role="tab" data-view="kebijakan" aria-selected="false" aria-controls="view">Kebijakan Rute</button>
+</nav>
 
-  <section class="toolbar">
-    <div class="tabs" id="tabs">
-      <button class="tab on" data-f="all">Semua</button>
-      <button class="tab" data-f="glm">GLM 5.3 Flash</button>
-      <button class="tab" data-f="ds">DeepSeek V4.1</button>
-      <button class="tab" data-f="ant">Sonnet 5.5</button>
-      <button class="tab" data-f="opu">Opus 5.5</button>
-      <button class="tab" data-f="gpt">GPT-5.6 Sol</button>
-    </div>
-    <label class="switch"><input type="checkbox" id="lanmode"><span>Mode HP (kartu ringkas)</span></label>
-  </section>
-
-  <section class="grid" id="grid">
-    <div class="card skel" style="height:220px"></div>
-    <div class="card skel" style="height:220px"></div>
-    <div class="card skel" style="height:220px"></div>
-    <div class="card skel" style="height:220px"></div>
-  </section>
-
-  <section class="panel">
-    <h2>Alur 16 Tahap — Pipa Riset → Produksi</h2>
-    <div class="flow" id="flow"></div>
-  </section>
-
-  <section class="panel two">
-    <div>
-      <h2>Kebijakan Routing (native dulu)</h2>
-      <ul class="pol">
-        <li><b>GLM 5.3 Flash</b> → TokenRouter → TokenHarbor → OpenCode (cc-frontend, cc-capture-forensics)</li>
-        <li><b>DeepSeek V4.1 Flash</b> → <b>API resmi DeepSeek</b> (api.deepseek.com, id <code>deepseek-flash</code>) — <b>tanpa perantara</b> di semua profil divisi (cc-builder, cc-orchestrator, cc-devops-docs, sodex, cex-binance, pregain, alpaca, hl-harvest, astronacci, anantara-sakti, robinhood, sodex-cex-monitor, villa-agency, lokal). Cadangan bila platform DeepSeek sedang bermasalah: <b>GLM 5.3 Flash</b> (kelas model sama), bukan DeepSeek dari perantara.</li>
-        <li><b>Sonnet 5.5</b> → Anthropic (OAuth) → TokenRouter (cc-architect, cc-reviewer-qa, keamanan)</li>
-        <li><b>Opus 5.5</b> → Anthropic → TokenRouter (cc-security-governor, auditor)</li>
-        <li><b>GPT-5.6 Sol</b> → OpenAI/Codex (OAuth) → TokenRouter (auditor cadangan)</li>
-      </ul>
-    </div>
-    <div>
-      <h2>Divisi D0–D11</h2>
-      <div class="divs" id="divs"></div>
-    </div>
-  </section>
-
-  <footer>
-    <span id="gen">—</span> · repo <span id="head">—</span> ·
-    sumber data: config.yaml profil (hanya id model, tanpa kunci)
-  </footer>
+<main id="main">
+  <section class="kpis" id="kpis" aria-label="Ringkasan armada"></section>
+  <section id="view" class="view" role="tabpanel" aria-live="polite"></section>
 </main>
+
+<div class="drawer-wrap" id="drawer" hidden>
+  <div class="scrim" data-close></div>
+  <aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="dTitle">
+    <header>
+      <div>
+        <p class="eyebrow" id="dEyebrow">Skenario</p>
+        <h2 id="dTitle">—</h2>
+      </div>
+      <button class="ghost" type="button" data-close aria-label="Tutup panel">✕</button>
+    </header>
+    <div class="drawer-body" id="dBody"></div>
+  </aside>
+</div>
+
+<footer class="foot">
+  <span id="footTxt">memuat…</span>
+  <span>deck v3 · data langsung dari /api/state</span>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="app.js"></script>
 </body>
 </html>

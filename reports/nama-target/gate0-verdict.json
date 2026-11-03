@@ -1,0 +1,18 @@
+{
+  "gate": "gate0",
+  "verdict": "FAIL",
+  "checked_at": "2026-11-01T09:08:10+0700",
+  "manifest": "/home/anashadi/super-dev-builders/evidence/nama-target/authorization.yaml",
+  "target": "",
+  "mode": "A",
+  "fail": [
+    "target_name kosong",
+    "authorization_type tidak valid: '' (pilih: ['open_source', 'owned', 'staging', 'written_permission'])",
+    "allowed_targets kosong (minimal satu url/repo/app)"
+  ],
+  "blocked": [
+    "approved_by kosong — butuh orang yang mengesahkan (keputusan manusia)",
+    "approved_at kosong — butuh timestamp persetujuan"
+  ],
+  "warn": []
+}

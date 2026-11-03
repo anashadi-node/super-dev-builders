@@ -51,9 +51,9 @@ BIN = Path.home() / ".local" / "bin"
 # (label, dir-name, role, divisions)
 PROFILE_META = [
     ("Orchestrator", "cc-orchestrator", "Planning / Intake / Gate-0", "D0 D2"),
-    ("Recon - Research", "cc-capture-forensics", "Research (GLM)", "D1"),
+    ("Recon - Research", "cc-capture-forensics", "Research (DeepSeek)", "D1"),
     ("Architect", "cc-architect", "Architecture (Sonnet)", "D3"),
-    ("Builder - Frontend", "cc-frontend", "Frontend (GLM)", "D4"),
+    ("Builder - Frontend", "cc-frontend", "Frontend (DeepSeek)", "D4"),
     ("Builder - Backend", "cc-builder", "Backend (DeepSeek)", "D5"),
     ("Reviewer - QA", "cc-reviewer-qa", "QA / E2E (Sonnet)", "D6 D7"),
     ("Security Governor", "cc-security-governor", "Security (Opus)", "D8"),

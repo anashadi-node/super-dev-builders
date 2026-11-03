@@ -77,6 +77,9 @@ def test_perintah_tak_dikenal_tidak_mengeksekusi_apa_pun(monkeypatch):
     terkirim = []
     monkeypatch.setattr(bot, "OWNER", "111")
     monkeypatch.setattr(bot, "_post_api", lambda m, p: terkirim.append(p) or {"ok": True})
+    sebelum = bot.jobs.list_jobs(50)
     bot.process_update({"message": {"chat": {"id": 111}, "text": "/topup 1000000"}})
     assert len(terkirim) == 1
-    assert "read-only" in terkirim[0]["text"].lower()
+    # Perintah tak dikenal hanya mengembalikan bantuan; tidak ada job baru/aksi tulis.
+    assert "/build" in terkirim[0]["text"]
+    assert bot.jobs.list_jobs(50) == sebelum

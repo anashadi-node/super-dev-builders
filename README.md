@@ -90,6 +90,22 @@ dipakai hasilnya **exit 2 "GAGAL MEMERIKSA"** — bukan "hijau". Kanal: Telegram
 (`SDB_TG_BOT_TOKEN`/`SDB_TG_CHAT_ID`, fallback ke bot yang sudah ada) + catatan JSONL di
 `~/.local/state/sdb/ci-watch/alerts.jsonl`, sehingga bukti tetap ada walau jaringan mati.
 
+## Telegram operasional (`@super_dev_builders_bot`)
+Tiga kanal, satu bot, khusus pemilik (`SDB_TG_CHAT_ID`; chat lain diabaikan diam-diam):
+
+- **Laporan otomatis tiap 4 jam** — `sdb-report-4h.timer` menjalankan
+  `scripts/sdb_report.py --send 4h` (00/04/08/12/16/20 WIB). Deterministik, tanpa LLM,
+  memuat proyek + progres, layanan, timer, deck, `control.db`, host, dan delta sejak
+  laporan sebelumnya.
+- **Tanya-jawab kapan saja** — `/eco`, `/projects`, `/ask <pertanyaan>`. `/ask`
+  menyuntikkan laporan nyata sebagai DATA ke agen dengan toolset minimal
+  (`terminal,file,skills`; tanpa web/browser/delegasi) sehingga jawaban ber-grounding.
+- **Perintah build** — `/build <deskripsi>` → `SPEC.md`/`PLAN.md`/`QUESTIONS.md` →
+  `/approve <id>` → implementasi bertahap (maks. 3 ronde) dengan tes nyata, `VERIFY.md`,
+  `README.md`, `GAPS.md`. Worker: `sdb-build-worker.service`, sandbox `~/sdb-builds/<id>-<slug>/`.
+
+Detail perintah, alur, konfigurasi, dan batas: [`docs/TELEGRAM_SDB.md`](docs/TELEGRAM_SDB.md).
+
 ## Aturan yang tidak bisa dinegosiasikan
 1. Tidak ada deep scan tanpa `authorization.yaml` berstatus PASS (Gate #0).
 2. Tidak ada bypass auth / CAPTCHA / anti-bot / paywall / DRM / licensing / pinning / access control.

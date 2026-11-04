@@ -82,3 +82,6 @@ docs/WORKFLOW_SKENARIO.pdf
 # Artefak run pemindai (dibuat ulang tiap jalan, tidak untuk git)
 .sdb-run/
 reports/raw/
+
+# PDF hasil build docs-tutorial: dibuat ulang lokal, melewati gerbang R1 (512 KB)
+docs/PAKET_UPDATE_SDB_*.pdf

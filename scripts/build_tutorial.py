@@ -123,20 +123,28 @@ TEMPLATE = """<!DOCTYPE html>
 
 
 def build(src: Path, out_html: Path, out_pdf: Path | None, title: str, desc: str,
-          kicker: str, badges: list[str], foot: str) -> None:
+          kicker: str, badges: list[str], foot: str,
+          toc_depth: str = "2-3", toc_enabled: bool = True) -> None:
     import markdown  # sengaja di dalam fungsi: pesan galat jelas bila modul tidak ada
 
     text = src.read_text(encoding="utf-8")
     text = re.sub(r"^# .*?\n", "", text, count=1)  # H1 pertama digantikan <h1> templat
     md = markdown.Markdown(extensions=["tables", "fenced_code", "toc", "sane_lists", "attr_list"],
-                           extension_configs={"toc": {"permalink": False, "toc_depth": "2-3"}})
+                           extension_configs={"toc": {"permalink": False, "toc_depth": toc_depth}})
     body = md.convert(text).replace("<table>", '<div class="table-wrap"><table>').replace(
         "</table>", "</table></div>")
     toc = getattr(md, "toc", "")  # disuntikkan ekstensi toc
-    inline = f'<div class="toc-inline"><div class="toc-title">Daftar Isi</div>{toc}</div>'
-    body = body.replace("<p>{{TOC}}</p>", inline).replace("{{TOC}}", inline)
+    if not toc_enabled:
+        # Dokumen yang sudah punya bagian "Daftar Isi" sendiri tidak perlu TOC ganda.
+        toc = ""
+        body = body.replace("<p>{{TOC}}</p>", "").replace("{{TOC}}", "")
+    else:
+        inline = f'<div class="toc-inline"><div class="toc-title">Daftar Isi</div>{toc}</div>'
+        body = body.replace("<p>{{TOC}}</p>", inline).replace("{{TOC}}", inline)
     out_html.write_text(TEMPLATE.format(
-        title=title, desc=desc, css=CSS, kicker=kicker, toc=toc, body=body, foot=foot,
+        title=title, desc=desc, css=CSS, kicker=kicker,
+        toc=f'<div class="toc">{toc}</div>' if toc else "",
+        body=body, foot=foot,
         badges="".join(f'<span class="badge">{b}</span>' for b in badges)), encoding="utf-8")
     print(f"html: {out_html} ({out_html.stat().st_size:,} bytes)")
     if out_pdf is None:
@@ -162,11 +170,15 @@ def main(argv: list[str] | None = None) -> int:
                                       "metrik, keamanan, dan semua kemungkinan galat.")
     ap.add_argument("--kicker", default="Super Dev Builders · Dokumentasi Pengguna")
     ap.add_argument("--badge", action="append", default=None)
+    ap.add_argument("--toc-depth", default="2-3", help='kedalaman TOC markdown, mis. "2" hanya H2')
+    ap.add_argument("--no-toc", action="store_true",
+                    help="jangan suntikkan TOC templat (untuk dokumen yang punya Daftar Isi sendiri)")
     args = ap.parse_args(argv)
     out_html = args.html or args.src.with_suffix(".html")
     out_pdf = None if args.no_pdf else (args.pdf or args.src.with_suffix(".pdf"))
     build(args.src, out_html, out_pdf, args.title, args.desc, args.kicker,
-          args.badge or ["dokumentasi", "tanpa dependensi runtime"], foot=args.desc)
+          args.badge or ["dokumentasi", "tanpa dependensi runtime"], foot=args.desc,
+          toc_depth=args.toc_depth, toc_enabled=not args.no_toc)
     return 0
 
 

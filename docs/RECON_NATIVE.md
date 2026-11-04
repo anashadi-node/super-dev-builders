@@ -40,21 +40,24 @@ ELF 64-bit PIE, x86-64, not stripped).
 |---|---|
 | `rea inspect` pada biner itu | **rc=0**, provider **Ghidra 12.1.4** benar-benar jalan: `evidence_id ev_cd0ecd1d…`, sha256 subjek `b3b9184e…`, format `elf`, arsitektur `x86_64` |
 | `recon-forge recon --kind native` pada target mode A (`sdb-local-demo`) | **rc=2 ditolak** — pesan "tidak mengizinkan analisis mendalam" (uji `test_native_target_mode_a_ditolak`) |
-| `gate_check` target `elf-demo` (mode B, `authorization_type: owned`) | **BLOCKED** — "mode B wajib authorization_type=written_permission" |
+| `gate_check` target `elf-demo` (mode B, `authorization_type: owned`, `owner_operator` cocok) | **PASS** — keputusan Owner 2026-11-04: `owned` sah bila operator akun OS yang menjalankan gerbang sama dengan `owner_operator` di manifest |
+| `gate_check` `owned` tanpa `owner_operator`, atau operator berbeda | **BLOCKED** — dua uji negatif (`test_mode_b_owned_tanpa_owner_operator_ditolak`, `test_mode_b_owned_operator_berbeda_ditolak`) memastikan `owned` bukan celah universal |
+| `recon-forge recon --kind native --decompile` target `elf-demo` | **rc=0 ujung-ke-ujung** — 2 artefak: inspect 8.440 B + decompile-all 44.123 B, provider **Ghidra 12.1.4**, `verified: true` |
 
-Artinya: rantai provider terbukti hidup, penolakan terbukti bekerja, tapi **jalur biner SDB
-belum pernah berhasil ujung-ke-ujung** karena gate menuntut izin tertulis untuk mode B,
-sementara artefak ini milik sendiri (`owned`). Ini keputusan Owner, bukan sesuatu yang boleh
-dilonggarkan sendiri oleh alat: mengubah `gate_check` agar menerima `owned` = mengubah gerbang
-keamanan.
+Artinya: jalur biner SDB **sudah terbukti bekerja ujung-ke-ujung** (gate → izin → REA → Ghidra
+→ artefak terverifikasi). Jalur `owned` tidak melonggarkan gerbang: ia mengikat izin ke identitas
+operator yang bisa diperiksa mesin, bukan ke prosa seperti "Mas Anas (pemilik)".
 
-Sampai keputusan itu ada, pemakaian yang sah:
+Pemakaian yang sah:
 
 ```bash
-scripts/rea inspect targets/elf-demo/demo --format json     # observasi, bukan gate SDB
+scripts/gate_check.py --target elf-demo                      # Gate #0
+tools/recon-forge.py recon --target elf-demo --kind native \
+  --path targets/elf-demo/demo --decompile --decompile-limit 10 --json
 ```
 
-Bukti mentah: `evidence/elf-demo/rea-inspect.json`.
+Bukti mentah: `evidence/elf-demo/rea/20261104T233108-inspect.json`,
+`evidence/elf-demo/rea/20261104T233108-decompiled/`, `evidence/elf-demo/rea/manifest.json`.
 
 ## Jebakan yang sudah ditemui
 

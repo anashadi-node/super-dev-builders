@@ -46,6 +46,45 @@ def test_baseline_manifest_passes():
     assert fail == [] and blocked == [], f"baseline harus PASS, dapat fail={fail} blocked={blocked}"
 
 
+def _mode_b(**over):
+    """Manifest mode B (analisis mendalam) dengan biner milik sendiri."""
+    m = _base(mode="B", deep_analysis_allowed=True,
+              allowed_targets={"apk_ipa_binaries": ["~/super-dev-builders/targets/uji"]})
+    m.update(over)
+    return m
+
+
+def test_mode_b_owned_lolos_bila_operator_cocok():
+    """Keputusan Owner 2026-11-04: milik sendiri = izinnya kepemilikan, bukan surat pihak ketiga."""
+    import getpass
+    fail, blocked, _ = evaluate(_mode_b(owner_operator=getpass.getuser()))
+    assert fail == [] and blocked == [], f"dapat fail={fail} blocked={blocked}"
+
+
+def test_mode_b_owned_tanpa_owner_operator_ditolak():
+    fail, blocked, _ = evaluate(_mode_b())
+    assert not fail
+    assert any("owner_operator" in b for b in blocked), blocked
+
+
+def test_mode_b_owned_operator_berbeda_ditolak():
+    """Kalau siapa pun bisa menulis 'owned', gerbang ini tidak menjaga apa pun."""
+    fail, blocked, _ = evaluate(_mode_b(owner_operator="orang-lain"))
+    assert not fail
+    assert any("hanya untuk pemilik" in b for b in blocked), blocked
+
+
+def test_mode_b_staging_tetap_ditolak():
+    fail, blocked, _ = evaluate(_mode_b(authorization_type="staging", owner_operator="siapa-saja"))
+    assert not fail
+    assert any("written_permission atau owned" in b for b in blocked), blocked
+
+
+def test_mode_b_written_permission_masih_lolos():
+    fail, blocked, _ = evaluate(_mode_b(authorization_type="written_permission"))
+    assert fail == [] and blocked == [], f"dapat fail={fail} blocked={blocked}"
+
+
 def test_as_bool_parses_quoted_strings():
     assert as_bool("false")[0] is False
     assert as_bool("true")[0] is True

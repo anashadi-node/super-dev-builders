@@ -659,6 +659,16 @@ def cmd_recon(args) -> int:
     return 0 if manifest["verified"] else 4
 
 
+def _provider_of(payload: dict) -> dict | None:
+    """Provider hulu yang menyuplai analisis (ghidra/ida/hopper/kuna), bukan pembungkusnya."""
+    profile = (payload.get("analysis_profile") or {})
+    upstream = ((profile.get("parameters") or {}).get("upstream_analysis_profile") or {})
+    for cand in (upstream.get("provider"), profile.get("provider"), payload.get("provider")):
+        if isinstance(cand, dict) and cand:
+            return {"id": cand.get("id"), "name": cand.get("name"), "version": cand.get("version")}
+    return None
+
+
 def _recon_native(args) -> int:
     """Jalur non-web: biner/firmware lewat `rea inspect` (dan `decompile-all` opsional).
 
@@ -686,6 +696,7 @@ def _recon_native(args) -> int:
                    env=rea_env())
     artifacts: list[dict] = []
     provider_block: str | None = None
+    payload: dict = {}
     if res["exit"] != 0:
         try:
             err = json.loads(res["stdout"]).get("error", "")
@@ -696,6 +707,10 @@ def _recon_native(args) -> int:
     else:
         inspect_out.write_text(res["stdout"], encoding="utf-8")
         artifacts.append({"op": "inspect", "file": repo_rel(inspect_out)})
+        try:
+            payload = json.loads(res["stdout"])
+        except json.JSONDecodeError:
+            payload = {}
         if args.decompile:
             dec_dir = outdir / f"{tag}-decompiled"
             dec_cmd = [str(REA_WRAPPER), "decompile-all", str(target_path),
@@ -719,8 +734,11 @@ def _recon_native(args) -> int:
         "tool": "recon-forge", "stage": "01B.recon", "kind": "native",
         "engine": f"rea@{rea_version()}", "target": args.target,
         "path": repo_rel(target_path), "at": now_iso(),
-        "provider": (read_json(snapshot / "analysis.json") or {}).get("provider")
-        if snapshot.exists() else None,
+        # Provider yang BENAR-BENAR dipakai: ambil dari payload inspect
+        # (`analysis_profile.parameters.upstream_analysis_profile.provider` = ghidra/ida/…),
+        # bukan dari snapshot/analysis.json yang namanya bisa berubah — dulu manifest menulis
+        # "provider": null meski Ghidra 12.1.4 jelas menjalankan analisis.
+        "provider": _provider_of(payload),
         "artifacts": artifacts,
         "unknowns": ([f"provider tidak tersedia: {provider_block}"] if provider_block else []),
         "verified": verified,

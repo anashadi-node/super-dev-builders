@@ -150,9 +150,11 @@ def test_gate_fails_when_sandbox_unsafe():
 
 
 def test_gate_blocked_mode_b_without_written_permission():
-    m = good_manifest(mode="B", deep_analysis_allowed=True)
+    # `owned` punya jalurnya sendiri (owner_operator), jadi di sini dipakai tipe sah
+    # lain yang tetap harus ditolak: staging tidak pernah boleh analisis mendalam.
+    m = good_manifest(mode="B", deep_analysis_allowed=True, authorization_type="staging")
     fail, blocked, _ = gate.evaluate(m)
-    assert any("written_permission" in b for b in blocked)
+    assert any("written_permission" in b for b in blocked), blocked
     assert not fail, "bentuk manifest valid: seharusnya BLOCKED, bukan FAIL"
 
 

@@ -10,6 +10,7 @@ Exit code: 0 = PASS, 1 = FAIL, 2 = BLOCKED.
 from __future__ import annotations
 
 import argparse
+import getpass
 import os
 import sys
 
@@ -89,6 +90,24 @@ def as_text(value) -> str:
     return str(value).strip()
 
 
+def operator_of_manifest(manifest) -> str:
+    """Nama operator (akun OS) yang dipakai untuk mengesahkan `owned` mode B.
+
+    Keputusan Owner 2026-11-04: artefak milik sendiri boleh dianalisis mendalam tanpa
+    surat izin pihak ketiga — tetapi hanya oleh pemiliknya. Karena itu manifest wajib
+    menyebut `owner_operator` secara mesin-terbaca (nama akun OS), bukan prosa bebas:
+    mencocokkan teks seperti "Mas Anas (pemilik)" ke nama akun akan menjadi tebakan.
+    """
+    return as_text((manifest or {}).get("owner_operator")).lower()
+
+
+def current_operator() -> str:
+    try:
+        return getpass.getuser().strip().lower()
+    except (KeyError, OSError):
+        return as_text(os.environ.get("USER")).lower()
+
+
 def evaluate(manifest: dict):
     fail, blocked, warn = [], [], []
     if not isinstance(manifest, dict):
@@ -135,8 +154,25 @@ def evaluate(manifest: dict):
         if binaries:
             blocked.append("mode A tidak boleh memuat apk_ipa_binaries")
     if mode == "B":
-        if auth_type != "written_permission":
-            blocked.append("mode B wajib authorization_type=written_permission")
+        if auth_type == "written_permission":
+            pass
+        elif auth_type == "owned":
+            # Artefak milik sendiri: izinnya adalah kepemilikan, tapi harus dibuktikan
+            # bahwa yang menjalankan gerbang memang pemiliknya (akun OS), bukan sekadar
+            # tulisan "owned" di manifest.
+            operator = operator_of_manifest(manifest)
+            if not operator:
+                blocked.append(
+                    "mode B + owned wajib mengisi owner_operator (nama akun OS pemilik) — "
+                    "tanpa itu gerbang tidak bisa membedakan pemilik dari penyusup")
+            elif operator != current_operator():
+                blocked.append(
+                    f"mode B + owned hanya untuk pemilik: owner_operator '{operator}' "
+                    f"tidak sama dengan operator saat ini '{current_operator()}'")
+        else:
+            blocked.append(
+                "mode B wajib authorization_type=written_permission atau owned "
+                f"(dapat '{auth_type}')")
         if not deep:
             warn.append("mode B tetapi deep_analysis_allowed=false")
 

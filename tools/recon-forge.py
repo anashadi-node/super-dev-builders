@@ -111,6 +111,34 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
+def sha256_tree(root: Path) -> str:
+    """Digest deterministik direktori artefak: relpath + isi tiap berkas, urut nama.
+
+    Tanpa ini artefak direktori (mis. hasil `decompile-all`) masuk manifest dengan
+    sha256 null — jejak audit jadi tidak bisa membuktikan isinya tidak berubah.
+    """
+    h = hashlib.sha256()
+    for p in sorted(x for x in root.rglob("*") if x.is_file()):
+        h.update(p.relative_to(root).as_posix().encode("utf-8"))
+        h.update(bytes.fromhex(sha256_file(p)))
+    return h.hexdigest()
+
+
+def tree_bytes(root: Path) -> int:
+    return sum(p.stat().st_size for p in root.rglob("*") if p.is_file())
+
+
+def stamp_artifact(art: dict) -> None:
+    """Isi sha256 + bytes untuk artefak berkas maupun direktori (in-place)."""
+    p = REPO / art["file"]
+    if p.is_file():
+        art["sha256"], art["bytes"] = sha256_file(p), p.stat().st_size
+    elif p.is_dir():
+        art["sha256"], art["bytes"] = sha256_tree(p), tree_bytes(p)
+    else:
+        art["sha256"], art["bytes"] = None, 0
+
+
 def write_json(path: Path, data) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".tmp")
@@ -189,16 +217,18 @@ def require_url(target: str, url: str) -> None:
         raise ForgeError(f"TOLAK: {url} tidak ada di allowed_targets {allowed}", 2)
 
 
-def run(cmd: list[str], timeout: int = 900, cwd: Path | None = None) -> dict:
+def run(cmd: list[str], timeout: int = 900, cwd: Path | None = None,
+        env: dict | None = None) -> dict:
     started = time.time()
     proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout,
-                          cwd=str(cwd or REPO))
+                          cwd=str(cwd or REPO), env=env)
     return {"cmd": cmd, "exit": proc.returncode, "stdout": proc.stdout, "stderr": proc.stderr,
             "seconds": round(time.time() - started, 2)}
 
 
-def run_tool(cmd: list[str], out_file: Path | None = None, timeout: int = 900) -> dict:
-    res = run(cmd, timeout=timeout)
+def run_tool(cmd: list[str], out_file: Path | None = None, timeout: int = 900,
+             env: dict | None = None) -> dict:
+    res = run(cmd, timeout=timeout, env=env)
     if out_file is not None:
         out_file.parent.mkdir(parents=True, exist_ok=True)
         payload = {"cmd": res["cmd"], "exit": res["exit"], "seconds": res["seconds"],
@@ -216,6 +246,139 @@ def rea_version() -> str | None:
         return None
     m = re.search(r"rea@(\d+\.\d+\.\d+)", res["stdout"] or "")
     return m.group(1) if m else None
+
+
+# Node: REA mensyaratkan patch minimum per lini (26.12.1 / 24.22.1 / 22.23.4).
+# Hermes membawa node 26.7.0 yang GAGAL syarat itu, jadi alat ini mencari node yang
+# memenuhi syarat secara terpisah dan menyerahkannya lewat REA_NODE_BIN — tanpa
+# menyentuh node milik Hermes (mengubah PATH global bisa mematikan agen lain).
+NODE_MIN = {22: (22, 23, 4), 24: (24, 22, 1), 26: (26, 12, 1), 28: (28, 0, 0)}
+
+
+def ver_tuple(text: str | None):
+    m = re.search(r"v?(\d+)\.(\d+)\.(\d+)", text or "")
+    return tuple(int(x) for x in m.groups()) if m else None
+
+
+def node_ok(version: str | None) -> bool:
+    got = ver_tuple(version)
+    if not got:
+        return False
+    floor = NODE_MIN.get(got[0])
+    return bool(floor and got >= floor)
+
+
+def rea_node() -> tuple[str | None, str | None]:
+    cands: list[Path] = []
+    for base in (Path.home() / ".local" / "opt", Path.home() / ".hermes" / "tools"):
+        cands += sorted(base.glob("node-v*/bin/node")) + sorted(base.glob("node-*/bin/node"))
+    system = shutil.which("node")
+    if system:
+        cands.append(Path(system))
+    best: tuple[str, str] | None = None
+    for cand in cands:
+        if not cand.exists():
+            continue
+        try:
+            ver = subprocess.run([str(cand), "-v"], capture_output=True, text=True,
+                                 timeout=20).stdout.strip()
+        except (OSError, subprocess.SubprocessError):
+            continue
+        cur = ver_tuple(ver)
+        prev = ver_tuple(best[1]) if best else None
+        if cur and node_ok(ver) and (prev is None or cur > prev):
+            best = (str(cand), ver)
+    return best or (None, None)
+
+
+def ghidra_home() -> Path | None:
+    for base in (Path.home() / ".local" / "opt", Path.home() / "opt", Path("/opt")):
+        for cand in sorted(base.glob("ghidra_*_PUBLIC"), reverse=True):
+            if (cand / "support" / "analyzeHeadless").exists():
+                return cand
+    return None
+
+
+def jdk_ok(home: Path) -> bool:
+    """JDK dianggap ada hanya bila benar-benar utuh.
+
+    Instalasi terpotong tetap meninggalkan `bin/java` berukuran 0 byte dan `release`
+    kosong; tanpa cek ini doctor menyatakan "siap recon-biner" lalu REA menolak di
+    tengah jalan dengan `provider_unavailable` yang membingungkan.
+    """
+    java = home / "bin" / "java"
+    release = home / "release"
+    try:
+        if java.stat().st_size == 0 or release.stat().st_size == 0:
+            return False
+        text = release.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return False
+    return "JAVA_VERSION=" in text
+
+
+def jdk_home(roots=None) -> Path | None:
+    if roots is None:
+        roots = (Path.home() / ".local" / "opt", Path.home() / "opt", Path.home() / "tools",
+                 Path("/usr/lib/jvm"), Path("/opt"))
+    cands: list[Path] = []
+    for base in roots:
+        if not base.is_dir():
+            continue
+        cands += sorted(base.glob("jdk-2*"), reverse=True)
+        cands += sorted(base.glob("jdk*"), reverse=True)
+    for cand in cands:
+        if jdk_ok(cand):
+            return cand
+    return None
+
+
+def rea_env() -> dict:
+    """Env untuk REA: node yang memenuhi syarat, Ghidra dan JDK bila ada.
+
+    Tidak mengubah PATH global: hanya proses REA yang melihat nilai ini.
+    """
+    env = dict(os.environ)
+    node, _ = rea_node()
+    if node:
+        env["REA_NODE_BIN"] = node
+    ghidra = ghidra_home()
+    if ghidra and not env.get("GHIDRA_INSTALL_DIR"):
+        env["GHIDRA_INSTALL_DIR"] = str(ghidra)
+    jdk = jdk_home()
+    if jdk:
+        env["JAVA_HOME"] = str(jdk)
+        env["PATH"] = f"{jdk / 'bin'}{os.pathsep}{env.get('PATH', '')}"
+    return env
+
+
+def allowed_paths(target: str) -> list[str]:
+    try:
+        import yaml
+    except ImportError:
+        return []
+    manifest = REPO / "evidence" / target / "authorization.yaml"
+    if not manifest.exists():
+        return []
+    data = yaml.safe_load(manifest.read_text(encoding="utf-8")) or {}
+    targets = data.get("allowed_targets") or {}
+    out: list[str] = []
+    for key in ("repos", "apps", "apk_ipa_binaries"):
+        out += [str(p) for p in (targets.get(key) or [])]
+    return out
+
+
+def require_path(target: str, raw: str) -> Path:
+    """Path harus berada DI DALAM akar yang diizinkan manifest (anti symlink-escape)."""
+    path = Path(os.path.expanduser(raw)).resolve()
+    if not path.exists():
+        raise ForgeError(f"path tidak ada: {path}", 2)
+    roots = [Path(os.path.expanduser(p)).resolve() for p in allowed_paths(target)]
+    roots.append((REPO / "targets" / target).resolve())
+    for root in roots:
+        if path == root or str(path).startswith(str(root) + os.sep):
+            return path
+    raise ForgeError(f"TOLAK: {path} di luar akar izin {[repo_rel(r) for r in roots]}", 2)
 
 
 def craft_bin() -> str | None:
@@ -245,17 +408,22 @@ def free_port() -> int:
 # --------------------------------------------------------------------------- doctor
 def cmd_doctor(args) -> int:
     rea = {"found": REA_WRAPPER.exists(), "path": repo_rel(REA_WRAPPER), "version": rea_version(),
-           "pin": REA_PIN, "healthy": None, "node": None, "doctor_detail": []}
+           "pin": REA_PIN, "healthy": None, "node": None, "doctor_detail": [], "checks": {}}
     if rea["found"]:
         try:
-            res = run([str(REA_WRAPPER), "doctor", "--format", "json"], timeout=180)
+            res = run([str(REA_WRAPPER), "doctor", "--format", "json"], timeout=180,
+                      env=rea_env())
             payload = json.loads(res["stdout"]) if res["stdout"].strip().startswith("{") else {}
             rea["healthy"] = bool(payload.get("healthy"))
-            for chk in payload.get("scope_checks", [])[:5]:
-                rea["doctor_detail"].append({k: chk.get(k) for k in ("name", "ok", "detail")})
             for chk in payload.get("scope_checks", []):
+                rea["doctor_detail"].append({k: chk.get(k) for k in ("name", "ok", "detail")})
+                if chk.get("name"):
+                    rea["checks"][chk["name"]] = bool(chk.get("ok"))
                 if chk.get("name") == "node":
                     rea["node"] = chk.get("detail")
+                if chk.get("name") in ("ghidra", "ida", "hopper", "jeb", "kuna"):
+                    rea.setdefault("providers", {})[chk["name"]] = {
+                        "ok": chk.get("ok"), "detail": (chk.get("detail") or "")[:120]}
         except (subprocess.SubprocessError, json.JSONDecodeError, OSError):
             rea["healthy"] = None
     craftp = craft_bin()
@@ -269,6 +437,14 @@ def cmd_doctor(args) -> int:
         craft["note"] = ("belum terpasang; pilot wajib dari rilis resmi + checksum, "
                          "bukan cargo install dari HEAD")
     chrome = chromium_bin()
+    node_path, node_ver = rea_node()
+    providers = rea.get("providers") or {}
+    checks = rea.get("checks") or {}
+    # Provider "ghidra ok" saja tidak cukup: decompile baru jalan bila JDK dan headless
+    # juga sehat. `ghidra-java` config_drift adalah penyebab nyata `provider_unavailable`.
+    blockers = sorted(k for k, ok in checks.items()
+                      if not ok and k in ("ghidra", "ghidra-java", "ghidra-headless", "java", "node"))
+    rea["blockers"] = blockers
     scripts = {name: (REPO / "scripts" / name).exists() for name in
                ("capture_web.py", "fidelity_compare.py", "gate_check.py")}
     gerbang = (REPO / "tools" / "gerbang-spec.py").exists()
@@ -278,12 +454,16 @@ def cmd_doctor(args) -> int:
             "rea": rea,
             "craft_anything": craft,
             "chromium": {"found": bool(chrome), "path": str(chrome) if chrome else None},
+            "node": {"path": node_path, "version": node_ver, "satisfies_rea": node_ok(node_ver)},
+            "decompiler_providers": providers,
             "sdb_scripts": scripts,
             "gerbang_spec": gerbang,
         },
         "verdict": {
             "recon_ready": bool(rea["found"] and rea["version"] == REA_PIN and chrome),
             "parity_ready": bool(all(scripts.values()) and chrome),
+            "native_ready": bool(rea["found"] and any(p.get("ok") for p in providers.values())
+                                 and not blockers),
             "rebuild_ready": bool(rea["found"] and (craft["found"])),
             "honest_note": ("craft_anything belum ada = Zona B hanya lewat replica-skill (agen); "
                             "rea healthy=false berarti sebagian operasi bisa menolak jalan"),
@@ -299,8 +479,17 @@ def cmd_doctor(args) -> int:
               f" healthy={e['rea']['healthy']} node={e['rea']['node']}")
         print(f"Craft Anything: {e['craft_anything']['version'] or 'belum terpasang (opsional)'}")
         print(f"Chromium      : {e['chromium']['path'] or 'TIDAK ADA'}")
+        print(f"Node (REA)    : {e['node']['version'] or 'TIDAK ADA'} "
+              f"{e['node']['path'] or ''} memenuhi={e['node']['satisfies_rea']}")
+        prov = e["decompiler_providers"] or {}
+        print("Provider biner: " + (", ".join(f"{k}={'ok' if v['ok'] else 'tidak'}"
+                                              for k, v in prov.items()) or "tidak ada"))
         print(f"Skrip SDB     : {e['sdb_scripts']}  gerbang-spec={e['gerbang_spec']}")
-        print(f"Siap recon={data['verdict']['recon_ready']} "
+        if e["rea"].get("blockers"):
+            print(f"Penghambat    : {', '.join(e['rea']['blockers'])} "
+                  f"(provider akan menolak jalan sampai ini beres)")
+        print(f"Siap recon-web={data['verdict']['recon_ready']} "
+              f"recon-biner={data['verdict']['native_ready']} "
               f"paritas={data['verdict']['parity_ready']} "
               f"rebuild-combo={data['verdict']['rebuild_ready']}")
     return 0
@@ -378,9 +567,9 @@ def stop_browser(proc: subprocess.Popen) -> None:
 
 def cmd_recon(args) -> int:
     require_gate(args.target)
+    if args.kind == "native":
+        return _recon_native(args)
     require_url(args.target, args.url)
-    if args.kind != "web":
-        raise ForgeError("recon non-web: pakai `rea analyze <path>` langsung; jalur ini web-only", 2)
     outdir = REPO / "evidence" / args.target / "rea"
     outdir.mkdir(parents=True, exist_ok=True)
     tag = stamp()
@@ -403,7 +592,8 @@ def cmd_recon(args) -> int:
         res = run_tool([str(REA_WRAPPER), "analyze-web-bundle", endpoint, target_id,
                         "--evidence_output", str(bundle), "--detail", "complete",
                         "--observation-ms", str(args.observation_ms), "--format", "json"],
-                       out_file=outdir / f"{tag}-web-bundle.run.json", timeout=args.timeout)
+                       out_file=outdir / f"{tag}-web-bundle.run.json", timeout=args.timeout,
+                       env=rea_env())
         if res["exit"] != 0:
             raise ForgeError(f"analyze-web-bundle gagal: {res['stderr'][-400:] or res['exit']}", 5)
         artifacts.append({"op": "analyze-web-bundle", "file": repo_rel(bundle)})
@@ -411,7 +601,8 @@ def cmd_recon(args) -> int:
         shot = outdir / f"{tag}-screenshot.json"
         res = run_tool([str(REA_WRAPPER), "capture-web-screenshot", endpoint, target_id,
                         "--format", "json"],
-                       out_file=outdir / f"{tag}-screenshot.run.json", timeout=args.timeout)
+                       out_file=outdir / f"{tag}-screenshot.run.json", timeout=args.timeout,
+                       env=rea_env())
         if res["exit"] == 0 and res["stdout"].strip():
             shot.write_text(res["stdout"], encoding="utf-8")
             artifacts.append({"op": "capture-web-screenshot", "file": repo_rel(shot)})
@@ -420,9 +611,7 @@ def cmd_recon(args) -> int:
         shutil.rmtree(profile, ignore_errors=True)
 
     for art in artifacts:
-        p = REPO / art["file"]
-        art["sha256"] = sha256_file(p) if p.exists() else None
-        art["bytes"] = p.stat().st_size if p.exists() else 0
+        stamp_artifact(art)
     manifest = {
         "tool": "recon-forge", "stage": "01B.recon", "engine": f"rea@{rea_version()}",
         "target": args.target, "url": args.url, "at": now_iso(), "cdp_port": port,
@@ -440,6 +629,81 @@ def cmd_recon(args) -> int:
         for art in artifacts:
             print(f"  - {art['op']}: {art['file']} ({art['bytes']} B)")
     return 0 if manifest["verified"] else 4
+
+
+def _recon_native(args) -> int:
+    """Jalur non-web: biner/firmware lewat `rea inspect` (dan `decompile-all` opsional).
+
+    Beda dari web: bukti tidak datang dari browser, tapi dari provider decompiler.
+    Tanpa provider (Ghidra/IDA/Hopper/Juna) REA menolak — dan alat ini TIDAK
+    berpura-pura berhasil: exit 5 + pesan penyebab yang bisa ditindaklanjuti.
+    """
+    if not args.path:
+        raise ForgeError("kind native butuh --path <biner|folder>", 2)
+    target_path = require_path(args.target, args.path)
+    outdir = REPO / "evidence" / args.target / "rea"
+    outdir.mkdir(parents=True, exist_ok=True)
+    tag = stamp()
+    snapshot = outdir / f"{tag}-analysis.snapshot"
+    inspect_out = outdir / f"{tag}-inspect.json"
+    res = run_tool([str(REA_WRAPPER), "inspect", str(target_path), "--snapshot", str(snapshot),
+                    "--format", "json"],
+                   out_file=outdir / f"{tag}-inspect.run.json", timeout=args.timeout,
+                   env=rea_env())
+    artifacts: list[dict] = []
+    provider_block: str | None = None
+    if res["exit"] != 0:
+        try:
+            err = json.loads(res["stdout"]).get("error", "")
+        except json.JSONDecodeError:
+            err = res["stderr"] or f"exit {res['exit']}"
+        detail = res["stdout"][:400] if "provider_unavailable" in (res["stdout"] or "") else ""
+        provider_block = f"{err} {detail}".strip()
+    else:
+        inspect_out.write_text(res["stdout"], encoding="utf-8")
+        artifacts.append({"op": "inspect", "file": repo_rel(inspect_out)})
+        if args.decompile:
+            dec_dir = outdir / f"{tag}-decompiled"
+            dec_cmd = [str(REA_WRAPPER), "decompile-all", str(target_path),
+                       "--output", str(dec_dir)]
+            if args.decompile_limit:
+                dec_cmd += ["--limit", str(args.decompile_limit)]
+            dec = run_tool(dec_cmd, out_file=outdir / f"{tag}-decompile-all.run.json",
+                           timeout=args.timeout, env=rea_env())
+            if dec["exit"] == 0:
+                manifest_file = dec_dir / "manifest.json"
+                artifacts.append({"op": "decompile-all",
+                                  "file": repo_rel(manifest_file if manifest_file.exists()
+                                                   else dec_dir)})
+            else:
+                provider_block = (dec["stderr"] or dec["stdout"])[-400:]
+
+    for art in artifacts:
+        stamp_artifact(art)
+    verified = bool(artifacts) and provider_block is None
+    manifest = {
+        "tool": "recon-forge", "stage": "01B.recon", "kind": "native",
+        "engine": f"rea@{rea_version()}", "target": args.target,
+        "path": repo_rel(target_path), "at": now_iso(),
+        "provider": (read_json(snapshot / "analysis.json") or {}).get("provider")
+        if snapshot.exists() else None,
+        "artifacts": artifacts,
+        "unknowns": ([f"provider tidak tersedia: {provider_block}"] if provider_block else []),
+        "verified": verified,
+    }
+    write_json(outdir / "manifest.json", manifest)
+    audit("D1", "rea", args.target, "recon-native", "ok" if verified else "blocked",
+          f"artefak={len(artifacts)}")
+    if provider_block:
+        print(f"BLOCKED: {provider_block}", file=sys.stderr)
+        print("  pasang provider (Ghidra 12.1.x + JDK 21) lalu set GHIDRA_INSTALL_DIR,\n"
+              "  atau ulangi dengan --provider lain. Bukti tidak dikarang.", file=sys.stderr)
+        return 5
+    print(f"recon native {args.target}: {len(artifacts)} artefak → "
+          f"{repo_rel(outdir / 'manifest.json')}")
+    for art in artifacts:
+        print(f"  - {art['op']}: {art['file']} ({art['bytes']} B)")
+    return 0
 
 
 # --------------------------------------------------------------------------- parity
@@ -638,8 +902,11 @@ def main(argv=None) -> int:
 
     r = sub.add_parser("recon", help="panen bukti dengan REA (browser CDP milik sendiri)")
     r.add_argument("--target", required=True)
-    r.add_argument("--url", required=True)
-    r.add_argument("--kind", default="web")
+    r.add_argument("--url", default="")
+    r.add_argument("--path", default="")
+    r.add_argument("--kind", choices=("web", "native"), default="web")
+    r.add_argument("--decompile", action="store_true")
+    r.add_argument("--decompile-limit", type=int, default=0)
     r.add_argument("--cdp-port", type=int, default=0)
     r.add_argument("--observation-ms", type=int, default=800)
     r.add_argument("--timeout", type=int, default=600)

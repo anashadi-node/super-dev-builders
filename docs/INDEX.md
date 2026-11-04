@@ -71,6 +71,8 @@ tanggalnya menang — dan yang kalah **harus** dipindahkan ke `docs/archive/`, b
 | Dokumen | Isi |
 |---|---|
 | `INTEGRASI_REA.md` | REA CLI terpin (audit + prosedur upgrade) |
+| `INTEGRASI_REPLICA.md` | integrasi `replica-skill` (Zona B) + kebijakan clone |
+| `RECON_FORGE.md` | orkestrator recon/paritas (`tools/recon-forge.py`): jalur web + native, akar izin, invarian bukti |
 | `INTEGRASI_GITHUB_VERCEL_SUPABASE.md` | integrasi repo/deploy/DB |
 
 ## Laporan & audit

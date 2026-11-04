@@ -172,17 +172,129 @@ def test_doctor_json_memuat_kunci_wajib(tmp_path, monkeypatch, capsys):
     assert "honest_note" in data["verdict"]
 
 
-def test_recon_non_web_ditolak(tmp_path):
+def test_native_tanpa_path_ditolak(tmp_path):
     root = fake_repo(tmp_path, {"gate": "gate0", "target": "uji", "verdict": "PASS"})
     mod = load_tool(root)
-    args = type("A", (), {"target": "uji", "url": "http://127.0.0.1:8201/", "kind": "native",
-                          "cdp_port": 0, "observation_ms": 100, "timeout": 10, "json": False})()
+    args = type("A", (), {"target": "uji", "path": "", "kind": "native", "decompile": False,
+                          "decompile_limit": 0, "timeout": 10, "json": False})()
     try:
         mod.cmd_recon(args)
     except mod.ForgeError as exc:
-        assert exc.code == 2 and "web-only" in str(exc)
+        assert exc.code == 2 and "--path" in str(exc)
     else:
-        raise AssertionError("recon native diterima lewat jalur web")
+        raise AssertionError("recon native jalan tanpa --path")
+
+
+def test_native_path_di_luar_izin_ditolak(tmp_path):
+    root = fake_repo(tmp_path, {"gate": "gate0", "target": "uji", "verdict": "PASS"})
+    luar = tmp_path / "luar" / "evil.bin"
+    luar.parent.mkdir(parents=True)
+    luar.write_bytes(b"\x7fELF")
+    mod = load_tool(root)
+    try:
+        mod.require_path("uji", str(luar))
+    except mod.ForgeError as exc:
+        assert exc.code == 2 and "TOLAK" in str(exc)
+    else:
+        raise AssertionError("path di luar akar izin diterima")
+
+
+def test_native_path_di_dalam_akar_izin_lolos(tmp_path):
+    root = fake_repo(tmp_path, {"gate": "gate0", "target": "uji", "verdict": "PASS"})
+    dalam = root / "targets" / "uji" / "app.bin"
+    dalam.parent.mkdir(parents=True)
+    dalam.write_bytes(b"\x7fELF")
+    mod = load_tool(root)
+    assert mod.require_path("uji", str(dalam)) == dalam.resolve()
+    assert mod.require_path("uji", str(dalam.parent)) == dalam.parent.resolve()
+
+
+def test_node_ok_memakai_patch_minimum_rea():
+    mod = load_tool()
+    assert mod.node_ok("v26.13.0") is True
+    assert mod.node_ok("v26.7.0") is False      # yang Hermes bawa: gagal syarat
+    assert mod.node_ok("v24.22.1") is True
+    assert mod.node_ok("v24.21.0") is False
+    assert mod.node_ok("v22.23.4") is True
+    assert mod.node_ok("") is False
+
+
+def test_jdk_ok_menolak_instalasi_terpotong(tmp_path):
+    """`bin/java` 0 byte + `release` kosong = JDK palsu (kasus nyata 2026-11-04)."""
+    mod = load_tool()
+    buruk = tmp_path / "jdk-21.0.13+9"
+    (buruk / "bin").mkdir(parents=True)
+    (buruk / "bin" / "java").write_bytes(b"")
+    (buruk / "release").write_bytes(b"")
+    assert mod.jdk_ok(buruk) is False
+    assert mod.jdk_home([tmp_path]) is None, "JDK rusak dipilih sebagai JAVA_HOME"
+
+
+def test_jdk_home_memilih_yang_utuh(tmp_path):
+    mod = load_tool()
+    for nama, versi in (("jdk-21.0.13+9", "21.0.13+9"), ("jdk-21.0.14+7", "21.0.14+7")):
+        d = tmp_path / nama
+        (d / "bin").mkdir(parents=True)
+        (d / "bin" / "java").write_bytes(b"\x7fELF")
+        (d / "release").write_text(f'JAVA_VERSION="{versi}"\n', encoding="utf-8")
+    assert mod.jdk_home([tmp_path]) == tmp_path / "jdk-21.0.14+7"
+
+
+def test_doctor_tidak_klaim_recon_biner_siap_bila_java_drift(tmp_path, capsys):
+    """Provider `ghidra` ok tapi `ghidra-java` gagal → recon-biner WAJIB False."""
+    root = fake_repo(tmp_path, {"gate": "gate0", "target": "uji", "verdict": "PASS"})
+    rea = root / "scripts" / "rea"
+    rea.parent.mkdir(parents=True, exist_ok=True)
+    rea.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+    rea.chmod(0o755)
+    mod = load_tool(root)
+    payload = {"healthy": False, "scope_checks": [
+        {"name": "node", "ok": True, "detail": "v26.13.0"},
+        {"name": "ghidra", "ok": True, "detail": "12.1.4"},
+        {"name": "ghidra-java", "ok": False, "detail": "config_drift"},
+        {"name": "ghidra-headless", "ok": True, "detail": "ok"},
+    ]}
+    asli = mod.run
+    setattr(mod, "run", lambda *a, **k: {"exit": 0, "stdout": json.dumps(payload), "stderr": ""})
+    try:
+        args = type("A", (), {"json": True, "target": "-"})()
+        assert mod.cmd_doctor(args) == 0
+    finally:
+        setattr(mod, "run", asli)
+    out = json.loads(capsys.readouterr().out)
+    assert out["verdict"]["native_ready"] is False
+    assert out["engines"]["rea"]["blockers"] == ["ghidra-java"]
+
+
+def test_sha256_tree_deterministik_dan_sensitif_isi(tmp_path):
+    """Digest direktori harus sama untuk isi sama (urutan tulis beda) dan beda bila isi beda."""
+    mod = load_tool()
+    a, b, c = tmp_path / "a", tmp_path / "b", tmp_path / "c"
+    for d in (a, b, c):
+        (d / "functions").mkdir(parents=True)
+    (a / "index.json").write_text('{"n":1}', encoding="utf-8")
+    (a / "functions" / "f1.c").write_text("int main(void){return 0;}", encoding="utf-8")
+    (b / "functions" / "f1.c").write_text("int main(void){return 0;}", encoding="utf-8")
+    (b / "index.json").write_text('{"n":1}', encoding="utf-8")
+    (c / "index.json").write_text('{"n":2}', encoding="utf-8")
+    (c / "functions" / "f1.c").write_text("int main(void){return 0;}", encoding="utf-8")
+    assert mod.sha256_tree(a) == mod.sha256_tree(b)
+    assert mod.sha256_tree(a) != mod.sha256_tree(c)
+    assert mod.tree_bytes(a) == mod.tree_bytes(b) > 0
+
+
+def test_stamp_artifact_direktori_tidak_null(tmp_path):
+    """Artefak direktori (hasil decompile-all) wajib punya sha256 + bytes nyata, bukan null/0."""
+    root = fake_repo(tmp_path, {"gate": "gate0", "target": "uji", "verdict": "PASS"})
+    dec = root / "evidence" / "uji" / "rea" / "20260101T000000-decompiled"
+    (dec / "functions").mkdir(parents=True)
+    (dec / "decompile-index.json").write_text("[]", encoding="utf-8")
+    (dec / "functions" / "f1.c").write_text("int main(void){return 0;}", encoding="utf-8")
+    mod = load_tool(root)
+    art = {"op": "decompile-all", "file": "evidence/uji/rea/20260101T000000-decompiled"}
+    mod.stamp_artifact(art)
+    assert art["sha256"] == mod.sha256_tree(dec)
+    assert art["bytes"] == mod.tree_bytes(dec) > 0
 
 
 if __name__ == "__main__":

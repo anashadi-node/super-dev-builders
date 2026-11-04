@@ -49,6 +49,10 @@ targets/e2e-*/
 **/_selftest*/
 **/zz-*/
 
+# Subjek uji jalur recon native (`recon --kind native`) — biner pihak ketiga, jangan masuk git.
+# Reproduksi: cp /usr/bin/true targets/forge-demo/native/hello-elf
+targets/*/native/
+
 # SDB deck runtime state
 dashboard/state/
 

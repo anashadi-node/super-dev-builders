@@ -2,6 +2,46 @@
 
 Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/) dan [SemVer](https://semver.org/lang/id/).
 
+## [Belum dirilis]
+
+### Ditambahkan
+- **`tools/recon-forge.py` — jalur recon native + gerbang bukti.** `recon --kind native
+  --path <berkas>` membungkus `rea inspect` (dan `decompile-all` dengan `--decompile`),
+  sehingga biner/ELF masuk alur yang sama dengan target web.
+  - Akar izin: `targets/<target>` plus `repos`/`apps`/`apk_ipa_binaries` dari
+    `evidence/<target>/authorization.yaml`. Path di luar akar ditolak (exit 2) sebelum
+    REA dipanggil; `resolve()` menutup jalan keluar lewat symlink.
+  - Provider gagal → exit 5 dengan penyebab + "Bukti tidak dikarang". Tidak ada
+    manifest `verified: true` untuk hasil yang tidak ada.
+- `jdk_ok()` / `jdk_home(roots=None)` — JDK hanya dianggap sehat bila `bin/java` dan
+  `release` berisi (bukan 0 byte) dan `release` memuat `JAVA_VERSION=`. Sebelumnya
+  instalasi terpotong lolos hanya karena `exists()`.
+- `cmd_doctor` kini menyimpan `rea.checks` dan `rea.blockers`; `recon-biner` baru
+  `True` bila ada provider ok **dan** tidak ada blocker (`ghidra`, `ghidra-java`,
+  `ghidra-headless`, `java`, `node`). Output manusia menampilkan baris "Penghambat".
+- `sha256_tree()` / `tree_bytes()` / `stamp_artifact()` — artefak berupa direktori
+  (hasil `decompile-all`) dicatat sebagai **digest pohon**: SHA-256 dari `relpath` +
+  isi tiap berkas dalam urutan nama.
+
+### Diperbaiki
+- **Manifest mencatat artefak direktori sebagai `sha256: null`, `bytes: 0`** — `sha256_file()`
+  hanya menerima berkas, dan `p.is_file()` selalu `False` untuk direktori. Kini jalur web
+  dan native sama-sama memakai `stamp_artifact()`; `decompile-all` tercatat 46191 byte
+  dengan digest `3a5fb8ad…` yang cocok saat dihitung ulang lewat shell.
+- Lint: 17 temuan `ruff` di `sdb_platform scripts tests skills dashboard` (RUF100, I001,
+  F841, BLE001 ×3, RUF005 ×2, E741 ×2, RUF059) dibersihkan tanpa melonggarkan config.
+
+### Diubah
+- `targets/*/native/` masuk `.gitignore`. Subjek uji jalur native ternyata identik dengan
+  `/usr/bin/true` host (GNU coreutils, GPLv3), jadi **tidak** di-commit ke repo BUSL-1.1;
+  cara reproduksi ditulis di `docs/RECON_FORGE.md` (sha256 `8a63c983…`).
+- `docs/INDEX.md` — entri `RECON_FORGE.md` dan `INTEGRASI_REPLICA.md` ditambahkan
+  (sebelumnya kedua dokumen tidak terindeks, melanggar aturan indeks di `docs/INDEX.md`).
+- `docs/RECON_FORGE.md` diselaraskan dengan kode: 21 uji, perintah native, akar izin,
+  artefak `<stamp>-inspect.json` / `<stamp>-decompiled/`, invarian keamanan 8–10,
+  tabel bukti biner `forge-demo`, dan catatan `healthy=false` yang akurat (sisa kegagalan
+  hanya komponen opsional/registrasi, bukan Node/Ghidra/Java).
+
 ## [0.7.6] — 2026-10-29
 
 ### Diperbaiki

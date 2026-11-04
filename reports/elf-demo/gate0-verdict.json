@@ -1,0 +1,13 @@
+{
+  "gate": "gate0",
+  "verdict": "BLOCKED",
+  "checked_at": "2026-11-04T23:03:07+0700",
+  "manifest": "/home/anashadi/super-dev-builders/evidence/elf-demo/authorization.yaml",
+  "target": "elf-demo",
+  "mode": "B",
+  "fail": [],
+  "blocked": [
+    "mode B wajib authorization_type=written_permission"
+  ],
+  "warn": []
+}

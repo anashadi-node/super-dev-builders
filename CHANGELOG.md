@@ -16,6 +16,21 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/) dan [S
 - `docs/adr/0008-html-dokumen-dilacak-dan-gerbang-docs-lint.md` — dasar keputusan HTML berdaftar
   boleh dilacak, PDF tidak pernah.
 
+### Diperbaiki
+- **Jalur biner tidak memeriksa `deep_analysis_allowed`.** `recon --kind native` pada target
+  mode A lolos Gate #0 lalu memanggil provider decompiler: gate berkata PASS, izin dilanggar.
+  `_recon_native` kini menolak (exit 2, pesan jelas) bila manifest tidak menyatakan
+  `deep_analysis_allowed: true`, dan menolak bila manifest hilang (fail-closed).
+- **Verdict `doctor` saling bertentangan.** REA melaporkan `healthy=false` karena registrasi
+  klien/skill opsional, sementara `native_ready=True`. `doctor` sekarang mencetak `sehat=`
+  (kebutuhan SDB, tanpa penghambat) dan memisahkan `healthy-lengkap` + daftar celah opsional.
+  Uji: `tests/test_recon_forge.py` (+2), `tests/test_docs_lint.py` (+10).
+- `tools/recon-forge.py`: `deep_allowed()` membaca manifest target sekali, dipakai jalur biner.
+
+### Dicatat
+- Target contoh `elf-demo` (`targets/elf-demo`, biner kompilasi sendiri 16 KB) + manifest
+  mode B, sebagai bukti jalur biner bisa dijalankan dan sebagai uji negatif mode A.
+
 ### Diubah
 - `README.md`: klaim jumlah custom skill 39 → 40 (sesuai registry) dan tautan repo resmi
   `github.com/anashadi-node/super-dev-builders` ditambahkan di bagian atas.

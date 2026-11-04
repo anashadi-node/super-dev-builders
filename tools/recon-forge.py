@@ -381,6 +381,25 @@ def require_path(target: str, raw: str) -> Path:
     raise ForgeError(f"TOLAK: {path} di luar akar izin {[repo_rel(r) for r in roots]}", 2)
 
 
+def deep_allowed(target: str) -> bool:
+    """Apakah manifest target mengizinkan analisis mendalam (decompiler/provider)?
+
+    Mode A hanya boleh mengamati permukaan; memanggil `rea inspect`/`decompile-all` pada
+    biner adalah analisis mendalam dan menuntut izin tertulis (mode B). Tanpa pembacaan
+    manifest di sini, `recon --kind native` bisa berjalan pada target mode A yang
+    manifest-nya menyatakan `deep_analysis_allowed: false` — gate lolos, izin dilanggar.
+    """
+    try:
+        import yaml
+    except ImportError:
+        return False
+    manifest = REPO / "evidence" / target / "authorization.yaml"
+    if not manifest.exists():
+        return False
+    data = yaml.safe_load(manifest.read_text(encoding="utf-8")) or {}
+    return data.get("deep_analysis_allowed") is True
+
+
 def craft_bin() -> str | None:
     for name in ("craft-anything", "craft-anything-cli", "craft"):
         found = shutil.which(name)
@@ -445,6 +464,12 @@ def cmd_doctor(args) -> int:
     blockers = sorted(k for k, ok in checks.items()
                       if not ok and k in ("ghidra", "ghidra-java", "ghidra-headless", "java", "node"))
     rea["blockers"] = blockers
+    # REA `healthy` (tanpa scope) menuntut registrasi klien + skill identity, yang opsional bagi
+    # SDB. Akibatnya doctor mencetak healthy=False padahal native_ready=True — dua verdict yang
+    # saling bertentangan membingungkan operator. Pisahkan: sehat untuk kebutuhan SDB = tidak ada
+    # penghambat nyata (node/provider/JDK), sisanya dilaporkan sebagai opsional.
+    rea["healthy_required"] = (not blockers) and any(p.get("ok") for p in providers.values())
+    rea["optional_gaps"] = sorted(k for k, ok in checks.items() if not ok and k not in blockers)
     scripts = {name: (REPO / "scripts" / name).exists() for name in
                ("capture_web.py", "fidelity_compare.py", "gate_check.py")}
     gerbang = (REPO / "tools" / "gerbang-spec.py").exists()
@@ -475,8 +500,11 @@ def cmd_doctor(args) -> int:
         print(json.dumps(data, indent=2, ensure_ascii=False))
     else:
         e = data["engines"]
+        gaps = e["rea"].get("optional_gaps") or []
         print(f"REA          : {e['rea']['version'] or 'TIDAK ADA'} (pin {REA_PIN})"
-              f" healthy={e['rea']['healthy']} node={e['rea']['node']}")
+              f" sehat={e['rea'].get('healthy_required')} node={e['rea']['node']}"
+              + (f" | healthy-lengkap={e['rea']['healthy']} karena opsional belum: "
+                 f"{', '.join(gaps[:4])}{'…' if len(gaps) > 4 else ''}" if gaps else ""))
         print(f"Craft Anything: {e['craft_anything']['version'] or 'belum terpasang (opsional)'}")
         print(f"Chromium      : {e['chromium']['path'] or 'TIDAK ADA'}")
         print(f"Node (REA)    : {e['node']['version'] or 'TIDAK ADA'} "
@@ -640,6 +668,12 @@ def _recon_native(args) -> int:
     """
     if not args.path:
         raise ForgeError("kind native butuh --path <biner|folder>", 2)
+    if not deep_allowed(args.target):
+        raise ForgeError(
+            f"target '{args.target}' tidak mengizinkan analisis mendalam "
+            "(manifest: deep_analysis_allowed=false / mode A). Jalur biner memanggil provider "
+            "decompiler = analisis mendalam; naikkan ke mode B dengan izin tertulis dulu, "
+            "atau amati target secara non-invasif.", 2)
     target_path = require_path(args.target, args.path)
     outdir = REPO / "evidence" / args.target / "rea"
     outdir.mkdir(parents=True, exist_ok=True)

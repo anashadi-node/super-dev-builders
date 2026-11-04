@@ -209,6 +209,48 @@ def test_native_path_di_dalam_akar_izin_lolos(tmp_path):
     assert mod.require_path("uji", str(dalam.parent)) == dalam.parent.resolve()
 
 
+def _manifest_deep(root: Path, deep: bool) -> None:
+    (root / "evidence" / "uji" / "authorization.yaml").write_text(
+        "schema_version: 2.2\ntarget_name: uji\nmode: B\n"
+        "allowed_targets:\n  apk_ipa_binaries: ['/tmp']\n"
+        f"deep_analysis_allowed: {str(deep).lower()}\n",
+        encoding="utf-8")
+
+
+def test_deep_allowed_membaca_manifest(tmp_path):
+    root = fake_repo(tmp_path, {"gate": "gate0", "target": "uji", "verdict": "PASS"})
+    mod = load_tool(root)
+    assert mod.deep_allowed("uji") is False          # manifest bawaan: tanpa deep_analysis_allowed
+    _manifest_deep(root, True)
+    assert mod.deep_allowed("uji") is True
+    _manifest_deep(root, False)
+    assert mod.deep_allowed("uji") is False
+    assert mod.deep_allowed("tidak-ada") is False
+
+
+def test_native_target_mode_a_ditolak(tmp_path):
+    """Gate PASS tapi manifest melarang analisis mendalam — jalur biner WAJIB menolak.
+
+    Sebelum ada pemeriksaan ini, `recon --kind native` pada target mode A lolos gate dan
+    memanggil provider decompiler: gate bilang PASS, izin dilanggar.
+    """
+    root = fake_repo(tmp_path, {"gate": "gate0", "target": "uji", "verdict": "PASS"})
+    biner = root / "targets" / "uji" / "app.bin"
+    biner.parent.mkdir(parents=True)
+    biner.write_bytes(b"\x7fELF")
+    mod = load_tool(root)
+    args = type("A", (), {"target": "uji", "path": str(biner), "kind": "native",
+                          "decompile": False, "decompile_limit": 0, "timeout": 10,
+                          "json": False})()
+    try:
+        mod.cmd_recon(args)
+    except mod.ForgeError as exc:
+        assert exc.code == 2
+        assert "analisis mendalam" in str(exc)
+    else:
+        raise AssertionError("recon native jalan pada target yang melarang analisis mendalam")
+
+
 def test_node_ok_memakai_patch_minimum_rea():
     mod = load_tool()
     assert mod.node_ok("v26.13.0") is True

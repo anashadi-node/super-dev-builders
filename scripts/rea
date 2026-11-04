@@ -19,4 +19,19 @@ if [ ! -f "$REA_ENTRY" ]; then
   exit 127
 fi
 
+
+# Ghidra/JDK: recon-forge sudah menemukannya otomatis, tapi panggilan manual
+# `scripts/rea inspect biner` dulu gagal "provider_unavailable / GHIDRA_INSTALL_DIR is not set"
+# padahal Ghidra ada di ~/.local/opt. Deteksi di sini supaya kedua jalur memberi hasil sama.
+if [ -z "${GHIDRA_INSTALL_DIR:-}" ]; then
+  for d in "$HOME"/.local/opt/ghidra_*_PUBLIC "$HOME"/opt/ghidra_*_PUBLIC /opt/ghidra_*_PUBLIC; do
+    if [ -x "$d/support/analyzeHeadless" ]; then export GHIDRA_INSTALL_DIR="$d"; break; fi
+  done
+fi
+if [ -z "${JAVA_HOME:-}" ]; then
+  for d in "$HOME"/.local/opt/jdk-2* "$HOME"/opt/jdk-2* /usr/lib/jvm/jdk-2* /usr/lib/jvm/java-2*; do
+    if [ -x "$d/bin/java" ]; then export JAVA_HOME="$d"; export PATH="$d/bin:$PATH"; break; fi
+  done
+fi
+
 exec "$REA_NODE" "$REA_ENTRY" "$@"

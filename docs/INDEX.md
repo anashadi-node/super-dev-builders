@@ -56,6 +56,7 @@ tanggalnya menang — dan yang kalah **harus** dipindahkan ke `docs/archive/`, b
 | `HANDOFF_CONTRACTS.md` | serah-terima antar divisi |
 | `PIPELINE_E2E_EVIDENCE.md` | bukti pipeline ujung-ke-ujung |
 | `WORKFLOW_SKENARIO.md` | alur kerja per skenario (web, mobile, desktop, backend, audit) beserta gate-nya |
+| `RECON_NATIVE.md` | jalur biner (ELF/PE/Mach-O/APK/firmware): dua saklar izin, contoh terbukti, jebakan |
 | `../workflows/*.yaml` | definisi workflow |
 
 ## Operasi
@@ -97,6 +98,7 @@ tanggalnya menang — dan yang kalah **harus** dipindahkan ke `docs/archive/`, b
 | `../reports/ronde-3-audit-sdb-20261011.md` | audit ronde 3 |
 | `PAKET_UPDATE_SDB_20261104.md` | paket update menyeluruh 2026-11-04 (keadaan, bukti, rencana) |
 | `REA_VS_CRAFT_ANYTHING_20261104.md` | riset perbandingan REA vs Craft Anything (dasar keputusan tool) |
+| `CRAFT_ANYTHING_PILOT_0.3.0.md` | uji coba terisolasi Craft Anything v0.3.0: checksum, isi paket, batas pemakaian |
 | `RESEARCH_REPLACEMENT_2026-10-04.md` | riset & eksekusi pengganti skill komersial |
 | `UPGRADE_REPORT.md` | catatan upgrade Copy Cloning V1 → SDB V2.2 |
 

@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REA vs Craft Anything — Riset Perbandingan</title>
+<meta name="description" content="Perbandingan mendalam skill/tools REA dan Craft Anything untuk Divisi Ekosistem SDB: cakupan, alur kerja, keselamatan, kematangan, biaya, lisensi, dan rekomendasi berbasis bukti.">
+<style>
+:root{--bg:#fff;--fg:#16181d;--muted:#5b6472;--line:#e3e7ee;--accent:#1e5fbf;--accent-soft:#eef4ff;
+--warn:#8a5a00;--warn-bg:#fff8e6;--code-bg:#f6f8fb}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;color:var(--fg);background:var(--bg);
+font:16px/1.72 -apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:0 28px 96px}
+header.hero{border-bottom:1px solid var(--line);margin-bottom:36px;padding:56px 0 28px;
+background:linear-gradient(180deg,var(--accent-soft),transparent)}
+.hero .kicker{color:var(--accent);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:12px}
+.hero h1{font-size:clamp(26px,4vw,40px);line-height:1.2;margin:10px 0 12px;letter-spacing:-.02em}
+.hero p{margin:0;color:var(--muted);max-width:70ch}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.badge{font-size:12.5px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);background:#fff}
+.layout{display:grid;grid-template-columns:266px minmax(0,1fr);gap:44px;align-items:start}
+nav.toc{position:sticky;top:18px;max-height:calc(100vh - 36px);overflow:auto;border-right:1px solid var(--line);padding-right:14px}
+nav.toc .toc-title,.toc-inline .toc-title{font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+color:var(--muted);font-weight:700;margin-bottom:10px}
+nav.toc ul{list-style:none;margin:0;padding:0;font-size:13.5px;line-height:1.45}
+nav.toc ul ul{margin:4px 0 8px 12px;border-left:1px solid var(--line);padding-left:10px}
+nav.toc li{margin:6px 0}
+nav.toc a{color:var(--muted);text-decoration:none;display:block;padding:2px 4px;border-radius:4px}
+nav.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+main{min-width:0}
+h1,h2,h3,h4{line-height:1.28;letter-spacing:-.015em}
+h2{font-size:26px;margin:46px 0 14px;padding-top:14px;border-top:1px solid var(--line)}
+h3{font-size:19.5px;margin:30px 0 10px}
+h4{font-size:16.5px;margin:22px 0 8px}
+p{margin:12px 0}
+a{color:var(--accent)}
+ul,ol{padding-left:22px}
+li{margin:6px 0}
+strong{font-weight:650}
+hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+code{font-family:ui-monospace,SFMono-Regular,"JetBrains Mono",Menlo,Consolas,monospace;font-size:13.6px;
+background:var(--code-bg);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+pre{background:var(--code-bg);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow:auto;line-height:1.55}
+pre code{background:none;border:0;padding:0;font-size:13.2px;white-space:pre}
+blockquote{margin:18px 0;padding:14px 18px;border-left:4px solid var(--warn);background:var(--warn-bg);
+color:#3a2b00;border-radius:0 8px 8px 0}
+blockquote p{margin:6px 0}
+.table-wrap{overflow:auto;margin:18px 0;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:14.2px}
+th,td{padding:10px 13px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere;word-break:break-word}
+th{background:#f8fafc;font-weight:650;white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:#fbfcfe}
+.toc-inline{border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin:18px 0 26px;background:#fbfcfe}
+.toc-inline ul{list-style:none;margin:0;padding:0;columns:2;column-gap:28px;font-size:13.8px}
+.toc-inline ul ul{columns:1;margin:2px 0 6px 12px;border-left:1px solid var(--line);padding-left:10px}
+.toc-inline a{color:var(--fg);text-decoration:none}
+.toc-inline a:hover{color:var(--accent)}
+.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13.5px}
+@media print{
+  nav.toc{display:none}
+  .layout{display:block}
+  header.hero{background:none;padding-top:0}
+  body{font-size:11.2pt;line-height:1.5}
+  h2,h3{page-break-after:avoid;margin-top:22px}
+  pre,blockquote{page-break-inside:avoid}
+  table{page-break-inside:auto}
+  tr,td,th{page-break-inside:avoid}
+  thead{display:table-header-group}
+  .table-wrap{overflow:visible}
+  a{color:#000;text-decoration:none}
+  .wrap{max-width:none;padding:0}
+  @page{size:A4;margin:16mm 14mm}
+}
+@media (max-width:900px){
+  .layout{display:block}
+  nav.toc{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--line);
+    padding:0 0 14px;margin-bottom:22px}
+}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <div class="kicker">Super Dev Builders · Riset Perbandingan Alat</div>
+  <h1>REA vs Craft Anything — Riset Perbandingan</h1>
+  <p>Perbandingan mendalam skill/tools REA dan Craft Anything untuk Divisi Ekosistem SDB: cakupan, alur kerja, keselamatan, kematangan, biaya, lisensi, dan rekomendasi berbasis bukti.</p>
+  <div class="badges"><span class="badge">4 November 2026</span><span class="badge">angka terverifikasi</span><span class="badge">keputusan: dua lapis</span></div>
+</div></header>
+<div class="wrap layout">
+<nav class="toc"><div class="toc-title">Daftar Isi</div><div class="toc"><div class="toc">
+<ul>
+<li><a href="#1-ringkasan-untuk-yang-tidak-punya-waktu">1. Ringkasan untuk yang tidak punya waktu</a></li>
+<li><a href="#2-catatan-penting-angka-di-gambar-anda-sudah-kedaluwarsa">2. Catatan penting: angka di gambar Anda sudah kedaluwarsa</a></li>
+<li><a href="#3-metode-riset-bisa-diulang-siapa-pun">3. Metode riset (bisa diulang siapa pun)</a></li>
+<li><a href="#4-fakta-dasar-berdampingan">4. Fakta dasar berdampingan</a></li>
+<li><a href="#5-perbandingan-per-faktor-bukti-pemenang">5. Perbandingan per faktor (bukti + pemenang)</a></li>
+<li><a href="#6-matriks-skor-berbobot-konteks-sdb-hari-ini">6. Matriks skor berbobot (konteks: SDB hari ini)</a></li>
+<li><a href="#7-jawaban-tegas-mana-yang-terbaik">7. Jawaban tegas: mana yang "terbaik"?</a></li>
+<li><a href="#8-rekomendasi-arsitektur-untuk-sdb">8. Rekomendasi arsitektur untuk SDB</a></li>
+<li><a href="#9-risiko-yang-harus-diterima-dan-mitigasinya">9. Risiko yang harus diterima (dan mitigasinya)</a></li>
+<li><a href="#10-rencana-uji-14-hari-konkret-bisa-dieksekusi">10. Rencana uji 14 hari (konkret, bisa dieksekusi)</a></li>
+<li><a href="#11-lampiran-a-perintah-verifikasi-bisa-diulang">11. Lampiran A — perintah verifikasi (bisa diulang)</a></li>
+<li><a href="#12-lampiran-b-sumber">12. Lampiran B — sumber</a></li>
+</ul>
+</div>
+</div></nav>
+<main>
+<p><strong>Tanggal:</strong> 4 November 2026 · <strong>Konteks:</strong> Divisi Ekosistem Super Dev Builders (SDB)
+<strong>Pertanyaan yang dijawab:</strong> dari semua segi dan faktor, mana yang terbaik — skill/tools <strong>REA (Reverse Engineering Anything)</strong> atau <strong>Craft Anything</strong>?</p>
+<hr />
+<h2 id="1-ringkasan-untuk-yang-tidak-punya-waktu">1. Ringkasan untuk yang tidak punya waktu</h2>
+<p>Keduanya <strong>bukan barang sejenis</strong>, jadi "mana yang terbaik" tidak punya satu jawaban tunggal. Yang benar adalah: <strong>terbaik untuk pekerjaan apa</strong>.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Kalau pekerjaannya…</th>
+<th>Yang menang</th>
+<th>Selisih</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Membongkar biner, firmware, paket jaringan, APK, .NET, game engine, EVM bytecode</td>
+<td><strong>REA</strong></td>
+<td>jelas (8,30 vs 6,89)</td>
+</tr>
+<tr>
+<td>Membangun ulang produk lalu <strong>membuktikan</strong> hasilnya mirip aslinya</td>
+<td><strong>Craft Anything</strong></td>
+<td>jelas (7,85 vs 6,95)</td>
+</tr>
+<tr>
+<td>Dipakai hari ini di SDB, tanpa menambah risiko baru</td>
+<td><strong>REA</strong></td>
+<td>tipis (7,50 vs 7,35)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Kesimpulan operasional:</strong> REA tetap <strong>instrumen tetap</strong> SDB. Craft Anything adalah <strong>pabrik + pemeriksa</strong> yang selama ini tidak dimiliki SDB — layak diuji sebagai <strong>pilot terpisah</strong>, bukan sebagai pengganti REA.</p>
+<p>Satu kalimat: <strong>REA lebih dalam melihat, Craft Anything lebih lengkap mengerjakan.</strong> SDB butuh dua-duanya, di peran yang berbeda.</p>
+<hr />
+<h2 id="2-catatan-penting-angka-di-gambar-anda-sudah-kedaluwarsa">2. Catatan penting: angka di gambar Anda sudah kedaluwarsa</h2>
+<p>Gambar laporan yang Anda lampirkan (verifikasi 3 Nov 2026) versus data langsung GitHub API pada 4 Nov 2026 19:5x WIB:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Di gambar</th>
+<th>Fakta 4 Nov</th>
+<th>Catatan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bintang (stars)</td>
+<td>5.677</td>
+<td><strong>9.997</strong></td>
+<td>naik ~76% dalam 1 hari — tanda viral, bukan tanda kualitas</td>
+</tr>
+<tr>
+<td>Fork</td>
+<td>968</td>
+<td><strong>1.652</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>Lisensi</td>
+<td><code>APACHE-2.0</code></td>
+<td><strong>MIT OR Apache-2.0</strong> (dua lisensi)</td>
+<td>GitHub hanya menampilkan satu; repo punya <code>LICENSE-MIT</code> + <code>LICENSE-APACHE</code></td>
+</tr>
+<tr>
+<td>Rilis</td>
+<td>tidak disebut</td>
+<td><strong>v0.1.0 (31 Okt) → v0.2.0 (1 Nov) → v0.3.0 (2 Nov)</strong></td>
+<td>3 rilis dalam 3 hari</td>
+</tr>
+<tr>
+<td>Isu terbuka</td>
+<td>tidak disebut</td>
+<td><strong>161</strong></td>
+<td>wajar untuk proyek 4 hari, tapi tetap 161</td>
+</tr>
+</tbody>
+</table></div>
+<p>Artinya: laporan itu benar soal <em>arah</em>, salah soal <em>besaran</em>. Untuk keputusan teknis, angka bintang memang bukan dasar — bagian 5–7 di bawah memakai bukti yang bisa diperiksa ulang.</p>
+<hr />
+<h2 id="3-metode-riset-bisa-diulang-siapa-pun">3. Metode riset (bisa diulang siapa pun)</h2>
+<p>Saya tidak menilai dari README saja. Yang dikerjakan:</p>
+<ol>
+<li><strong>Metadata resmi</strong> — GitHub REST API untuk kedua repo: tanggal lahir, bahasa, lisensi, bintang, fork, isu, ukuran, commit terakhir.</li>
+<li><strong>Klon dangkal</strong> <code>craft-anything</code> (26 MB) lalu <strong>hitung sendiri</strong>: 204.498 baris Rust, 460 berkas <code>.rs</code>, 14 crate.</li>
+<li><strong>Audit status tool</strong> bawaan proyek: <code>docs/tool-status.md</code> — 134 tool <em>verified</em> di input nyata, 52 <em>unverified</em>.</li>
+<li><strong>Pemeriksaan lokal REA</strong> yang sudah terpasang di mesin ini: <code>scripts/rea capabilities</code> → 53 grup operasi, <strong>113 operasi</strong> yang benar-benar tersedia di host ini (sisanya butuh Ghidra/IDA/Hopper/JEB yang tidak dipasang).</li>
+<li><strong>Pencarian jejak jaringan keluar</strong>: tidak ditemukan telemetri di kedua pihak.</li>
+<li><strong>Baca aturan internal</strong> proyek: <code>AGENTS.md</code>, <code>SECURITY.md</code>, <code>docs/STATUS.md</code>, <code>deny.toml</code>.</li>
+</ol>
+<p><strong>Batas kejujuran:</strong> saya <strong>belum</strong> menjalankan rebuild nyata dengan Craft Anything, dan <strong>belum</strong> memakai REA pada target ber-Gate #0. Jadi penilaian di bawah adalah penilaian <strong>kesiapan dan rekayasa</strong>, bukan hasil uji lapangan. Bagian 10 menutup celah itu dengan rencana uji 14 hari.</p>
+<hr />
+<h2 id="4-fakta-dasar-berdampingan">4. Fakta dasar berdampingan</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Dimensi</th>
+<th>REA</th>
+<th>Craft Anything</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Repo</td>
+<td><code>morluto/rea</code></td>
+<td><code>storytold/craft-anything</code></td>
+</tr>
+<tr>
+<td>Lahir</td>
+<td>14 April 2026 (~6,7 bulan)</td>
+<td><strong>31 Oktober 2026 (4 hari)</strong></td>
+</tr>
+<tr>
+<td>Bahasa</td>
+<td>TypeScript / Node.js</td>
+<td><strong>Rust</strong> (204.498 baris)</td>
+</tr>
+<tr>
+<td>Lisensi</td>
+<td>MIT</td>
+<td><strong>MIT OR Apache-2.0</strong></td>
+</tr>
+<tr>
+<td>Versi dipakai</td>
+<td><code>rea-agents</code> <strong>6.8.0</strong> (npm)</td>
+<td><strong>0.3.0</strong> — label sendiri: <em>Early alpha</em></td>
+</tr>
+<tr>
+<td>Bintang / fork</td>
+<td>429.205 / 106.756</td>
+<td>9.997 / 1.652</td>
+</tr>
+<tr>
+<td>Isu terbuka</td>
+<td>1.661</td>
+<td>161</td>
+</tr>
+<tr>
+<td>Kontributor</td>
+<td>tidak dihitung (repo besar)</td>
+<td><strong>48</strong></td>
+</tr>
+<tr>
+<td>Commit sejak lahir</td>
+<td>—</td>
+<td><strong>348</strong> (≈ 80/hari)</td>
+</tr>
+<tr>
+<td>Ukuran terpasang</td>
+<td>53 MB (Node + paket)</td>
+<td>60–66 MB per paket install; 26 MB sumber</td>
+</tr>
+<tr>
+<td>Cara pakai</td>
+<td>CLI <code>rea</code> + MCP + skill agen</td>
+<td>GUI desktop + CLI + MCP + plugin</td>
+</tr>
+<tr>
+<td>Jumlah tool</td>
+<td>≈229–282 tool (229 di registry SDB; 282 nama unik di <code>dist</code> 6.8.0)</td>
+<td><strong>301 tool mesin</strong> + AI/pengaturan ≈ 320</td>
+</tr>
+<tr>
+<td>Platform</td>
+<td>Node lintas OS; provider <code>native-macos</code> hanya macOS</td>
+<td>Linux x86_64/aarch64/riscv64, FreeBSD, Windows, macOS</td>
+</tr>
+<tr>
+<td>Biaya tambahan</td>
+<td>tidak ada (Ghidra/IDA opsional, milik sendiri)</td>
+<td><strong>token LLM agen</strong> (Claude Code/ACP/Ollama) + aset opsional fal.ai</td>
+</tr>
+<tr>
+<td>Telemetri</td>
+<td>tidak ditemukan</td>
+<td>tidak ditemukan</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Analogi supaya mudah:</strong> REA itu <strong>laboratorium forensik</strong> — mikroskop, spektrometer, alat bedah, dan buku catatan barang bukti. Craft Anything itu <strong>pabrik mini lengkap dengan quality control</strong> — bisa membongkar, lalu membangun barang baru, lalu mengukur seberapa mirip hasilnya dengan aslinya. Laboratorium tidak membangun apa pun; pabrik tanpa laboratorium tidak tahu apa yang harus dibangun.</p>
+<hr />
+<h2 id="5-perbandingan-per-faktor-bukti-pemenang">5. Perbandingan per faktor (bukti + pemenang)</h2>
+<h3 id="f1-kedalaman-investigasi-rea-menang-9-vs-7">F1. Kedalaman investigasi — <strong>REA menang (9 vs 7)</strong></h3>
+<p>REA dibangun untuk "apa pun": 41 jenis target terdokumentasi, dari aplikasi desktop, Electron, JavaScript, APK/Android, Apple/Mach-O, .NET, Java, format berkas, firmware, paket jaringan, database, sampai bytecode EVM dan sinyal JTAG. Ia bekerja dengan <strong>provider</strong> yang bisa dipasang: Ghidra, IDA, Hopper, Kuna, JEB, <code>rea-dotnet-static</code>, <code>sqlite</code>, <code>rea-artifact-graph</code>. Yang tidak ada, tidak diklaim ada: <code>capabilities</code> menyebutkan batas tiap provider secara eksplisit.</p>
+<p>Craft Anything punya 301 tool dengan cakupan luas juga (native, .NET, Java, Android, Apple, web, format, firmware, paket, database, game 12 engine), <strong>tapi</strong> audit internalnya sendiri menyatakan <strong>52 tool belum pernah dijalankan</strong> (23 tool Android-perangkat, 9 Frida, 5 runtime, 6 Apple, sisanya). Untuk biner eksotis, REA lebih dalam dan lebih terverifikasi.</p>
+<h3 id="f2-alur-kerja-end-to-end-craft-anything-menang-9-vs-4">F2. Alur kerja end-to-end — <strong>Craft Anything menang (9 vs 4)</strong></h3>
+<p>Ini pembeda terbesar. REA berhenti di <strong>bukti</strong>: artefak, temuan, daftar "belum diketahui". Ia tidak membangun apa pun dan tidak membandingkan hasil.</p>
+<p>Craft Anything punya siklus penuh <strong>Study → Build → Check → Refine</strong>:</p>
+<ul>
+<li>Menangkap target (website: sampai 4 halaman lain, menu dibuka di desktop dan ponsel);</li>
+<li>Menyuruh agen pengkode membangun proyek (default clean-room);</li>
+<li>Membandingkan hasil vs asli di <strong>3 lebar layar (1440/768/390 px)</strong> dengan skor kemiripan = rata-rata <em>layout</em> + detail perseptual (SSIM), mengecualikan bagian yang berubah sendiri (difoto 3× untuk mendeteksi);</li>
+<li>Melaporkan hal konkret yang kurang: teks, struktur, warna, font, ukuran, spasi, halaman yang melebar ke samping, error, request gagal, celah aksesibilitas;</li>
+<li>Mengulang sampai <strong>6 putaran</strong> atau <strong>90% kemiripan</strong>.</li>
+</ul>
+<p>Analoginya: REA memberi Anda <strong>foto rontgen</strong>; Craft Anything memberi rontgen <strong>plus</strong> operasi <strong>plus</strong> rontgen pasca-operasi untuk memastikan hasilnya benar.</p>
+<h3 id="f3-kematangan-stabilitas-rea-menang-9-vs-3">F3. Kematangan &amp; stabilitas — <strong>REA menang (9 vs 3)</strong></h3>
+<p>REA sudah di <strong>6.8.0</strong> dengan 41 jenis target, riwayat 6,7 bulan, dan sudah melewati banyak siklus perbaikan. Craft Anything di <strong>0.3.0</strong>, umur 4 hari, dan <code>STATUS.md</code>-nya sendiri menulis hal seperti <em>"no live Clean room build run yet"</em> (build clean-room belum pernah dijalankan nyata) dan <em>"local model builds: not yet"</em>. Itu jujur — dan justru karena jujur, kita harus memperlakukannya sebagai <strong>alpha</strong>.</p>
+<h3 id="f4-kecepatan-perubahan-rea-lebih-tenang-8-vs-3">F4. Kecepatan perubahan — <strong>REA lebih tenang (8 vs 3)</strong></h3>
+<p>348 commit dalam 4 hari = sekitar 80 commit/hari, 3 rilis dalam 3 hari. Bagus untuk perkembangan, <strong>buruk untuk reproduksibilitas</strong>: kalau kita pin v0.3.0 hari ini, dalam seminggu bisa ada v0.6.0 dengan perubahan format proyek. Untuk SDB yang menganut "pin + hash + approval", ini risiko nyata.</p>
+<h3 id="f5-kualitas-bukti-craft-anything-sedikit-unggul-9-vs-8">F5. Kualitas bukti — <strong>Craft Anything sedikit unggul (9 vs 8)</strong></h3>
+<p>REA: artefak + operasi ber-<em>effect</em> (<code>launches_process</code>, <code>may_show_ui</code>, <code>may_write_filesystem</code>, <code>may_access_network</code>) + daftar <em>unknown</em>.
+Craft Anything: <strong>bukti yang bisa diukur</strong> — <code>checks/</code> berisi tiap perbandingan, skor kemiripan per halaman per lebar, daftar selisih, plus <code>investigation.cany/</code> dan <code>inbox/</code> untuk pertanyaan terbuka. Untuk klaim "hasil mirip aslinya", milik Craft Anything lebih kuat karena ada angkanya.</p>
+<h3 id="f6-keselamatan-izin-dan-isolasi-craft-anything-menang-9-vs-7">F6. Keselamatan, izin, dan isolasi — <strong>Craft Anything menang (9 vs 7)</strong></h3>
+<p>Craft Anything secara arsitektur:</p>
+<ul>
+<li><strong>Clean room adalah default</strong>: hanya tool di <code>engine/src/clean_room.rs</code> yang boleh jalan; semua tool lain — termasuk milik plugin — <strong>ditolak</strong> di app, CLI, MCP, dan agen, kecuali Deep mode dinyalakan sadar.</li>
+<li>Setiap program luar (Ghidra, Java, adb, browser, agen CLI, ssh, git) lewat satu gerbang <code>platform::process</code>: stdin ditutup, ada batas waktu, output dibatasi, pipe tidak boleh penuh.</li>
+<li>Plugin WASM <strong>tidak mengimpor apa pun</strong>; plugin MCP harus minta izin tiap panggilan.</li>
+<li>Ada aturan keras <strong>never-crash</strong> untuk input berbahaya (input berbahaya justru input utamanya).</li>
+<li><code>SECURITY.md</code> menyebut kelas bug yang dianggap serius, termasuk "agen bertindak di luar proyeknya tanpa persetujuan".</li>
+</ul>
+<p>REA punya <strong>deklarasi efek per operasi</strong> dan tier izin (T0 statis → T3 adb) yang kita bangun di SDB, tapi kekuatannya lebih luas: 229+ tool MCP, provider pihak ketiga, dan <code>native-macos</code> yang menjalankan proses. Tanpa pagar SDB, REA lebih "tajam". Dengan pagar SDB (yang sudah ada: Gate #0, tier, 6 tes integrasi), risikonya terkendali.</p>
+<h3 id="f7-privasi-seri-kuat-10-vs-9">F7. Privasi — <strong>seri kuat (10 vs 9)</strong></h3>
+<p>Keduanya <strong>tidak</strong> mengandung telemetri; tidak ditemukan endpoint analitik di kode. Craft Anything tetap membuka koneksi hanya untuk hal yang Anda minta: model LLM (kunci Anda sendiri), unduh Ghidra, atau aset fal.ai (opsional, ada anggaran default $5/proyek). REA tanpa koneksi sama sekali kecuali Anda memakainya untuk target jaringan.</p>
+<h3 id="f8-kesesuaian-dengan-aturan-sdb-rea-menang-hari-ini-8-vs-4">F8. Kesesuaian dengan aturan SDB — <strong>REA menang hari ini (8 vs 4)</strong></h3>
+<p>SDB mensyaratkan: Gate #0 (izin), clean-room, bukti tersimpan, rantai pasok terpin, tanpa MCP raksasa, dan tes yang menjaga semuanya.</p>
+<ul>
+<li>REA: sudah terdaftar (<code>skills.yaml</code>), terpasang 6.8.0 dengan pin commit + sha512, dimuat 5 dari 8 peran, punya 6 tes integrasi, MCP sengaja tidak didaftarkan. <strong>Nol biaya integrasi.</strong></li>
+<li>Craft Anything: belum ada di registry, belum ada approval, ukuran permukaan besar (301 tool + GUI), butuh agen LLM untuk fungsinya, dan masih alpha. <strong>Butuh jalur approval baru</strong> (#20) sebelum boleh menyentuh target nyata.</li>
+</ul>
+<h3 id="f9-biaya-sumber-daya-rea-menang-9-vs-5">F9. Biaya &amp; sumber daya — <strong>REA menang (9 vs 5)</strong></h3>
+<p>REA: Node yang sudah ada, 53 MB, tanpa GPU, tanpa LLM. Craft Anything: biner 60–66 MB, build dari sumber butuh Rust 1.97 + 7 paket <code>apt</code> untuk GUI, dan <strong>setiap rebuild membakar token agen</strong> (Claude Code/ACP/Ollama). Untuk target kecil itu wajar; untuk eksperimen massal, biayanya nyata.</p>
+<h3 id="f10-portabilitas-seri-8-vs-8">F10. Portabilitas — <strong>seri (8 vs 8)</strong></h3>
+<p>REA lintas OS via Node, tapi provider <code>native-macos</code> hanya macOS — di Linux, kemampuan native-nya bergantung alat yang dipasang. Craft Anything menyediakan paket Linux x86_64/aarch64/riscv64, FreeBSD, Windows, macOS — <strong>tapi</strong> audit tool-nya dilakukan di Windows 11, jadi keberhasilan di Linux belum terbukti menyeluruh (sebagian sudah diuji: Vineflower di JAR nyata, Ghidra 12.2 di Linux).</p>
+<h3 id="f11-lisensi-craft-anything-sedikit-unggul-10-vs-9">F11. Lisensi — <strong>Craft Anything sedikit unggul (10 vs 9)</strong></h3>
+<p>MIT dan MIT/Apache-2.0 dua-duanya permisif dan aman untuk produk komersial. Apache menambah hibah paten eksplisit — sedikit lebih nyaman untuk dijual.</p>
+<h3 id="f12-adopsi-dukungan-rea-unggul-9-vs-7">F12. Adopsi &amp; dukungan — <strong>REA unggul (9 vs 7)</strong></h3>
+<p>429 ribu bintang dan 106 ribu fork membuat REA menjadi salah satu proyek paling banyak dipakai di kategori ini; dokumentasi dan jawaban komunitas lebih mungkin ada. Craft Anything tumbuh luar biasa cepat (10 ribu bintang / 4 hari, 48 kontributor), tapi belum punya kedalaman jawaban komunitas.</p>
+<p><strong>Peringatan metodologis:</strong> bintang mengukur <strong>perhatian</strong>, bukan <strong>kecocokan</strong>. Dua-duanya punya pola pertumbuhan yang tidak wajar-cepat; jangan jadikan dasar keputusan.</p>
+<h3 id="f13-rantai-pasok-craft-anything-sedikit-unggul-8-vs-7">F13. Rantai pasok — <strong>Craft Anything sedikit unggul (8 vs 7)</strong></h3>
+<p>Craft Anything: <code>Cargo.lock</code> (205 KB, seluruh pohon dependensi terkunci), <code>deny.toml</code> (wildcard dilarang), rilis dengan 29 aset per versi. REA: satu paket npm <code>rea-agents</code> dengan 12 dependensi langsung + <code>frida</code> opsional — lebih sedikit, tapi ekosistem npm punya riwayat insiden yang lebih banyak. SDB sudah memitigasi REA dengan pin + sha512 + audit #19.</p>
+<hr />
+<h2 id="6-matriks-skor-berbobot-konteks-sdb-hari-ini">6. Matriks skor berbobot (konteks: SDB hari ini)</h2>
+<p>Bobot dipilih karena SDB hidup dari <strong>alur kerja + keselamatan</strong>, bukan dari eksplorasi bebas.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Faktor</th>
+<th style="text-align: right;">Bobot</th>
+<th style="text-align: right;">REA</th>
+<th style="text-align: right;">Craft Anything</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Alur end-to-end (recon → bangun → uji paritas)</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;"><strong>9</strong></td>
+</tr>
+<tr>
+<td>Keselamatan, izin, isolasi</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;"><strong>9</strong></td>
+</tr>
+<tr>
+<td>Kematangan versi</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;"><strong>9</strong></td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr>
+<td>Kedalaman investigasi</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;"><strong>9</strong></td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr>
+<td>Kualitas bukti</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;"><strong>9</strong></td>
+</tr>
+<tr>
+<td>Biaya &amp; sumber daya</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;"><strong>9</strong></td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr>
+<td>Lisensi</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;"><strong>10</strong></td>
+</tr>
+<tr>
+<td>Adopsi &amp; dukungan</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;"><strong>9</strong></td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr>
+<td><strong>Skor akhir</strong></td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;"><strong>7,50</strong></td>
+<td style="text-align: right;"><strong>7,35</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>Dengan bobot lain, pemenangnya berubah — dan itu justru intinya:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Skenario</th>
+<th>Bobot yang berubah</th>
+<th style="text-align: right;">REA</th>
+<th style="text-align: right;">Craft Anything</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Rebuild-first</strong> (bangun ulang produk, paritas diuji)</td>
+<td>alur 30, bukti 15, keselamatan 20</td>
+<td style="text-align: right;">6,95</td>
+<td style="text-align: right;"><strong>7,85</strong></td>
+</tr>
+<tr>
+<td><strong>RE biner/firmware/malware</strong></td>
+<td>kedalaman 35, kematangan 20</td>
+<td style="text-align: right;"><strong>8,30</strong></td>
+<td style="text-align: right;">6,89</td>
+</tr>
+<tr>
+<td><strong>SDB hari ini</strong> (di atas)</td>
+<td>—</td>
+<td style="text-align: right;"><strong>7,50</strong></td>
+<td style="text-align: right;">7,35</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="7-jawaban-tegas-mana-yang-terbaik">7. Jawaban tegas: mana yang "terbaik"?</h2>
+<ol>
+<li><strong>Untuk membongkar dan memahami</strong> — REA. Lebih dalam, lebih matang, lebih luas jenis target, sudah terpasang dan terpagar di SDB.</li>
+<li><strong>Untuk menghasilkan produk jadi yang terbukti mirip</strong> — Craft Anything. Satu-satunya dari keduanya yang punya siklus bangun + ukur kemiripan.</li>
+<li><strong>Untuk SDB sekarang</strong> — REA, karena skor kesiapan lebih tinggi dan biaya integrasinya nol. Tapi keunggulannya <strong>tipis (0,15 poin)</strong>, dan tipisnya disebabkan satu hal: SDB belum punya tahap "bangun + uji paritas", yang justru kekuatan Craft Anything.</li>
+</ol>
+<p>Karena itu jawaban yang jujur bukan "pilih salah satu", melainkan: <strong>pakai REA sebagai mata, uji Craft Anything sebagai tangan.</strong> Mengganti REA dengan Craft Anything hari ini = menukar alat matang dengan alpha 4 hari yang belum pernah menjalankan clean-room build nyata. Menolak Craft Anything sepenuhnya = melewatkan satu-satunya jalur yang bisa membuktikan "hasil rebuild mirip aslinya" dengan angka.</p>
+<hr />
+<h2 id="8-rekomendasi-arsitektur-untuk-sdb">8. Rekomendasi arsitektur untuk SDB</h2>
+<p><strong>Lapis 1 — Instrumen (tetap): REA 6.8.0</strong>
+Dipakai agen recon/architect/reviewer/security. Tetap T0 default, tetap lewat Gate #0, tetap tanpa MCP terdaftar.</p>
+<p><strong>Lapis 2 — Pilot (baru, terisolasi): Craft Anything v0.3.0</strong>
+Aturan pilot:</p>
+<ul>
+<li>Dipasang <strong>hanya</strong> dari rilis resmi v0.3.0 (unduh aset Linux + verifikasi checksum), <strong>bukan</strong> <code>cargo install</code> dari HEAD — supaya reproducible;</li>
+<li>Jalan di <strong>mesin/container terpisah</strong> dari host trading; tidak menyentuh <code>~/anantara-sakti</code> sama sekali;</li>
+<li>Hanya <strong>Clean room mode</strong>; Deep mode dilarang pada pilot;</li>
+<li>Hanya target <strong>milik sendiri</strong> (<code>sdb-local-demo</code>, <code>rt-rw-portal</code> build lokal) — Gate #0 PASS tertulis sebelum eksekusi;</li>
+<li>Anggaran token LLM dibatasi per proyek; tidak ada kunci aset fal.ai;</li>
+<li>Output proyek disimpan di <code>evidence/craft-anything/&lt;target&gt;/</code> dan <strong>tidak</strong> masuk <code>runs/</code> sampai ada keputusan.</li>
+</ul>
+<p><strong>Lapis 3 — Keputusan (setelah 14 hari)</strong>
+Craft Anything naik jadi tahap resmi pipeline SDB <strong>hanya jika</strong> 4 gerbang lulus:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Gerbang</th>
+<th>Syarat lulus</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G1 Fungsional</td>
+<td>1 rebuild nyata pada <code>sdb-local-demo</code> mencapai status <strong>Ready</strong> dengan skor kemiripan ≥ 0,80</td>
+</tr>
+<tr>
+<td>G2 Keselamatan</td>
+<td>0 pelanggaran clean-room (tidak ada tool Deep yang jalan, tidak ada akses keluar folder proyek)</td>
+</tr>
+<tr>
+<td>G3 Reproduksibilitas</td>
+<td>Instalasi dari rilis v0.3.0 + checksum, bisa diulang di mesin kedua dengan hasil sama</td>
+</tr>
+<tr>
+<td>G4 Biaya</td>
+<td>Token per rebuild tercatat dan masuk anggaran yang disetujui</td>
+</tr>
+</tbody>
+</table></div>
+<p>Gagal salah satu → pilot ditutup, REA tetap satu-satunya instrumen, temuan ditulis di <code>reports/</code>.</p>
+<hr />
+<h2 id="9-risiko-yang-harus-diterima-dan-mitigasinya">9. Risiko yang harus diterima (dan mitigasinya)</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Risiko</th>
+<th>Pada</th>
+<th>Mitigasi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Alpha 4 hari, 348 commit/4 hari</td>
+<td>Craft Anything</td>
+<td>Pin v0.3.0, larang update otomatis, uji ulang tiap naik versi</td>
+</tr>
+<tr>
+<td>52 tool belum terverifikasi</td>
+<td>Craft Anything</td>
+<td>Batasi ke toolset yang sudah <em>Verified</em> (core, native, browser, format)</td>
+</tr>
+<tr>
+<td>161 isu terbuka</td>
+<td>Craft Anything</td>
+<td>Baca isu yang menyentuh toolset kita sebelum pilot</td>
+</tr>
+<tr>
+<td>229+ tool MCP membengkakkan konteks</td>
+<td>REA</td>
+<td>Tetap CLI-first (sudah jadi aturan SDB)</td>
+</tr>
+<tr>
+<td>Provider butuh Ghidra/IDA/Hopper berlisensi</td>
+<td>REA</td>
+<td>Default tanpa Ghidra; bila perlu, Ghidra (gratis) saja</td>
+</tr>
+<tr>
+<td>Bintang bukan ukuran mutu</td>
+<td>keduanya</td>
+<td>Keputusan berbasis uji 14 hari, bukan popularitas</td>
+</tr>
+<tr>
+<td>Token LLM membengkak</td>
+<td>Craft Anything</td>
+<td>Batas anggaran per proyek, <code>--rounds 1</code> untuk uji awal</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="10-rencana-uji-14-hari-konkret-bisa-dieksekusi">10. Rencana uji 14 hari (konkret, bisa dieksekusi)</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Hari</th>
+<th>Aksi</th>
+<th>Kriteria lulus</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Unduh rilis v0.3.0 Linux x86_64, verifikasi checksum, <code>doctor</code></td>
+<td><code>doctor</code> hijau, tanpa build dari sumber</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Tulis Gate #0 untuk <code>sdb-local-demo</code></td>
+<td>Berkas izin tersimpan, target = milik sendiri</td>
+</tr>
+<tr>
+<td>3–4</td>
+<td>Rebuild clean-room 1 putaran</td>
+<td>Proyek dibuat, status Build tercapai</td>
+</tr>
+<tr>
+<td>5–7</td>
+<td>Rebuild sampai 6 putaran / 90%</td>
+<td>Skor kemiripan tercatat per lebar layar</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Audit jejak: apakah ada tool Deep yang jalan?</td>
+<td>0 pelanggaran (cek log + <code>checks/</code>)</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Ulangi instalasi di mesin kedua</td>
+<td>Hasil sama (G3)</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Hitung token &amp; biaya</td>
+<td>Angka nyata, dibanding anggaran</td>
+</tr>
+<tr>
+<td>11–12</td>
+<td>Uji banding: REA pada target sama</td>
+<td>Catat apa yang REA temukan dan Craft Anything lewatkan</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Tulis laporan</td>
+<td><code>reports/CRAFT_ANYTHING_PILOT_2026xxxx.md</code></td>
+</tr>
+<tr>
+<td>14</td>
+<td>Keputusan G1–G4</td>
+<td>Naik / tidak naik</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="11-lampiran-a-perintah-verifikasi-bisa-diulang">11. Lampiran A — perintah verifikasi (bisa diulang)</h2>
+<pre><code class="language-bash"># 1. Metadata kedua repo
+curl -s https://api.github.com/repos/morluto/rea | jq '{stargazers_count,forks_count,open_issues_count,created_at,license:.license.spdx_id}'
+curl -s https://api.github.com/repos/storytold/craft-anything | jq '{stargazers_count,forks_count,open_issues_count,created_at,license:.license.spdx_id}'
+
+# 2. Ukuran rekayasa Craft Anything
+git clone --depth 1 https://github.com/storytold/craft-anything &amp;&amp; cd craft-anything
+find . -name '*.rs' -not -path './vendor/*' | wc -l          # 460
+find . -name '*.rs' -not -path './vendor/*' | xargs cat | wc -l  # 204498
+ls crates                                                    # 14 crate
+
+# 3. Status tool yang jujur (bawaan proyek)
+sed -n '1,30p' docs/tool-status.md
+
+# 4. Kesiapan REA di host ini
+cd ~/super-dev-builders &amp;&amp; scripts/rea capabilities | head -40
+scripts/rea --version                                        # 6.8.0
+
+# 5. Cek telemetri (harus kosong)
+grep -rn -iE 'posthog|sentry|amplitude|telemetry' craft-anything/crates craft-anything/apps | head
+</code></pre>
+<h2 id="12-lampiran-b-sumber">12. Lampiran B — sumber</h2>
+<ul>
+<li>GitHub REST API, <code>morluto/rea</code> dan <code>storytold/craft-anything</code>, diambil 4 Nov 2026.</li>
+<li><code>storytold/craft-anything</code> — <code>README.md</code>, <code>AGENTS.md</code>, <code>SECURITY.md</code>, <code>docs/STATUS.md</code>, <code>docs/tool-status.md</code>, <code>docs/tools.md</code>, <code>deny.toml</code>, rilis <code>v0.3.0</code> (29 aset).</li>
+<li><code>rea-agents@6.8.0</code> lokal: <code>~/.hermes/tools/rea-6.8.0/node_modules/rea-agents</code> — <code>package.json</code> (MIT, 12 dependensi), <code>README.md</code>, <code>dist</code>, keluaran <code>scripts/rea capabilities</code> (12 entri provider, 53 grup, 113 operasi di host ini).</li>
+<li>Registry SDB: <code>registry/skills.yaml:253-262</code>, <code>registry/tools.yaml:116-121</code>, <code>scripts/workflow_run.py:53-72</code>, <code>tests/test_rea_integration.py</code>.</li>
+</ul>
+<hr />
+<p><em>Disusun oleh Hermes Anantara v3 untuk Divisi Ekosistem SDB. Semua angka dapat diperiksa ulang dengan perintah di Lampiran A. Yang belum diuji dinyatakan belum diuji.</em></p>
+<div class="foot">Perbandingan mendalam skill/tools REA dan Craft Anything untuk Divisi Ekosistem SDB: cakupan, alur kerja, keselamatan, kematangan, biaya, lisensi, dan rekomendasi berbasis bukti.</div>
+</main>
+</div>
+</body>
+</html>

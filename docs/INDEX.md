@@ -32,6 +32,7 @@ tanggalnya menang — dan yang kalah **harus** dipindahkan ke `docs/archive/`, b
 | `adr/0005-billing-prabayar-ber-rantai-hash.md` | uang integer μUSD, hold/charge/release, ledger ber-rantai |
 | `adr/0006-worker-lease-dan-idempotensi.md` | klaim atomik, lease, penyelesaian tepat sekali |
 | `adr/0007-pengetatan-pasca-audit.md` | siapa boleh menutup job, batal ditagih pemakaian, invoice admin, hash v2 |
+| `adr/0008-html-dokumen-dilacak-dan-gerbang-docs-lint.md` | HTML dokumen berdaftar boleh dilacak; `make docs-lint` menegakkan indeks, PDF, dan klaim angka |
 
 ## Kebijakan & keamanan
 
@@ -42,6 +43,7 @@ tanggalnya menang — dan yang kalah **harus** dipindahkan ke `docs/archive/`, b
 | `RECONSTRUCTION_POLICY.md` | batas rekonstruksi |
 | `PERMISSION_MATRIX.md` | izin per peran |
 | `THIRD_PARTY_SKILLS_DECISION_2026-10-05.md` | keputusan skill pihak ketiga |
+| `SECURITY_GATE_10.md` | gerbang keamanan lapis 10: apa yang diperiksa sebelum klaim "aman" |
 | `TECHNOLOGY_GOVERNANCE.md` | pemilihan teknologi |
 
 ## Pipeline & bukti
@@ -53,6 +55,7 @@ tanggalnya menang — dan yang kalah **harus** dipindahkan ke `docs/archive/`, b
 | `EVIDENCE_SCHEMA.md` | bentuk evidence |
 | `HANDOFF_CONTRACTS.md` | serah-terima antar divisi |
 | `PIPELINE_E2E_EVIDENCE.md` | bukti pipeline ujung-ke-ujung |
+| `WORKFLOW_SKENARIO.md` | alur kerja per skenario (web, mobile, desktop, backend, audit) beserta gate-nya |
 | `../workflows/*.yaml` | definisi workflow |
 
 ## Operasi
@@ -65,6 +68,8 @@ tanggalnya menang — dan yang kalah **harus** dipindahkan ke `docs/archive/`, b
 | `ROLLBACK_PLAN.md` | rollback umum |
 | `GETTING_STARTED.md` | orientasi cepat |
 | `HERMES_VENV_HARDENING_2026-10-05.md` | pengerasan lingkungan |
+| `DECK_INTAKE.md` | kanal input per skenario: apa yang dikirim, ke mana, jadi job apa |
+| `TELEGRAM_SDB.md` | kanal operasional Telegram: report 4 jam, tanya-jawab, perintah build |
 
 ## Integrasi
 
@@ -75,6 +80,13 @@ tanggalnya menang — dan yang kalah **harus** dipindahkan ke `docs/archive/`, b
 | `RECON_FORGE.md` | orkestrator recon/paritas (`tools/recon-forge.py`): jalur web + native, akar izin, invarian bukti |
 | `INTEGRASI_GITHUB_VERCEL_SUPABASE.md` | integrasi repo/deploy/DB |
 
+## Tutorial
+
+| Berkas | Untuk apa |
+|---|---|
+| `TUTORIAL_PENGGUNAAN.md` | panduan pakai SDB dari nol: alur, perintah, jebakan |
+| `TUTORIAL_PRIBADI.md` | panduan kerja di PC ini dan lewat Telegram |
+
 ## Laporan & audit
 
 | Dokumen | Isi |
@@ -83,6 +95,10 @@ tanggalnya menang — dan yang kalah **harus** dipindahkan ke `docs/archive/`, b
 | `../reports/REA_AUDIT_20261026.md` | audit REA sebelum integrasi |
 | `../reports/human-approval-required.md` | daftar approval |
 | `../reports/ronde-3-audit-sdb-20261011.md` | audit ronde 3 |
+| `PAKET_UPDATE_SDB_20261104.md` | paket update menyeluruh 2026-11-04 (keadaan, bukti, rencana) |
+| `REA_VS_CRAFT_ANYTHING_20261104.md` | riset perbandingan REA vs Craft Anything (dasar keputusan tool) |
+| `RESEARCH_REPLACEMENT_2026-10-04.md` | riset & eksekusi pengganti skill komersial |
+| `UPGRADE_REPORT.md` | catatan upgrade Copy Cloning V1 → SDB V2.2 |
 
 ## Arsip
 
@@ -93,8 +109,11 @@ sumbernya `.md`). Jangan menautkan arsip sebagai rujukan utama.
 
 1. Satu dokumen = satu tujuan. Kalau judulnya "dan", pecah.
 2. Kebijakan → `docs/`; keputusan → `docs/adr/`; prosedur insiden → `docs/runbooks/`; temuan → `reports/`.
-3. Perbarui indeks ini di commit yang sama. Dokumen tanpa indeks dianggap draf.
-4. Format: `.md` adalah sumber; `.html`/`.pdf` hanya hasil generate, tidak disimpan di repo (ADR-0002).
+3. Perbarui indeks ini di commit yang sama. Dokumen tanpa indeks **menggagalkan `make check`**
+   (`scripts/docs_lint.py`), bukan sekadar dianggap draf.
+4. Format: `.md` adalah sumber. `.pdf` tidak pernah disimpan di repo. `.html` hasil generate hanya boleh
+   dilacak bila terdaftar di `platform/docs-html-allowlist.json` dengan alasan tertulis (ADR-0008).
+5. Rujukan di tabel ini wajib menunjuk berkas yang benar-benar ada — tautan mati ikut menggagalkan gerbang.
 
 ## Kontrak & kode Fase 2
 

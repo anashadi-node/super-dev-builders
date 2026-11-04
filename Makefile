@@ -25,7 +25,7 @@ PY_DOC ?= $(shell \
 # TARGET lewat lingkungan (bukan interpolasi make ke shell): nilai ber-kutip/`;`/`$(...)` tetap data.
 export TARGET
 
-.PHONY: help check lint drift doctor inventory test gate-init lint-registry release-check skills-list install-main workflow install-dry-run clean-pyc docs-tutorial
+.PHONY: help check lint drift doctor inventory test gate-init lint-registry release-check skills-list install-main workflow install-dry-run clean-pyc docs-tutorial docs-lint
 
 help:
 	@grep -E "^[a-z-]+:" Makefile | sed "s/:.*//" | column -c 80
@@ -49,8 +49,11 @@ drift:
 	@if [ -d "$$HOME/.hermes/skills" ]; then $(PY_SYS) scripts/doctor.py --drift-only; \
 	else echo "SKIP drift — tanpa $$HOME/.hermes/skills (mis. runner CI)"; fi
 
-# gerbang lokal sebelum commit: lint + registry + test + drift + higiene artefak + pack
-check: lint lint-registry test drift hygiene packs
+# gerbang lokal sebelum commit: lint + registry + test + drift + higiene artefak + pack + dokumen
+# docs-lint (ADR-0008) menegakkan apa yang dulu hanya prosa di docs/INDEX.md: setiap dokumen
+# terindeks, tiap rujukan indeks hidup, tidak ada PDF terlacak, HTML generate wajib berdaftar,
+# klaim jumlah skill di README sama dengan registry. Tanpa ini aturan dokumen tidak pernah bisa gagal.
+check: lint lint-registry test drift hygiene packs docs-lint
 
 # Manifest paket per divisi (ADR-0003): hash + lisensi harus cocok dengan registry & SKILL.md.
 packs:
@@ -78,6 +81,9 @@ docs-tutorial:
 	  --title "Workflow SDB — Semua Skenario" \
 	  --desc "Alur kerja SDB untuk clone/reverse engineering, PRD jadi, chat ide, game, mobile, CLI, data, refactor, audit, dan operasional." \
 	  --kicker "Super Dev Builders · Workflow Skenario"
+
+docs-lint:
+	$(PY_SYS) scripts/docs_lint.py
 
 hygiene:
 	$(PY_SYS) scripts/repo_hygiene.py

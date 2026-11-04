@@ -4,6 +4,8 @@ Software-engineering ecosystem berbasis Hermes: merancang, membangun, menguji, m
 mendokumentasikan, dan men-deploy website / web app / mobile / desktop / backend / API / database /
 AI-agent integration / platform enterprise — **termasuk Authorized Reverse Engineering & Reconstruction**.
 
+Repo resmi: <https://github.com/anashadi-node/super-dev-builders> (privat; akses lewat undangan Owner).
+
 Acuan utama (sumber kebenaran) arsitektur ini: `docs/00_MASTER_BLUEPRINT_V2.2.html`
 (Hermes AI Software Engineering Company — Super Dev Builders Ecosystem — Master Blueprint V2.2).
 Semua keputusan di repo ini harus bisa ditelusuri balik ke blueprint tersebut.
@@ -25,7 +27,7 @@ platform/        kontrak produk: skema tenant/job/artifact, baseline higiene, ma
 sdb_platform/    kode produk Python — control plane: tenant, kuota, job, artefak (Fase 2a)
 docs/            blueprint, arsitektur, ADR, runbook, kebijakan, indeks dokumen (docs/INDEX.md)
 registry/        skill registry + tool registry (sumber, revisi terpin, status)
-skills/          sumber kanonik custom skill ekosistem ini (jumlah = registry/skills.yaml, kini 39; cek `make drift`) (dipasang ke profil, bukan disalin liar)
+skills/          sumber kanonik custom skill ekosistem ini (jumlah = registry/skills.yaml, kini 40; cek `make drift`) (dipasang ke profil, bukan disalin liar)
 agents/          charter mesin-terbaca per divisi (permission, input/output, batas)
 workflows/       definisi gate + tahap workflow (machine-readable)
 templates/       manifest otorisasi, target manifest, ADR, laporan akhir, handover

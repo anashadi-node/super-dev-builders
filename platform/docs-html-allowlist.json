@@ -1,0 +1,37 @@
+{
+  "keterangan": "HTML dokumen yang SENGAJA dilacak agar bisa dibaca langsung dari repo tanpa build. Berkas HTML baru di docs/ atau reports/ wajib punya entri di sini + alasan tertulis, atau akan menggagalkan `make docs-lint` (ADR-0008). PDF tidak pernah diizinkan.",
+  "files": [
+    {
+      "path": "docs/00_MASTER_BLUEPRINT_V2.2.html",
+      "reason": "Sumber kebenaran arsitektur yang ditulis sebagai HTML asli (bukan hasil generate .md); README menautkannya sebagai acuan utama."
+    },
+    {
+      "path": "docs/TUTORIAL_PENGGUNAAN.html",
+      "reason": "Tutorial pengguna dibaca langsung dari repo; dibangun ulang oleh `make docs-tutorial`, tapi HTML-nya adalah bentuk baca yang disepakati."
+    },
+    {
+      "path": "docs/TUTORIAL_PRIBADI.html",
+      "reason": "Panduan kerja pribadi Owner, bentuk baca HTML agar tabel lebar tetap terbaca."
+    },
+    {
+      "path": "docs/WORKFLOW_SKENARIO.html",
+      "reason": "Skema alur kerja dengan diagram; HTML mempertahankan tampilan diagram yang rusak bila dibaca sebagai .md mentah."
+    },
+    {
+      "path": "docs/PAKET_UPDATE_SDB_20261104.html",
+      "reason": "Paket revisi yang dikirim ke Owner sebagai lampiran baca; .md tetap menjadi sumber."
+    },
+    {
+      "path": "docs/REA_VS_CRAFT_ANYTHING_20261104.html",
+      "reason": "Laporan perbandingan REA vs Craft Anything untuk keputusan Owner; HTML agar tabel bukti terbaca."
+    },
+    {
+      "path": "reports/LAPORAN_SDB_LENGKAP_20261008.html",
+      "reason": "Laporan lengkap untuk dibaca; satu-satunya bentuk berkasnya (tanpa pasangan .md)."
+    },
+    {
+      "path": "reports/RESEARCH_REPLACEMENT_2026-10-04.html",
+      "reason": "Laporan riset pengganti tool komersial, dikirim sebagai dokumen baca."
+    }
+  ]
+}

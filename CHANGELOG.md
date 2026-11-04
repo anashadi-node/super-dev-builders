@@ -5,6 +5,30 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/) dan [S
 ## [Belum dirilis]
 
 ### Ditambahkan
+- **Gerbang dokumen `scripts/docs_lint.py` (`make docs-lint`, ikut `make check`).** Aturan
+  `docs/INDEX.md` dulu hanya prosa; audit 2026-11-04 menemukan 10 dokumen tanpa entri indeks,
+  3 PDF hasil generate masih terlacak, dan README mengklaim 39 skill padahal registry berisi 40.
+  Gerbang kini memeriksa: setiap `docs/**/*.md` terindeks (ADR lewat nomor `ADR-000N`), setiap
+  rujukan indeks menunjuk berkas yang ada, tidak ada `.pdf` terlacak, `.html` di `docs/`/`reports/`
+  wajib berdaftar di `platform/docs-html-allowlist.json` beserta alasan, klaim jumlah skill README
+  sama dengan `registry/skills.yaml`, dan tautan repo resmi ada. 10 uji negatif di
+  `tests/test_docs_lint.py` — tiap aturan diuji karena harus MENOLAK, bukan sekadar ada.
+- `docs/adr/0008-html-dokumen-dilacak-dan-gerbang-docs-lint.md` — dasar keputusan HTML berdaftar
+  boleh dilacak, PDF tidak pernah.
+
+### Diubah
+- `README.md`: klaim jumlah custom skill 39 → 40 (sesuai registry) dan tautan repo resmi
+  `github.com/anashadi-node/super-dev-builders` ditambahkan di bagian atas.
+- `docs/INDEX.md`: 10 dokumen masuk indeks (Seksi Tutorial baru, `DECK_INTAKE`, `TELEGRAM_SDB`,
+  `WORKFLOW_SKENARIO`, `SECURITY_GATE_10`, 4 laporan), ADR-0008 terdaftar, aturan menambah
+  dokumen kini menunjuk gerbang nyata.
+
+### Dihapus
+- 3 PDF hasil generate (`docs/REA_VS_CRAFT_ANYTHING_20261104.pdf`,
+  `docs/archive/INTEGRASI_GITHUB_VERCEL_SUPABASE.pdf`, `reports/RESEARCH_REPLACEMENT_2026-10-04.pdf`)
+  dan 1 HTML arsip hasil generate dilepas dari pelacakan (tetap ada di disk, bisa dibangun ulang
+  dari `.md`; riwayat git tidak ditulis ulang). `.gitignore` menolak PDF baru.
+
 - **`tools/recon-forge.py` — jalur recon native + gerbang bukti.** `recon --kind native
   --path <berkas>` membungkus `rea inspect` (dan `decompile-all` dengan `--decompile`),
   sehingga biner/ELF masuk alur yang sama dengan target web.

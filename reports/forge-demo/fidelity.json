@@ -1,0 +1,65 @@
+[
+  {
+    "dimension": "visual",
+    "status": "ok",
+    "coverage": 0.9755,
+    "evidence": "verification/forge-demo/diffs/visual-index.png",
+    "note": "pixel diff full-page / (coverage = 1 - rasio piksel berbeda; selisih gaya disengaja dilaporkan apa adanya)"
+  },
+  {
+    "dimension": "navigation",
+    "status": "ok",
+    "coverage": 1.0,
+    "evidence": "normalized/forge-demo/screens.json",
+    "note": "Jaccard tautan (original=2, rebuild=2)"
+  },
+  {
+    "dimension": "interaction",
+    "status": "NOT_MEASURED",
+    "coverage": null,
+    "evidence": "capture.json#pages[].interaction",
+    "note": "tidak ada interaksi berhasil untuk dibandingkan"
+  },
+  {
+    "dimension": "api_contract",
+    "status": "NOT_OBSERVED",
+    "coverage": null,
+    "evidence": "normalized/<target>/network.json",
+    "note": "tidak ada panggilan API yang diobservasi — tidak diklaim setara, tidak dikarang"
+  },
+  {
+    "dimension": "functional",
+    "status": "ok",
+    "coverage": 1.0,
+    "evidence": "normalized/forge-demo/inventory.json",
+    "note": "status HTTP per halaman sama"
+  },
+  {
+    "dimension": "accessibility",
+    "status": "ok",
+    "coverage": 1.0,
+    "evidence": "normalized/<target>/components.json",
+    "note": "fitur original terpenuhi 3/3"
+  },
+  {
+    "dimension": "responsive",
+    "status": "NOT_MEASURED",
+    "coverage": null,
+    "evidence": "-",
+    "note": "capture mobile tidak dijalankan"
+  },
+  {
+    "dimension": "performance",
+    "status": "ok",
+    "coverage": 1.0,
+    "evidence": "capture.json#pages[].load_ms",
+    "note": "load original 500 ms vs rebuild 486 ms (coverage=rasio dibatasi 1.0)"
+  },
+  {
+    "dimension": "external_dependency",
+    "status": "NOT_OBSERVED",
+    "coverage": null,
+    "evidence": "normalized/<target>/network.json",
+    "note": "original juga tidak menghubungi host pihak ketiga"
+  }
+]

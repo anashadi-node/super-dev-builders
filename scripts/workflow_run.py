@@ -53,7 +53,10 @@ INTAKE_AS: dict[str, str] = {"01": "requirements.md"}
 STAGES: list[tuple[str, str, list[str], str]] = [
     ("01", "USER OBJECTIVE", ["runs/{t}/requirements.md"], "-"),
     ("01A", "AUTHORIZATION/SCOPE GATE", ["reports/{t}/gate0-verdict.json"], "gate_check.py"),
-    ("01B", "RECON/EVIDENCE PACKAGE", ["normalized/{t}/inventory.json", "evidence/{t}/**/*.json"], "-"),
+    # 01B menerima manifest recon-forge: bukti yang dipanen alat (REA) bertanda hash,
+    # bukan sekadar "ada berkas JSON di folder evidence".
+    ("01B", "RECON/EVIDENCE PACKAGE",
+     ["evidence/{t}/rea/manifest.json", "normalized/{t}/inventory.json", "evidence/{t}/**/*.json"], "-"),
     ("02", "ORCHESTRATOR: KLARIFIKASI", ["runs/{t}/clarifications.md", "runs/{t}/requirements.md"], "-"),
     ("03", "RESEARCH (bila perlu)", ["runs/{t}/docs/research-*.md", "docs/RESEARCH_*"], "-"),
     ("04", "ARCHITECTURE + ADR", ["runs/{t}/docs/adr-*.md", "runs/{t}/docs/architecture-*.md"], "-"),

@@ -1,0 +1,47 @@
+{
+  "target": "forge-demo",
+  "at": "2026-11-04T20:30:14+07:00",
+  "tool": "recon-forge",
+  "stages": [
+    {
+      "stage": "01A.gate0",
+      "artifact": "reports/forge-demo/gate0-verdict.json",
+      "present": true,
+      "sha256": "a5d4037f1ecac95ce4131f3ec1e50a63084cd8a758e1c8580dc78dc391feaa6f",
+      "status": "PASS"
+    },
+    {
+      "stage": "01B.recon",
+      "artifact": "evidence/forge-demo/rea/manifest.json",
+      "present": true,
+      "sha256": "81a23176700b5c2e1545375b6e33b02ca02a9e6a41ad9255ff13e444bdd12119",
+      "status": "VERIFIED",
+      "at": "2026-11-04T20:29:40+07:00",
+      "engine": "rea@6.8.0"
+    },
+    {
+      "stage": "01B.capture",
+      "artifact": "evidence/forge-demo/capture/rebuilt/capture.json",
+      "present": true,
+      "sha256": "dd805477362651a3bd73ef93944fdd34ed0bd25016f496390954986067bdb97e",
+      "status": "PRESENT"
+    },
+    {
+      "stage": "09.parity",
+      "artifact": "reports/forge-demo/parity-summary.json",
+      "present": true,
+      "sha256": "916d74495b94d2d3059f522145547418697f96bfc961cacd7c4d9fd6d06b7766",
+      "status": "MEASURED",
+      "mean_coverage": 0.9951
+    }
+  ],
+  "unknowns": [
+    "SPEC belum ada — gerbang G1 (gerbang-spec) belum bisa dijalankan"
+  ],
+  "ladder": {
+    "evidence_collected": true,
+    "parity_measured": true,
+    "release_ready": false
+  },
+  "honest_note": "release_ready selalu false di sini: rilis butuh G3 + approval manusia"
+}

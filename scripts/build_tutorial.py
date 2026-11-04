@@ -62,7 +62,7 @@ color:#3a2b00;border-radius:0 8px 8px 0}
 blockquote p{margin:6px 0}
 .table-wrap{overflow:auto;margin:18px 0;border:1px solid var(--line);border-radius:10px}
 table{border-collapse:collapse;width:100%;font-size:14.2px}
-th,td{padding:10px 13px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th,td{padding:10px 13px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere;word-break:break-word}
 th{background:#f8fafc;font-weight:650;white-space:nowrap}
 tbody tr:last-child td{border-bottom:0}
 tbody tr:hover{background:#fbfcfe}

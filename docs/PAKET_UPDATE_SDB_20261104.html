@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Paket Update Menyeluruh — Super Dev Builders (SDB)</title>
-<meta name="description" content="Dokumen lengkap SDB versi 2.0: arsitektur, 18 tahap kerja, 5 gerbang bukti, 12 divisi, 8 agen, Telegram, control plane, keamanan, dan batasan teknis — dalam bahasa sederhana.">
+<meta name="description" content="Dokumen lengkap SDB versi 2.1: arsitektur, 18 tahap kerja, 5 gerbang bukti, 12 divisi, 8 agen, status REA, Telegram, control plane, keamanan, dan batasan teknis — dalam bahasa sederhana.">
 <style>
 :root{--bg:#fff;--fg:#16181d;--muted:#5b6472;--line:#e3e7ee;--accent:#1e5fbf;--accent-soft:#eef4ff;
 --warn:#8a5a00;--warn-bg:#fff8e6;--code-bg:#f6f8fb}
@@ -50,7 +50,7 @@ color:#3a2b00;border-radius:0 8px 8px 0}
 blockquote p{margin:6px 0}
 .table-wrap{overflow:auto;margin:18px 0;border:1px solid var(--line);border-radius:10px}
 table{border-collapse:collapse;width:100%;font-size:14.2px}
-th,td{padding:10px 13px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th,td{padding:10px 13px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere;word-break:break-word}
 th{background:#f8fafc;font-weight:650;white-space:nowrap}
 tbody tr:last-child td{border-bottom:0}
 tbody tr:hover{background:#fbfcfe}
@@ -84,10 +84,10 @@ tbody tr:hover{background:#fbfcfe}
 </head>
 <body>
 <header class="hero"><div class="wrap">
-  <div class="kicker">Super Dev Builders · Dokumen Induk v2.0</div>
+  <div class="kicker">Super Dev Builders · Dokumen Induk v2.1</div>
   <h1>Paket Update Menyeluruh — Super Dev Builders (SDB)</h1>
-  <p>Dokumen lengkap SDB versi 2.0: arsitektur, 18 tahap kerja, 5 gerbang bukti, 12 divisi, 8 agen, Telegram, control plane, keamanan, dan batasan teknis — dalam bahasa sederhana.</p>
-  <div class="badges"><span class="badge">versi 2.0</span><span class="badge">4 November 2026</span><span class="badge">repo privat</span></div>
+  <p>Dokumen lengkap SDB versi 2.1: arsitektur, 18 tahap kerja, 5 gerbang bukti, 12 divisi, 8 agen, status REA, Telegram, control plane, keamanan, dan batasan teknis — dalam bahasa sederhana.</p>
+  <div class="badges"><span class="badge">versi 2.1</span><span class="badge">4 November 2026</span><span class="badge">repo privat</span></div>
 </div></header>
 <div class="wrap layout">
 <nav class="toc"><div class="toc-title">Daftar Isi</div></nav>
@@ -1804,6 +1804,214 @@ dengan izin tertulis. Ini keputusan sadar, bukan kelalaian.</p>
 </tr>
 </tbody>
 </table></div>
+<h3 id="97-rea-reverse-engineering-anything-dipakai-atau-hanya-terpasang">9.7 REA (Reverse Engineering Anything) — dipakai atau hanya terpasang?</h3>
+<p>Ini pertanyaan yang sering muncul, dan jawabannya perlu <strong>empat lapis</strong> — karena "dipakai" bisa berarti
+empat hal berbeda.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Lapis</th>
+<th>Pertanyaan</th>
+<th>Jawaban</th>
+<th>Bukti</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Terdaftar resmi sebagai bagian SDB?</td>
+<td><strong>Ya</strong></td>
+<td><code>skills.yaml:253-262</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Terpasang dan bisa dijalankan?</td>
+<td><strong>Ya</strong>, <code>rea-agents</code> 6.8.0</td>
+<td><code>tools.yaml:116-121</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>Dimuat otomatis oleh agen tertentu?</td>
+<td><strong>Ya</strong>, 5 dari 8 peran</td>
+<td>5 pack + 5 profil (§9.7.2)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Dipanggil otomatis oleh runner?</td>
+<td><strong>Tidak</strong></td>
+<td><code>workflow_run.py:53-72</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Sudah dipakai pada target nyata?</td>
+<td><strong>Belum ada jejak</strong></td>
+<td>0 rujukan di <code>runs/</code>, <code>evidence/</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Kesimpulan satu baris:</strong> REA <strong>terpasang, teruji, dan siap dipakai</strong> oleh peran recon/architect/
+reviewer/security — tetapi <strong>belum pernah benar-benar dijalankan pada target</strong>, dan <strong>bukan</strong> bagian
+otomatis dari runner. Ia alat di kotak perkakas, bukan lini produksi otomatis.</p>
+<h3 id="971-apa-itu-rea-dan-dari-mana-asalnya">9.7.1 Apa itu REA dan dari mana asalnya</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Hal</th>
+<th>Nilai</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nama</td>
+<td><code>rea-reverse-engineering</code> (skill) + <code>rea-agents</code> (tool)</td>
+</tr>
+<tr>
+<td>Asal</td>
+<td><code>morluto/rea</code> — paket npm <code>rea-agents@6.8.0</code>, lisensi <strong>MIT</strong></td>
+</tr>
+<tr>
+<td>Commit terpin</td>
+<td><code>160d821ac9a0310afcb8d1fc427862dd6508add5</code></td>
+</tr>
+<tr>
+<td>Integritas</td>
+<td><code>sha512-9QDeRnGqEDzABZyr04eLnBXBv/c6I9/TWu/6M0MD4pEfkySI/BIgwTODIbAReX3C1x6hjw9+Jlx4A2yUSPZ9ww==</code></td>
+</tr>
+<tr>
+<td>Approval</td>
+<td>#19, 26 Oktober 2026</td>
+</tr>
+<tr>
+<td>Lokasi terpasang</td>
+<td><code>~/.hermes/tools/rea-6.8.0/node_modules/rea-agents/</code></td>
+</tr>
+<tr>
+<td>Audit</td>
+<td><code>reports/REA_AUDIT_20261026.md</code> · <code>docs/INTEGRASI_REA.md</code></td>
+</tr>
+<tr>
+<td>Commit integrasi</td>
+<td><code>3e5f32a</code> (D1, 26 Okt) · <code>223dc4c</code> (REA × Replica, Zona B)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Dua keputusan penting saat integrasi:</p>
+<ol>
+<li><strong>Tanpa <code>npx</code>.</strong> <code>npx</code> selalu mengambil versi terbaru — artinya kode yang berjalan bisa berbeda
+   minggu depan. Wrapper <code>scripts/rea</code> memakai versi terpin + node terpin
+   (<code>~/.hermes/tools/node-26.7.0-linux-x64/bin/node</code>). Satu titik versi, satu titik kegagalan.</li>
+<li><strong>MCP tidak didaftarkan.</strong> REA punya MCP server dengan <strong>229 tool</strong> dan skema <strong>3,79 MB</strong>. Itu tidak
+   dimuat ke profil Hermes, karena 229 tool akan membanjiri pemilihan tool agen dan memperbesar prompt
+   setiap sesi. Integrasi bersifat <strong>CLI-first</strong>: agen memanggil <code>scripts/rea &lt;perintah&gt;</code>.</li>
+</ol>
+<h3 id="972-siapa-yang-memuatnya">9.7.2 Siapa yang memuatnya</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Pack</th>
+<th>Profil Hermes</th>
+<th>Alasan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sdb-orchestrator</code></td>
+<td><code>cc-orchestrator</code></td>
+<td>memutuskan kapan recon perlu</td>
+</tr>
+<tr>
+<td><code>sdb-recon</code></td>
+<td><code>cc-capture-forensics</code></td>
+<td>pemakai utama: observasi target</td>
+</tr>
+<tr>
+<td><code>sdb-architect</code></td>
+<td><code>cc-architect</code></td>
+<td>membaca hasil recon → desain</td>
+</tr>
+<tr>
+<td><code>sdb-reviewer</code></td>
+<td><code>cc-reviewer-qa</code></td>
+<td>memeriksa klaim paritas</td>
+</tr>
+<tr>
+<td><code>sdb-security</code></td>
+<td><code>cc-security-governor</code></td>
+<td>menilai risiko target</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Sengaja TIDAK ada</strong> di <code>sdb-builder</code>, <code>sdb-frontend</code>, <code>sdb-devops</code>. Alasannya bukan lupa: pembangun
+harus bekerja <strong>clean-room</strong> — tidak melihat kode/hasil mentah target. Kalau builder memegang alat
+reverse engineering, batas itu hanya jadi kesepakatan lisan. Ini yang disebut batas ADR-0003 di
+<code>governance/policies/clone-policy.md</code>.</p>
+<h3 id="973-pagar-yang-mengikat-pemakaiannya">9.7.3 Pagar yang mengikat pemakaiannya</h3>
+<p>REA adalah alat paling berisiko di repo ini (bisa membaca, membongkar, dan menjalankan target). Karena
+itu pagarnya berlapis:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Lapis</th>
+<th>Aturan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gate #0</td>
+<td><strong>wajib PASS</strong> sebelum satu perintah pun dijalankan pada target</td>
+</tr>
+<tr>
+<td>Tier <strong>T0</strong> (statis, read-only)</td>
+<td><code>analyze</code>, <code>analyze-javascript-application</code>, <code>inspect-artifact</code>, <code>list-*</code>, <code>capabilities</code> — default</td>
+</tr>
+<tr>
+<td>Tier <strong>T1</strong> (capture runtime)</td>
+<td>butuh <code>network_capture_allowed: true</code> <strong>dan</strong> origin ada di <code>allowed_targets.urls</code></td>
+</tr>
+<tr>
+<td>Tier <strong>T2</strong> (debug/instrumentasi)</td>
+<td><code>gdb</code>, <code>rizin</code>, <code>frida</code> — <strong>approval tertulis per aksi</strong>, proses terisolasi, non-root, tanpa mount kredensial</td>
+</tr>
+<tr>
+<td>Tier <strong>T3</strong> (perangkat Android)</td>
+<td><code>adb</code> — hanya perangkat milik sendiri/lab, approval per aksi, <strong>tidak pernah</strong> perangkat pihak ketiga</td>
+</tr>
+<tr>
+<td>Di luar tier</td>
+<td>tidak dipakai; kalau butuh, naikkan tier <strong>eksplisit</strong> di laporan</td>
+</tr>
+</tbody>
+</table></div>
+<p>Kalau aturan ini hilang dari <code>SKILL.md</code>, <code>tests/test_rea_integration.py</code> <strong>gagal</strong> — jadi pagar ini
+bukan sekadar dokumen, tapi diuji.</p>
+<h3 id="974-enam-tes-yang-menjaga-integrasi-rea">9.7.4 Enam tes yang menjaga integrasi REA</h3>
+<p><code>tests/test_rea_integration.py</code> memeriksa:</p>
+<ol>
+<li><code>scripts/rea</code> ada, executable, versi terpin <code>6.8.0</code>, <strong>tanpa</strong> <code>npx</code>.</li>
+<li><code>registry/tools.yaml</code> memuat pin + integritas sha512 + jejak approval + kebijakan Gate #0.</li>
+<li><code>registry/skills.yaml</code> memuat entri <code>morluto/rea</code> dengan commit pin, scan, audit, dan status
+   <code>INSTALLED</code>.</li>
+<li><code>SKILL.md</code> masih memuat aturan Gate #0, tier T0/T2/T3, rujukan audit, dan <strong>clean-room</strong>.</li>
+<li>MCP 229 tool tetap <strong>tidak</strong> didaftarkan.</li>
+<li><code>approved_custom_count</code> (40) cocok dengan jumlah entri custom.</li>
+</ol>
+<h3 id="975-kenapa-belum-ada-bukti-pemakaian">9.7.5 Kenapa belum ada bukti pemakaian</h3>
+<p>Tiga target yang ada (<code>rt-rw-portal</code>, <code>oss-sb-agency</code>, <code>sdb-local-demo</code>) dibangun dengan jalur
+capture biasa (<code>capture_web.py</code> + Playwright), bukan REA. Akibatnya:</p>
+<ul>
+<li>Integrasi REA <strong>teruji secara mekanis</strong> (pin, wrapper, registry, gate, tes lulus).</li>
+<li>Tetapi <strong>belum teruji secara operasional</strong> — belum pernah menghasilkan satu <code>evidence</code> record dari
+  perintah REA sungguhan.</li>
+</ul>
+<p>Itu bukan kegagalan, tapi <strong>utang validasi</strong>. Cara melunasinya murah:</p>
+<pre><code class="language-bash">cd ~/super-dev-builders
+sdb gate sdb-local-demo                 # harus exit 0 (PASS)
+scripts/rea capabilities                # daftar tool + tier
+scripts/rea analyze --target ...        # T0 saja, read-only
+</code></pre>
+<p>Setelah itu catat satu record <code>{tool, command_digest, tier, sha256, captured_at, redaction_status}</code> ke
+<code>evidence/sdb-local-demo/</code> — bukti pemakaian pertama, dan sekaligus uji apakah skema bukti REA cocok
+dengan <code>docs/EVIDENCE_SCHEMA.md</code>.</p>
 <hr />
 <h2 id="10-pack-divisi-dan-pagar-25-skill">10. Pack divisi dan pagar 25 skill</h2>
 <h3 id="101-apa-itu-pack">10.1 Apa itu pack</h3>
@@ -5163,8 +5371,13 @@ python3 scripts/release_check.py --help
 <td>Versi awal: 20 bagian, 690 baris</td>
 </tr>
 <tr>
-<td><strong>2.0</strong></td>
+<td><strong>2.1</strong></td>
 <td><strong>4 Nov 2026</strong></td>
+<td><strong>+§9.7 REA: status empat lapis (terdaftar / terpasang 6.8.0 / dimuat 5 pack / tidak dipanggil runner / belum ada bukti pakai), tier T0–T3, 6 tes integrasi, cara melunasi utang validasi</strong></td>
+</tr>
+<tr>
+<td>2.0</td>
+<td>4 Nov 2026</td>
 <td><strong>Revisi menyeluruh: 32 bagian; +link repo GitHub; +20 rute control plane; +7 tabel DB rinci; +16 perintah bot dengan alur teknis; +status layanan &amp; 3 timer nyata; +model ancaman 6 batas kepercayaan; +25 batasan berrujukan; +roadmap P0/P1/P2; +troubleshooting 7 kategori; +cheat sheet; +Lampiran A dengan 24 angka terverifikasi</strong></td>
 </tr>
 </tbody>
@@ -5191,9 +5404,9 @@ python3 scripts/release_check.py --help
 </ul>
 <hr />
 <p><strong>Akhir dokumen.</strong></p>
-<p><em>Super Dev Builders — Divisi Ekosistem · 4 November 2026 · versi 2.0</em>
+<p><em>Super Dev Builders — Divisi Ekosistem · 4 November 2026 · versi 2.1</em>
 <em>Repository: <a href="https://github.com/anashadi-node/super-dev-builders">github.com/anashadi-node/super-dev-builders</a></em></p>
-<div class="foot">Dokumen lengkap SDB versi 2.0: arsitektur, 18 tahap kerja, 5 gerbang bukti, 12 divisi, 8 agen, Telegram, control plane, keamanan, dan batasan teknis — dalam bahasa sederhana.</div>
+<div class="foot">Dokumen lengkap SDB versi 2.1: arsitektur, 18 tahap kerja, 5 gerbang bukti, 12 divisi, 8 agen, status REA, Telegram, control plane, keamanan, dan batasan teknis — dalam bahasa sederhana.</div>
 </main>
 </div>
 </body>

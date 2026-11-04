@@ -756,6 +756,111 @@ dengan izin tertulis. Ini keputusan sadar, bukan kelalaian.
 | **Command Deck** | `sdb-command-deck` | D4, D10 |
 | **Dokumentasi** | `release-handover-docs` | D10, D11 |
 
+### 9.7 REA (Reverse Engineering Anything) — dipakai atau hanya terpasang?
+
+Ini pertanyaan yang sering muncul, dan jawabannya perlu **empat lapis** — karena "dipakai" bisa berarti
+empat hal berbeda.
+
+| Lapis | Pertanyaan | Jawaban | Bukti |
+|---|---|---|---|
+| 1 | Terdaftar resmi sebagai bagian SDB? | **Ya** | `skills.yaml:253-262` |
+| 2 | Terpasang dan bisa dijalankan? | **Ya**, `rea-agents` 6.8.0 | `tools.yaml:116-121` |
+| 3 | Dimuat otomatis oleh agen tertentu? | **Ya**, 5 dari 8 peran | 5 pack + 5 profil (§9.7.2) |
+| 4 | Dipanggil otomatis oleh runner? | **Tidak** | `workflow_run.py:53-72` |
+| 5 | Sudah dipakai pada target nyata? | **Belum ada jejak** | 0 rujukan di `runs/`, `evidence/` |
+
+**Kesimpulan satu baris:** REA **terpasang, teruji, dan siap dipakai** oleh peran recon/architect/
+reviewer/security — tetapi **belum pernah benar-benar dijalankan pada target**, dan **bukan** bagian
+otomatis dari runner. Ia alat di kotak perkakas, bukan lini produksi otomatis.
+
+### 9.7.1 Apa itu REA dan dari mana asalnya
+
+| Hal | Nilai |
+|---|---|
+| Nama | `rea-reverse-engineering` (skill) + `rea-agents` (tool) |
+| Asal | `morluto/rea` — paket npm `rea-agents@6.8.0`, lisensi **MIT** |
+| Commit terpin | `160d821ac9a0310afcb8d1fc427862dd6508add5` |
+| Integritas | `sha512-9QDeRnGqEDzABZyr04eLnBXBv/c6I9/TWu/6M0MD4pEfkySI/BIgwTODIbAReX3C1x6hjw9+Jlx4A2yUSPZ9ww==` |
+| Approval | #19, 26 Oktober 2026 |
+| Lokasi terpasang | `~/.hermes/tools/rea-6.8.0/node_modules/rea-agents/` |
+| Audit | `reports/REA_AUDIT_20261026.md` · `docs/INTEGRASI_REA.md` |
+| Commit integrasi | `3e5f32a` (D1, 26 Okt) · `223dc4c` (REA × Replica, Zona B) |
+
+Dua keputusan penting saat integrasi:
+
+1. **Tanpa `npx`.** `npx` selalu mengambil versi terbaru — artinya kode yang berjalan bisa berbeda
+   minggu depan. Wrapper `scripts/rea` memakai versi terpin + node terpin
+   (`~/.hermes/tools/node-26.7.0-linux-x64/bin/node`). Satu titik versi, satu titik kegagalan.
+2. **MCP tidak didaftarkan.** REA punya MCP server dengan **229 tool** dan skema **3,79 MB**. Itu tidak
+   dimuat ke profil Hermes, karena 229 tool akan membanjiri pemilihan tool agen dan memperbesar prompt
+   setiap sesi. Integrasi bersifat **CLI-first**: agen memanggil `scripts/rea <perintah>`.
+
+### 9.7.2 Siapa yang memuatnya
+
+| Pack | Profil Hermes | Alasan |
+|---|---|---|
+| `sdb-orchestrator` | `cc-orchestrator` | memutuskan kapan recon perlu |
+| `sdb-recon` | `cc-capture-forensics` | pemakai utama: observasi target |
+| `sdb-architect` | `cc-architect` | membaca hasil recon → desain |
+| `sdb-reviewer` | `cc-reviewer-qa` | memeriksa klaim paritas |
+| `sdb-security` | `cc-security-governor` | menilai risiko target |
+
+**Sengaja TIDAK ada** di `sdb-builder`, `sdb-frontend`, `sdb-devops`. Alasannya bukan lupa: pembangun
+harus bekerja **clean-room** — tidak melihat kode/hasil mentah target. Kalau builder memegang alat
+reverse engineering, batas itu hanya jadi kesepakatan lisan. Ini yang disebut batas ADR-0003 di
+`governance/policies/clone-policy.md`.
+
+### 9.7.3 Pagar yang mengikat pemakaiannya
+
+REA adalah alat paling berisiko di repo ini (bisa membaca, membongkar, dan menjalankan target). Karena
+itu pagarnya berlapis:
+
+| Lapis | Aturan |
+|---|---|
+| Gate #0 | **wajib PASS** sebelum satu perintah pun dijalankan pada target |
+| Tier **T0** (statis, read-only) | `analyze`, `analyze-javascript-application`, `inspect-artifact`, `list-*`, `capabilities` — default |
+| Tier **T1** (capture runtime) | butuh `network_capture_allowed: true` **dan** origin ada di `allowed_targets.urls` |
+| Tier **T2** (debug/instrumentasi) | `gdb`, `rizin`, `frida` — **approval tertulis per aksi**, proses terisolasi, non-root, tanpa mount kredensial |
+| Tier **T3** (perangkat Android) | `adb` — hanya perangkat milik sendiri/lab, approval per aksi, **tidak pernah** perangkat pihak ketiga |
+| Di luar tier | tidak dipakai; kalau butuh, naikkan tier **eksplisit** di laporan |
+
+Kalau aturan ini hilang dari `SKILL.md`, `tests/test_rea_integration.py` **gagal** — jadi pagar ini
+bukan sekadar dokumen, tapi diuji.
+
+### 9.7.4 Enam tes yang menjaga integrasi REA
+
+`tests/test_rea_integration.py` memeriksa:
+
+1. `scripts/rea` ada, executable, versi terpin `6.8.0`, **tanpa** `npx`.
+2. `registry/tools.yaml` memuat pin + integritas sha512 + jejak approval + kebijakan Gate #0.
+3. `registry/skills.yaml` memuat entri `morluto/rea` dengan commit pin, scan, audit, dan status
+   `INSTALLED`.
+4. `SKILL.md` masih memuat aturan Gate #0, tier T0/T2/T3, rujukan audit, dan **clean-room**.
+5. MCP 229 tool tetap **tidak** didaftarkan.
+6. `approved_custom_count` (40) cocok dengan jumlah entri custom.
+
+### 9.7.5 Kenapa belum ada bukti pemakaian
+
+Tiga target yang ada (`rt-rw-portal`, `oss-sb-agency`, `sdb-local-demo`) dibangun dengan jalur
+capture biasa (`capture_web.py` + Playwright), bukan REA. Akibatnya:
+
+- Integrasi REA **teruji secara mekanis** (pin, wrapper, registry, gate, tes lulus).
+- Tetapi **belum teruji secara operasional** — belum pernah menghasilkan satu `evidence` record dari
+  perintah REA sungguhan.
+
+Itu bukan kegagalan, tapi **utang validasi**. Cara melunasinya murah:
+
+```bash
+cd ~/super-dev-builders
+sdb gate sdb-local-demo                 # harus exit 0 (PASS)
+scripts/rea capabilities                # daftar tool + tier
+scripts/rea analyze --target ...        # T0 saja, read-only
+```
+
+Setelah itu catat satu record `{tool, command_digest, tier, sha256, captured_at, redaction_status}` ke
+`evidence/sdb-local-demo/` — bukti pemakaian pertama, dan sekaligus uji apakah skema bukti REA cocok
+dengan `docs/EVIDENCE_SCHEMA.md`.
+
 ---
 
 ## 10. Pack divisi dan pagar 25 skill
@@ -2222,7 +2327,8 @@ python3 scripts/release_check.py --help
 | Versi | Tanggal | Perubahan |
 |---|---|---|
 | 1.0 | 4 Nov 2026 | Versi awal: 20 bagian, 690 baris |
-| **2.0** | **4 Nov 2026** | **Revisi menyeluruh: 32 bagian; +link repo GitHub; +20 rute control plane; +7 tabel DB rinci; +16 perintah bot dengan alur teknis; +status layanan & 3 timer nyata; +model ancaman 6 batas kepercayaan; +25 batasan berrujukan; +roadmap P0/P1/P2; +troubleshooting 7 kategori; +cheat sheet; +Lampiran A dengan 24 angka terverifikasi** |
+| **2.1** | **4 Nov 2026** | **+§9.7 REA: status empat lapis (terdaftar / terpasang 6.8.0 / dimuat 5 pack / tidak dipanggil runner / belum ada bukti pakai), tier T0–T3, 6 tes integrasi, cara melunasi utang validasi** |
+| 2.0 | 4 Nov 2026 | **Revisi menyeluruh: 32 bagian; +link repo GitHub; +20 rute control plane; +7 tabel DB rinci; +16 perintah bot dengan alur teknis; +status layanan & 3 timer nyata; +model ancaman 6 batas kepercayaan; +25 batasan berrujukan; +roadmap P0/P1/P2; +troubleshooting 7 kategori; +cheat sheet; +Lampiran A dengan 24 angka terverifikasi** |
 
 ### Yang berubah dari 1.0 ke 2.0
 
@@ -2248,5 +2354,5 @@ python3 scripts/release_check.py --help
 
 **Akhir dokumen.**
 
-*Super Dev Builders — Divisi Ekosistem · 4 November 2026 · versi 2.0*
+*Super Dev Builders — Divisi Ekosistem · 4 November 2026 · versi 2.1*
 *Repository: [github.com/anashadi-node/super-dev-builders](https://github.com/anashadi-node/super-dev-builders)*

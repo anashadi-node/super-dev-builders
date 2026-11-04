@@ -98,7 +98,7 @@ def list_jobs(limit: int = 10, only_open: bool = False) -> list[dict]:
         args = OPEN_STATES
     sql += " ORDER BY id DESC LIMIT ?"
     with connect() as con:
-        return [dict(r) for r in con.execute(sql, args + (limit,))]
+        return [dict(r) for r in con.execute(sql, (*args, limit))]
 
 
 def set_status(job_id: int, status: str, note: str = "") -> None:

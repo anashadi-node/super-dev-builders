@@ -12,8 +12,8 @@ import pytest
 
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
 sys.path.insert(0, str(SCRIPTS))
-import intake_lib  # noqa: E402
-import workflow_run  # noqa: E402
+import intake_lib
+import workflow_run
 
 IID = "20261101-094618-df1e92"
 TARGET = "demo-target"
@@ -42,7 +42,7 @@ def env(tmp_path, monkeypatch):
 
 
 def test_list_intakes(env, capsys):
-    repo, _root = env
+    _repo, _root = env
     assert workflow_run.main(["--list-intakes"]) == 0
     out = capsys.readouterr().out
     assert IID in out and "scen=A" in out

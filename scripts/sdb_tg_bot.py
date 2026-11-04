@@ -33,7 +33,7 @@ import urllib.request
 from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import sdb_jobs as jobs  # noqa: E402
+import sdb_jobs as jobs
 
 API = "https://api.telegram.org"
 DB_PATH = Path(os.environ.get("SDB_DB_PATH", "~/super-dev-builders/data/control.db")).expanduser()
@@ -191,13 +191,13 @@ def _ask_hermes(question: str, context: str) -> str:
     base = ["hermes", "chat", "-Q", "--oneshot", "--query-file", "-",
             "--max-turns", "20", "--run-budget", "240"]
     try:
-        r = subprocess.run(base + ["-t", "terminal,file,skills"], input=prompt,
+        r = subprocess.run([*base, "-t", "terminal,file,skills"], input=prompt,
                            capture_output=True, text=True, timeout=300, env=env)
         if "invalid toolset" in (r.stdout or "") + (r.stderr or ""):
             r = subprocess.run(base, input=prompt, capture_output=True,
                                text=True, timeout=300, env=env)
         out = (r.stdout or "").strip()
-        out = "\n".join(l for l in out.splitlines() if not l.startswith("session_id: "))
+        out = "\n".join(ln for ln in out.splitlines() if not ln.startswith("session_id: "))
         return out or "(tidak ada jawaban)"
     except subprocess.TimeoutExpired:
         return "Analisis melebihi 5 menit. Coba pertanyaan lebih spesifik."
@@ -382,7 +382,7 @@ def process_update(u: dict) -> None:
         _post_api("sendMessage", {"chat_id": chat, "text": "Menganalisis dari data nyata… (±30 dtk)"})
     try:
         reply = handle(text)
-    except Exception as e:  # satu perintah rusak tidak boleh mematikan poller
+    except Exception as e:  # noqa: BLE001 — satu perintah rusak tidak boleh mematikan poller
         reply = f"Perintah gagal: {type(e).__name__}: {e}"[:900]
     import sdb_report
     for piece in sdb_report.chunk(reply):

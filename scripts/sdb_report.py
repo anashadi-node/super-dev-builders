@@ -31,7 +31,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 REPO = Path(os.environ.get("SDB_REPO", "~/super-dev-builders")).expanduser()
@@ -128,7 +128,7 @@ def git_info(path: Path) -> dict:
         info.update(subject=subj[:70], commit_ts=int(ts), commit_ago=rel)
     info["dirty"] = bool(run(["git", "-C", str(path), "status", "--porcelain"]))
     last7 = run(["git", "-C", str(path), "log", "--since=7.days", "--oneline"])
-    info["commit_7d"] = len([l for l in last7.splitlines() if l.strip()])
+    info["commit_7d"] = len([ln for ln in last7.splitlines() if ln.strip()])
     return info
 
 
@@ -292,7 +292,7 @@ def open_jobs(limit: int = 5) -> list[dict]:
     try:
         import sdb_jobs
         return sdb_jobs.list_jobs(limit, only_open=True)
-    except Exception:
+    except Exception:  # noqa: BLE001 — DB belum ada/belum siap: laporan tetap jalan tanpa job
         return []
 
 

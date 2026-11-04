@@ -26,7 +26,7 @@ import urllib.request
 from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import sdb_jobs as jobs  # noqa: E402
+import sdb_jobs as jobs
 
 TOKEN = os.environ.get("SDB_TG_BOT_TOKEN", "")
 OWNER = os.environ.get("SDB_TG_CHAT_ID", "")
@@ -235,7 +235,6 @@ def do_spec(job: dict) -> None:
         return
     jobs.set_status(jid, "spec_ready", "spesifikasi siap, menunggu persetujuan")
     q = read_text(d / "QUESTIONS.md", 900)
-    spec = read_text(d / "SPEC.md", 1500)
     body = (f"[#{jid}] {job['title']}\nSPESIFIKASI SIAP — menunggu persetujuan Anda.\n\n"
             f"{text[:1500]}\n")
     if q and "TIDAK ADA PERTANYAAN" not in q.upper():
@@ -327,7 +326,7 @@ def main() -> int:
         try:
             if not once():
                 time.sleep(POLL)
-        except Exception as e:  # worker tidak boleh mati karena satu job rusak
+        except Exception as e:  # noqa: BLE001 — worker tidak boleh mati karena satu job rusak
             print(f"loop error: {type(e).__name__}: {e}", file=sys.stderr)
             time.sleep(15)
 

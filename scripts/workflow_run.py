@@ -39,9 +39,8 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from sdb_common import now_iso, repo_path, validate_slug
-
 import intake_lib
+from sdb_common import now_iso, repo_path, validate_slug
 
 # Tahap yang artefaknya memang kata-kata Owner sendiri, sehingga boleh diisi
 # langsung dari brief intake. Tahap lain TIDAK boleh: brief bukan pengganti ADR,

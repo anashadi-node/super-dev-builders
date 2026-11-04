@@ -132,7 +132,7 @@ def test_brief_kosong_ditolak(live):
 
 def test_id_tidak_valid_ditolak(live):
     base, token, _root = live
-    st, j, _ = _get(base, "/api/inbox/get?id=../../etc/passwd", token)
+    st, _j, _ = _get(base, "/api/inbox/get?id=../../etc/passwd", token)
     assert st == 400
 
 
@@ -140,7 +140,7 @@ def test_download_paksa_attachment(live):
     base, token, _root = live
     _, j = _submit(base, token)
     _post(base, f"/api/inbox/file?id={j['id']}&name=jahat.html", b"<script>alert(1)</script>", token, "text/html")
-    st, body, hdrs = _get(base, f"/api/inbox/download?id={j['id']}&name=jahat.html", token)
+    st, _body, hdrs = _get(base, f"/api/inbox/download?id={j['id']}&name=jahat.html", token)
     assert st == 200
     assert hdrs["Content-Type"] == "application/octet-stream"
     assert hdrs["Content-Disposition"].startswith("attachment")

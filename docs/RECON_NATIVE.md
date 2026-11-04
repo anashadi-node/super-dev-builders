@@ -43,6 +43,7 @@ ELF 64-bit PIE, x86-64, not stripped).
 | `gate_check` target `elf-demo` (mode B, `authorization_type: owned`, `owner_operator` cocok) | **PASS** — keputusan Owner 2026-11-04: `owned` sah bila operator akun OS yang menjalankan gerbang sama dengan `owner_operator` di manifest |
 | `gate_check` `owned` tanpa `owner_operator`, atau operator berbeda | **BLOCKED** — dua uji negatif (`test_mode_b_owned_tanpa_owner_operator_ditolak`, `test_mode_b_owned_operator_berbeda_ditolak`) memastikan `owned` bukan celah universal |
 | `recon-forge recon --kind native --decompile` target `elf-demo` | **rc=0 ujung-ke-ujung** — 2 artefak: inspect 8.440 B + decompile-all 44.123 B, provider **Ghidra 12.1.4**, `verified: true` |
+| Target kedua: `forge-demo` (`hello-elf`, 26 KB) setelah dinaikkan ke mode B + `owner_operator: anashadi` | **rc=0** — `ev_a17d127c…`, sha256 `8a63c983…`, 2 artefak (8.424 B + 46.191 B), provider **Ghidra 12.1.4**, `verified: true` |
 
 Artinya: jalur biner SDB **sudah terbukti bekerja ujung-ke-ujung** (gate → izin → REA → Ghidra
 → artefak terverifikasi). Jalur `owned` tidak melonggarkan gerbang: ia mengikat izin ke identitas

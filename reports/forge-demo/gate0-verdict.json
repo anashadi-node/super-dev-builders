@@ -1,10 +1,10 @@
 {
   "gate": "gate0",
   "verdict": "PASS",
-  "checked_at": "2026-11-04T20:28:25+0700",
+  "checked_at": "2026-11-04T23:40:50+0700",
   "manifest": "/home/anashadi/super-dev-builders/evidence/forge-demo/authorization.yaml",
   "target": "forge-demo",
-  "mode": "A",
+  "mode": "B",
   "fail": [],
   "blocked": [],
   "warn": []

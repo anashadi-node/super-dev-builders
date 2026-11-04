@@ -78,7 +78,11 @@ tbody tr:hover{background:#fbfcfe}
   header.hero{background:none;padding-top:0}
   body{font-size:11.2pt;line-height:1.5}
   h2,h3{page-break-after:avoid;margin-top:22px}
-  pre,table,blockquote{page-break-inside:avoid}
+  pre,blockquote{page-break-inside:avoid}
+  table{page-break-inside:auto}
+  tr,td,th{page-break-inside:avoid}
+  thead{display:table-header-group}
+  .table-wrap{overflow:visible}
   a{color:#000;text-decoration:none}
   .wrap{max-width:none;padding:0}
   @page{size:A4;margin:16mm 14mm}

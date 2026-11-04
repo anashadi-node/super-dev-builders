@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paket Update Menyeluruh — Super Dev Builders</title>
+<meta name="description" content="Semua detail SDB: 16 tahap, 12 divisi, gate, perkakas, bot Telegram, bukti, dan batasan — bahasa awam">
+<style>
+:root{--bg:#fff;--fg:#16181d;--muted:#5b6472;--line:#e3e7ee;--accent:#1e5fbf;--accent-soft:#eef4ff;
+--warn:#8a5a00;--warn-bg:#fff8e6;--code-bg:#f6f8fb}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;color:var(--fg);background:var(--bg);
+font:16px/1.72 -apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:0 28px 96px}
+header.hero{border-bottom:1px solid var(--line);margin-bottom:36px;padding:56px 0 28px;
+background:linear-gradient(180deg,var(--accent-soft),transparent)}
+.hero .kicker{color:var(--accent);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:12px}
+.hero h1{font-size:clamp(26px,4vw,40px);line-height:1.2;margin:10px 0 12px;letter-spacing:-.02em}
+.hero p{margin:0;color:var(--muted);max-width:70ch}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.badge{font-size:12.5px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);background:#fff}
+.layout{display:grid;grid-template-columns:266px minmax(0,1fr);gap:44px;align-items:start}
+nav.toc{position:sticky;top:18px;max-height:calc(100vh - 36px);overflow:auto;border-right:1px solid var(--line);padding-right:14px}
+nav.toc .toc-title,.toc-inline .toc-title{font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+color:var(--muted);font-weight:700;margin-bottom:10px}
+nav.toc ul{list-style:none;margin:0;padding:0;font-size:13.5px;line-height:1.45}
+nav.toc ul ul{margin:4px 0 8px 12px;border-left:1px solid var(--line);padding-left:10px}
+nav.toc li{margin:6px 0}
+nav.toc a{color:var(--muted);text-decoration:none;display:block;padding:2px 4px;border-radius:4px}
+nav.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+main{min-width:0}
+h1,h2,h3,h4{line-height:1.28;letter-spacing:-.015em}
+h2{font-size:26px;margin:46px 0 14px;padding-top:14px;border-top:1px solid var(--line)}
+h3{font-size:19.5px;margin:30px 0 10px}
+h4{font-size:16.5px;margin:22px 0 8px}
+p{margin:12px 0}
+a{color:var(--accent)}
+ul,ol{padding-left:22px}
+li{margin:6px 0}
+strong{font-weight:650}
+hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+code{font-family:ui-monospace,SFMono-Regular,"JetBrains Mono",Menlo,Consolas,monospace;font-size:13.6px;
+background:var(--code-bg);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+pre{background:var(--code-bg);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow:auto;line-height:1.55}
+pre code{background:none;border:0;padding:0;font-size:13.2px;white-space:pre}
+blockquote{margin:18px 0;padding:14px 18px;border-left:4px solid var(--warn);background:var(--warn-bg);
+color:#3a2b00;border-radius:0 8px 8px 0}
+blockquote p{margin:6px 0}
+.table-wrap{overflow:auto;margin:18px 0;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:14.2px}
+th,td{padding:10px 13px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:#f8fafc;font-weight:650;white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:#fbfcfe}
+.toc-inline{border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin:18px 0 26px;background:#fbfcfe}
+.toc-inline ul{list-style:none;margin:0;padding:0;columns:2;column-gap:28px;font-size:13.8px}
+.toc-inline ul ul{columns:1;margin:2px 0 6px 12px;border-left:1px solid var(--line);padding-left:10px}
+.toc-inline a{color:var(--fg);text-decoration:none}
+.toc-inline a:hover{color:var(--accent)}
+.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13.5px}
+@media print{
+  nav.toc{display:none}
+  .layout{display:block}
+  header.hero{background:none;padding-top:0}
+  body{font-size:11.2pt;line-height:1.5}
+  h2,h3{page-break-after:avoid;margin-top:22px}
+  pre,blockquote{page-break-inside:avoid}
+  table{page-break-inside:auto}
+  tr,td,th{page-break-inside:avoid}
+  thead{display:table-header-group}
+  .table-wrap{overflow:visible}
+  a{color:#000;text-decoration:none}
+  .wrap{max-width:none;padding:0}
+  @page{size:A4;margin:16mm 14mm}
+}
+@media (max-width:900px){
+  .layout{display:block}
+  nav.toc{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--line);
+    padding:0 0 14px;margin-bottom:22px}
+}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <div class="kicker">Super Dev Builders · Dokumentasi Pengguna</div>
+  <h1>Paket Update Menyeluruh — Super Dev Builders</h1>
+  <p>Semua detail SDB: 16 tahap, 12 divisi, gate, perkakas, bot Telegram, bukti, dan batasan — bahasa awam</p>
+  <div class="badges"><span class="badge">dokumentasi</span><span class="badge">tanpa dependensi runtime</span></div>
+</div></header>
+<div class="wrap layout">
+<nav class="toc"><div class="toc-title">Daftar Isi</div><div class="toc">
+<ul>
+<li><a href="#daftar-isi">Daftar Isi</a></li>
+<li><a href="#1-ringkasan-tiga-menit">1. Ringkasan tiga menit</a></li>
+<li><a href="#2-apa-itu-super-dev-builders-dengan-analogi">2. Apa itu Super Dev Builders — dengan analogi</a><ul>
+<li><a href="#21-analogi-utama-bengkel-mobil-dengan-sop">2.1 Analogi utama: bengkel mobil dengan SOP</a></li>
+<li><a href="#22-analogi-kedua-dapur-restoran">2.2 Analogi kedua: dapur restoran</a></li>
+<li><a href="#23-tiga-kata-yang-perlu-dipegang">2.3 Tiga kata yang perlu dipegang</a></li>
+</ul>
+</li>
+<li><a href="#3-masalah-yang-dipecahkan-sdb">3. Masalah yang dipecahkan SDB</a></li>
+<li><a href="#4-prinsip-0-keamanan-lebih-dulu-bukan-kecepatan">4. Prinsip #0: keamanan lebih dulu, bukan kecepatan</a></li>
+<li><a href="#5-alur-kerja-16-tahap-dari-ide-sampai-serah-terima">5. Alur kerja 16 tahap — dari ide sampai serah terima</a></li>
+<li><a href="#6-dua-belas-divisi-siapa-mengerjakan-apa">6. Dua belas divisi: siapa mengerjakan apa</a></li>
+<li><a href="#7-gerbang-gate-dan-bukti-kenapa-sudah-selesai-tidak-cukup">7. Gerbang (gate) dan bukti: kenapa "sudah selesai" tidak cukup</a><ul>
+<li><a href="#71-gate-0-pintu-izin">7.1 Gate #0 — pintu izin</a></li>
+<li><a href="#72-release-gate-bukti-bukan-pernyataan">7.2 Release gate — bukti, bukan pernyataan</a></li>
+<li><a href="#73-empat-kelas-risiko">7.3 Empat kelas risiko</a></li>
+<li><a href="#74-pemantau-ci">7.4 Pemantau CI</a></li>
+</ul>
+</li>
+<li><a href="#8-isi-rumah-struktur-folder-dan-artinya">8. Isi rumah: struktur folder dan artinya</a></li>
+<li><a href="#9-perkakas-31-skrip-14-perintah-sdb-470-tes">9. Perkakas: 31 skrip, 14 perintah sdb, 470 tes</a><ul>
+<li><a href="#91-satu-pintu-masuk-scriptssdbpy">9.1 Satu pintu masuk: scripts/sdb.py</a></li>
+<li><a href="#92-skrip-pendukung-penting">9.2 Skrip pendukung penting</a></li>
+<li><a href="#93-target-make-yang-sering-dipakai">9.3 Target make yang sering dipakai</a></li>
+<li><a href="#94-uji-otomatis-470-tes">9.4 Uji otomatis: 470 tes</a></li>
+</ul>
+</li>
+<li><a href="#10-skill-dan-tool-40-skill-sendiri-17-tool-terpasang">10. Skill dan tool: 40 skill sendiri, 17 tool terpasang</a><ul>
+<li><a href="#101-skill-cara-kerja-yang-bisa-dipanggil">10.1 Skill (cara kerja yang bisa dipanggil)</a></li>
+<li><a href="#102-tool-terpasang-versi-dipin-bukan-latest">10.2 Tool terpasang (versi dipin, bukan "latest")</a></li>
+</ul>
+</li>
+<li><a href="#11-ruang-kendali-command-deck-dan-control-plane">11. Ruang kendali (Command Deck) dan control plane</a><ul>
+<li><a href="#111-command-deck-jendela-pandang-di-pc-ini">11.1 Command Deck — jendela pandang di PC ini</a></li>
+<li><a href="#112-control-plane-loket-layanan-multi-tenant-tahap-awal">11.2 Control plane — loket layanan multi-tenant (tahap awal)</a></li>
+</ul>
+</li>
+<li><a href="#12-bot-telegram-sdb-tiga-kanal-operasional">12. Bot Telegram SDB: tiga kanal operasional</a><ul>
+<li><a href="#121-kanal-1-laporan-otomatis-tiap-4-jam">12.1 Kanal 1 — laporan otomatis tiap 4 jam</a></li>
+<li><a href="#122-kanal-2-tanya-kapan-saja">12.2 Kanal 2 — tanya kapan saja</a></li>
+<li><a href="#123-kanal-3-perintah-membuat-produk">12.3 Kanal 3 — perintah membuat produk</a></li>
+</ul>
+</li>
+<li><a href="#13-alur-membuat-produk-lewat-telegram-langkah-demi-langkah">13. Alur membuat produk lewat Telegram — langkah demi langkah</a><ul>
+<li><a href="#131-alurnya">13.1 Alurnya</a></li>
+<li><a href="#132-kenapa-dua-tahap">13.2 Kenapa dua tahap?</a></li>
+<li><a href="#133-bukti-nyata-job-1-villa-nusantara">13.3 Bukti nyata: job #1 "Villa Nusantara"</a></li>
+<li><a href="#134-batas-yang-dipasang-pada-pekerja-build">13.4 Batas yang dipasang pada pekerja build</a></li>
+</ul>
+</li>
+<li><a href="#14-keamanan-berlapis-apa-yang-dijaga-dan-bagaimana">14. Keamanan berlapis: apa yang dijaga dan bagaimana</a></li>
+<li><a href="#15-cara-pakai-harian-cheat-sheet">15. Cara pakai harian — cheat sheet</a><ul>
+<li><a href="#151-di-telegram-paling-praktis">15.1 Di Telegram (paling praktis)</a></li>
+<li><a href="#152-di-terminal-pc-ini">15.2 Di terminal PC ini</a></li>
+<li><a href="#153-melihat-hasil-build">15.3 Melihat hasil build</a></li>
+<li><a href="#154-kalau-laporan-telegram-berhenti">15.4 Kalau laporan Telegram berhenti</a></li>
+</ul>
+</li>
+<li><a href="#16-batasan-jujur-apa-yang-belum-ada">16. Batasan jujur: apa yang belum ada</a></li>
+<li><a href="#17-glosarium-bahasa-awam">17. Glosarium bahasa awam</a></li>
+<li><a href="#18-peta-dokumen-rujukan">18. Peta dokumen rujukan</a></li>
+<li><a href="#19-lampiran-a-angka-terverifikasi-dan-cara-mengeceknya">19. Lampiran A — angka terverifikasi dan cara mengeceknya</a><ul>
+<li><a href="#hasil-uji-terakhir">Hasil uji terakhir</a></li>
+</ul>
+</li>
+<li><a href="#20-lampiran-b-riwayat-dokumen">20. Lampiran B — riwayat dokumen</a></li>
+</ul>
+</div>
+</nav>
+<main>
+<p><strong>Versi dokumen:</strong> 1.0 · <strong>Tanggal:</strong> 4 November 2026 · <strong>Disusun oleh:</strong> Divisi Ekosistem SDB
+<strong>Untuk:</strong> Mas Anas (pemilik) · <strong>Sifat:</strong> penjelasan lengkap, bahasa awam, semua angka terverifikasi</p>
+<blockquote>
+<p><strong>Cara membaca dokumen ini.</strong> Kalau Anda hanya punya 3 menit, baca <strong>Bagian 1</strong> saja.
+Kalau ingin tahu "apa saja isinya", baca <strong>Bagian 4–7</strong>. Kalau ingin langsung memakai,
+lompat ke <strong>Bagian 13 (cheat sheet)</strong>. Semua istilah asing dijelaskan di <strong>Bagian 17 (glosarium)</strong>.</p>
+</blockquote>
+<hr />
+<h2 id="daftar-isi">Daftar Isi</h2>
+<ol>
+<li>Ringkasan tiga menit</li>
+<li>Apa itu Super Dev Builders — dengan analogi</li>
+<li>Masalah yang dipecahkan SDB</li>
+<li>Prinsip #0: keamanan lebih dulu, bukan kecepatan</li>
+<li>Alur kerja 16 tahap — dari ide sampai serah terima</li>
+<li>Dua belas divisi: siapa mengerjakan apa</li>
+<li>Gerbang (gate) dan bukti: kenapa "sudah selesai" tidak cukup</li>
+<li>Isi rumah: struktur folder dan artinya</li>
+<li>Perkakas: 31 skrip, 14 perintah <code>sdb</code>, 470 tes</li>
+<li>Skill dan tool: 40 skill sendiri, 17 tool terpasang</li>
+<li>Ruang kendali (Command Deck) dan control plane</li>
+<li>Bot Telegram SDB: tiga kanal operasional</li>
+<li>Alur membuat produk lewat Telegram — langkah demi langkah</li>
+<li>Keamanan berlapis: apa yang dijaga dan bagaimana</li>
+<li>Cara pakai harian — cheat sheet</li>
+<li>Batasan jujur: apa yang belum ada</li>
+<li>Glosarium bahasa awam</li>
+<li>Peta dokumen rujukan</li>
+<li>Lampiran A — angka terverifikasi dan cara mengeceknya</li>
+<li>Lampiran B — riwayat dokumen</li>
+</ol>
+<hr />
+<h2 id="1-ringkasan-tiga-menit">1. Ringkasan tiga menit</h2>
+<p><strong>SDB adalah "pabrik perangkat lunak" pribadi yang bekerja dengan prosedur tetap.</strong>
+Ia bukan satu program ajaib, melainkan kumpulan aturan + alat + agen AI yang dijalankan
+dengan urutan yang sama setiap kali: <strong>izin dulu → pahami → rencanakan → bangun → periksa →
+bukti → serahkan.</strong></p>
+<p>Tiga hal yang membuatnya berbeda dari "minta AI bikin aplikasi":</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Hal</th>
+<th>Tanpa SDB</th>
+<th>Dengan SDB</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Izin</td>
+<td>Langsung kerjakan</td>
+<td><strong>Gate #0</strong>: harus ada dasar otorisasi tertulis, kalau tidak → berhenti</td>
+</tr>
+<tr>
+<td>Bukti</td>
+<td>"Sudah jadi, percaya saja"</td>
+<td>Perintah + output nyata ditempel di <code>VERIFY.md</code>; gate menolak PASS tanpa artefak</td>
+</tr>
+<tr>
+<td>Keamanan</td>
+<td>Terserah model</td>
+<td>4 kelas risiko, isolasi proses, pemindaian rahasia, approval manusia untuk aksi berisiko</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Kondisinya per 4 November 2026</strong> (semua angka bisa Anda cek sendiri, lihat Lampiran A):</p>
+<ul>
+<li>130 commit, 103 berkas Python, 18.748 baris kode, 36 berkas tes, <strong>470 tes</strong>.</li>
+<li><strong>40 skill buatan sendiri</strong> + 17 tool terpasang (versi dipin) + 8 paket divisi.</li>
+<li><strong>12 divisi (D0–D11)</strong>, <strong>16 tahap kerja</strong>, <strong>4 kelas risiko</strong>.</li>
+<li>3 layanan aktif: bot Telegram, pekerja build, dan Command Deck; 3 timer: laporan 4 jam,</li>
+<li>pemantau CI, dan pemeriksaan kesehatan deck.</li>
+<li>Bot Telegram sudah bisa <strong>melapor otomatis tiap 4 jam</strong>, <strong>menjawab pertanyaan</strong>, dan</li>
+<li><strong>menerima perintah membuat produk</strong> dengan alur dua tahap (spesifikasi → persetujuan → build).</li>
+</ul>
+<p><strong>Satu kalimat:</strong> SDB mengubah "minta AI menulis kode" menjadi "proyek kecil yang punya
+izin, rencana, bukti uji, dan jejak audit".</p>
+<hr />
+<h2 id="2-apa-itu-super-dev-builders-dengan-analogi">2. Apa itu Super Dev Builders — dengan analogi</h2>
+<h3 id="21-analogi-utama-bengkel-mobil-dengan-sop">2.1 Analogi utama: bengkel mobil dengan SOP</h3>
+<p>Bayangkan bengkel yang menerima mobil pelanggan. Bengkel biasa: mekanik langsung buka kap
+mesin. Bengkel bersertifikat:</p>
+<ol>
+<li><strong>Cek surat-surat dulu</strong> — ini mobil siapa, boleh dibongkar atau tidak. (Gate #0)</li>
+<li><strong>Diagnosa</strong> — keluhan apa, gejala apa, dicatat. (Tahap 01–03)</li>
+<li><strong>Rancang perbaikan</strong> — gambar kerja, part apa. (Tahap 04–06)</li>
+<li><strong>Kerjakan</strong> — mekanik berbeda untuk mesin, kelistrikan, bodi. (Tahap 07, divisi D4/D5)</li>
+<li><strong>Periksa mutu</strong> — mekanik lain memeriksa pekerjaan mekanik pertama. (Tahap 08–09, D6/D7)</li>
+<li><strong>Uji keselamatan</strong> — rem, lampu, emisi. (Tahap 10–11, D8/D9)</li>
+<li><strong>Serah terima dengan berita acara</strong> — bukan "sudah pak, silakan". (Tahap 12–16)</li>
+</ol>
+<p>SDB melakukan hal yang sama untuk <strong>perangkat lunak</strong>: website, aplikasi, program, skrip,
+bahkan membangun ulang aplikasi yang Anda miliki izinnya.</p>
+<h3 id="22-analogi-kedua-dapur-restoran">2.2 Analogi kedua: dapur restoran</h3>
+<ul>
+<li><strong>Resep</strong> = workflow 16 tahap (tidak berubah tiap hari).</li>
+<li><strong>Koki</strong> = agen AI (model berbeda untuk tugas berbeda — yang murah untuk tugas rutin,
+  yang mahal untuk arsitektur dan keamanan).</li>
+<li><strong>Bahan</strong> = artefak: requirement, ADR (catatan keputusan), diff kode, hasil tes, laporan scan.</li>
+<li><strong>Juru rasa</strong> = gate deterministik yang menolak hidangan kalau kurang asin — dan juru rasa
+  ini <strong>bukan AI</strong>, jadi tidak bisa dibujuk.</li>
+</ul>
+<h3 id="23-tiga-kata-yang-perlu-dipegang">2.3 Tiga kata yang perlu dipegang</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Kata</th>
+<th>Arti praktis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Otonom</strong></td>
+<td>Bisa jalan sendiri (laporan 4 jam, build bertahap) tanpa Anda menunggui</td>
+</tr>
+<tr>
+<td><strong>Terkendali</strong></td>
+<td>Setiap langkah berisiko punya gerbang: izin, approval, rollback</td>
+</tr>
+<tr>
+<td><strong>Terbukti</strong></td>
+<td>Klaim hanya sah kalau ada artefak yang bisa diperiksa mesin, bukan kalimat</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="3-masalah-yang-dipecahkan-sdb">3. Masalah yang dipecahkan SDB</h2>
+<p>SDB tidak dibuat untuk "seru-seruan bikin website". Ia menjawab lima masalah nyata:</p>
+<ol>
+<li><strong>AI suka mengarang status.</strong> "Sudah saya perbaiki" padahal belum. SDB memaksa output
+   berupa artefak: log tes, log build, verdict JSON. Kalau tidak ada → FAIL, bukan PASS.</li>
+<li><strong>AI suka melebar.</strong> Satu permintaan kecil jadi refactor seluruh repo. SDB membatasi
+   dengan spesifikasi + rencana tugas kecil (1 tugas = 1 berkas + 1 cara verifikasi).</li>
+<li><strong>Pekerjaan berisiko diperlakukan sama dengan pekerjaan ringan.</strong> SDB membagi risiko
+   LOW/MEDIUM/HIGH/CRITICAL. Aksi destruktif produksi <strong>tidak boleh otonom</strong>.</li>
+<li><strong>Kontek hilang antar sesi.</strong> SDB menyimpan keputusan sebagai dokumen (ADR, blueprint,
+   <code>memory</code>, <code>VERIFY.md</code>), bukan mengandalkan ingatan percakapan.</li>
+<li><strong>Pemilik tidak punya jendela pandang.</strong> Command Deck + laporan Telegram 4 jam memberi
+   visibilitas tanpa harus membuka terminal.</li>
+</ol>
+<hr />
+<h2 id="4-prinsip-0-keamanan-lebih-dulu-bukan-kecepatan">4. Prinsip #0: keamanan lebih dulu, bukan kecepatan</h2>
+<p>Urutan prioritas SDB, tidak bisa dibalik:</p>
+<pre><code>1. Keamanan &amp; privasi (termasuk PC ini, kredensial, dan data)
+2. Kebenaran (bukti, bukan klaim)
+3. Kecepatan menuju hasil
+</code></pre>
+<p>Konsekuensi yang terlihat sehari-hari:</p>
+<ul>
+<li><strong>Gate #0 wajib</strong> sebelum menyentuh target yang bukan milik sendiri — termasuk membangun
+  ulang aplikasi. Tanpa dasar otorisasi → proses berhenti, bukan "lanjut pelan-pelan".</li>
+<li><strong>Rahasia tidak masuk prompt/log.</strong> Redaksi (<code>scripts/redact_network.py</code>, <code>secret_scan</code>)
+  dijalankan sebelum artefak disimpan.</li>
+<li><strong>Token bot tidak pernah diwariskan</strong> ke proses agen yang sedang membangun (dihapus dari
+  environment anak), sehingga kode hasil build tidak bisa "membaca" token tersebut.</li>
+<li><strong>Aksi HIGH/CRITICAL berhenti minta manusia.</strong> Termasuk deploy produksi, migrasi DB,
+  rotasi kredensial.</li>
+</ul>
+<hr />
+<h2 id="5-alur-kerja-16-tahap-dari-ide-sampai-serah-terima">5. Alur kerja 16 tahap — dari ide sampai serah terima</h2>
+<p>Ini "resep" yang sama untuk semua proyek SDB. Dijalankan oleh <code>scripts/workflow_run.py</code>
+(dengan artefak per tahap), dan gate-nya oleh <code>scripts/gate_check.py</code> +
+<code>scripts/release_check.py</code>.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Tahap</th>
+<th>Bahasa awam</th>
+<th>Siapa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>01</td>
+<td>User objective</td>
+<td>Anda menyebut keinginan</td>
+<td>Anda + D0</td>
+</tr>
+<tr>
+<td>01A</td>
+<td><strong>Authorization / Scope Gate</strong></td>
+<td>Cek surat izin. Gagal = stop</td>
+<td>D0 + <code>gate_check.py</code></td>
+</tr>
+<tr>
+<td>—</td>
+<td>RE &amp; reconstruction</td>
+<td>Kalau target sudah ada: bedah dulu, pisahkan FAKTA / DUGAAN / TIDAK TAHU</td>
+<td>D1</td>
+</tr>
+<tr>
+<td>02</td>
+<td>Orchestrator clarification</td>
+<td>Tanya yang belum jelas, <strong>dilarang menebak</strong></td>
+<td>D0</td>
+</tr>
+<tr>
+<td>03</td>
+<td>Research</td>
+<td>Riset seperlunya, output pendek</td>
+<td>D2</td>
+</tr>
+<tr>
+<td>04</td>
+<td>Architecture + ADR</td>
+<td>Rancang bentuk + catat alasan keputusan</td>
+<td>D3</td>
+</tr>
+<tr>
+<td>05</td>
+<td>Human design approval</td>
+<td>Anda menyetujui desain (proyek besar)</td>
+<td>Anda</td>
+</tr>
+<tr>
+<td>06</td>
+<td>Implementation plan</td>
+<td>Pecah jadi tugas kecil + cara verifikasinya</td>
+<td>D0/D3</td>
+</tr>
+<tr>
+<td>07</td>
+<td>Frontend / backend</td>
+<td>Menulis kode dengan TDD</td>
+<td>D4/D5</td>
+</tr>
+<tr>
+<td>08</td>
+<td>Code review</td>
+<td>Diperiksa orang (agen) lain</td>
+<td>D6</td>
+</tr>
+<tr>
+<td>09</td>
+<td>QA / integration / E2E</td>
+<td>Diuji, bukan diasumsikan</td>
+<td>D7</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Security</td>
+<td>SAST, dependency, secret, config scan</td>
+<td>D8</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Code audit &amp; assurance</td>
+<td>Cek "apakah ini masih sesuai rancangan"</td>
+<td>D9</td>
+</tr>
+<tr>
+<td>12</td>
+<td><strong>Release gate</strong></td>
+<td>Berkas bukti diperiksa mesin; kedaluwarsa 24 jam</td>
+<td>D10 + <code>release_check.py</code></td>
+</tr>
+<tr>
+<td>13</td>
+<td>Human approval</td>
+<td>Anda menyetujui rilis produksi</td>
+<td>Anda</td>
+</tr>
+<tr>
+<td>14</td>
+<td>DevOps deploy</td>
+<td>Pasang, satu layanan sekaligus</td>
+<td>D10</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Observability / smoke / rollback</td>
+<td>Pantau, uji asap, siapkan jalan pulang</td>
+<td>D10</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Documentation + handover</td>
+<td>README, runbook, catatan rilis</td>
+<td>D11</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Kenapa 16 tahap, bukan 3?</strong> Karena kesalahan termahal terjadi di sambungan antar tahap,
+bukan di dalam tahap. Contoh: kode bagus tapi tidak ada rollback → insiden jadi panjang.</p>
+<hr />
+<h2 id="6-dua-belas-divisi-siapa-mengerjakan-apa">6. Dua belas divisi: siapa mengerjakan apa</h2>
+<p>Divisi bukan gedung, melainkan <strong>peran</strong>. Satu agen bisa memegang beberapa peran, tetapi
+tanggung jawabnya dipisah supaya ada pemeriksa independen.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Divisi</th>
+<th>Nama</th>
+<th>Tugas inti</th>
+<th>Agen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D0</td>
+<td>Master Orchestrator / Product &amp; Planning</td>
+<td>Menerima permintaan, menjalankan Gate #0, memecah pekerjaan</td>
+<td><code>sdb-orchestrator</code></td>
+</tr>
+<tr>
+<td>D1</td>
+<td>Reverse Engineering &amp; Reconstruction</td>
+<td>Bedah target berizin, kumpulkan bukti, ukur kemiripan</td>
+<td><code>sdb-recon</code></td>
+</tr>
+<tr>
+<td>D2</td>
+<td>Research</td>
+<td>Riset teknologi, perbandingan, sumber</td>
+<td><code>sdb-orchestrator</code>, <code>sdb-architect</code></td>
+</tr>
+<tr>
+<td>D3</td>
+<td>Architecture</td>
+<td>Rancangan sistem, ADR, pemilihan stack</td>
+<td><code>sdb-architect</code></td>
+</tr>
+<tr>
+<td>D4/D5</td>
+<td>Engineering Frontend &amp; Backend</td>
+<td>Menulis kode</td>
+<td><code>sdb-frontend</code>, <code>sdb-builder</code></td>
+</tr>
+<tr>
+<td>D6</td>
+<td>Code Review</td>
+<td>Menilai kode orang lain</td>
+<td><code>sdb-reviewer</code></td>
+</tr>
+<tr>
+<td>D7</td>
+<td>QA / Test</td>
+<td>Uji unit, integrasi, E2E</td>
+<td><code>sdb-reviewer</code></td>
+</tr>
+<tr>
+<td>D8</td>
+<td>Security</td>
+<td>Scan &amp; triase keamanan</td>
+<td><code>sdb-security</code></td>
+</tr>
+<tr>
+<td>D9</td>
+<td>Code Audit &amp; Engineering Assurance</td>
+<td>Audit menyeluruh, <strong>independen</strong> dari pembuat</td>
+<td><code>sdb-security</code></td>
+</tr>
+<tr>
+<td>D10</td>
+<td>DevOps / Release / Reliability</td>
+<td>Deploy, observabilitas, rollback</td>
+<td><code>sdb-devops</code></td>
+</tr>
+<tr>
+<td>D11</td>
+<td>Documentation</td>
+<td>README, runbook, handover</td>
+<td><code>sdb-devops</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Aturan pemisahan:</strong> pembuat tidak boleh menjadi satu-satunya pemeriksa. D6/D9 sengaja
+berbeda peran dari D4/D5 supaya "sudah saya cek sendiri" tidak berlaku.</p>
+<hr />
+<h2 id="7-gerbang-gate-dan-bukti-kenapa-sudah-selesai-tidak-cukup">7. Gerbang (gate) dan bukti: kenapa "sudah selesai" tidak cukup</h2>
+<h3 id="71-gate-0-pintu-izin">7.1 Gate #0 — pintu izin</h3>
+<p>Berkas <code>evidence/&lt;target&gt;/authorization.yaml</code> harus memuat, antara lain:</p>
+<ul>
+<li>nama target (slug valid),</li>
+<li>jenis otorisasi: <code>owned</code> (milik sendiri), <code>open_source</code>, <code>staging</code>, atau <code>written_permission</code>,</li>
+<li>daftar target yang diizinkan (URL / repo / app / binary),</li>
+<li>batas kedalaman analisis untuk tiap mode,</li>
+<li>aturan retensi: <strong>redaksi sebelum masuk prompt</strong> = wajib <code>true</code>,</li>
+<li>sandbox: isolasi proses penuh, non-root, <strong>tanpa</strong> socket Docker, <strong>tanpa</strong> kredensial host,</li>
+<li><code>approved_by</code> + <code>approved_at</code>,</li>
+<li>daftar larangan inti: bypass autentikasi, captcha, paywall, rate limit, DRM, certificate
+  pinning, brute-force, pengambilan data backend.</li>
+</ul>
+<p>Hasil: <strong>PASS / FAIL / BLOCKED</strong>, disimpan sebagai <code>reports/&lt;target&gt;/gate0-verdict.json</code>.
+FAIL = berhenti total. BLOCKED = minta keputusan manusia.</p>
+<h3 id="72-release-gate-bukti-bukan-pernyataan">7.2 Release gate — bukti, bukan pernyataan</h3>
+<p>Aturan tertulisnya: <strong>"Tidak ada PASS tanpa artefak baru. LLM statement bukan evidence."</strong>
+Artefak wajib dan <strong>umurnya maksimal 24 jam</strong>:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>Artefak wajib</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Requirement</td>
+<td><code>requirements.md</code></td>
+</tr>
+<tr>
+<td>Build</td>
+<td><code>logs/build-*.log</code></td>
+</tr>
+<tr>
+<td>Tests</td>
+<td><code>logs/tests-*.log</code></td>
+</tr>
+<tr>
+<td>Review</td>
+<td><code>reports/review-*.md</code></td>
+</tr>
+<tr>
+<td>Security</td>
+<td><code>reports/security-gate.md</code> + <code>reports/security-verdict.json</code> (field <code>verdict</code> harus <code>PASS</code>)</td>
+</tr>
+<tr>
+<td>Audit</td>
+<td><code>reports/assurance-audit.md</code></td>
+</tr>
+<tr>
+<td>Docs</td>
+<td><code>docs/README-*</code>, <code>reports/handover-*.md</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Penting: <strong>artefak baru yang isinya FAIL tetap FAIL.</strong> Keberadaan + kesegaran saja tidak
+pernah cukup. Ini menutup celah "jalankan tes, tes gagal, tetap bilang lulus".</p>
+<h3 id="73-empat-kelas-risiko">7.3 Empat kelas risiko</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Kelas</th>
+<th>Contoh</th>
+<th>Kontrol</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LOW</td>
+<td>dokumentasi, format, riset read-only</td>
+<td>kontrol normal</td>
+</tr>
+<tr>
+<td>MEDIUM</td>
+<td>edit kode di workspace dev</td>
+<td>branch git + tes + approval</td>
+</tr>
+<tr>
+<td>HIGH</td>
+<td>auth, pembayaran, rahasia, migrasi, CI/CD, infra</td>
+<td>isolasi proses penuh + audit keamanan independen + approval manusia</td>
+</tr>
+<tr>
+<td>CRITICAL</td>
+<td>aksi destruktif produksi, rotasi kredensial, hapus data</td>
+<td><strong>tanpa eksekusi otonom</strong>, prosedur manusia, bukti rollback</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="74-pemantau-ci">7.4 Pemantau CI</h3>
+<p><code>sdb-ci-watch.timer</code> memeriksa pipeline secara berkala (berikutnya terjadwal), melaporkan
+hasil ke kanal yang sama dengan laporan ekosistem. Fungsinya: mendeteksi "hijau kemarin,
+merah hari ini" tanpa menunggu Anda membuka GitHub.</p>
+<hr />
+<h2 id="8-isi-rumah-struktur-folder-dan-artinya">8. Isi rumah: struktur folder dan artinya</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Folder/berkas</th>
+<th>Isi</th>
+<th>Analogi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>README.md</code></td>
+<td>Pintu masuk, ringkasan kapabilitas</td>
+<td>papan nama &amp; brosur</td>
+</tr>
+<tr>
+<td><code>docs/</code> (35 berkas MD)</td>
+<td>Blueprint, workflow, divisi, matriks model, tutorial</td>
+<td>buku manual</td>
+</tr>
+<tr>
+<td><code>workflows/</code></td>
+<td>Definisi gate &amp; pipeline (YAML)</td>
+<td>SOP tertulis</td>
+</tr>
+<tr>
+<td><code>scripts/</code> (31 skrip)</td>
+<td>Alat kerja: gate, workflow, laporan, bot, build</td>
+<td>peralatan bengkel</td>
+</tr>
+<tr>
+<td><code>registry/</code></td>
+<td>Daftar skill &amp; tool + status persetujuan</td>
+<td>buku inventaris</td>
+</tr>
+<tr>
+<td><code>skills/</code> (40)</td>
+<td>Skill SDB (cara kerja yang bisa dipanggil)</td>
+<td>resep siap pakai</td>
+</tr>
+<tr>
+<td><code>agents/</code> (8 paket)</td>
+<td>Definisi peran agen per divisi</td>
+<td>kartu jabatan</td>
+</tr>
+<tr>
+<td><code>platform/packs/</code> (8)</td>
+<td>Paket aturan per jenis pekerjaan</td>
+<td>kit per jenis mobil</td>
+</tr>
+<tr>
+<td><code>evidence/</code> (8 target)</td>
+<td>Bukti capture &amp; otorisasi per target</td>
+<td>berita acara</td>
+</tr>
+<tr>
+<td><code>runs/</code> (5)</td>
+<td>Catatan eksekusi workflow</td>
+<td>log harian bengkel</td>
+</tr>
+<tr>
+<td><code>reports/</code></td>
+<td>Laporan gate, audit, keamanan</td>
+<td>sertifikat uji</td>
+</tr>
+<tr>
+<td><code>dashboard/</code></td>
+<td>Command Deck (port 8484) + state</td>
+<td>ruang kendali</td>
+</tr>
+<tr>
+<td><code>sdb_platform/</code></td>
+<td>Control plane multi-tenant (port 8088)</td>
+<td>loket layanan</td>
+</tr>
+<tr>
+<td><code>tests/</code> (36 berkas, 470 tes)</td>
+<td>Uji otomatis</td>
+<td>kalibrasi alat</td>
+</tr>
+<tr>
+<td><code>data/control.db</code></td>
+<td>DB control plane (tenant, job, tagihan)</td>
+<td>buku kas</td>
+</tr>
+<tr>
+<td><code>~/.local/state/sdb/build_jobs.db</code></td>
+<td>Antrean build Telegram</td>
+<td>papan order</td>
+</tr>
+<tr>
+<td><code>~/sdb-builds/&lt;id&gt;-&lt;slug&gt;/</code></td>
+<td>Hasil build per job (sandbox)</td>
+<td>ruang kerja terpisah</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="9-perkakas-31-skrip-14-perintah-sdb-470-tes">9. Perkakas: 31 skrip, 14 perintah <code>sdb</code>, 470 tes</h2>
+<h3 id="91-satu-pintu-masuk-scriptssdbpy">9.1 Satu pintu masuk: <code>scripts/sdb.py</code></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Perintah</th>
+<th>Fungsi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sdb gate &lt;target&gt;</code></td>
+<td>Jalankan Gate #0 → PASS/FAIL/BLOCKED</td>
+</tr>
+<tr>
+<td><code>sdb init &lt;target&gt;</code></td>
+<td>Buat workspace target (evidence/normalized/...)</td>
+</tr>
+<tr>
+<td><code>sdb capture &lt;target&gt;</code></td>
+<td>Capture terkendali (wajib Gate #0 PASS)</td>
+</tr>
+<tr>
+<td><code>sdb normalize &lt;target&gt;</code></td>
+<td>Ubah artefak capture jadi JSON bersih</td>
+</tr>
+<tr>
+<td><code>sdb redact &lt;file&gt;</code></td>
+<td>Hapus rahasia dari artefak jaringan</td>
+</tr>
+<tr>
+<td><code>sdb lint &lt;target&gt;</code></td>
+<td>Evidence lint (metadata, confidence, redaksi)</td>
+</tr>
+<tr>
+<td><code>sdb workflow &lt;target&gt;</code></td>
+<td>Jalankan 16 tahap berbasis bukti</td>
+</tr>
+<tr>
+<td><code>sdb release &lt;target&gt;</code></td>
+<td>Release gate berbasis artefak</td>
+</tr>
+<tr>
+<td><code>sdb fidelity &lt;a&gt; &lt;b&gt;</code></td>
+<td>Bandingkan asli vs hasil bangun ulang</td>
+</tr>
+<tr>
+<td><code>sdb fidelity-report</code></td>
+<td>Laporan kemiripan 9 dimensi</td>
+</tr>
+<tr>
+<td><code>sdb scan &lt;target&gt;</code></td>
+<td>Pindai pola eksekusi/eksfiltrasi pihak ketiga</td>
+</tr>
+<tr>
+<td><code>sdb inventory</code></td>
+<td>Inventaris ekosistem</td>
+</tr>
+<tr>
+<td><code>sdb doctor</code></td>
+<td>Cek kapabilitas host + drift skill + pin dependency</td>
+</tr>
+<tr>
+<td><code>sdb install</code> / <code>uninstall</code></td>
+<td>Pasang/lepas skill &amp; CLI (dry-run default)</td>
+</tr>
+<tr>
+<td><code>sdb list-skills</code></td>
+<td>Daftar/pasang skill ke profil</td>
+</tr>
+<tr>
+<td><code>sdb registry-lint</code></td>
+<td>Validasi daftar skill/tool</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="92-skrip-pendukung-penting">9.2 Skrip pendukung penting</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Skrip</th>
+<th>Gunanya</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gate_check.py</code></td>
+<td>Mesin Gate #0</td>
+</tr>
+<tr>
+<td><code>release_check.py</code></td>
+<td>Mesin release gate (kesegaran 24 jam + verdict)</td>
+</tr>
+<tr>
+<td><code>evidence_lint.py</code></td>
+<td>Periksa mutu bukti</td>
+</tr>
+<tr>
+<td><code>ci_watch.py</code></td>
+<td>Pemantau pipeline</td>
+</tr>
+<tr>
+<td><code>secret_scan</code> (via make <code>secrets</code>)</td>
+<td>Cari rahasia sebelum commit</td>
+</tr>
+<tr>
+<td><code>repo_hygiene.py</code></td>
+<td>Kebersihan repo (berkas nyasar, artefak besar)</td>
+</tr>
+<tr>
+<td><code>inventory_ecosystem.py</code></td>
+<td>Potret isi ekosistem</td>
+</tr>
+<tr>
+<td><code>workflow_run.py</code></td>
+<td>Runner 16 tahap</td>
+</tr>
+<tr>
+<td><code>fidelity_compare.py</code></td>
+<td>Ukur kemiripan hasil bangun ulang</td>
+</tr>
+<tr>
+<td><code>sdb_report.py</code></td>
+<td>Laporan ekosistem deterministik (dipakai bot 4 jam)</td>
+</tr>
+<tr>
+<td><code>sdb_jobs.py</code></td>
+<td>Antrean &amp; status job build</td>
+</tr>
+<tr>
+<td><code>sdb_build_worker.py</code></td>
+<td>Pekerja build bertahap (systemd)</td>
+</tr>
+<tr>
+<td><code>sdb_tg_bot.py</code></td>
+<td>Bot Telegram (owner-only)</td>
+</tr>
+<tr>
+<td><code>md_to_pdf.py</code>, <code>build_tutorial.py</code></td>
+<td>Ubah dokumen MD → HTML + PDF</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="93-target-make-yang-sering-dipakai">9.3 Target <code>make</code> yang sering dipakai</h3>
+<p><code>make test</code> · <code>make lint</code> · <code>make check</code> · <code>make gate-init</code> · <code>make release-check</code> ·
+<code>make secrets</code> · <code>make doctor</code> · <code>make inventory</code> · <code>make packs</code> · <code>make worker</code> ·
+<code>make control-plane</code> · <code>make docs-tutorial</code> · <code>make hygiene</code> · <code>make drift</code>.</p>
+<h3 id="94-uji-otomatis-470-tes">9.4 Uji otomatis: 470 tes</h3>
+<ul>
+<li>36 berkas tes, <strong>470 tes</strong> terkumpul (<code>pytest --collect-only</code>).</li>
+<li>Mencakup: gate, release, evidence lint, laporan, bot Telegram, antrean build,
+  control plane (isolasi tenant, kuota, idempotensi), redaksi, dsb.</li>
+<li><code>make test</code> adalah syarat sebelum commit — bukan formalitas.</li>
+</ul>
+<hr />
+<h2 id="10-skill-dan-tool-40-skill-sendiri-17-tool-terpasang">10. Skill dan tool: 40 skill sendiri, 17 tool terpasang</h2>
+<h3 id="101-skill-cara-kerja-yang-bisa-dipanggil">10.1 Skill (cara kerja yang bisa dipanggil)</h3>
+<p><strong>40 skill custom</strong> (terdaftar di <code>registry/skills.yaml</code>, semuanya berstatus <code>ADD</code>), dikelompokkan menurut sifat pekerjaan:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Kelompok</th>
+<th>Isi (nama nyata di registry)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rekonstruksi &amp; bukti (D1)</td>
+<td><code>reconstruction-scope-gate</code>, <code>target-inventory</code>, <code>ui-ux-state-mapper</code>, <code>observed-network-contract</code>, <code>technology-profiler</code>, <code>evidence-normalizer</code>, <code>reconstruction-spec</code>, <code>reconstruction-fidelity</code>, <code>rea-reverse-engineering</code>, <code>replica-skill-pipeline</code></td>
+</tr>
+<tr>
+<td>Arsitektur (D3)</td>
+<td><code>architecture-decision-record</code>, <code>technology-selection</code>, <code>architecture-docs</code>, <code>architecture-compliance-audit</code></td>
+</tr>
+<tr>
+<td>Rekayasa (D4/D5)</td>
+<td><code>api-contract</code>, <code>feature-workflow</code>, <code>bug-workflow</code>, <code>chore-workflow</code>, <code>database-migration-safety</code>, <code>authz-authn-review</code>, <code>accessibility-audit</code>, <code>geo-audit</code>, <code>html-to-video-render</code>, <code>realtime-visual-engine</code>, <code>local-media-generation</code>, <code>model-hub-provenance</code>, <code>local-llm-serving</code>, <code>privilege-free-tooling</code>, <code>public-feed-reader</code></td>
+</tr>
+<tr>
+<td>Mutu, audit &amp; rilis (D7/D9/D10)</td>
+<td><code>test-pyramid-and-risk</code>, <code>engineering-release-audit</code>, <code>ci-cd-release-gate</code>, <code>rollback-and-recovery</code>, <code>release-handover-docs</code>, <code>sdb-command-deck</code>, <code>local-experiment-tracking</code></td>
+</tr>
+<tr>
+<td>Produk / PLANORA (D0/D2)</td>
+<td><code>product-kit</code>, <code>product-status</code>, <code>product-change</code>, <code>product-execution</code></td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>Catatan hitungan: <strong>40</strong> adalah skill milik SDB di registry. Hermes (host) juga punya skill
+bawaannya sendiri — mis. <code>third-party-tool-vetting</code>, <code>security-static-review</code>,
+<code>skill-inspector</code>, <code>plan</code>, <code>test-generator</code> — yang <strong>tidak</strong> masuk angka 40 dan tidak
+dihitung sebagai aset SDB.</p>
+</blockquote>
+<p><strong>17 tool pihak ketiga</strong> terdaftar dengan status eksplisit: <strong>2 terpasang</strong> (<code>trailofbits/skills</code>,
+<code>morluto/rea</code>), <strong>1 dipakai</strong> (<code>microsoft/playwright</code>), <strong>3 ditolak</strong>, <strong>4 karantina</strong>
+(MobSF, jadx, Apktool, ghidra), <strong>1 ditunda</strong> (BackstopJS), <strong>6 belum terpasang</strong>.
+Alasan penolakan dicatat, bukan sekadar "tidak jadi":</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Ditolak</th>
+<th>Status</th>
+<th>Alasan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>obra/superpowers</code></td>
+<td><code>REJECTED_BLUEPRINT</code></td>
+<td>pendekatannya sudah menjadi blueprint native SDB</td>
+</tr>
+<tr>
+<td><code>getsentry/skills</code></td>
+<td><code>REJECTED_COVERED</code></td>
+<td>kapabilitasnya sudah tercakup skill SDB sendiri</td>
+</tr>
+<tr>
+<td><code>anthropics/skills</code></td>
+<td><code>REJECTED_LICENSE</code></td>
+<td>lisensi tidak cocok untuk dipakai di sini</td>
+</tr>
+</tbody>
+</table></div>
+<p>Aturan masuk tool baru (7 langkah, tidak boleh dilompati):
+<code>source_trust_check</code> → <code>pin_revision</code> → <code>hermes_native_scan</code> → <code>manual_source_review</code> →
+<code>sandbox_test</code> → <code>allowlist_tools</code> → <code>human_approval</code>.</p>
+<h3 id="102-tool-terpasang-versi-dipin-bukan-latest">10.2 Tool terpasang (versi dipin, bukan "latest")</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Versi</th>
+<th>Peran</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>git</td>
+<td>2.43.0</td>
+<td>jejak versi &amp; bukti</td>
+</tr>
+<tr>
+<td>node / npm</td>
+<td>26.7.0 / 11.19.0</td>
+<td>tooling frontend</td>
+</tr>
+<tr>
+<td>docker</td>
+<td>29.8.2</td>
+<td>isolasi proses penuh (socket <strong>tidak</strong> diberikan ke pekerjaan untrusted)</td>
+</tr>
+<tr>
+<td>uv</td>
+<td>0.12.5</td>
+<td>isolasi tool Python</td>
+</tr>
+<tr>
+<td>pytest</td>
+<td>9.1.1</td>
+<td>runner tes</td>
+</tr>
+<tr>
+<td>playwright</td>
+<td>1.63.0</td>
+<td>mesin capture utama (Chromium)</td>
+</tr>
+<tr>
+<td>jq</td>
+<td>1.7</td>
+<td>olah bukti JSON</td>
+</tr>
+<tr>
+<td>ruff</td>
+<td>0.16.10</td>
+<td>lint/format Python</td>
+</tr>
+<tr>
+<td>semgrep</td>
+<td>1.179.0</td>
+<td>SAST cepat (read-only, metrik mati)</td>
+</tr>
+<tr>
+<td>trivy</td>
+<td>0.75.0</td>
+<td>dependency/container/IaC/secret scan</td>
+</tr>
+<tr>
+<td>syft</td>
+<td>1.54.0</td>
+<td>SBOM (SPDX/CycloneDX)</td>
+</tr>
+<tr>
+<td>codeql</td>
+<td>2.27.1</td>
+<td>SAST mendalam — <strong>hanya</strong> untuk kode open source/riset, dilarang untuk kode proprietary &amp; CI</td>
+</tr>
+<tr>
+<td>llama.cpp server</td>
+<td>0.5.0-dev (commit dipin)</td>
+<td>LLM lokal, bind 127.0.0.1 saja</td>
+</tr>
+<tr>
+<td>ffmpeg</td>
+<td>build host</td>
+<td>encode video bukti</td>
+</tr>
+<tr>
+<td>Chromium headless</td>
+<td>playwright 1.63.0</td>
+<td>render visual realtime</td>
+</tr>
+<tr>
+<td>rea-agents</td>
+<td>6.8.0</td>
+<td>reverse engineering artefak terkirim (JS/Electron/web)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Prinsip: <strong>versi dipin + bukti pemasangan + persetujuan manusia</strong>. Bukan <code>npm i</code> lalu berharap.</p>
+<hr />
+<h2 id="11-ruang-kendali-command-deck-dan-control-plane">11. Ruang kendali (Command Deck) dan control plane</h2>
+<h3 id="111-command-deck-jendela-pandang-di-pc-ini">11.1 Command Deck — jendela pandang di PC ini</h3>
+<ul>
+<li>Alamat: <code>http://127.0.0.1:8484</code> (layanan <code>sdb-command-deck</code>, aktif).</li>
+<li>Isi: papan status agen, monitor pekerjaan, tampilan "cast", panel intake (draf → Approve →
+  Kirim), dan <strong>PIN workspace</strong> sebagai pintu masuk.</li>
+<li>Catatan: layanan ini bind ke <code>0.0.0.0</code> agar bisa dibuka dari perangkat lain di jaringan
+  rumah. Artinya <strong>bisa dijangkau dari LAN</strong>; PIN adalah lapisan pertama, bukan satu-satunya.
+  Kalau tidak perlu diakses dari perangkat lain, sebaiknya diubah ke <code>127.0.0.1</code>.</li>
+</ul>
+<h3 id="112-control-plane-loket-layanan-multi-tenant-tahap-awal">11.2 Control plane — loket layanan multi-tenant (tahap awal)</h3>
+<ul>
+<li>Alamat: <code>http://127.0.0.1:8088</code> (layanan <code>sdb-control-plane</code>, aktif).</li>
+<li>Dibangun dengan <strong>stdlib <code>http.server</code></strong>, sengaja tanpa framework: lebih sedikit permukaan
+  serangan, lebih mudah diaudit.</li>
+<li>Endpoint: <code>/v1/tenants</code>, <code>/v1/jobs</code>, <code>/v1/usage</code>, <code>/v1/billing</code>, <code>/v1/invoices</code>,
+  <code>/v1/ledger</code>, <code>/v1/credits/topup</code>, <code>/v1/admin/revenue</code>, <code>/v1/admin/invoices</code>,
+  <code>/v1/worker/claim</code>, <code>/v1/jobs/&lt;id&gt;/artifacts</code>, <code>/v1/jobs/&lt;id&gt;/heartbeat</code>.</li>
+<li>Isi DB saat ini: <strong>0 tenant, 0 job, 0 tagihan</strong> — jadi ini "loket yang sudah berdiri tapi
+  belum ada antrean". Jujur: belum dipakai untuk pelanggan nyata.</li>
+</ul>
+<hr />
+<h2 id="12-bot-telegram-sdb-tiga-kanal-operasional">12. Bot Telegram SDB: tiga kanal operasional</h2>
+<p>Bot: <code>@super_dev_builders_bot</code>. Layanan <code>sdb-tg-bot</code> aktif. <strong>Hanya chat Anda</strong> yang
+dilayani; pesan dari chat lain diabaikan tanpa balasan (tidak ada "bot menolak" yang
+membocorkan keberadaan bot).</p>
+<h3 id="121-kanal-1-laporan-otomatis-tiap-4-jam">12.1 Kanal 1 — laporan otomatis tiap 4 jam</h3>
+<ul>
+<li>Timer <code>sdb-report-4h.timer</code>: 00/04/08/12/16/20 WIB.</li>
+<li>Isi laporan: proyek + progres (berkas, baris, commit, perubahan belum di-commit),
+  layanan hidup/mati, timer, Command Deck, <code>control.db</code>, kondisi host, antrean build,
+  dan <strong>delta sejak laporan sebelumnya</strong>.</li>
+<li><strong>Deterministik tanpa LLM</strong> → 0 biaya token, tidak bisa berhalusinasi. Snapshot disimpan
+  di <code>dashboard/state/report_snapshot.json</code>.</li>
+</ul>
+<h3 id="122-kanal-2-tanya-kapan-saja">12.2 Kanal 2 — tanya kapan saja</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Perintah</th>
+<th>Jawaban</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/status</code> <code>/health</code> <code>/revenue</code></td>
+<td>ringkas</td>
+</tr>
+<tr>
+<td><code>/eco</code></td>
+<td>kondisi ekosistem lengkap</td>
+</tr>
+<tr>
+<td><code>/projects</code></td>
+<td>daftar proyek + progres</td>
+</tr>
+<tr>
+<td><code>/ask &lt;pertanyaan&gt;</code></td>
+<td>jawaban atas pertanyaan bebas</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>/ask</code> menyuntikkan laporan nyata sebagai <strong>DATA</strong> dan hanya diberi toolset
+<code>terminal, file, skills</code> (tanpa web/browser/delegasi). Tujuannya: jawaban ber-grounding,
+tidak melebar jadi aksi.</p>
+<h3 id="123-kanal-3-perintah-membuat-produk">12.3 Kanal 3 — perintah membuat produk</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Perintah</th>
+<th>Arti</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/build &lt;deskripsi&gt;</code></td>
+<td>Buat spesifikasi + rencana + daftar pertanyaan (tanpa menulis kode dulu)</td>
+</tr>
+<tr>
+<td><code>/approve &lt;id&gt;</code></td>
+<td>Setujui spesifikasi → mulai build</td>
+</tr>
+<tr>
+<td><code>/job &lt;id&gt;</code></td>
+<td>Lihat status job</td>
+</tr>
+<tr>
+<td><code>/jobs</code></td>
+<td>Daftar job</td>
+</tr>
+<tr>
+<td><code>/revise &lt;id&gt; &lt;arahan&gt;</code></td>
+<td>Revisi spesifikasi sebelum/sesudah build</td>
+</tr>
+<tr>
+<td><code>/answer &lt;id&gt; &lt;jawaban&gt;</code></td>
+<td>Jawab pertanyaan spesifikasi</td>
+</tr>
+<tr>
+<td><code>/reject &lt;id&gt;</code></td>
+<td>Tolak spesifikasi</td>
+</tr>
+<tr>
+<td><code>/retry &lt;id&gt;</code></td>
+<td>Lanjutkan job <code>paused</code> tanpa mengulang dari nol</td>
+</tr>
+<tr>
+<td><code>/cancel &lt;id&gt;</code></td>
+<td>Batalkan</td>
+</tr>
+<tr>
+<td><code>/help</code></td>
+<td>Daftar perintah</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="13-alur-membuat-produk-lewat-telegram-langkah-demi-langkah">13. Alur membuat produk lewat Telegram — langkah demi langkah</h2>
+<h3 id="131-alurnya">13.1 Alurnya</h3>
+<pre><code>/build &quot;katalog villa + booking WhatsApp + admin&quot;
+   │
+   ├─ 2–5 menit → SPEC.md (kebutuhan), PLAN.md (tahap), QUESTIONS.md (yang belum jelas)
+   │              status: awaiting_approval  ← TIDAK ada kode ditulis di sini
+   │
+/approve 1
+   │
+   ├─ build bertahap: ronde 1, 2, 3 (maks. 3) + 1 ronde dokumentasi
+   │  sandbox: ~/sdb-builds/001-&lt;slug&gt;/
+   │  bukti: README.md + VERIFY.md (perintah + output nyata) + GAPS.md
+   │
+   └─ status: done  → notifikasi + ringkasan bukti
+        (kalau belum tuntas) status: paused → /retry &lt;id&gt;
+</code></pre>
+<h3 id="132-kenapa-dua-tahap">13.2 Kenapa dua tahap?</h3>
+<p>Karena kesalahan termahal adalah <strong>membangun barang yang salah dengan rapi</strong>. Tahap
+spesifikasi memaksa kebutuhan ditulis lebih dulu, dan Anda bisa menolak sebelum satu baris
+kode pun ditulis. Ini penghemat waktu, bukan birokrasi.</p>
+<h3 id="133-bukti-nyata-job-1-villa-nusantara">13.3 Bukti nyata: job #1 "Villa Nusantara"</h3>
+<p>Yang diminta: katalog villa + tombol booking WhatsApp + panel admin (CRUD).</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Aspek</th>
+<th>Hasil terukur</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tumpukan</td>
+<td>Next.js 15 (App Router) + SQLite</td>
+</tr>
+<tr>
+<td>Tes unit</td>
+<td><strong>44 lulus</strong></td>
+</tr>
+<tr>
+<td>Build produksi</td>
+<td><strong>compile sukses</strong> (<code>npm run build</code>)</td>
+</tr>
+<tr>
+<td>Smoke test</td>
+<td><strong>55/55 PASS</strong></td>
+</tr>
+<tr>
+<td>Data contoh</td>
+<td>9 villa diseed, <strong>8 tampil</strong> di katalog</td>
+</tr>
+<tr>
+<td>Dokumentasi</td>
+<td><code>README.md</code>, <code>VERIFY.md</code> (isinya perintah + output asli), <code>GAPS.md</code></td>
+</tr>
+<tr>
+<td>Lokasi</td>
+<td><code>~/sdb-builds/001-website-katalog-villa-dengan-fil/</code></td>
+</tr>
+<tr>
+<td>Status</td>
+<td><code>done</code> — dinilai dari <strong>keberadaan</strong> README + VERIFY, bukan dari klaim agen</td>
+</tr>
+</tbody>
+</table></div>
+<p>Contoh isi <code>VERIFY.md</code> (ringkas): perintah build, perintah tes, jumlah lulus/gagal, dan
+potongan output apa adanya — termasuk catatan kalau ada yang belum selesai.</p>
+<h3 id="134-batas-yang-dipasang-pada-pekerja-build">13.4 Batas yang dipasang pada pekerja build</h3>
+<ul>
+<li>Satu job diproses <strong>satu per satu</strong> (job lain mengantre).</li>
+<li>Batas turn per ronde, batas anggaran, dan batas waktu dinding; proses dibunuh per
+  process-group kalau melewati batas.</li>
+<li>Kerja dipaksa di dalam <code>~/sdb-builds/&lt;id&gt;-&lt;slug&gt;/</code>.</li>
+<li>Job dianggap selesai hanya jika README + VERIFY benar-benar ada.</li>
+</ul>
+<hr />
+<h2 id="14-keamanan-berlapis-apa-yang-dijaga-dan-bagaimana">14. Keamanan berlapis: apa yang dijaga dan bagaimana</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Lapisan</th>
+<th>Yang dijaga</th>
+<th>Caranya</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Identitas</td>
+<td>Hanya pemilik yang bisa memerintah</td>
+<td>Cek <code>chat_id</code> terhadap <code>SDB_TG_CHAT_ID</code>; chat lain diabaikan diam-diam</td>
+</tr>
+<tr>
+<td>Rahasia</td>
+<td>Token bot tidak bocor ke kode hasil build</td>
+<td>Token dibaca dari <code>EnvironmentFile</code> (mode 600), <strong>dihapus</strong> dari env proses anak</td>
+</tr>
+<tr>
+<td>Izin</td>
+<td>Tidak membangun/membedah tanpa hak</td>
+<td>Gate #0 + <code>authorization.yaml</code> + verdict JSON</td>
+</tr>
+<tr>
+<td>Isolasi</td>
+<td>Pekerjaan tidak menyentuh hal lain</td>
+<td>CWD dikunci ke sandbox, larangan menyentuh <code>~/.hermes</code>, <code>~/.config</code>, repo lain</td>
+</tr>
+<tr>
+<td>Mutu</td>
+<td>Tidak ada "selesai palsu"</td>
+<td>Release gate: artefak wajib, umur ≤ 24 jam, verdict harus PASS</td>
+</tr>
+<tr>
+<td>Rantai pasok</td>
+<td>Tool/skill tidak membawa malware</td>
+<td>7 langkah vetting + versi dipin + tinjauan manusia</td>
+</tr>
+<tr>
+<td>Audit</td>
+<td>Semua langkah bisa ditelusuri</td>
+<td><code>events</code> per job, log systemd, <code>reports/*.json</code>, commit git</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Yang perlu Anda tahu secara jujur:</strong> isolasi untuk pekerja build saat ini bersifat
+<strong>tingkat instruksi + direktori kerja</strong>, belum container OS terpisah. Artinya agen build
+berjalan sebagai user Anda. Mitigasinya: approval dua tahap, hanya pemilik, batas waktu,
+dan jejak audit. Kalau nanti dipakai untuk pekerjaan dari pihak luar, langkah berikutnya
+adalah menjalankan worker di container/VM terpisah.</p>
+<hr />
+<h2 id="15-cara-pakai-harian-cheat-sheet">15. Cara pakai harian — cheat sheet</h2>
+<h3 id="151-di-telegram-paling-praktis">15.1 Di Telegram (paling praktis)</h3>
+<pre><code>/eco                      kondisi ekosistem sekarang
+/projects                 progres proyek
+/ask kenapa build tadi lama?   tanya bebas
+/build website katalog kue + admin
+/approve 2
+/job 2                    cek status
+/retry 2                  lanjutkan kalau paused
+</code></pre>
+<h3 id="152-di-terminal-pc-ini">15.2 Di terminal PC ini</h3>
+<pre><code class="language-bash">cd ~/super-dev-builders
+
+make test                 # 470 tes, wajib hijau sebelum commit
+make check                # lint + tes + hygiene
+make doctor               # kapabilitas host + drift
+make inventory             # potret ekosistem
+make secrets               # cari rahasia sebelum commit
+
+.venv/bin/python scripts/sdb_report.py --text     # laporan yang sama dengan bot
+.venv/bin/python scripts/sdb_jobs.py stats        # antrean build
+./scripts/sdb.py gate &lt;target&gt;                    # gate izin
+./scripts/sdb.py workflow &lt;target&gt;                # 16 tahap
+./scripts/sdb.py release &lt;target&gt;                 # release gate
+</code></pre>
+<h3 id="153-melihat-hasil-build">15.3 Melihat hasil build</h3>
+<pre><code class="language-bash">cd ~/sdb-builds/001-*/ &amp;&amp; cat VERIFY.md &amp;&amp; npm run dev
+</code></pre>
+<h3 id="154-kalau-laporan-telegram-berhenti">15.4 Kalau laporan Telegram berhenti</h3>
+<pre><code class="language-bash">systemctl --user status sdb-report-4h.timer sdb-tg-bot
+systemctl --user list-timers 'sdb*'
+journalctl --user -u sdb-report-4h -n 50 --no-pager
+</code></pre>
+<hr />
+<h2 id="16-batasan-jujur-apa-yang-belum-ada">16. Batasan jujur: apa yang belum ada</h2>
+<p>Bagian ini sengaja tidak dibungkus rapi. Kalau sebuah dokumen tidak punya bagian ini,
+dokumen itu iklan, bukan laporan.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Belum ada / terbatas</th>
+<th>Dampak</th>
+<th>Rencana</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Control plane belum dipakai (0 tenant)</td>
+<td>Belum ada pelanggan nyata</td>
+<td>Diisi setelah ada kebutuhan multi-tenant</td>
+</tr>
+<tr>
+<td>Isolasi build belum container</td>
+<td>Agen build berjalan sebagai user</td>
+<td>Pindah ke container/VM saat dipakai pihak luar</td>
+</tr>
+<tr>
+<td>Model routing bergantung ketersediaan provider</td>
+<td>Bisa turun kualitas saat provider down</td>
+<td>Ada jalur cadangan (mis. GPT-5.6 Sol untuk security)</td>
+</tr>
+<tr>
+<td>CodeQL dilarang untuk kode proprietary</td>
+<td>Analisis mendalam terbatas pada kode berlisensi</td>
+<td>Pakai semgrep/trivy + review manual</td>
+</tr>
+<tr>
+<td>Deck bind 0.0.0.0</td>
+<td>Terjangkau dari LAN</td>
+<td>Ubah ke 127.0.0.1 bila tidak perlu remote</td>
+</tr>
+<tr>
+<td>Belum ada auto-deploy produksi</td>
+<td>Rilis tetap manual (memang disengaja)</td>
+<td>Jangan diotomatiskan untuk HIGH/CRITICAL</td>
+</tr>
+<tr>
+<td>Job build contoh baru 1 (Villa)</td>
+<td>Bukti pipeline, belum bukti skala</td>
+<td>Tambah job nyata berikutnya</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="17-glosarium-bahasa-awam">17. Glosarium bahasa awam</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Istilah</th>
+<th>Arti sederhana</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ADR</strong></td>
+<td>Catatan keputusan: apa yang dipilih, kenapa, apa alternatifnya</td>
+</tr>
+<tr>
+<td><strong>Artefak</strong></td>
+<td>Barang bukti hasil kerja: log, laporan, JSON, diff</td>
+</tr>
+<tr>
+<td><strong>Gate</strong></td>
+<td>Pintu pemeriksaan; tidak lolos = tidak boleh lanjut</td>
+</tr>
+<tr>
+<td><strong>Deterministik</strong></td>
+<td>Hasilnya sama setiap dijalankan; tidak mengarang</td>
+</tr>
+<tr>
+<td><strong>Sandbox</strong></td>
+<td>Ruang kerja terpisah supaya tidak merusak hal lain</td>
+</tr>
+<tr>
+<td><strong>SBOM</strong></td>
+<td>Daftar bahan (library) yang dipakai sebuah aplikasi</td>
+</tr>
+<tr>
+<td><strong>SAST</strong></td>
+<td>Pemeriksa kode otomatis untuk pola berbahaya</td>
+</tr>
+<tr>
+<td><strong>Tenant</strong></td>
+<td>Satu pelanggan/pengguna terpisah dalam satu sistem</td>
+</tr>
+<tr>
+<td><strong>Idempotensi</strong></td>
+<td>Menekan tombol dua kali tidak membuat dua data</td>
+</tr>
+<tr>
+<td><strong>Rollback</strong></td>
+<td>Jalan pulang ke kondisi sebelum perubahan</td>
+</tr>
+<tr>
+<td><strong>Smoke test</strong></td>
+<td>Uji cepat "apakah nyala dan fungsi dasar jalan"</td>
+</tr>
+<tr>
+<td><strong>Turn</strong></td>
+<td>Satu giliran agen memanggil alat lalu menjawab</td>
+</tr>
+<tr>
+<td><strong>Fidelity</strong></td>
+<td>Seberapa mirip hasil bangun ulang dengan aslinya</td>
+</tr>
+<tr>
+<td><strong>Evidence</strong></td>
+<td>Bukti yang bisa diperiksa mesin, bukan cerita</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="18-peta-dokumen-rujukan">18. Peta dokumen rujukan</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Dokumen</th>
+<th>Isi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>docs/BLUEPRINT_V2.2.md</code></td>
+<td>Cetak biru lengkap ekosistem</td>
+</tr>
+<tr>
+<td><code>docs/WORKFLOW_GATES.md</code></td>
+<td>16 tahap + isi gate + kelas risiko</td>
+</tr>
+<tr>
+<td><code>docs/DIVISIONS.md</code></td>
+<td>12 divisi dan pembagian peran</td>
+</tr>
+<tr>
+<td><code>docs/MODEL_ROUTING_MATRIX.md</code></td>
+<td>Model mana untuk tahap mana</td>
+</tr>
+<tr>
+<td><code>docs/TELEGRAM_SDB.md</code></td>
+<td>Detail teknis bot Telegram</td>
+</tr>
+<tr>
+<td><code>docs/TUTORIAL_PENGGUNAAN.md</code></td>
+<td>Tutorial pemakaian (HTML/PDF tersedia)</td>
+</tr>
+<tr>
+<td><code>docs/TUTORIAL_PRIBADI.md</code></td>
+<td>Panduan pribadi: deck, shortcut, bot</td>
+</tr>
+<tr>
+<td><code>docs/PETA_STRUKTUR.md</code></td>
+<td>Peta struktur repo</td>
+</tr>
+<tr>
+<td><code>README.md</code></td>
+<td>Ringkasan kapabilitas</td>
+</tr>
+<tr>
+<td><code>registry/skills.yaml</code>, <code>registry/tools.yaml</code></td>
+<td>Inventaris skill &amp; tool</td>
+</tr>
+<tr>
+<td><code>workflows/*.yaml</code></td>
+<td>Definisi mesin dari gate</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="19-lampiran-a-angka-terverifikasi-dan-cara-mengeceknya">19. Lampiran A — angka terverifikasi dan cara mengeceknya</h2>
+<p>Semua di bawah diambil <strong>4 November 2026</strong> dari mesin ini, bukan dari ingatan.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Angka</th>
+<th>Nilai</th>
+<th>Perintah pengecekan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Commit</td>
+<td>130 (terakhir <code>852c0ab</code>, 2026-11-03)</td>
+<td><code>git rev-list --count HEAD</code></td>
+</tr>
+<tr>
+<td>Berkas Python</td>
+<td>103</td>
+<td><code>find . -name '*.py' -not -path './skills/*' -not -path './.venv/*' \| wc -l</code></td>
+</tr>
+<tr>
+<td>Baris Python</td>
+<td>18.748</td>
+<td><code>find ... -print0 \| xargs -0 cat \| wc -l</code></td>
+</tr>
+<tr>
+<td>Berkas tes</td>
+<td>36</td>
+<td><code>ls tests/test_*.py \| wc -l</code></td>
+</tr>
+<tr>
+<td>Jumlah tes</td>
+<td><strong>470</strong></td>
+<td><code>pytest --collect-only -q \| awk -F': ' '/^tests\//{s+=$2} END{print s}'</code></td>
+</tr>
+<tr>
+<td>Dokumen MD di <code>docs/</code></td>
+<td>35</td>
+<td><code>ls docs/*.md \| wc -l</code></td>
+</tr>
+<tr>
+<td>Skrip di <code>scripts/</code></td>
+<td>31</td>
+<td><code>ls scripts/*.py \| wc -l</code></td>
+</tr>
+<tr>
+<td>Skill custom</td>
+<td>40</td>
+<td><code>registry/skills.yaml</code> → <code>custom</code></td>
+</tr>
+<tr>
+<td>Tool pihak ketiga</td>
+<td>17 (3 ditolak)</td>
+<td><code>registry/skills.yaml</code> → <code>third_party</code></td>
+</tr>
+<tr>
+<td>Tool host terpasang</td>
+<td>17</td>
+<td><code>registry/tools.yaml</code> → <code>present</code></td>
+</tr>
+<tr>
+<td>Paket divisi</td>
+<td>8</td>
+<td><code>ls platform/packs</code></td>
+</tr>
+<tr>
+<td>Paket agen</td>
+<td>8</td>
+<td><code>ls agents</code></td>
+</tr>
+<tr>
+<td>Layanan aktif</td>
+<td>3 (<code>sdb-tg-bot</code>, <code>sdb-build-worker</code>, <code>sdb-command-deck</code>)</td>
+<td><code>systemctl --user list-units 'sdb*'</code></td>
+</tr>
+<tr>
+<td>Timer</td>
+<td>3 (laporan 4 jam, CI watch, deck health)</td>
+<td><code>systemctl --user list-timers 'sdb*'</code></td>
+</tr>
+<tr>
+<td>Port</td>
+<td>8484 (deck), 8088 (control plane)</td>
+<td><code>ss -lptn</code></td>
+</tr>
+<tr>
+<td>Job build</td>
+<td>1 selesai (Villa Nusantara), 22 event</td>
+<td><code>scripts/sdb_jobs.py stats</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="hasil-uji-terakhir">Hasil uji terakhir</h3>
+<pre><code>pytest: 470 tes terkumpul; suite penuh hijau (make test)
+build job #1: 44 tes unit lulus · build Next.js compile · smoke 55/55 PASS
+gate/release/evidence lint: hijau
+</code></pre>
+<hr />
+<h2 id="20-lampiran-b-riwayat-dokumen">20. Lampiran B — riwayat dokumen</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Versi</th>
+<th>Tanggal</th>
+<th>Perubahan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.0</td>
+<td>2026-11-04</td>
+<td>Dokumen paket update menyeluruh pertama: 16 tahap, 12 divisi, gate, perkakas, deck, control plane, bot Telegram 3 kanal, bukti job #1, batasan, glosarium, lampiran verifikasi</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Cara memperbarui dokumen ini:</strong> jalankan perintah di Lampiran A, bandingkan angkanya,
+lalu ubah angka + tanggal. Jangan menambah klaim baru tanpa artefak pendukung.</p>
+<hr />
+<p><em>Dokumen ini bagian dari SDB — Divisi Ekosistem. Semua klaim memiliki jejak perintah yang
+bisa dijalankan ulang. Kalau ada yang tidak cocok dengan kenyataan, yang benar adalah
+kenyataan; dokumen ini yang harus diperbaiki.</em></p>
+<div class="foot">Semua detail SDB: 16 tahap, 12 divisi, gate, perkakas, bot Telegram, bukti, dan batasan — bahasa awam</div>
+</main>
+</div>
+</body>
+</html>

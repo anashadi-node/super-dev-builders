@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Bot Telegram read-only untuk ekosistem SDB (Super Dev Builders).
+"""Bot Telegram SDB — laporan otomatis, tanya-jawab, dan perintah build (owner-only).
 
 Desain keamanan:
-- READ-ONLY: membaca data/control.db lewat koneksi SQLite mode=ro (secara fisik tak bisa menulis)
+- control.db dibaca lewat koneksi SQLite mode=ro (secara fisik tak bisa menulis);
+  antrean build ditulis terpisah di ~/.local/state/sdb/build_jobs.db
   dan health.json Command Deck. Tidak ada perintah yang mengubah uang.
 - Hanya chat ID pemilik yang dilayani; chat lain diabaikan diam-diam.
 - Long polling (tanpa webhook): tidak membuka port, tanpa butuh TLS/publik.

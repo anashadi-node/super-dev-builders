@@ -38,3 +38,22 @@ area berisiko, dan tautan dokumen. Ringkas — ini hemat konteks, bukan tempat c
 
 ## Output
 - `README.md`, `docs/runbooks/*.md`, `CHANGELOG.md`, `AGENTS.md`, `reports/handover-<tanggal>.md`
+
+## Paket dokumen 3 format (MD + HTML + PDF)
+Untuk permintaan "dokumen lengkap" dari pemilik: hasilkan `.md` (sumber), `.html` (TOC + anchor), `.pdf` (cetak).
+Generator repo: `python3 scripts/build_tutorial.py <md> --html <out.html> --pdf <out.pdf> --title ... --desc ...`.
+
+Pitfall yang sudah menimpa proyek ini:
+- **repo_hygiene R1 menolak berkas > 512 KB** (`platform/hygiene-baseline.json`). PDF hasil Chromium sering
+  600–700 KB → `make test` FAIL di `tests/test_repo_hygiene.py`. Kompres dulu:
+  `gs -sDEVICE=pdfwrite -dPDFSETTINGS=/ebook -dNOPAUSE -dQUIET -dBATCH -sOutputFile=out.pdf in.pdf`
+  (23 halaman → ~320 KB, teks tetap tajam), lalu render ulang halaman 1 untuk cek visual.
+- **Tabel panjang terpotong ke halaman berikutnya menyisakan setengah halaman kosong** bila CSS cetak memakai
+  `table{page-break-inside:avoid}`. Pakai `table{page-break-inside:auto}`, `tr,td,th{page-break-inside:avoid}`,
+  `thead{display:table-header-group}`, dan `.table-wrap{overflow:visible}` agar header berulang dan tabel mengalir.
+- Daftar isi panjang wajar tumpah ke halaman 2 — bukan bug, tapi cek `pdftotext -f 2 -l 2` untuk memastikan
+  item lanjutan benar-benar tercetak.
+
+Verifikasi wajib sebelum menyerahkan: `pdfinfo` (jumlah halaman), hitung anchor vs href (broken link harus 0),
+`pdftoppm` halaman 1 + satu halaman tabel lalu periksa visual, dan pastikan angka di dokumen diambil dari
+perintah nyata (bukan ingatan) dengan menyertakan lampiran cara mengecek ulang.

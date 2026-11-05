@@ -27,14 +27,15 @@ python3 scripts/rotate_control_keys.py --dry-run
 # 2) rotasi + restart + buktikan kunci lama mati
 python3 scripts/rotate_control_keys.py \
   --restart sdb-control-plane --restart sdb-build-worker --restart sdb-tg-bot \
-  --verify-url http://127.0.0.1:8088/v1/admin/revenue --verify-header X-Admin-Key \
-  --verify-url http://127.0.0.1:8088/v1/worker/claim --verify-header X-Worker-Key \
-  --verify-method POST --verify-body '{"worker_id":"rotate-check"}'
+  --verify 'GET http://127.0.0.1:8088/v1/admin/revenue X-Admin-Key' \
+  --verify 'POST http://127.0.0.1:8088/v1/worker/claim X-Worker-Key {"worker_id":"rotate-check"}'
 ```
 
 Skrip: mencadangkan env ke `control.env.bak-<stamp>` (0600), menulis nilai baru
-atomik (tmp 0600 → `os.replace`), merestart unit, lalu menguji matriks
-**baru → 2xx** dan **lama → 401**. Exit ≠ 0 bila salah satu tidak terpenuhi.
+atomik (tmp 0600 → `os.replace`), merestart unit, menunggu control plane menerima
+koneksi, lalu menguji matriks **baru → 2xx** dan **lama → 401** per `--verify`.
+Exit ≠ 0 bila salah satu tidak terpenuhi. Spesifikasi `--verify` divalidasi
+sebelum berkas disentuh (salah sintaks = tidak ada rotasi).
 
 ## 3. Verifikasi manual (bila skrip tidak dipakai)
 
@@ -63,6 +64,7 @@ kunci **lama** = 401, `NRestarts=0`.
 | nilai kunci di berkas terlacak git | 0 kemunculan |
 | mode env + cadangan | 0600 |
 | stabilitas 20 s | `active`, `NRestarts=0` |
+| skrip end-to-end (rotasi ke-4, 18:05) | exit 0 — admin baru/lama 200/401, worker baru/lama 200/401 |
 
 ## 5. Rollback
 

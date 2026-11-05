@@ -65,6 +65,7 @@ tanggalnya menang — dan yang kalah **harus** dipindahkan ke `docs/archive/`, b
 |---|---|
 | `runbooks/GIT_PURGE.md` | pembersihan artefak dari riwayat git (destruktif, wajib backup) |
 | `runbooks/RELEASE.md` | cara menandai & rollback rilis |
+| `runbooks/ROTASI_KREDENSIAL.md` | rotasi `SDB_ADMIN_KEY`/`SDB_WORKER_KEY`: prosedur, bukti 401, rollback |
 | `INSTALLATION_PLAN.md` | instalasi |
 | `ROLLBACK_PLAN.md` | rollback umum |
 | `GETTING_STARTED.md` | orientasi cepat |

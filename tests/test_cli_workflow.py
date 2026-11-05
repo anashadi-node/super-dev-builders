@@ -259,7 +259,15 @@ def test_release_accepts_positional_target_like_other_commands(tmp_path):
     rc_flag = release.main(["--target", "zz-release-posisional", "--out", str(out_b)])
     assert rc_pos == rc_flag, f"posisional={rc_pos} vs --target={rc_flag} harus identik"
     assert rc_pos != 0, "tanpa artefak fresh wajib FAIL (bukan PASS)"
-    assert out_a.read_text() == out_b.read_text(), "kedua bentuk harus menghasilkan verdict sama"
+    # Bandingkan isi verdict tanpa medan waktu: dua pemanggilan bisa melewati
+    # batas detik sehingga `checked_at` berbeda walau keputusan identik.
+    a, b = json.loads(out_a.read_text()), json.loads(out_b.read_text())
+    for volatile in ("checked_at",):
+        a.pop(volatile, None)
+        b.pop(volatile, None)
+    assert a == b, "kedua bentuk harus menghasilkan verdict sama (kecuali checked_at)"
+    for field in ("gate", "verdict", "project"):
+        assert field in a, f"verdict wajib memuat {field}"
 
 
 def test_release_rejects_traversal_slug_before_writing(tmp_path):

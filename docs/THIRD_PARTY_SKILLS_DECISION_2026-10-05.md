@@ -123,7 +123,7 @@ Tanpa membaca isinya, angka itu akan menyesatkan. Setelah tiap temuan HIGH dibac
 | `Tool Misuse → Unsafe Defaults` (codeql:32) | **tabel ambang severity** di dokumen ("medium ≥ 6.0 → Keep") | false positive |
 | `Tool Misuse → Chaining/Parameter Abuse` (semgrep:392) | `[ -n "$OUTPUT_DIR" ] && rm -rf "$OUTPUT_DIR/repos"` — ter-guard, dalam OUTDIR sendiri | nyata tapi terkendali → caveat |
 
-**Artefak nyata yang ditemukan (dan diukur, bukan diasumsikan)**: pemindaian seluruh 6 skill menemukan **tepat 2 karakter tak-terlihat (U+200B)** di satu berkas (`audit-context-building/resources/ANALYSIS_FORMAT.md`), keduanya di samping pagar kode, **tanpa teks tersembunyi di belakangnya**. Nol karakter tak-terlihat di 5 skill lainnya.
+**Artefak nyata yang ditemukan (dan diukur, bukan diasumsikan)**: pemindaian seluruh 6 skill menemukan **tepat 2 karakter tak-terlihat (U+200B)** di satu berkas (`third-party:audit-context-building/resources/ANALYSIS_FORMAT.md`), keduanya di samping pagar kode, **tanpa teks tersembunyi di belakangnya**. Nol karakter tak-terlihat di 5 skill lainnya.
 
 Kesimpulan yang bisa dipertanggungjawabkan: skor agregat `100/CRITICAL/DO_NOT_INSTALL` **tidak dapat ditindaklanjuti** — ia menjumlahkan salah-kelas antara dokumentasi skill (yang memang berisi instruksi kepada agent; itu hakikat sebuah SKILL) dengan kode. Yang bertindak sebagai bukti tetap: (1) verdict hub `ALLOWED`, (2) pemindai deterministik kami 0 temuan, (3) pemeriksaan baris-demi-baris di tabel ini.
 
@@ -252,7 +252,7 @@ Hub menandai **aturan yang justru mencari `os.system`/`exec`** sebagai "executio
 | Rule hub | Pemicu nyata | Vonis |
 |---|---|---|
 | `uv_run` (mayoritas dari 90) | `uv run ruff check .`, `uv run pytest`, `uv run ty check`, `#!/usr/bin/env -S uv run --script` | tool yang kita pakai sendiri; hitungan membengkak karena satu rule mengenai puluhan baris dokumentasi |
-| `curl_pipe_shell` | 2 baris installer (`astral.sh/uv/install.sh`) | **nyata & dilarang di host ini** |
+| `curl_pipe_shell` | 2 baris installer (`https://astral.sh/uv/install.sh`) | **nyata & dilarang di host ini** |
 | `destructive_home_rm` | `rm -rf ~/.cache/pre-commit` (prek.md:200) | pembersihan cache milik user sendiri |
 | `dump_all_env`, `remote_fetch` | contoh dokumentasi | bukan eksekusi |
 | `HIGH exfiltration` @SKILL.md:66,272 | **baris tabel** berisi `uv run <cmd>` | salah-kelas |

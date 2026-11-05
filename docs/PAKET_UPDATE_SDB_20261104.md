@@ -360,7 +360,7 @@ Detail penting yang sering disalahpahami:
 - **Exit code tetap 0** walau ada yang `MISSING` — kecuali Anda memakai `--require-all`, maka
   menjadi exit 1 (`scripts/workflow_run.py:267-268, 364`).
 - **Runner tidak menjalankan gate.** Tahap 14 dan 15 mencantumkan nama tool
-  (`tools/design_verdict.py`, `tools/arsitektur_verdict.py`) tetapi runner hanya *mencatat* nama itu,
+  (`design_verdict.py` dan `arsitektur_verdict.py` di `tools/` — keduanya tidak ada di repo, temuan audit 2026-11-05) tetapi runner hanya *mencatat* nama itu,
   tidak mengeksekusinya (`scripts/workflow_run.py:69-70`).
 
 ### 6.3 Arti tiap tahap dalam bahasa manusia

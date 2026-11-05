@@ -126,8 +126,8 @@ ruff check skills/             -> All checks passed!
 
 | Berkas | Perubahan |
 |---|---|
-| `skills/local-llm-serving/**` | **baru** — SKILL.md + `scripts/serve_and_bench.py` (multi-run, median, metadata bukti) |
-| `skills/realtime-visual-engine/**` | **baru** — SKILL.md + `scripts/render_shader.py` (WebGL + kontrol UDP/OSC + ffmpeg) |
+| `skills/local-llm-serving/**` | **baru** — SKILL.md + `skills/local-llm-serving/scripts/serve_and_bench.py` (multi-run, median, metadata bukti) |
+| `skills/realtime-visual-engine/**` | **baru** — SKILL.md + `skills/realtime-visual-engine/scripts/render_shader.py` (WebGL + kontrol UDP/OSC + ffmpeg) |
 | `skills/model-hub-provenance/scripts/fetch_gguf.py` | ditambah jalur ModelScope + pin sha256 + verifikasi ukuran |
 | `registry/skills.yaml` | +2 entri (29), `approved_custom_count: 29`, klaim parity + bukti |
 | `registry/tools.yaml` | +`llama_cpp_server`, `ffmpeg`, `chromium_headless_webgl`; bagian baru `model_sources` (termasuk catatan HF diblokir) |

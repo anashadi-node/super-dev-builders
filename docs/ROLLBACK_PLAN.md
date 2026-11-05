@@ -67,6 +67,6 @@ Catatan: rollback tidak menghapus backup; jalankan `gzip -t` sebelum ekstraksi u
 
 ## 4. Kriteria kapan rollback dipertimbangkan
 - Ada regresi pada pekerjaan Anantara Sakti (profil trading) akibat perubahan ini — (tidak terjadi: tidak ada
-  profil trading yang disentuh; diverifikasi tidak ada referensi `cc-*` di `config.yaml`/`cron/jobs.json`/kanban).
+  profil trading yang disentuh; diverifikasi tidak ada referensi `cc-*` di `config.yaml`/`~/.hermes/cron/jobs.json`/kanban).
 - Skill/ekosistem baru menyebabkan kebocoran token atau kegagalan gate yang tidak bisa diperbaiki cepat.
 - Owner memutuskan struktur V1 lebih sesuai.

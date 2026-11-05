@@ -82,5 +82,5 @@ Target: `startbootstrap/startbootstrap-agency` @ `b2d5d5c6b1396bc5b0e8dd92c693b1
 ### 5.2 Deltas yang disengaja (bukan cacat)
 Rebuild tidak menghubungi host pihak ketiga sama sekali: **8 request / 5 host → 0** (Google Fonts, jsDelivr,
 FontAwesome, cdn.startbootstrap). Konsekuensinya visual 0,66 dan responsif 0,57 — dilaporkan apa adanya, bukan
-dinaikkan dengan menyalin aset pihak ketiga (lisensi & privasi). Detail: `reconstruction/oss-sb-agency/SPEC.md` §3.
+dinaikkan dengan menyalin aset pihak ketiga (lisensi & privasi). Detail: `reports/oss-sb-agency/fidelity-report.md` §3.
 

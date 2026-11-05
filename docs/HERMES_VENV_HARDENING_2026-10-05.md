@@ -15,7 +15,7 @@ untuk /home/anashadi/.hermes/hermes-agent → 8f187687540a47e8
 ```
 
 Nilai `environment` wajib berada di bawah `installs/<key>/environments/<gen>/venv`.
-Kode acuan: `pm/environments.py` (`selected_venv`, `_recorded_venv`, `committed_venv`, `ACTIVATION_INPUTS`).
+Kode acuan (repo Hermes, luar SDB): `hermes:pm/environments.py` (`selected_venv`, `_recorded_venv`, `committed_venv`, `ACTIVATION_INPUTS`).
 
 Konsekuensi: **jangan** menyimpulkan hasil upgrade dari inspeksi `hermes-agent/venv` — itu pohon mati.
 
@@ -93,7 +93,7 @@ Bukti uji (bukan sekadar audit):
 npm test --workspace web     # 51 file / 369 tes PASS
 npm run build:ink --workspace ui-tui && npm test --workspace ui-tui   # 176 file / 1620 tes PASS (2 skip)
 ```
-`build:ink` wajib lebih dulu: 77 file uji `ui-tui` gagal collect (**pre-existing**, bukan regresi bump) karena `packages/hermes-ink/dist/entry-exports.js` belum dibundel.
+`build:ink` wajib lebih dulu: 77 file uji `ui-tui` gagal collect (**pre-existing**, bukan regresi bump) karena `hermes:packages/hermes-ink/dist/entry-exports.js` belum dibundel.
 
 Patch: `~/backups/sdb-hardening-20261005_full/hermes-agent-npm-20261005.patch`
 sha256 `e36df7d1db8dec6cb14beb9cd177458b630f57f77e65c1d559a0a06ecfd6847d`.

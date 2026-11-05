@@ -1,7 +1,7 @@
 # SDB — Super Dev Builders: Dokumen Lengkap A–Z
 
 **Versi dokumen:** 3.0 · **Tanggal:** 5 November 2026, 06:10 WIB
-**Status:** aktif dikembangkan · **Repo resmi:** <https://github.com/anashadi-node/super-dev-builders> (privat, pemilik `anashadi-node`)
+**Status:** aktif dikembangkan · **Repo resmi:** <https://github.com/anashadi-node/super-dev-builders> (publik — diverifikasi `gh repo view` 5 Nov 2026; pemilik `anashadi-node`)
 **Cakupan:** seluruh sistem SDB — filosofi, tujuan, struktur, arsitektur, 18 tahap, gerbang, 12 divisi, 8 agen, 40 skill, 17 tool, CLI, Command Deck, control plane, basis data, penagihan, bot Telegram, alur build, laporan, keamanan, skenario operasional, batasan jujur, dan bukti verifikasi.
 
 > **Cara membaca dokumen ini.** Bagian depan (Ringkasan Eksekutif + Peta Cepat) untuk Anda yang ingin tahu "ini apa" dalam 5 menit. Bab A–Z disusun seperti kamus: setiap huruf satu topik, berdiri sendiri, boleh dibaca melompat. Lampiran berisi angka mentah dan perintah untuk memverifikasi sendiri setiap klaim. Semua angka di dokumen ini diambil dari mesin pada 5 November 2026 pukul 06:05–06:10 WIB, bukan dari ingatan dan bukan dari dokumen lama.
@@ -21,13 +21,13 @@
 
 **Angka kunci (terverifikasi 5 Nov 2026):**
 
-- 118 berkas Python terlacak, **22.953 baris** kode Python.
-- **547 item tes** terkumpul di 38 berkas; seluruh suite lulus.
+- 118 berkas Python terlacak, **23.207 baris** kode Python.
+- **629 item tes** terkumpul di 50 berkas (`tests/` 533, sisanya `skills/` + `integrations/`); seluruh suite lulus dalam 49,83 s.
 - **40 skill** buatan sendiri, **17 repo pihak ketiga** dievaluasi, **8 pack** divisi.
 - **12 divisi** (D0–D11), **8 agen**, **8 profil Hermes**.
 - **18 tahap** pipeline (bukan 16 — docstring lama salah).
 - **6 gerbang mesin**: Gate #0, evidence lint, security verdict, release gate, higiene repo, runner tahap; plus **7 gerbang `make check`**.
-- **159 berkas Markdown** terlacak, 52 di antaranya di `docs/`.
+- **160 berkas Markdown** terlacak, 53 di antaranya di `docs/`.
 - 6 direktori target, 5 direktori run, 10 direktori evidence, 30 berkas laporan.
 - Control plane: **3.044 kali restart** sejak konfigurasi rusak (bukti di `journalctl`, 5 Nov 06:06).
 
@@ -319,7 +319,7 @@ SDB memakai tangga, karena "mirip" bukan nilai biner:
 | `workflows/` | `gate0.yaml`, `release-gate.yaml` | ambang gerbang |
 | `governance/policies/` | `clone-policy.md` | aturan mengikat |
 | `tools/` | `recon-forge.py` (45 KB), `scan-keamanan.sh`, `scan-privasi-media.py`, `arsitektur_verdict.py` | perkakas berat |
-| `tests/` | 38 berkas, 547 item tes | gerbang mutu |
+| `tests/` | 42 berkas, 533 item tes (629 bila `skills/` + `integrations/` ikut) | gerbang mutu |
 | `docs/` | 52 berkas Markdown (40 top-level, 9 ADR, 2 arsip, 1 lain) | pengetahuan |
 | `targets/` | 6 target (5 nyata + 1 contoh `nama-target`) | subjek uji |
 | `runs/` | 5 direktori run (state, log, planora) | jejak eksekusi |
@@ -1292,30 +1292,42 @@ Setiap entri punya `sha256` 64 hex. Skill yang sama di beberapa pack memakai has
 
 Total: **31 skrip** di `scripts/*.py` (+1 bersarang di `scripts/privasi/portal-rt-rw/`).
 
-## O.3 Empat ratus lima puluh tujuh… atau 547?
+## O.3 Empat ratus tujuh puluh… atau 533… atau 629?
 
-Angka tes adalah contoh mengapa dokumen harus diperbarui, bukan dipercaya:
+Angka tes adalah contoh mengapa dokumen harus diperbarui, bukan dipercaya. Tiga angka “benar” bisa
+hidup berdampingan karena mengukur himpunan yang berbeda:
 
-| Sumber | Angka | Cara mengukur |
-|---|---:|---|
-| Dokumen v2.0 (4 Nov) | 470 | waktu itu |
-| **Hari ini (5 Nov)** | **547 item terkumpul** | `pytest tests skills --co -q` dijumlahkan per berkas |
-| Berkas tes | **38** | `git ls-files 'tests/*.py'` |
-| Fungsi `def test_` | 488 | `grep` — lebih kecil dari 547 karena parametrize |
+| Sumber | Angka | Cara mengukur | Himpunan |
+|---|---:|---|---|
+| Dokumen v2.0 (4 Nov) | 470 | waktu itu | `tests/` saja |
+| **Hari ini (5 Nov, audit)** | **533** | `pytest tests/ --co -q` | `tests/` (42 berkas) |
+| **Hari ini (5 Nov, audit)** | **629** | `pytest tests skills integrations --co -q` | yang benar-benar dijalankan `make test` (50 berkas) |
+| Fungsi `def test_` di `tests/` | 471 | `grep -rc "def test_" tests/*.py` | lebih kecil karena `parametrize` |
 
-Perbedaan 470 → 547 wajar: `test_recon_forge.py` (21 uji) dan beberapa uji baru masuk setelah dokumen v2.0.
+**Pelajaran dari audit 5 Nov:** angka 547 pada versi sebelumnya **tidak salah hitung**, tetapi
+**tidak pernah menyebut himpunannya** — dan justru `integrations/` (57 uji) tidak ikut `make test`
+saat itu. Sekarang `make test` menjalankan ketiga direktori dan angkanya ditulis lengkap dengan
+himpunan. Rincian: `docs/AUDIT_VALIDASI_SDB_20261105.md` §10.
+
+Dua gerbang lain yang dulu tidak terukur dan sekarang punya angka:
+
+| Gerbang | Sebelum | Sesudah | Perintah |
+|---|---|---|---|
+| Uji mutasi (apakah tes menjaga) | 5/10 (50%) | **10/10 (100%)** | `make mutation` |
+| *Coverage* cabang `sdb_platform` | tidak diukur | **88%** | §11 laporan audit |
 
 ## O.4 Makefile — target yang sering dipakai
 
 | Target | Yang dijalankan | Untuk apa |
 |---|---|---|
-| `make test` | pytest seluruh `tests/` + `skills/` | sebelum commit |
+| `make test` | pytest `tests/` + `skills/` + `integrations/` (629 item) | sebelum commit |
 | `make lint` | `ruff check sdb_platform scripts tests skills dashboard` | gaya kode |
 | `make lint-registry` | `registry_lint.py` | integritas registry |
 | `make drift` | `doctor.py --drift-only` | skill terpasang vs repo |
 | `make hygiene` | `repo_hygiene.py` | ukuran/PII/jenis berkas |
 | `make packs` | `pack_build.py verify` | hash & lisensi pack |
-| `make docs-lint` | `docs_lint.py` | indeks & PDF/HTML |
+| `make docs-lint` | `docs_lint.py` | indeks, rujukan path (264), PDF/HTML |
+| `make mutation` | `mutation_gate.py --run --fast` | apakah tes menjaga gerbang (10 mutan, wajib 100%) |
 | `make secrets` | gitleaks (bila ada) | scan rahasia |
 | `make doctor` | `doctor.py` | kapabilitas host |
 | `make workflow` | `workflow_run.py` | kelengkapan 18 tahap |
@@ -1331,7 +1343,7 @@ Berkas `.github/workflows/ci.yml`. Pemicu: push/PR ke `master`/`main` + `workflo
 |---:|---|---|---|
 | 1 | Lint kode | `make lint` | ada pelanggaran gaya |
 | 2 | Lint registry | `make lint-registry` | registry tidak konsisten |
-| 3 | Test suite | `make test` (547 item) | satu tes gagal |
+| 3 | Test suite | `make test` (629 item) | satu tes gagal |
 | 4 | Drift skill | `make drift` | skill terpasang ≠ repo |
 | 5 | Higiene | `make hygiene` | berkas >512 KB / PII / `.env` |
 | 6 | Manifest pack | `make packs` | hash/lisensi/jumlah skill salah |
@@ -1500,17 +1512,23 @@ Main process exited, code=exited, status=2/INVALIDARGUMENT
 Scheduled restart job, restart counter is at 3044.
 ```
 
-Penyebab: unit systemd tidak memuat `SDB_ADMIN_KEY`. Ini **fail-closed yang benar** (lebih baik mati daripada terbuka tanpa kunci), tetapi operasionalnya salah: unit seharusnya memakai `EnvironmentFile` dan tidak di-restart tanpa henti.
+Penyebab (diverifikasi ulang 5 Nov 2026, 13:00 WIB): unit **sudah** memakai
+`EnvironmentFile=%h/.config/sdb/control.env`, tetapi berkas itu hanya berisi dua kunci Telegram
+(`SDB_TG_BOT_TOKEN`, `SDB_TG_CHAT_ID`) — `SDB_ADMIN_KEY` memang belum pernah dibuat. Jadi ini
+**fail-closed yang benar** (lebih baik mati daripada terbuka tanpa kunci), tetapi operasionalnya salah:
+unit di-restart tanpa henti (`NRestarts=783` dan terus naik ±40/menit saat diperiksa).
 
-Perbaikan (butuh keputusan Anda karena membuat kredensial baru):
+Perbaikan (butuh keputusan Anda karena membuat kredensial baru). **Wajib `>>`, bukan `>`** — `>`
+akan menghapus dua kunci Telegram yang sudah ada di berkas itu:
 
 ```bash
 mkdir -p ~/.config/sdb && chmod 700 ~/.config/sdb
-python3 -c "import secrets;print('SDB_ADMIN_KEY='+secrets.token_urlsafe(32))" > ~/.config/sdb/control.env
+cp ~/.config/sdb/control.env ~/.config/sdb/control.env.bak   # jaga 2 kunci lama
+python3 -c "import secrets;print('SDB_ADMIN_KEY='+secrets.token_urlsafe(32))" >> ~/.config/sdb/control.env
 python3 -c "import secrets;print('SDB_WORKER_KEY='+secrets.token_urlsafe(32))" >> ~/.config/sdb/control.env
 chmod 600 ~/.config/sdb/control.env
-# tambahkan ke unit: EnvironmentFile=%h/.config/sdb/control.env
-systemctl --user daemon-reload && systemctl --user restart sdb-control-plane
+# EnvironmentFile sudah ada di unit — tidak perlu menambah baris apa pun
+systemctl --user restart sdb-control-plane && sleep 2 && curl -s localhost:8088/healthz
 ```
 
 ## Q.4 Tiga jenis kunci
@@ -2215,7 +2233,7 @@ journalctl --user -u sdb-report-4h -n 30 --no-pager
 
 | Komponen | Status | Bukti |
 |---|---|---|
-| Gerbang & test | **sehat** | `make check` PASS, 547 tes |
+| Gerbang & test | **sehat** | `make check` PASS, 629 tes, mutan 10/10 |
 | Repo & dokumentasi | **sehat** | `docs_lint` PASS |
 | Deck `:8484` | **sehat** | unit active |
 | Bot Telegram | **sehat** | unit active |
@@ -2286,12 +2304,12 @@ make check
 # hasil: lint OK, lint-registry OK, test OK, drift OK, hygiene OK, packs OK, docs-lint OK
 
 # 2. Jumlah tes
-.venv/bin/python -m pytest tests skills --co -q   # 547 item (dijumlahkan per berkas)
+.venv/bin/python -m pytest tests skills integrations --co -q   # 629 item di 50 berkas
 
 # 3. Ukuran & isi repo
 git ls-files | wc -l                              # jumlah berkas terlacak
-git ls-files '*.py' | xargs wc -l | tail -1       # 22.953 baris Python
-git ls-files 'docs/*.md' | wc -l                  # 52 dokumen
+git ls-files '*.py' | xargs wc -l | tail -1       # 23.207 baris Python
+git ls-files 'docs/*.md' | wc -l                  # 53 dokumen
 git rev-list --count HEAD                         # jumlah commit
 git remote -v                                     # origin = github.com/anashadi-node/super-dev-builders
 
@@ -2314,28 +2332,28 @@ sqlite3 data/control.db "select count(*) from ledger;"    # 0
 | Angka | Nilai | Sumber | Cara cek |
 |---|---:|---|---|
 | Berkas Python | 118 | `git ls-files '*.py'` | perintah di Z.1 |
-| Baris Python | 22.953 | `wc -l` | idem |
-| Item tes | 547 | `pytest --co -q` | idem |
-| Berkas tes | 38 | `git ls-files 'tests/*.py'` | idem |
+| Baris Python | 23.207 | `wc -l` | idem |
+| Item tes | 629 (533 di `tests/`) | `pytest --co -q` | idem |
+| Berkas tes | 42 | `git ls-files 'tests/*.py'` | idem |
 | Skill custom | 40 | `registry/skills.yaml` | idem |
 | Repo pihak ketiga | 17 | idem | idem |
 | Pack | 8 | `ls platform/packs/*.json` | idem |
 | Divisi | 12 (D0–D11) | `agents/*.yaml` + registry | idem |
 | Agen | 8 | `ls agents/*.yaml` | idem |
-| Tahap | 18 | `workflow_run.py:53-72` | baca kode |
-| Dokumen `.md` di `docs/` | 52 (50 aktif + 2 arsip) | `git ls-files` | idem |
-| Berkas Markdown total | 159 | `git ls-files '*.md'` | idem |
+| Tahap | 18 | `workflows/stages.yaml` | baca YAML |
+| Dokumen `.md` di `docs/` | 53 (51 aktif + 2 arsip) | `git ls-files` | idem |
+| Berkas Markdown total | 160 | `git ls-files '*.md'` | idem |
 | Target | 6 direktori | `ls -d targets/*/` | idem |
 | Evidence | 10 direktori | `ls -d evidence/*/` | idem |
 | Reports | 30 berkas | `ls reports/ \| wc -l` | idem |
 | Timer SDB | 3 | `list-timers` | idem |
-| Restart control plane | 3.044 | `journalctl` | idem |
+| Restart control plane | 783 (13:00 WIB, +±40/menit) | `systemctl show -p NRestarts` | journal 06:xx mencatat 3.044 |
 
 ## Z.3 Repo resmi
 
 ```
 git@github.com:anashadi-node/super-dev-builders.git
-https://github.com/anashadi-node/super-dev-builders        (privat)
+https://github.com/anashadi-node/super-dev-builders        (publik)
 ```
 
 Aturan `docs_lint` mewajibkan README memuat tautan ini; bila hilang, `make check` gagal (`docs_lint.py:147-149`).
@@ -2346,13 +2364,13 @@ Aturan `docs_lint` mewajibkan README memuat tautan ini; bila hilang, `make check
 
 | Kategori | Angka | Catatan |
 |---|---:|---|
-| Python: berkas / baris | 118 / 22.953 | terlacak git |
-| Tes: berkas / item | 38 / 547 | item termasuk parametrize |
+| Python: berkas / baris | 118 / 23.207 | terlacak git |
+| Tes: berkas / item | 42 / 533 | `tests/`; 629 bila `skills/` + `integrations/` ikut |
 | Skill: custom / pihak ketiga / keep_local | 40 / 17 / 26 | registry v2.2.0 |
 | Tool: present / pending / quarantine / deferred | 17 / 1 / 4 / 3 | registry tools |
 | Pack: jumlah / skill / native | 8 / 79 / 56 | `platform/packs` |
 | Agen / profil / divisi | 8 / 8 / 12 | `agents/` |
-| Tahap pipeline | 18 | `workflow_run.py` |
+| Tahap pipeline | 18 | `workflows/stages.yaml` |
 | Rute Deck / intake | 12 / 6 | `dashboard/` |
 | Rute control plane | 20 (19 aktif + 1 dicabut) | `app.py` |
 | Tabel `control.db` / `build_jobs.db` | 7 / 2 | `store.py`, `sdb_jobs.py` |
@@ -2414,7 +2432,7 @@ Aturan `docs_lint` mewajibkan README memuat tautan ini; bila hilang, `make check
 **Yang berubah di 3.0 dibanding 2.0:**
 
 1. Struktur A–Z (26 bab) supaya bisa dibaca melompat, bukan 32 bagian berurutan.
-2. Angka tes diperbarui 470 → **547** (diverifikasi ulang).
+2. Angka tes diperbarui 470 → 547 → **629** (5 Nov, termasuk `integrations/`; 533 di `tests/`).
 3. Ditambahkan bab khusus **recon-forge** dan bukti jalur native (ELF/Ghidra).
 4. Ditambahkan temuan **control plane crash loop 3.044 restart** (keadaan 5 Nov, tidak ada di 2.0).
 5. Ditambahkan 10 skenario operasional + tabel gejala → sebab → tindakan.

@@ -102,8 +102,8 @@
    "D1"
   ],
   "mission": "Observasi sah target, bangun evidence package, normalisasi, dan spesifikasi ulang tanpa menembus proteksi.",
-  "primary": "glm-5.3-flash",
-  "available_now": "z-ai/glm-5.3-flash (tokenrouter)",
+  "primary": "deepseek-flash",
+  "available_now": "deepseek-flash (deepseek, api.deepseek.com)",
   "escalation": "sonnet-5.5",
   "stages": [
    "recon"
@@ -135,7 +135,7 @@
    "08",
    "09"
   ],
-  "notes": "Review tidak boleh 'asal setuju'; QA deterministik boleh GLM.",
+  "notes": "Review tidak boleh 'asal setuju'. Rutin/QA mekanis: DeepSeek Flash lewat API resmi.",
   "gates": [],
   "permissions": [
    "test_runners",
@@ -179,13 +179,13 @@
    "D4"
   ],
   "mission": "Implementasi frontend clean-room dari spec/component contract, dengan test dan bukti build.",
-  "primary": "glm-5.3-flash",
-  "available_now": "z-ai/glm-5.3-flash (tokenrouter)",
+  "primary": "deepseek-flash",
+  "available_now": "deepseek-flash (deepseek, api.deepseek.com)",
   "escalation": "sonnet-5.5",
   "stages": [
    "07"
   ],
-  "notes": "Rantai GLM Owner: TokenRouter -> TokenHarbor -> OpenCode; kuota OpenCode-go habis s/d 25 Okt (429).",
+  "notes": "Owner 2026-11-06: D4 pindah dari GLM ke DeepSeek Flash (API resmi).",
   "gates": [],
   "permissions": [
    "build_tools",

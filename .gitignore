@@ -25,7 +25,6 @@ evidence/rt-rw-portal/identity-scan.json
 .venv/
 
 # Artefak lingkungan sementara (uv run --with)
-uv.lock
 
 # Evidence MENTAH sebelum redaksi (wajib diredaksi dulu) — berlaku SEMUA tree
 **/*.raw
@@ -96,3 +95,14 @@ docs/**/*.pdf
 reports/**/*.pdf
 docs/archive/*.html
 docs/archive/*.pdf
+
+# Path dengan variabel shell tak ter-expand (bug penulisan path; gerbang R6 menolak)
+/$HOME/
+
+# Target lokal: symlink ke repo produk di mesin ini, bukan bagian repo.
+/targets/rt-rw-portal
+
+# Artefak cakupan lokal
+.coverage
+.coverage.*
+htmlcov/

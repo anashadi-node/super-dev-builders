@@ -28,24 +28,13 @@ TOKEN_FILE = DATA / ".token"
 MAX_BODY = 64 * 1024
 MAX_PARALLEL = 2
 
-STAGES = [
-    ("01", "Intake", "cc-orchestrator", "doc"),
-    ("02", "Clarify", "cc-orchestrator", "doc"),
-    ("03", "Scope", "cc-orchestrator", "doc"),
-    ("04", "ADR/Design", "cc-architect", "doc"),
-    ("05", "Recon", "cc-capture-forensics", "doc"),
-    ("06", "Impl Plan", "cc-orchestrator", "doc"),
-    ("07", "Build", "cc-builder", "exec"),
-    ("08", "Review", "cc-reviewer-qa", "exec"),
-    ("09", "QA/E2E", "cc-reviewer-qa", "exec"),
-    ("10", "Security", "cc-security-governor", "exec"),
-    ("11", "Audit", "auditor", "exec"),
-    ("12", "Verdict", "auditor", "exec"),
-    ("13", "Dashboard", "cc-frontend", "exec"),
-    ("14", "Release", "cc-devops-docs", "exec"),
-    ("15", "Deploy", "cc-devops-docs", "exec"),
-    ("16", "Handover", "cc-devops-docs", "exec"),
-]
+# DITURUNKAN dari workflows/stages.yaml (satu sumber bersama scripts/workflow_run.py).
+# Sebelumnya berkas ini punya 16 tahap sementara runner punya 18, dengan nomor yang
+# sama tetapi arti berbeda — status di dashboard bisa menyesatkan.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+from stage_registry import as_dashboard_rows  # noqa: E402  (impor setelah sys.path)
+
+STAGES = as_dashboard_rows()
 # Tahap "doc" = keluaran dokumen murni (aman dijalankan dari web).
 # Tahap "exec" = butuh kode/test/scan nyata di repo -> hanya brief serah-terima.
 

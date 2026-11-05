@@ -25,7 +25,7 @@ PY_DOC ?= $(shell \
 # TARGET lewat lingkungan (bukan interpolasi make ke shell): nilai ber-kutip/`;`/`$(...)` tetap data.
 export TARGET
 
-.PHONY: help check lint drift doctor inventory test gate-init lint-registry release-check skills-list install-main workflow install-dry-run clean-pyc docs-tutorial docs-lint
+.PHONY: help check lint drift doctor inventory test gate-init lint-registry release-check skills-list install-main workflow install-dry-run clean-pyc docs-tutorial docs-lint mutation
 
 help:
 	@grep -E "^[a-z-]+:" Makefile | sed "s/:.*//" | column -c 80
@@ -36,8 +36,10 @@ doctor:
 inventory:
 	$(PY_SYS) scripts/inventory_ecosystem.py --out reports/inventory_after.json
 
+# Uji integrasi ikut dijalankan: sebelumnya 57 uji di integrations/ hanya lulus
+# kalau seseorang ingat menjalankannya manual (audit 2026-11-05, temuan VF2).
 test:
-	$(PY_SYS) -m pytest tests skills -q
+	$(PY_SYS) -m pytest tests skills integrations -q
 
 lint:
 	ruff check sdb_platform scripts tests skills dashboard
@@ -85,6 +87,13 @@ docs-tutorial:
 docs-lint:
 	$(PY_SYS) scripts/docs_lint.py
 
+# Uji mutasi (temuan T-09/T-13 audit 2026-11-05): sengaja merusak satu baris logika
+# gerbang, jalankan suite, lalu pulihkan. Mutan yang SINTAS = baris tanpa penjaga.
+# Tidak masuk `make check`: 10 mutan x suite penuh terlalu lambat untuk tiap commit.
+# Skor wajib 100% (10/10). Lihat docs/AUDIT_VALIDASI_SDB_20261105.md §9.
+mutation:
+	$(PY_SYS) tools/mutation_gate.py --run --fast
+
 hygiene:
 	$(PY_SYS) scripts/repo_hygiene.py
 
@@ -121,7 +130,7 @@ release-check:
 skills-list:
 	$(PY_SYS) scripts/install_skills.py --list
 
-# runner 16 tahap (TARGET=<slug>); tanpa TARGET pakai run terbaru di runs/
+# runner 18 tahap (TARGET=<slug>); daftar tunggal di workflows/stages.yaml
 workflow:
 	@slug="$${TARGET:-}"; \
 	if [ -z "$$slug" ]; then slug=$$($(PY_SYS) -c "import os;r='runs';c=[(os.path.getmtime(os.path.join(r,d)),d) for d in (os.listdir(r) if os.path.isdir(r) else [])];print(max(c)[1] if c else '')" 2>/dev/null); fi; \

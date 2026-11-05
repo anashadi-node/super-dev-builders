@@ -43,10 +43,10 @@ Saya tidak menilai dari README saja. Yang dikerjakan:
 
 1. **Metadata resmi** — GitHub REST API untuk kedua repo: tanggal lahir, bahasa, lisensi, bintang, fork, isu, ukuran, commit terakhir.
 2. **Klon dangkal** `craft-anything` (26 MB) lalu **hitung sendiri**: 204.498 baris Rust, 460 berkas `.rs`, 14 crate.
-3. **Audit status tool** bawaan proyek: `docs/tool-status.md` — 134 tool *verified* di input nyata, 52 *unverified*.
+3. **Audit status tool** bawaan proyek: `craft:docs/tool-status.md` — 134 tool *verified* di input nyata, 52 *unverified*.
 4. **Pemeriksaan lokal REA** yang sudah terpasang di mesin ini: `scripts/rea capabilities` → 53 grup operasi, **113 operasi** yang benar-benar tersedia di host ini (sisanya butuh Ghidra/IDA/Hopper/JEB yang tidak dipasang).
 5. **Pencarian jejak jaringan keluar**: tidak ditemukan telemetri di kedua pihak.
-6. **Baca aturan internal** proyek: `AGENTS.md`, `SECURITY.md`, `docs/STATUS.md`, `deny.toml`.
+6. **Baca aturan internal** proyek: `AGENTS.md`, `SECURITY.md`, `craft:docs/STATUS.md`, `deny.toml`.
 
 **Batas kejujuran:** saya **belum** menjalankan rebuild nyata dengan Craft Anything, dan **belum** memakai REA pada target ber-Gate #0. Jadi penilaian di bawah adalah penilaian **kesiapan dan rekayasa**, bukan hasil uji lapangan. Bagian 10 menutup celah itu dengan rencana uji 14 hari.
 
@@ -281,7 +281,7 @@ grep -rn -iE 'posthog|sentry|amplitude|telemetry' craft-anything/crates craft-an
 ## 12. Lampiran B — sumber
 
 - GitHub REST API, `morluto/rea` dan `storytold/craft-anything`, diambil 4 Nov 2026.
-- `storytold/craft-anything` — `README.md`, `AGENTS.md`, `SECURITY.md`, `docs/STATUS.md`, `docs/tool-status.md`, `docs/tools.md`, `deny.toml`, rilis `v0.3.0` (29 aset).
+- `storytold/craft-anything` — `README.md`, `AGENTS.md`, `SECURITY.md`, `craft:docs/STATUS.md`, `craft:docs/tool-status.md`, `craft:docs/tools.md`, `deny.toml`, rilis `v0.3.0` (29 aset).
 - `rea-agents@6.8.0` lokal: `~/.hermes/tools/rea-6.8.0/node_modules/rea-agents` — `package.json` (MIT, 12 dependensi), `README.md`, `dist`, keluaran `scripts/rea capabilities` (12 entri provider, 53 grup, 113 operasi di host ini).
 - Registry SDB: `registry/skills.yaml:253-262`, `registry/tools.yaml:116-121`, `scripts/workflow_run.py:53-72`, `tests/test_rea_integration.py`.
 

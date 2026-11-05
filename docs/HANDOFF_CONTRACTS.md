@@ -1,6 +1,6 @@
 # Handoff Contracts — artifact per tahap
 
-Migrasi dari V1 `docs/AGENT_CHARTERS.md` (agent charters) — kini dipisah: charter per divisi ada di
+Migrasi dari V1 (berkas `AGENT_CHARTERS.md` sudah tidak ada di repo; isinya dipecah) — kini dipisah: charter per divisi ada di
 `docs/DIVISIONS.md` + `agents/*.yaml`; berkas ini mengatur **kontrak serah-terima artifact**.
 
 ## Prinsip

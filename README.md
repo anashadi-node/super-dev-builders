@@ -4,7 +4,10 @@ Software-engineering ecosystem berbasis Hermes: merancang, membangun, menguji, m
 mendokumentasikan, dan men-deploy website / web app / mobile / desktop / backend / API / database /
 AI-agent integration / platform enterprise — **termasuk Authorized Reverse Engineering & Reconstruction**.
 
-Repo resmi: <https://github.com/anashadi-node/super-dev-builders> (privat; akses lewat undangan Owner).
+Repo resmi: <https://github.com/anashadi-node/super-dev-builders> — **publik** (dicek 2026-11-05 lewat
+`gh repo view`; sebelumnya README menyebut "privat/undangan", itu tidak akurat). Konsekuensinya:
+tidak ada kredensial, kunci, data pelanggan, atau berkas profil browser yang boleh masuk repo —
+gerbang higiene (`scripts/repo_hygiene.py`) menegakkan ini.
 
 Acuan utama (sumber kebenaran) arsitektur ini: `docs/00_MASTER_BLUEPRINT_V2.2.html`
 (Hermes AI Software Engineering Company — Super Dev Builders Ecosystem — Master Blueprint V2.2).

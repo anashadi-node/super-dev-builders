@@ -12,7 +12,7 @@ Pin dashboard juga belum membatasi percobaan tebak.
 
 ## Keputusan
 
-1. **Token bucket per tenant, di memori proses.** `RateLimiter` di `control_plane/metrics.py`.
+1. **Token bucket per tenant, di memori proses.** `RateLimiter` di `sdb_platform/control_plane/metrics.py`.
    Kapasitas burst = 2× laju per detik (minimal 5 token), isi ulang kontinu, jam `monotonic`.
    Jatah default 600 permintaan/menit (`SDB_RATE_PER_MIN`), dapat ditimpa per tenant lewat kolom baru
    `tenants.rate_per_min` (`limits.rate_per_min` saat membuat tenant, 1..100000).
@@ -30,7 +30,7 @@ Pin dashboard juga belum membatasi percobaan tebak.
 
 - **Batas di reverse proxy (nginx/Envoy).** Lebih tahan restart dan multi-node, tetapi butuh konfigurasi
   di luar aplikasi; jatah per tenant jadi tidak bisa diatur lewat API. Dicatat sebagai langkah produksi
-  wajib (lihat `docs/PRODUKSI.md`) — keduanya bisa hidup bersama.
+  wajib untuk produksi (belum ada dokumen khusus; lihat `docs/runbooks/RELEASE.md`) — keduanya bisa hidup bersama.
 - **Redis / sliding window bersama.** Benar untuk banyak instance, tetapi menambah dependensi baru
   untuk sistem yang masih SQLite satu node (prinsip: dependency yang sudah ada dulu).
 - **Timezone/`time.time()` untuk isi ulang.** Jam dinding bisa mundur → jatah gratis; `monotonic` benar.

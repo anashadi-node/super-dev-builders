@@ -41,6 +41,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import intake_lib
 from sdb_common import now_iso, repo_path, validate_slug
+from stage_registry import as_cli_rows
 
 # Tahap yang artefaknya memang kata-kata Owner sendiri, sehingga boleh diisi
 # langsung dari brief intake. Tahap lain TIDAK boleh: brief bukan pengganti ADR,
@@ -48,30 +49,10 @@ from sdb_common import now_iso, repo_path, validate_slug
 INTAKE_AS: dict[str, str] = {"01": "requirements.md"}
 
 # (kode, nama, pola artefak relatif repo — {t} diganti slug target, tool deterministik)
-# Pola memakai glob; artefak pertama yang cocok dianggap bukti.
-STAGES: list[tuple[str, str, list[str], str]] = [
-    ("01", "USER OBJECTIVE", ["runs/{t}/requirements.md"], "-"),
-    ("01A", "AUTHORIZATION/SCOPE GATE", ["reports/{t}/gate0-verdict.json"], "gate_check.py"),
-    # 01B menerima manifest recon-forge: bukti yang dipanen alat (REA) bertanda hash,
-    # bukan sekadar "ada berkas JSON di folder evidence".
-    ("01B", "RECON/EVIDENCE PACKAGE",
-     ["evidence/{t}/rea/manifest.json", "normalized/{t}/inventory.json", "evidence/{t}/**/*.json"], "-"),
-    ("02", "ORCHESTRATOR: KLARIFIKASI", ["runs/{t}/clarifications.md", "runs/{t}/requirements.md"], "-"),
-    ("03", "RESEARCH (bila perlu)", ["runs/{t}/docs/research-*.md", "docs/RESEARCH_*"], "-"),
-    ("04", "ARCHITECTURE + ADR", ["runs/{t}/docs/adr-*.md", "runs/{t}/docs/architecture-*.md"], "-"),
-    ("05", "HUMAN DESIGN APPROVAL", ["runs/{t}/reports/approval-design.json", "runs/{t}/reports/approval-design-*.md"], "-"),
-    ("06", "IMPLEMENTATION PLAN", ["runs/{t}/plan.md", "runs/{t}/tasks.json"], "-"),
-    ("07", "IMPLEMENTASI (FE/BE)", ["targets/{t}/**/*"], "-"),
-    ("08", "CODE REVIEW", ["runs/{t}/reports/review-*.md"], "-"),
-    ("09", "QA / INTEGRATION / E2E", ["runs/{t}/logs/tests-*.log"], "-"),
-    ("10", "SECURITY (SAST/DEP/SECRET)", ["runs/{t}/reports/security-gate.md"], "-"),
-    ("11", "CODE AUDIT & ASSURANCE", ["runs/{t}/reports/assurance-audit.md"], "-"),
-    ("12", "RELEASE GATE", ["runs/{t}/reports/release-verdict.json", "reports/{t}/release-gate.json"], "release_check.py"),
-    ("13", "HUMAN APPROVAL PRODUKSI", ["runs/{t}/reports/approval-prod.json", "runs/{t}/reports/approval-prod-*.md"], "-"),
-    ("14", "DEVOPS DEPLOY", ["runs/{t}/reports/deploy-*.md"], "-"),
-    ("15", "OBSERVABILITY/SMOKE/ROLLBACK", ["runs/{t}/logs/smoke-*.log", "runs/{t}/docs/ROLLBACK_PLAN.md"], "-"),
-    ("16", "DOCS + HANDOVER", ["runs/{t}/reports/handover-*.md", "runs/{t}/docs/README-*.md"], "-"),
-]
+# DITURUNKAN dari workflows/stages.yaml. Jangan menulis ulang daftar ini di sini:
+# dulu daftar ini 18 baris sementara dashboard/ws_api.py punya 16 baris dengan arti
+# berbeda untuk nomor yang sama. tests/test_stage_registry.py menjaga satu sumber.
+STAGES: list[tuple[str, str, list[str], str]] = as_cli_rows()
 
 
 def _root(root: str | None = None) -> str:

@@ -32,6 +32,14 @@
     {
       "path": "reports/RESEARCH_REPLACEMENT_2026-10-04.html",
       "reason": "Laporan riset pengganti tool komersial, dikirim sebagai dokumen baca."
+    },
+    {
+      "path": "docs/SDB_LENGKAP_A_Z_20261105.html",
+      "reason": "Dokumentasi A–Z (bentuk baca HTML) — tabel lebar & daftar isi bertaut; dibangun ulang oleh scripts/build_tutorial.py dari .md yang sama."
+    },
+    {
+      "path": "docs/AUDIT_VALIDASI_SDB_20261105.html",
+      "reason": "Laporan audit 5 Nov 2026 (bentuk baca HTML) — bukti sebelum/sesudah yang dibaca Owner dari repo; sumber .md ikut terlacak."
     }
   ]
 }

@@ -74,6 +74,19 @@ jobs:
       - name: Drift skill (repo vs terpasang)
         run: if [ -d "$HOME/.hermes/skills" ]; then make drift; else echo SKIP_drift_tanpa_direktori_skill; fi
 
+      # Gerbang dokumen sudah ada sejak lama tetapi TIDAK dipanggil CI — gerbang yang
+      # tidak pernah dieksekusi sama saja dengan prosa (audit 2026-11-05, temuan KD3).
+      - name: Docs lint (indeks, rujukan path, klaim angka)
+        run: make docs-lint
+
+      # Ambang cakupan hanya untuk inti platform (sdb_platform). Diukur 2026-11-05:
+      # branch coverage 88%; ambang 85 memberi ruang refactor tanpa membiarkan turun diam-diam.
+      - name: Cakupan inti platform tidak boleh turun
+        run: |
+          python -m pip install "coverage==7.11.0"
+          python -m coverage run --branch --source=sdb_platform -m pytest tests -q -o addopts=
+          python -m coverage report --include='sdb_platform/*' --fail-under=85
+
       - name: Higiene artefak (ukuran, PII, jenis berkas)
         run: make hygiene
 

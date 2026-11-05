@@ -80,6 +80,52 @@ def _custom_skill_count(root: str) -> int | None:
     return len(custom) if isinstance(custom, list) else None
 
 
+REF_EXT = (".md", ".py", ".json", ".yml", ".yaml", ".sh", ".toml", ".c", ".js", ".sql")
+# Direktori hasil-jalan: tidak ada di klon bersih, jadi rujukannya tidak boleh dinilai mati.
+GENERATED_PREFIX = ("reports/", "runs/", "evidence/", "normalized/", "data/", "targets/",
+                    "docs/archive/", "dashboard/state/", ".sdb-run/")
+REF_RE = re.compile(r"`([^`\n]+)`")
+REF_EXTERNAL_RE = re.compile(r"^(hermes|craft|third-party|upstream):")
+
+
+def _check_path_refs(root: str, docs_md: list[str], readme: str) -> tuple[int, int, list[tuple[str, str]]]:
+    """Periksa rujukan `path/berkas.ext` di dokumen terhadap isi repo.
+
+    Batas yang disengaja: hanya token berisi '/' dan berekstensi sumber. Rujukan ke
+    direktori hasil-jalan (reports/, runs/, evidence/, data/, targets/) dilewati —
+    direktori itu dibuat alat, bukan bagian repo. Placeholder ({t}, <slug>, *) juga
+    dilewati karena bukan path konkret.
+    """
+    total = checked = 0
+    missing: list[tuple[str, str]] = []
+    docs = [os.path.join("docs", rel) for rel in docs_md] + ["README.md"]
+    for rel in docs:
+        if rel == readme:
+            continue
+        text = _read(os.path.join(root, rel))
+        if not text:
+            continue
+        for m in REF_RE.finditer(text):
+            tok = m.group(1).strip()
+            total += 1
+            if "/" not in tok or not tok.endswith(REF_EXT):
+                continue
+            if tok.startswith(GENERATED_PREFIX) or tok.startswith(("http", "~/", "/", "git@", "www.")):
+                continue
+            # Namespace eksternal eksplisit: hermes:pm/environments.py (repo Hermes),
+            # craft:docs/STATUS.md (repo craft-anything), third-party:... (skill pihak ketiga).
+            # Tanpa penanda ini, rujukan ke repo lain tampak seperti path mati di repo ini.
+            if REF_EXTERNAL_RE.match(tok):
+                continue
+            if any(ch in tok for ch in "*{}<>|$ ") or "#" in tok:
+                continue
+            checked += 1
+            if not (os.path.exists(os.path.join(root, tok)) or
+                    os.path.exists(os.path.join(root, "docs", tok))):
+                missing.append((tok, rel))
+    return total, checked, missing
+
+
 def lint(root: str) -> dict:
     errors: list[str] = []
     warnings: list[str] = []
@@ -148,11 +194,21 @@ def lint(root: str) -> dict:
     if "github.com/anashadi-node/super-dev-builders" not in readme:
         errors.append("README tidak memuat tautan repo resmi github.com/anashadi-node/super-dev-builders")
 
+    # 7. Rujukan path di dalam backtick harus menunjuk berkas yang benar-benar ada.
+    #    Hanya untuk path sumber yang memang dilacak git; path hasil-jalan (reports/, runs/,
+    #    evidence/, data/, normalize/, targets/) dilewati karena tidak ada di klon bersih.
+    ref_total, ref_checked, ref_missing = _check_path_refs(root, docs_md, readme)
+    for ref, where in ref_missing[:20]:
+        errors.append(f"rujukan path mati: {ref} (disebut di {where})")
+    if len(ref_missing) > 20:
+        warnings.append(f"{len(ref_missing) - 20} rujukan path mati lainnya tidak ditampilkan")
+
     return {
         "errors": errors,
         "warnings": warnings,
         "stats": {"docs_md": len(docs_md) - 1, "html_dilacak": len(tracked_html), "html_diizinkan": len(allow),
-                  "custom_skill": n_custom, "klaim_readme": int(claim.group(1)) if claim else None},
+                  "custom_skill": n_custom, "klaim_readme": int(claim.group(1)) if claim else None,
+                  "path_ref": ref_total, "path_ref_diperiksa": ref_checked, "path_ref_mati": len(ref_missing)},
     }
 
 

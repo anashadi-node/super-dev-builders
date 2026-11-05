@@ -246,6 +246,9 @@ def _route_class(path: str) -> str:
 def make_handler(api: Api):
     class Handler(BaseHTTPRequestHandler):
         protocol_version = "HTTP/1.1"
+        # TCP_NODELAY: tanpa ini respons kecil + keep-alive kena delayed-ACK ~40 ms
+        # per permintaan (diukur 40,28 ms -> 0,23 ms; audit SK2).
+        disable_nagle_algorithm = True
         server_version = "sdb-control-plane/0.5"
         timeout = SOCKET_TIMEOUT
 
@@ -293,8 +296,14 @@ def make_handler(api: Api):
                 if method != "POST" and (self.headers.get("Content-Length") or "0") != "0":
                     self.close_connection = True  # body GET tidak dibaca: jangan pakai ulang koneksi
                 body = self._read_body() if method == "POST" else None
-                with api.lock:
-                    status, payload = api.handle(method, path, dict(self.headers.items()), body)
+                if method == "GET" and path == "/healthz":
+                    # Probes tidak boleh menunggu lock tulis: endpoint ini konstan (tanpa DB),
+                    # sehingga aman dilayani tanpa api.lock. Diukur: dengan lock global, satu
+                    # klaim 92 ms membuat healthz ikut tertahan.
+                    status, payload = 200, {"status": "ok"}
+                else:
+                    with api.lock:
+                        status, payload = api.handle(method, path, dict(self.headers.items()), body)
             except RateLimited as exc:
                 status = 429
                 payload = {"error": {"code": "rate_limited",
@@ -328,8 +337,15 @@ def make_handler(api: Api):
 
 def serve(store: Store, admin_key: str, host: str = "127.0.0.1", port: int = 8088,
           worker_key: str | None = None) -> ThreadingHTTPServer:
-    httpd = ThreadingHTTPServer((host, port), make_handler(Api(store, admin_key, worker_key)))
-    httpd.daemon_threads = True  # thread koneksi tidak menahan proses saat shutdown
+    class Server(ThreadingHTTPServer):
+        # Backlog default socketserver = 5. Diukur: 16 koneksi paralel -> 296 req/s
+        # (SYN queue penuh, klien retransmisi ~1 s); dengan 128 -> lihat laporan audit.
+        request_queue_size = 128
+        daemon_threads = True  # thread koneksi tidak menahan proses saat shutdown
+
+    api = Api(store, admin_key, worker_key)
+    httpd = Server((host, port), make_handler(api))
+    httpd.api = api  # dipakai uji & operasional (introspeksi lock/metrics tanpa membuka request)
     return httpd
 
 

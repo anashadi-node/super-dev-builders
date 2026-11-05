@@ -110,7 +110,7 @@ super-dev-builders/
 |---|---|---|---|
 | `docs/*.md` kebijakan | `docs/policies/` | `git mv` + perbarui tautan | rendah |
 | `docs/ARCHITECTURE.md`, `DIVISIONS.md` | tetap di `docs/` | — | — |
-| `docs/AUDIT_20261007_R2/R3.md` | `docs/archive/` | `git mv` | rendah |
+| `docs/archive/AUDIT_20261007_R2.md` + `docs/archive/AUDIT_20261007_R3.md` | `docs/archive/` | `git mv` | rendah |
 | `docs/INTEGRASI_GITHUB_VERCEL_SUPABASE.{html,pdf}` | `docs/archive/` (md tetap) | `git mv` | rendah |
 | `reports/*.html`, `*.pdf`, `RESEARCH_*.pdf` | object store + `reports/INDEX.md` | unggah, hapus dari git | sedang (tautan) |
 | `reports/*.md` | tetap, + `INDEX.md` | tambah indeks | rendah |

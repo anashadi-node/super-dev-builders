@@ -31,7 +31,9 @@ ignore = [
 
 [tool.pytest.ini_options]
 # skills/*/tests ikut dijalankan: tes bawaan skill (product-kit, product-status) dulu tidak pernah masuk `make test`
-testpaths = ["tests", "skills"]
+# integrations/: 57 uji (rendering->PDF, forge, capture) sempat hanya jalan bila ada yang ingat mengetiknya
+# sendiri — audit 5 Nov 2026 (T-11) memasukkannya ke testpaths supaya `pytest` polos pun menjalankan semuanya.
+testpaths = ["tests", "skills", "integrations"]
 # -rs: tampilkan ALASAN skip. Uji yang khusus-host (skill terpasang) memang di-skip di
 # runner CI; tanpa -rs, skip itu tidak terlihat dan orang bisa mengira semua terperiksa.
 # Skip tanpa alasan yang terbaca = lubang bukti. Jangan hapus -rs.

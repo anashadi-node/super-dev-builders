@@ -1,0 +1,232 @@
+# Sumber TUNGGAL daftar tahap SDB.
+#
+# Sebelum berkas ini ada, ada dua daftar yang bertentangan: 18 tahap di
+# scripts/workflow_run.py dan 16 tahap di dashboard/ws_api.py, dengan arti
+# berbeda untuk nomor yang sama (05 = "Human design approval" vs "Recon").
+# Sekarang keduanya membaca berkas ini. Uji `tests/test_stage_registry.py`
+# gagal bila ada modul yang mendefinisikan daftar tahap kedua.
+#
+# Aturan field:
+#   code      unik, "NN" atau "NNX" (mis. 01A)
+#   name      judul tahap (dipakai CLI dan dashboard)
+#   artifacts pola glob relatif repo; {t} diganti slug target (CLI runner)
+#   tool      alat deterministik yang memutuskan lolos, "-" bila belum ada
+#   profile   profil agen Hermes yang mengerjakan
+#   kind      doc | exec | gate | approval
+#   brief     instruksi satu paragraf untuk agen (tahap doc)
+#   human     true bila tahap ini butuh keputusan manusia (tidak bisa self-approve)
+version: 1
+updated: "2026-11-05"
+stages:
+  - code: "01"
+    name: "USER OBJECTIVE"
+    artifacts: ["runs/{t}/requirements.md"]
+    tool: "-"
+    profile: "cc-orchestrator"
+    kind: "doc"
+    human: false
+    brief: >-
+      Tulis Requirements: tujuan yang bisa diukur, pengguna, ruang lingkup,
+      batasan, dan kriteria sukses. Pisahkan FAKTA / ASUMSI / REKOMENDASI.
+
+  - code: "01A"
+    name: "AUTHORIZATION/SCOPE GATE"
+    artifacts: ["reports/{t}/gate0-verdict.json"]
+    tool: "gate_check.py"
+    profile: "cc-security-governor"
+    kind: "gate"
+    human: false
+    brief: >-
+      Periksa manifest evidence/{t}/authorization.yaml lewat scripts/gate_check.py.
+      Tahap ini tidak boleh ditulis manual: verdict hanya sah bila keluar dari alat.
+
+  - code: "01B"
+    name: "RECON/EVIDENCE PACKAGE"
+    artifacts:
+      - "evidence/{t}/rea/manifest.json"
+      - "normalized/{t}/inventory.json"
+      - "evidence/{t}/**/*.json"
+    tool: "-"
+    profile: "cc-capture-forensics"
+    kind: "exec"
+    human: false
+    brief: >-
+      Panen bukti dengan alat (REA/capture_web) dan simpan manifest ber-hash.
+      Berkas JSON tanpa hash bukan bukti.
+
+  - code: "02"
+    name: "ORCHESTRATOR: KLARIFIKASI"
+    artifacts: ["runs/{t}/clarifications.md"]
+    tool: "-"
+    profile: "cc-orchestrator"
+    kind: "doc"
+    human: false
+    brief: >-
+      Daftar pertanyaan klarifikasi yang benar-benar menentukan scope (maks 8),
+      tiap item dengan opsi jawaban, rekomendasi, dan alasan. Jangan mengarang
+      jawaban Owner.
+
+  - code: "03"
+    name: "RESEARCH (bila perlu)"
+    artifacts: ["runs/{t}/docs/research-*.md", "docs/RESEARCH_*"]
+    tool: "-"
+    profile: "cc-architect"
+    kind: "doc"
+    human: false
+    brief: >-
+      Riset opsi solusi: bandingkan minimal 2 pendekatan dengan bukti/trade-off.
+      Sebut sumber; tandai TIDAK TERVERIFIKASI bila dari ingatan model.
+
+  - code: "04"
+    name: "ARCHITECTURE + ADR"
+    artifacts: ["runs/{t}/docs/adr-*.md", "runs/{t}/docs/architecture-*.md"]
+    tool: "-"
+    profile: "cc-architect"
+    kind: "doc"
+    human: false
+    brief: >-
+      ADR: 2-3 pilihan stack + trade-off + rekomendasi, arsitektur tingkat tinggi,
+      model data inti, batas keamanan & privasi, risiko. Tandai keputusan yang
+      butuh Owner.
+
+  - code: "05"
+    name: "HUMAN DESIGN APPROVAL"
+    artifacts:
+      - "runs/{t}/reports/approval-design.json"
+      - "runs/{t}/reports/approval-design-*.md"
+    tool: "-"
+    profile: "-"
+    kind: "approval"
+    human: true
+    brief: >-
+      Persetujuan desain oleh manusia. Tidak bisa dijalankan otomatis: berkas
+      approval wajib memuat approved_by dan approved_at dari orang yang berwenang.
+
+  - code: "06"
+    name: "IMPLEMENTATION PLAN"
+    artifacts: ["runs/{t}/plan.md", "runs/{t}/tasks.json"]
+    tool: "-"
+    profile: "cc-orchestrator"
+    kind: "doc"
+    human: false
+    brief: >-
+      Rencana implementasi: milestone & task terurut, tiap task punya kriteria
+      selesai yang bisa diuji, dependensi, dan pemilik (FE/BE/DevOps).
+
+  - code: "07"
+    name: "IMPLEMENTASI (FE/BE)"
+    artifacts: ["targets/{t}/**/*"]
+    tool: "-"
+    profile: "cc-builder"
+    kind: "exec"
+    human: false
+    brief: >-
+      Implementasi nyata di repo target. Selesai hanya bila ada kode + bukti
+      jalan (test/smoke), bukan deskripsi.
+
+  - code: "08"
+    name: "CODE REVIEW"
+    artifacts: ["runs/{t}/reports/review-*.md"]
+    tool: "-"
+    profile: "cc-reviewer-qa"
+    kind: "exec"
+    human: false
+    brief: >-
+      Review kode: temuan per berkas/baris, tingkat keparahan, dan usulan patch.
+      Tanpa temuan bukan berarti bersih — sebut apa yang diperiksa.
+
+  - code: "09"
+    name: "QA / INTEGRATION / E2E"
+    artifacts: ["runs/{t}/logs/tests-*.log"]
+    tool: "-"
+    profile: "cc-reviewer-qa"
+    kind: "exec"
+    human: false
+    brief: >-
+      Jalankan uji nyata dan lampirkan log apa adanya (perintah + ringkasan
+      lulus/gagal). Log kosong bukan bukti.
+
+  - code: "10"
+    name: "SECURITY (SAST/DEP/SECRET)"
+    artifacts: ["runs/{t}/reports/security-gate.md"]
+    tool: "-"
+    profile: "cc-security-governor"
+    kind: "exec"
+    human: false
+    brief: >-
+      SAST, dependensi, rahasia. Tulis alat yang dipakai, temuan per tingkat,
+      dan keputusan lolos/tidak. Alat tidak ada = BLOCKED, bukan PASS.
+
+  - code: "11"
+    name: "CODE AUDIT & ASSURANCE"
+    artifacts: ["runs/{t}/reports/assurance-audit.md"]
+    tool: "-"
+    profile: "cc-reviewer-qa"
+    kind: "exec"
+    human: false
+    brief: >-
+      Audit independen atas klaim tim: periksa bukti, cari yang tidak diukur,
+      nyatakan batas. Jangan mengulang ringkasan tim tanpa verifikasi.
+
+  - code: "12"
+    name: "RELEASE GATE"
+    artifacts:
+      - "runs/{t}/reports/release-verdict.json"
+      - "reports/{t}/release-gate.json"
+    tool: "release_check.py"
+    profile: "cc-devops-docs"
+    kind: "exec"
+    human: false
+    brief: >-
+      Jalankan scripts/release_check.py: artefak wajib segar + verdict keamanan
+      PASS + ambang mutu. Verdict hanya sah bila keluar dari alat.
+
+  - code: "13"
+    name: "HUMAN APPROVAL PRODUKSI"
+    artifacts:
+      - "runs/{t}/reports/approval-prod.json"
+      - "runs/{t}/reports/approval-prod-*.md"
+    tool: "-"
+    profile: "-"
+    kind: "approval"
+    human: true
+    brief: >-
+      Persetujuan produksi oleh manusia setelah release gate PASS. Wajib memuat
+      approved_by, approved_at, dan rujukan verdict rilis.
+
+  - code: "14"
+    name: "DEVOPS DEPLOY"
+    artifacts: ["runs/{t}/reports/deploy-*.md"]
+    tool: "-"
+    profile: "cc-devops-docs"
+    kind: "exec"
+    human: false
+    brief: >-
+      Catat deploy: versi/commit yang dirilis, langkah, waktu, dan hasil
+      verifikasi pasca-deploy. Tanpa commit hash, bukan bukti deploy.
+
+  - code: "15"
+    name: "OBSERVABILITY/SMOKE/ROLLBACK"
+    artifacts:
+      - "runs/{t}/logs/smoke-*.log"
+      - "runs/{t}/docs/ROLLBACK_PLAN.md"
+    tool: "-"
+    profile: "cc-devops-docs"
+    kind: "exec"
+    human: false
+    brief: >-
+      Smoke test pasca-deploy + rencana rollback yang bisa dijalankan (perintah
+      persis), bukan niat.
+
+  - code: "16"
+    name: "DOCS + HANDOVER"
+    artifacts:
+      - "runs/{t}/reports/handover-*.md"
+      - "runs/{t}/docs/README-*.md"
+    tool: "-"
+    profile: "cc-devops-docs"
+    kind: "doc"
+    human: false
+    brief: >-
+      README + runbook + catatan serah-terima: cara jalan, cara uji, cara
+      rollback, batas yang diketahui, dan kontak pemilik.

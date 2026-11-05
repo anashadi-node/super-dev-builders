@@ -96,6 +96,8 @@ tanggalnya menang — dan yang kalah **harus** dipindahkan ke `docs/archive/`, b
 | `../reports/REA_AUDIT_20261026.md` | audit REA sebelum integrasi |
 | `../reports/human-approval-required.md` | daftar approval |
 | `../reports/ronde-3-audit-sdb-20261011.md` | audit ronde 3 |
+| `SDB_LENGKAP_A_Z_20261105.md` | **dokumen A–Z terlengkap** (26 bab + 5 lampiran, semua angka terverifikasi 2026-11-05) |
+| `AUDIT_VALIDASI_SDB_20261105.md` | **laporan audit, validasi & remediasi 2026-11-05**: 18 temuan, angka sebelum/sesudah, uji mutasi 50%→100%, sisa risiko |
 | `PAKET_UPDATE_SDB_20261104.md` | paket update menyeluruh 2026-11-04 (keadaan, bukti, rencana) |
 | `REA_VS_CRAFT_ANYTHING_20261104.md` | riset perbandingan REA vs Craft Anything (dasar keputusan tool) |
 | `CRAFT_ANYTHING_PILOT_0.3.0.md` | uji coba terisolasi Craft Anything v0.3.0: checksum, isi paket, batas pemakaian |

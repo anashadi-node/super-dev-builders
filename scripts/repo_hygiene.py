@@ -85,8 +85,24 @@ def run(root: str) -> dict:
 
     for rel in files:
         full = os.path.join(root, rel)
+
+        # R7 — symlink bertarget absolut: menunjuk ke /home/<user> mesin pembuat, mati di tempat lain.
+        # Diperiksa SEBELUM `isfile` karena symlink direktori (targets/<slug>) tidak lolos isfile.
+        if os.path.islink(full):
+            target = os.readlink(full)
+            if os.path.isabs(target):
+                warns.append({"rule": "R7_absolute_symlink", "path": rel,
+                              "detail": f"target absolut {target}"})
+
         if not os.path.isfile(full):
             continue
+
+        # R6 — path dengan variabel shell yang tidak ter-expand ("$HOME/...", "~/...").
+        # Berkas seperti ini hanya lahir dari bug penulisan path (variabel dikutip satu)
+        # dan membuat repo tidak portabel: di mesin lain isinya nyasar ke folder aneh.
+        if rel.startswith(("$", "~")) or "/$" in rel:
+            fails.append({"rule": "R6_unexpanded_path", "path": rel,
+                          "detail": "path memuat $VAR/~ yang tidak ter-expand"})
 
         # R1 — ukuran
         size = os.path.getsize(full)

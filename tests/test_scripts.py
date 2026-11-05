@@ -274,6 +274,64 @@ def test_release_gate_rejects_malformed_security_verdict(tmp_path):
     assert any("JSON tidak sah" in item["reason"] for item in verdict["failures"])
 
 
+# Penutup mutan M1/M2: "fresh" bukan hanya "ada". Umur artefak dan umur verdict
+# sama-sama gerbang keras — kalau pemeriksaan umur dimatikan, rilis lama bisa
+# lolos sebagai PASS. Uji ini mengunci kedua cabang itu.
+_STALE_EPOCH = 1_600_000_000  # 2020-09-13, jauh di luar max_artifact_age_hours
+
+
+def test_release_gate_rejects_stale_artifact(tmp_path):
+    _fresh_release_artifacts(tmp_path, json.dumps({"verdict": "PASS"}))
+    os.utime(tmp_path / "logs/build-1.log", (_STALE_EPOCH, _STALE_EPOCH))
+    assert release.main(["--project", str(tmp_path), "--out", str(tmp_path / "verdict.json")]) == 1
+    verdict = json.loads((tmp_path / "verdict.json").read_text())
+    assert verdict["verdict"] == "FAIL"
+    assert any(item["gate"] == "build" and "kedaluwarsa" in item["reason"]
+               for item in verdict["failures"])
+
+
+def test_release_gate_rejects_stale_verdict(tmp_path):
+    _fresh_release_artifacts(tmp_path, json.dumps({"verdict": "PASS"}))
+    os.utime(tmp_path / "reports/security-verdict.json", (_STALE_EPOCH, _STALE_EPOCH))
+    assert release.main(["--project", str(tmp_path), "--out", str(tmp_path / "verdict.json")]) == 1
+    verdict = json.loads((tmp_path / "verdict.json").read_text())
+    assert verdict["verdict"] == "FAIL"
+    assert any(item["gate"] == "security-verdict" and "verdict kedaluwarsa" in item["reason"]
+               for item in verdict["failures"])
+
+
+# Penutup mutan M7: SLUG_RE sendiri mengizinkan titik, jadi hanya pemeriksaan
+# eksplisit ".." yang menahan traversal bertopeng nama wajar ("a..b").
+@pytest.mark.parametrize("slug", ["a..b", "a..", "x..y..z", "Laporan..final"])
+def test_validate_slug_rejects_dotdot_inside_plain_name(slug):
+    with pytest.raises(ValueError):
+        common.validate_slug(slug)
+
+
+# Penutup mutan M6: menghapus entri pertama tidak mengubah hash entri kedua,
+# jadi hanya pemeriksaan prev_hash yang bisa mendeteksi rantai terputus.
+def _load_tool(name: str):
+    spec = importlib.util.spec_from_file_location(name.replace("-", "_"),
+                                                  os.path.join(REPO, "tools", name + ".py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def test_audit_log_detects_removed_head_of_chain(tmp_path):
+    auditlog = _load_tool("audit-log")
+    log = tmp_path / "audit-log.jsonl"
+    auditlog.append(log, {"actor": "D1", "tool": "t", "target": "x", "action": "a", "result": "ok"})
+    auditlog.append(log, {"actor": "D1", "tool": "t", "target": "x", "action": "b", "result": "ok"})
+    assert auditlog.verify(log)[0] is True
+
+    lines = log.read_text(encoding="utf-8").splitlines()
+    log.write_text("\n".join(lines[1:]) + "\n", encoding="utf-8")  # entri pertama dihapus
+    ok, msg = auditlog.verify(log)
+    assert ok is False
+    assert "prev_hash" in msg
+
+
 # ------------------------------------------------------------- registry lint
 def test_registry_lint_passes_on_repo():
     assert registry.main() == 0, "registry + frontmatter skill harus konsisten"

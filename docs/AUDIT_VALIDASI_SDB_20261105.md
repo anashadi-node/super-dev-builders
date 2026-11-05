@@ -303,20 +303,22 @@ systemctl --user show sdb-control-plane -p NRestarts
 
 ## 9. Uji mutasi — tabel lengkap
 
-`make mutation` (≈40 s, 10 mutan). Kolom “pembunuh” = uji yang gagal saat mutan aktif.
+`make mutation` (≈40 s, 10 mutan pada 6 berkas: `release_check.py` ×3, `recon-forge.py` ×2,
+`gate_check.py`, `audit-log.py`, `sdb_common.py`, `capture_web.py` ×2). Kolom “pembunuh” = uji yang
+gagal saat mutan aktif, diambil dari `/tmp/mut2.json` (`score=100.0`, `killed=10`), bukan dari ingatan.
 
 | Mutan | Berkas | Yang dirusak | Sebelum | Sesudah | Pembunuh |
 |---|---|---|---|---|---|
 | M1 | `scripts/release_check.py` | umur artefak diabaikan | SINTAS | KILLED | `test_release_gate_rejects_stale_artifact` |
-| M2 | `scripts/release_check.py` | umur verdict diabaikan | SINTAS | KILLED | `test_release_gate_rejects_stale_verdict` |
-| M3 | `tools/recon-forge.py` | batas izin target dilewati | KILLED | KILLED | `tests/test_recon_forge.py` |
-| M4 | `tools/recon-forge.py` | pemisahan data terlarang dilewati | KILLED | KILLED | `tests/test_recon_forge.py` |
-| M5 | `scripts/gate_check.py` | pemeriksaan pemilik izin dilewati | KILLED | KILLED | `tests/test_gerbang_g1.py` |
+| M2 | `scripts/release_check.py` | umur verdict diabaikan | SINTAS | KILLED | `test_release_gate_rejects_stale_verdict` (gerbang mencetak `…stale_artifact` — cacat pelaporan, lihat catatan di bawah) |
+| M3 | `tools/recon-forge.py` | URL di luar `allowed_targets` diterima | KILLED | KILLED | `test_recon_forge.py` |
+| M4 | `tools/recon-forge.py` | path di luar akar izin diterima | KILLED | KILLED | `test_native_path_di_luar_izin_ditolak` |
+| M5 | `scripts/gate_check.py` | batas Mode B dilewati (`operator` dianggap pemilik) | KILLED | KILLED | `test_gate_check.py::test_mode_b_owned_operator_berbeda_ditolak` |
 | M6 | `tools/audit-log.py` | `prev_hash` tidak diperiksa | SINTAS | KILLED | `test_audit_log_detects_removed_head_of_chain` |
-| M7 | `scripts/sdb_common.py` | `..` lolos dari `validate_slug` | SINTAS | KILLED | `test_validate_slug_rejects_dotdot_inside_plain_name[4 kasus]` |
-| M8 | `scripts/capture_web.py` | `origin_allowed` selalu benar | KILLED | KILLED | `tests/test_capture_scope.py` |
+| M7 | `scripts/sdb_common.py` | `..` lolos dari `validate_slug` | SINTAS | KILLED | `test_validate_slug_rejects_dotdot_inside_plain_name[a..b]` (+3 varian) |
+| M8 | `scripts/capture_web.py` | `origin_allowed` selalu benar | KILLED | KILLED | `test_lookalike_origin_rejected[https://example.com.evil.test]` |
 | M9 | `scripts/capture_web.py` | origin tidak dicek di loop capture | SINTAS | KILLED | `test_redirect_keluar_scope_membatalkan_capture` |
-| M10 | `scripts/evidence_lint.py` | label bukti tidak divalidasi | KILLED | KILLED | `tests/test_evidence_lint.py` |
+| M10 | `scripts/release_check.py` | verdict `SECURITY FAIL` diterima sebagai lulus | KILLED | KILLED | `test_release_gate_rejects_fresh_security_fail` |
 
 **Skor: 5/10 (50%) → 10/10 (100%).** Tanpa mutasi, kelima celah ini tidak terlihat: suite tetap hijau 533 tes.
 

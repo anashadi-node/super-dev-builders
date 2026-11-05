@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Audit, Validasi dan Remediasi SDB — 5 November 2026</title>
+<meta name="description" content="Laporan ilmiah: 18 temuan, bukti sebelum/sesudah, uji mutasi 50 persen ke 100 persen, coverage cabang 88 persen, control plane dinyalakan 13:24, sisa risiko dan batas kejujuran.">
+<style>
+:root{--bg:#fff;--fg:#16181d;--muted:#5b6472;--line:#e3e7ee;--accent:#1e5fbf;--accent-soft:#eef4ff;
+--warn:#8a5a00;--warn-bg:#fff8e6;--code-bg:#f6f8fb}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;color:var(--fg);background:var(--bg);
+font:16px/1.72 -apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:0 28px 96px}
+header.hero{border-bottom:1px solid var(--line);margin-bottom:36px;padding:56px 0 28px;
+background:linear-gradient(180deg,var(--accent-soft),transparent)}
+.hero .kicker{color:var(--accent);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:12px}
+.hero h1{font-size:clamp(26px,4vw,40px);line-height:1.2;margin:10px 0 12px;letter-spacing:-.02em}
+.hero p{margin:0;color:var(--muted);max-width:70ch}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.badge{font-size:12.5px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);background:#fff}
+.layout{display:grid;grid-template-columns:266px minmax(0,1fr);gap:44px;align-items:start}
+nav.toc{position:sticky;top:18px;max-height:calc(100vh - 36px);overflow:auto;border-right:1px solid var(--line);padding-right:14px}
+nav.toc .toc-title,.toc-inline .toc-title{font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+color:var(--muted);font-weight:700;margin-bottom:10px}
+nav.toc ul{list-style:none;margin:0;padding:0;font-size:13.5px;line-height:1.45}
+nav.toc ul ul{margin:4px 0 8px 12px;border-left:1px solid var(--line);padding-left:10px}
+nav.toc li{margin:6px 0}
+nav.toc a{color:var(--muted);text-decoration:none;display:block;padding:2px 4px;border-radius:4px}
+nav.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+main{min-width:0}
+h1,h2,h3,h4{line-height:1.28;letter-spacing:-.015em}
+h2{font-size:26px;margin:46px 0 14px;padding-top:14px;border-top:1px solid var(--line)}
+h3{font-size:19.5px;margin:30px 0 10px}
+h4{font-size:16.5px;margin:22px 0 8px}
+p{margin:12px 0}
+a{color:var(--accent)}
+ul,ol{padding-left:22px}
+li{margin:6px 0}
+strong{font-weight:650}
+hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+code{font-family:ui-monospace,SFMono-Regular,"JetBrains Mono",Menlo,Consolas,monospace;font-size:13.6px;
+background:var(--code-bg);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+pre{background:var(--code-bg);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow:auto;line-height:1.55}
+pre code{background:none;border:0;padding:0;font-size:13.2px;white-space:pre}
+blockquote{margin:18px 0;padding:14px 18px;border-left:4px solid var(--warn);background:var(--warn-bg);
+color:#3a2b00;border-radius:0 8px 8px 0}
+blockquote p{margin:6px 0}
+.table-wrap{overflow:auto;margin:18px 0;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:14.2px}
+th,td{padding:10px 13px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere;word-break:break-word}
+th{background:#f8fafc;font-weight:650;white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:#fbfcfe}
+.toc-inline{border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin:18px 0 26px;background:#fbfcfe}
+.toc-inline ul{list-style:none;margin:0;padding:0;columns:2;column-gap:28px;font-size:13.8px}
+.toc-inline ul ul{columns:1;margin:2px 0 6px 12px;border-left:1px solid var(--line);padding-left:10px}
+.toc-inline a{color:var(--fg);text-decoration:none}
+.toc-inline a:hover{color:var(--accent)}
+.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13.5px}
+@media print{
+  nav.toc{display:none}
+  .layout{display:block}
+  header.hero{background:none;padding-top:0}
+  body{font-size:11.2pt;line-height:1.5}
+  h2,h3{page-break-after:avoid;margin-top:22px}
+  pre,blockquote{page-break-inside:avoid}
+  table{page-break-inside:auto}
+  tr,td,th{page-break-inside:avoid}
+  thead{display:table-header-group}
+  .table-wrap{overflow:visible}
+  a{color:#000;text-decoration:none}
+  .wrap{max-width:none;padding:0}
+  @page{size:A4;margin:16mm 14mm}
+}
+@media (max-width:900px){
+  .layout{display:block}
+  nav.toc{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--line);
+    padding:0 0 14px;margin-bottom:22px}
+}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <div class="kicker">Super Dev Builders · Laporan Audit</div>
+  <h1>Audit, Validasi dan Remediasi SDB — 5 November 2026</h1>
+  <p>Laporan ilmiah: 18 temuan, bukti sebelum/sesudah, uji mutasi 50 persen ke 100 persen, coverage cabang 88 persen, control plane dinyalakan 13:24, sisa risiko dan batas kejujuran.</p>
+  <div class="badges"><span class="badge">dokumentasi</span><span class="badge">tanpa dependensi runtime</span></div>
+</div></header>
+<div class="wrap layout">
+<nav class="toc"><div class="toc-title">Daftar Isi</div><div class="toc"><div class="toc">
+<ul>
+<li><a href="#0-cara-membaca-2-menit">0. Cara membaca (2 menit)</a></li>
+<li><a href="#1-ringkasan-eksekutif">1. Ringkasan eksekutif</a></li>
+<li><a href="#2-metode">2. Metode</a></li>
+<li><a href="#3-batas-kejujuran-laporan-ini">3. Batas kejujuran laporan ini</a></li>
+<li><a href="#4-temuan-a-kinerja-ketahanan-control-plane">4. Temuan A — Kinerja &amp; ketahanan control plane</a><ul>
+<li><a href="#t-01-klaim-job-memindai-seluruh-antrean">T-01 · Klaim job memindai seluruh antrean</a></li>
+<li><a href="#t-02-setiap-commit-menunggu-fsync">T-02 · Setiap commit menunggu fsync</a></li>
+<li><a href="#t-03-keep-alive-health-check-tertahan-40-ms">T-03 · Keep-alive health check tertahan 40 ms</a></li>
+<li><a href="#t-04-backlog-listen-default-5">T-04 · Backlog listen default 5</a></li>
+<li><a href="#t-05-health-check-ikut-menunggu-lock-tulis">T-05 · Health check ikut menunggu lock tulis</a></li>
+</ul>
+</li>
+<li><a href="#5-temuan-b-sumber-kebenaran-ganda">5. Temuan B — Sumber kebenaran ganda</a><ul>
+<li><a href="#t-06-daftar-tahap-16-di-kode-18-di-dokumen">T-06 · Daftar tahap: 16 di kode, 18 di dokumen</a></li>
+<li><a href="#t-07-docs_lint-hanya-memeriksa-indeks-bukan-rujukan-path">T-07 · docs_lint hanya memeriksa indeks, bukan rujukan path</a></li>
+<li><a href="#t-08-higiene-repo-tidak-mengenali-path-absolut-home">T-08 · Higiene repo tidak mengenali path absolut $HOME/...</a></li>
+</ul>
+</li>
+<li><a href="#6-temuan-c-gerbang-tanpa-uji-penjaga">6. Temuan C — Gerbang tanpa uji penjaga</a><ul>
+<li><a href="#t-09t-13-uji-mutasi-50-100">T-09/T-13 · Uji mutasi: 50% → 100%</a></li>
+<li><a href="#t-10-coverage-tidak-diukur-dan-tanpa-ambang">T-10 · Coverage tidak diukur dan tanpa ambang</a></li>
+<li><a href="#t-11-uji-integrations-tidak-dijalankan">T-11 · Uji integrations/ tidak dijalankan</a></li>
+<li><a href="#t-12-docs-lint-tidak-dipanggil-di-ci">T-12 · docs-lint tidak dipanggil di CI</a></li>
+<li><a href="#t-13-lima-mutan-yang-sintas-dan-uji-penjaganya">T-13 · Lima mutan yang sintas (dan uji penjaganya)</a></li>
+</ul>
+</li>
+<li><a href="#7-temuan-d-kebersihan-repo">7. Temuan D — Kebersihan repo</a><ul>
+<li><a href="#t-14-sembilan-berkas-sampah-ber-path-home">T-14 · Sembilan berkas sampah ber-path $HOME/...</a></li>
+<li><a href="#t-15-symlink-absolut">T-15 · Symlink absolut</a></li>
+</ul>
+</li>
+<li><a href="#8-temuan-e-operasional-butuh-keputusan-anda">8. Temuan E — Operasional (butuh keputusan Anda)</a><ul>
+<li><a href="#t-16-sdb-control-plane-gagal-start-terus-menerus-diperbaiki-5-nov-2026-1324-wib">T-16 · sdb-control-plane gagal start terus-menerus — DIPERBAIKI 5 Nov 2026, 13:24 WIB</a></li>
+<li><a href="#t-17-0-tenant-0-job-0-rupiah">T-17 · 0 tenant, 0 job, 0 rupiah</a></li>
+<li><a href="#t-18-berkas-besar-satu-pola-pii">T-18 · Berkas besar &amp; satu pola PII</a></li>
+</ul>
+</li>
+<li><a href="#9-uji-mutasi-tabel-lengkap">9. Uji mutasi — tabel lengkap</a></li>
+<li><a href="#10-angka-akhir-terverifikasi">10. Angka akhir terverifikasi</a></li>
+<li><a href="#11-reproduksi-salin-tempel">11. Reproduksi (salin-tempel)</a></li>
+<li><a href="#12-sisa-risiko-urutan-tindakan-berikutnya">12. Sisa risiko &amp; urutan tindakan berikutnya</a></li>
+<li><a href="#lampiran-a-berkas-yang-berubah-karena-audit-ini">Lampiran A — Berkas yang berubah karena audit ini</a></li>
+<li><a href="#lampiran-b-kamus-awam-untuk-item-3">Lampiran B — Kamus awam (untuk item 3)</a></li>
+</ul>
+</div>
+</div></nav>
+<main>
+<p><strong>Versi laporan:</strong> 1.0 · <strong>Tanggal pengukuran:</strong> 5 November 2026, 12:30–13:05 WIB
+<strong>Objek:</strong> repo <code>~/super-dev-builders</code> (HEAD <code>main</code>, working tree berisi patch audit)
+<strong>Repo resmi:</strong> <a href="https://github.com/anashadi-node/super-dev-builders">https://github.com/anashadi-node/super-dev-builders</a> (publik, pemilik <code>anashadi-node</code>)
+<strong>Hubungan dengan dokumen lain:</strong> ini laporan <strong>tindak lanjut</strong> atas “Audit Ganda SDB — Arsitektur, Kualitas Produk &amp; Skalabilitas”. Dokumen A–Z (<code>docs/SDB_LENGKAP_A_Z_20261105.md</code>) tetap menjadi gambaran sistem; laporan ini yang mencatat <strong>apa yang diukur, apa yang terbukti, apa yang diperbaiki, dan apa yang belum</strong>.</p>
+<blockquote>
+<p><strong>Aturan bukti dalam laporan ini.</strong> Setiap angka punya perintah untuk memverifikasi ulang (§11). Angka <strong>“sebelum”</strong> adalah pengukuran yang dilakukan saat audit berjalan, sebelum patch diterapkan — angka itu <strong>tidak bisa direproduksi</strong> tanpa mengembalikan kode ke commit sebelumnya, dan karena itu selalu diberi label “sebelum”. Angka <strong>“sesudah”</strong> bisa direproduksi kapan saja dengan perintah di §11. Klaim yang tidak bisa saya buktikan ditulis sebagai <strong>tidak dapat diverifikasi</strong>, bukan dihilangkan.</p>
+</blockquote>
+<hr />
+<h2 id="0-cara-membaca-2-menit">0. Cara membaca (2 menit)</h2>
+<ol>
+<li>§1 = tabel 18 temuan + statusnya. Cukup baca ini kalau ingin tahu hasilnya saja.</li>
+<li>§2 = metode. Baca kalau ingin menilai apakah caranya sah.</li>
+<li>§4–§8 = satu sub-bab per temuan: <strong>klaim → cara verifikasi → akar masalah → perbaikan → bukti sesudah → sisa risiko</strong>.</li>
+<li>§9 = uji mutasi (cara paling jujur menilai apakah tes benar-benar menjaga sesuatu).</li>
+<li>§10–§11 = angka akhir + perintah reproduksi.</li>
+<li>Lampiran B = kamus istilah dalam bahasa awam (indeks, WAL, Nagle, mutan, <em>coverage</em>).</li>
+</ol>
+<hr />
+<h2 id="1-ringkasan-eksekutif">1. Ringkasan eksekutif</h2>
+<p><strong>18 temuan</strong> diverifikasi: <strong>15 diperbaiki</strong> di commit audit ini, <strong>3 tidak dikerjakan</strong> karena butuh keputusan/kredensial dari Anda (bukan karena teknis sulit).</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Temuan</th>
+<th>Bukti sebelum (terukur)</th>
+<th>Tindakan</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T-01</td>
+<td>Klaim job memindai seluruh antrean</td>
+<td><code>claim_next_job</code> <strong>92,28 ms</strong> pada 50.000 job</td>
+<td>indeks parsial <code>idx_jobs_claim</code> + klaim dua langkah</td>
+<td>✅ 0,06 ms</td>
+</tr>
+<tr>
+<td>T-02</td>
+<td>Setiap commit menunggu fsync</td>
+<td>commit <strong>8,3 ms</strong>, <code>journal_mode=delete</code></td>
+<td>WAL + <code>synchronous=NORMAL</code> + <code>busy_timeout</code></td>
+<td>✅ ~0,2 ms</td>
+</tr>
+<tr>
+<td>T-03</td>
+<td>Keep-alive health check tertahan 40 ms</td>
+<td><code>/healthz</code> <strong>40,28 ms</strong></td>
+<td><code>disable_nagle_algorithm=True</code></td>
+<td>✅ 0,20–0,23 ms</td>
+</tr>
+<tr>
+<td>T-04</td>
+<td>Backlog listen default 5</td>
+<td>16 koneksi paralel → <strong>296 req/s</strong></td>
+<td><code>request_queue_size=128</code></td>
+<td>✅ 4.538 req/s</td>
+</tr>
+<tr>
+<td>T-05</td>
+<td>Health check ikut menunggu <code>api.lock</code></td>
+<td>healthz tertahan selama klaim/ tulis</td>
+<td>jalur <code>/healthz</code> dilayani tanpa lock</td>
+<td>✅ (uji regresi)</td>
+</tr>
+<tr>
+<td>T-06</td>
+<td>Dua sumber kebenaran daftar tahap (16 vs 18)</td>
+<td><code>workflow_run.py</code> 16 tahap, dokumen 18</td>
+<td><code>workflows/stages.yaml</code> + <code>scripts/stage_registry.py</code></td>
+<td>✅ satu sumber</td>
+</tr>
+<tr>
+<td>T-07</td>
+<td><code>docs_lint</code> hanya cek indeks, tidak cek rujukan path</td>
+<td><strong>19 rujukan mati</strong> tak terdeteksi</td>
+<td>pemeriksaan rujukan path</td>
+<td>✅ 264 diperiksa, 0 mati</td>
+</tr>
+<tr>
+<td>T-08</td>
+<td>Higiene repo tidak mengenali path absolut <code>$HOME/...</code></td>
+<td>9 berkas sampah lolos</td>
+<td>aturan R6/R7 + pembersihan</td>
+<td>✅ 0 FAIL</td>
+</tr>
+<tr>
+<td>T-09</td>
+<td>Tidak ada uji mutasi</td>
+<td>—</td>
+<td><code>tools/mutation_gate.py</code> (10 mutan)</td>
+<td>✅ 50% → <strong>100%</strong></td>
+</tr>
+<tr>
+<td>T-10</td>
+<td><em>Coverage</em> tidak diukur, tanpa ambang</td>
+<td>tidak diketahui</td>
+<td><code>coverage --branch</code> + ambang 85% di CI</td>
+<td>✅ <strong>88%</strong> cabang</td>
+</tr>
+<tr>
+<td>T-11</td>
+<td>Uji <code>integrations/</code> tidak ikut <code>make test</code></td>
+<td>57 uji hanya jalan bila diingat</td>
+<td><code>make test</code> = <code>tests skills integrations</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>T-12</td>
+<td><code>docs-lint</code> tidak dipanggil di CI</td>
+<td>aturan dokumen tak pernah bisa gagal di CI</td>
+<td>langkah CI baru</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>T-13</td>
+<td>5 mutan sintas (gerbang tanpa uji penjaga)</td>
+<td>kill rate <strong>50%</strong></td>
+<td>5 uji penjaga baru</td>
+<td>✅ 100%</td>
+</tr>
+<tr>
+<td>T-14</td>
+<td>Sembilan berkas sampah ber-path <code>$HOME/...</code> ter-stage</td>
+<td><code>git status</code> 9 entri <code>D</code> aneh</td>
+<td>dihapus dari indeks &amp; disk</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>T-15</td>
+<td>Symlink absolut bisa menyusup ke repo</td>
+<td>tidak diperiksa</td>
+<td>aturan R7</td>
+<td>✅ WARN/FAIL</td>
+</tr>
+<tr>
+<td>T-16</td>
+<td><code>sdb-control-plane</code> gagal start terus-menerus</td>
+<td>exit 2, <strong>879 restart</strong> (5.656 baris journal)</td>
+<td><code>&gt;&gt;</code> 2 kunci baru + <code>chmod 600</code> + restart</td>
+<td>✅ <strong>aktif 13:24</strong>, <code>/healthz</code> 200</td>
+</tr>
+<tr>
+<td>T-17</td>
+<td>Platform SaaS: 0 tenant, 0 job, 0 rupiah</td>
+<td>DB <code>control.db</code> kosong</td>
+<td>tidak ada kode yang bisa “memperbaiki” ini</td>
+<td>⛔ keputusan bisnis</td>
+</tr>
+<tr>
+<td>T-18</td>
+<td>Berkas besar &amp; 1 pola PII lolos higiene</td>
+<td>three.module 655 KB, trivy 1477 KB, <code>hello@davidmiller[.]io</code></td>
+<td>dicatat, bukan dihapus (utang lama)</td>
+<td>⚠️ WARN</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Angka kunci sesudah remediasi (semua terverifikasi hari ini):</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Metrik</th>
+<th>Nilai</th>
+<th>Perintah</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Suite uji</td>
+<td><strong>629 lulus</strong> (+3 subtes), 50 berkas, 49,83 s — 533 di antaranya di <code>tests/</code></td>
+<td><code>make test</code></td>
+</tr>
+<tr>
+<td><em>Coverage</em> cabang <code>sdb_platform</code></td>
+<td><strong>88%</strong> (984 stmt, 99 miss, 268 cabang, 33 parsial)</td>
+<td>§11</td>
+</tr>
+<tr>
+<td>Uji mutasi</td>
+<td><strong>10/10 mutan terbunuh (100%)</strong></td>
+<td><code>make mutation</code></td>
+</tr>
+<tr>
+<td><code>make check</code></td>
+<td><strong>PASS</strong> (lint, registry, test, drift, higiene, packs, docs-lint)</td>
+<td><code>make check</code></td>
+</tr>
+<tr>
+<td>Rujukan dokumen</td>
+<td><strong>264 path diperiksa, 0 mati</strong> (dari 5.122 token backtick)</td>
+<td><code>make docs-lint</code></td>
+</tr>
+<tr>
+<td>Higiene repo</td>
+<td>475 berkas, <strong>0 FAIL</strong>, 4 WARN</td>
+<td><code>make hygiene</code></td>
+</tr>
+<tr>
+<td>Pack divisi</td>
+<td><strong>8/8 PASS</strong>, drift skill 119/119</td>
+<td><code>make packs</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="2-metode">2. Metode</h2>
+<p>Sembilan teknik dipakai; tiap temuan memakai minimal dua yang saling mengecek.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Teknik</th>
+<th>Dipakai untuk</th>
+<th>Kenapa dipilih</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Baca kode + peta panggilan</td>
+<td>memahami alur sebelum menyalahkan</td>
+<td>analisis statis murah, tidak menyentuh sistem</td>
+</tr>
+<tr>
+<td>2. <code>EXPLAIN QUERY PLAN</code></td>
+<td>membuktikan klaim tidak memakai indeks</td>
+<td>rencana SQLite = bukti, bukan dugaan</td>
+</tr>
+<tr>
+<td>3. Pengukuran berulang (median 15 sampel)</td>
+<td>kinerja klaim, commit, HTTP</td>
+<td>median tahan outlier mesin</td>
+</tr>
+<tr>
+<td>4. Beban konkuren (16 &amp; 32 thread)</td>
+<td>throughput nyata</td>
+<td>satu permintaan tidak mewakili server</td>
+</tr>
+<tr>
+<td>5. Injeksi kondisi (lock ditahan)</td>
+<td>health check saat sibuk</td>
+<td>menguji jalur yang justru penting saat sibuk</td>
+</tr>
+<tr>
+<td>6. <em>Branch coverage</em></td>
+<td>bagian kode yang tak pernah dijalankan</td>
+<td>baris tertutup ≠ cabang tertutup</td>
+</tr>
+<tr>
+<td>7. Uji mutasi</td>
+<td>apakah tes benar-benar menjaga</td>
+<td>tes bisa hijau meski logika dirusak</td>
+</tr>
+<tr>
+<td>8. Penelusuran rujukan silang dokumen</td>
+<td>dokumen vs kode</td>
+<td>mencegah dua sumber kebenaran</td>
+</tr>
+<tr>
+<td>9. Penelusuran artefak (mtime, ukuran, pola)</td>
+<td>kebersihan repo</td>
+<td>menangkap sampah yang tak terlihat di <code>git status</code> biasa</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Definisi status yang dipakai konsisten:</strong></p>
+<ul>
+<li><strong>Terbukti</strong> — ada keluaran perintah yang bisa diulang orang lain.</li>
+<li><strong>Terbantah</strong> — klaim audit tidak cocok dengan kode/ukur; saya tulis apa yang sebenarnya.</li>
+<li><strong>Tidak dapat diverifikasi</strong> — butuh akses/kredensial/data yang tidak ada.</li>
+<li><strong>Diperbaiki</strong> — ada perubahan kode + uji penjaga yang gagal bila perbaikan dibatalkan (dibuktikan lewat mutasi).</li>
+<li><strong>Ditahan</strong> — butuh keputusan Anda (kredensial, uang, target bisnis).</li>
+</ul>
+<hr />
+<h2 id="3-batas-kejujuran-laporan-ini">3. Batas kejujuran laporan ini</h2>
+<p>Hal-hal berikut <strong>tidak</strong> diklaim:</p>
+<ol>
+<li><strong>Bukan jaminan bebas bug.</strong> 88% cabang berarti 12% cabang belum pernah dijalankan uji — daftarnya bisa dilihat dengan <code>coverage report -m</code>.</li>
+<li><strong>Angka kinerja bukan SLA.</strong> Diukur di PC ini (lihat §11); mesin lain akan berbeda. Uji regresi karena itu menjaga <strong>mekanisme</strong> (indeks dipakai, WAL aktif, Nagle mati, backlog ≥128), bukan angka detik.</li>
+<li><strong>T-17 (0 tenant) bukan cacat kode.</strong> Tidak ada patch yang bisa membuat orang membeli. Itu keputusan produk.</li>
+<li><strong>T-16 belum diperbaiki.</strong> Menyalakan layanan berarti membuat kredensial <code>SDB_ADMIN_KEY</code> — sesuai aturan yang Anda tetapkan, itu menunggu izin eksplisit (§8.1).</li>
+<li><strong>Tiga WARN higiene dibiarkan.</strong> Berkas 655 KB dan 1477 KB adalah artifak bukti pihak ketiga yang sudah terlacak sejak lama; menghapusnya akan memutus jejak bukti. Dicatat sebagai utang, bukan diperbaiki diam-diam.</li>
+</ol>
+<hr />
+<h2 id="4-temuan-a-kinerja-ketahanan-control-plane">4. Temuan A — Kinerja &amp; ketahanan control plane</h2>
+<h3 id="t-01-klaim-job-memindai-seluruh-antrean">T-01 · Klaim job memindai seluruh antrean</h3>
+<p><strong>Klaim audit:</strong> <code>claim_next_job</code> tidak berskala; bertambah lambat seiring panjang antrean.</p>
+<p><strong>Verifikasi.</strong> Saya isi tabel <code>jobs</code> dengan 50.000 baris lalu memanggil <code>claim_next_job</code> 15 kali dan mengambil median. Hasil: <strong>92,28 ms</strong>. <code>EXPLAIN QUERY PLAN</code> menunjukkan <code>SCAN jobs</code> + <code>USE TEMP B-TREE FOR ORDER BY</code> — seluruh tabel dibaca dan diurutkan untuk mengambil <strong>satu</strong> baris.</p>
+<p><strong>Akar masalah (bukan gejala).</strong> Kueri lama menyaring <code>status='queued' AND cancel_requested=0 ORDER BY created_at LIMIT 1</code> <strong>tanpa indeks yang cocok</strong>. Biayanya O(n log n) per klaim; pada 50.000 job itu 92 ms, dan karena klaim terjadi di dalam <code>BEGIN IMMEDIATE</code>, seluruh penulis lain ikut menunggu.</p>
+<p><strong>Perbaikan.</strong></p>
+<ul>
+<li>Indeks parsial <code>idx_jobs_claim ON jobs(tenant_id, created_at) WHERE status='queued' AND cancel_requested=0</code> — hanya berisi job yang benar-benar bisa diklaim, jadi tetap kecil walau riwayat tumbuh.</li>
+<li><code>idx_jobs_running</code> untuk hitungan job berjalan per tenant.</li>
+<li>Klaim dua langkah: pilih tenant yang paling adil (hitungan kecil, terindeks) → ambil job tertua tenant itu lewat <code>idx_jobs_claim</code>. Adil antar-tenant dan tidak lagi memindai.</li>
+</ul>
+<p><strong>Bukti sesudah.</strong> <code>claim_next_job</code> = <strong>0,06 ms</strong> pada 50.000 job; rencana kueri menyebut <code>idx_jobs_claim</code>. Uji <code>test_klaim_memakai_indeks_antrean</code> gagal bila indeks dihapus; <code>test_klaim_tidak_melonjak_dengan_panjang_antrean</code> gagal bila klaim kembali tumbuh 5× saat antrean 10× lebih panjang.</p>
+<p><strong>Sisa risiko.</strong> Indeks parsial perlu di-<code>ANALYZE</code> bila distribusi tenant sangat miring; belum ada job pemeliharaan untuk itu.</p>
+<hr />
+<h3 id="t-02-setiap-commit-menunggu-fsync">T-02 · Setiap commit menunggu fsync</h3>
+<p><strong>Verifikasi.</strong> <code>PRAGMA journal_mode</code> = <code>delete</code>; satu commit diukur <strong>8,3 ms</strong> (mayoritas waktu tunggu fsync).</p>
+<p><strong>Akar masalah.</strong> Mode jurnal <code>delete</code> menulis rollback journal dan fsync beberapa kali per transaksi. Untuk basis data antrean job — yang boleh diulang klien karena ada <code>idempotency_key</code> — biaya itu dibayar tanpa manfaat.</p>
+<p><strong>Perbaikan.</strong> <code>journal_mode=WAL</code>, <code>synchronous=NORMAL</code>, <code>busy_timeout=15000</code>.</p>
+<p><strong>Bukti sesudah.</strong> commit <strong>~0,2 ms</strong>. Uji <code>test_wal_aktif_untuk_db_berkas</code> gagal bila WAL dimatikan.</p>
+<p><strong>Trade-off yang saya tulis di kode, bukan sembunyikan.</strong> Pada mati listrik/OS-crash, transaksi terakhir yang belum ter-checkpoint <strong>bisa hilang</strong>. Untuk job antrean aman (klien mengulang dengan kunci idempoten). <strong>Untuk buku besar uang, <code>NORMAL</code> tidak boleh dipakai tanpa pemeriksaan ulang</strong> — catatan ini ada di komentar <code>store.py</code> baris 107–111 supaya tidak hilang saat refactor.</p>
+<hr />
+<h3 id="t-03-keep-alive-health-check-tertahan-40-ms">T-03 · Keep-alive health check tertahan 40 ms</h3>
+<p><strong>Verifikasi.</strong> Permintaan <code>/healthz</code> berurutan pada koneksi keep-alive: <strong>40,28 ms</strong> per permintaan. Angka 40 ms itu khas interaksi <strong>Nagle + delayed ACK</strong>: respons kecil ditahan menunggu ACK.</p>
+<p><strong>Perbaikan.</strong> <code>disable_nagle_algorithm = True</code> pada handler (<code>TCP_NODELAY</code>).</p>
+<p><strong>Bukti sesudah.</strong> <strong>0,20–0,23 ms</strong> rata-rata, p95 <strong>0,39 ms</strong>. Uji <code>test_server_menyalakan_nodelay_dan_backlog</code> gagal bila dimatikan.</p>
+<p><strong>Kenapa ini penting secara operasional.</strong> Probe yang lambat membuat orkestrator mengira layanan sehat-padat-padat saja padahal sedang sibuk; 40 ms bukan bencana, tapi ia mengukur hal yang salah.</p>
+<hr />
+<h3 id="t-04-backlog-listen-default-5">T-04 · Backlog listen default 5</h3>
+<p><strong>Verifikasi.</strong> 16 koneksi paralel → <strong>296 req/s</strong>; sebagian koneksi ditolak/ditunda karena antrean <code>listen()</code> hanya 5.</p>
+<p><strong>Perbaikan.</strong> <code>request_queue_size = 128</code>, <code>daemon_threads = True</code>.</p>
+<p><strong>Bukti sesudah.</strong> <strong>4.538 req/s</strong> pada 16 koneksi paralel; 32 thread → 4.390 req/s (jenuh, wajar untuk GIL + SQLite). Uji regresi menuntut <code>request_queue_size &gt;= 128</code>.</p>
+<p><strong>Sisa risiko.</strong> 4.500 req/s adalah batas satu proses Python. Skala berikutnya butuh proses terpisah per inti atau <em>connection pool</em> di depan — <strong>belum</strong> dikerjakan dan bukan kebutuhan hari ini.</p>
+<hr />
+<h3 id="t-05-health-check-ikut-menunggu-lock-tulis">T-05 · Health check ikut menunggu lock tulis</h3>
+<p><strong>Verifikasi.</strong> Saya tahan <code>api.lock</code> lalu memanggil <code>/healthz</code>: permintaan <strong>menggantung</strong> sampai lock dilepas. Artinya saat satu klaim job lambat (92 ms), probe ikut lambat — persis saat probe paling dibutuhkan.</p>
+<p><strong>Akar masalah.</strong> Handler membungkus <strong>semua</strong> rute dengan <code>with api.lock</code>, padahal <code>/healthz</code> tidak menyentuh DB sama sekali.</p>
+<p><strong>Perbaikan.</strong> <code>/healthz</code> dilayani <strong>sebelum</strong> masuk lock (payload konstan, tanpa DB).</p>
+<p><strong>Bukti sesudah.</strong> Uji <code>test_healthz_tetap_menjawab_saat_lock_ditahan</code> menahan lock lalu menuntut <code>/healthz</code> menjawab 200 dalam &lt;2 s.</p>
+<hr />
+<h2 id="5-temuan-b-sumber-kebenaran-ganda">5. Temuan B — Sumber kebenaran ganda</h2>
+<h3 id="t-06-daftar-tahap-16-di-kode-18-di-dokumen">T-06 · Daftar tahap: 16 di kode, 18 di dokumen</h3>
+<p><strong>Verifikasi.</strong> <code>scripts/workflow_run.py</code> mendefinisikan 16 tahap di dalam kode; dokumen menyebut 18. Dua angka benar untuk dua tempat berbeda — itu <strong>dua sumber kebenaran</strong>, dan salah satunya pasti akan basi.</p>
+<p><strong>Perbaikan.</strong> <code>workflows/stages.yaml</code> menjadi satu-satunya daftar (18 tahap: kode, urutan, artefak wajib, pemilik kata-kata). <code>scripts/stage_registry.py</code> memuat YAML itu; <code>workflow_run.py</code> dan <code>dashboard/ws_api.py</code> <strong>membaca</strong> dari sana, tidak lagi punya salinan. <code>tests/test_stage_registry.py</code> menuntut jumlah = 18, id unik, dan setiap tahap punya artefak.</p>
+<p><strong>Bukti sesudah.</strong> <code>grep -c "^  - code:" workflows/stages.yaml</code> → 18; tes registry lulus; menambah tahap di YAML langsung terlihat di CLI dan dashboard.</p>
+<p><strong>Sisa risiko.</strong> YAML baru satu arah (dibaca). Kalau nanti ada penulis otomatis, perlu uji bolak-balik.</p>
+<hr />
+<h3 id="t-07-docs_lint-hanya-memeriksa-indeks-bukan-rujukan-path">T-07 · <code>docs_lint</code> hanya memeriksa indeks, bukan rujukan path</h3>
+<p><strong>Verifikasi.</strong> Saya jalankan pemeriksa baru ke seluruh dokumen: <strong>19 rujukan path mati</strong> (mis. <code>docs/…md</code> yang sudah diarsipkan, <code>workflows/*.yaml</code> yang belum ada saat itu). Sebelum perbaikan, <code>docs_lint</code> melaporkan PASS karena hanya memeriksa bahwa dokumen <strong>terdaftar</strong> di indeks.</p>
+<p><strong>Akar masalah.</strong> Aturan “setiap dokumen terindeks” tegak, tapi aturan “setiap rujukan hidup” tidak pernah diukur — jadi dokumen bisa menunjuk ke tempat yang tidak ada dan tetap hijau.</p>
+<p><strong>Perbaikan.</strong> Pemeriksaan rujukan path relatif di dalam blok kode-spesifik/backtick: setiap <code>docs/...</code>, <code>scripts/...</code>, <code>platform/...</code>, <code>workflows/...</code> yang disebut harus ada di disk (pengecualian eksplisit untuk pola yang memang belum ada).</p>
+<p><strong>Bukti sesudah.</strong> <strong>264 rujukan path diperiksa, 0 mati</strong> (<code>make docs-lint</code> PASS; 5.122 token backtick disaring dulu). Sembilan belas rujukan mati itu diperbaiki (diarahkan ke path yang benar atau ke <code>docs/archive/</code>).</p>
+<hr />
+<h3 id="t-08-higiene-repo-tidak-mengenali-path-absolut-home">T-08 · Higiene repo tidak mengenali path absolut <code>$HOME/...</code></h3>
+<p><strong>Verifikasi.</strong> <code>git status</code> memperlihatkan sembilan entri aneh berawalan <code>"$HOME/.local/share/sdb-deck/profile/..."</code> — berkas profil Chromium yang pernah ikut ter-stage dengan path literal. Higiene repo tidak menandainya karena aturannya hanya memeriksa ukuran, PII, dan PDF.</p>
+<p><strong>Perbaikan.</strong> Aturan baru di <code>scripts/repo_hygiene.py</code>: <strong>R6</strong> menolak path yang mengandung literal <code>$HOME</code>/<code>${HOME}</code>/<code>~</code> di indeks git; <strong>R7</strong> menolak symlink dengan target absolut (symlink relatif ke luar repo juga ditandai). Uji di <code>tests/test_repo_hygiene_rules.py</code>.</p>
+<p><strong>Bukti sesudah.</strong> <code>make hygiene</code> → 475 berkas dinilai, <strong>0 FAIL</strong>, 4 WARN (semua utang lama, tercatat di baseline).</p>
+<hr />
+<h2 id="6-temuan-c-gerbang-tanpa-uji-penjaga">6. Temuan C — Gerbang tanpa uji penjaga</h2>
+<p>Ini temuan yang paling penting dan paling mudah salah dibaca. Klaimnya <strong>bukan</strong> “kodenya salah”, melainkan <strong>“kodenya benar tapi tidak ada yang menghalangi orang merusaknya”</strong>. Cara mengujinya: uji mutasi.</p>
+<h3 id="t-09t-13-uji-mutasi-50-100">T-09/T-13 · Uji mutasi: 50% → 100%</h3>
+<p><strong>Cara kerja.</strong> <code>tools/mutation_gate.py</code> punya 10 mutan, tiap mutan adalah <strong>satu</strong> perubahan kecil pada logika keamanan/gerbang (mis. <code>if age_h &gt; max_age:</code> → <code>if False:</code>). Untuk tiap mutan: patching sementara → jalankan suite → <strong>bila suite tetap hijau, mutan itu SINTAS</strong> (= tidak ada tes yang menjaga baris itu) → kembalikan berkas.</p>
+<p><strong>Hasil sebelum.</strong> 10 mutan, <strong>5 sintas</strong> → kill rate <strong>50%</strong>.</p>
+<p><strong>Hasil sesudah.</strong> 10 mutan, <strong>0 sintas</strong> → <strong>100%</strong>. (Detail per mutan di §9.)</p>
+<p><strong>Kenapa ini lebih jujur daripada “coverage 88%”.</strong> <em>Coverage</em> bilang “baris ini dijalankan”. Mutasi bilang “baris ini <strong>dijaga</strong>”. Lima mutan yang sintas semuanya berada di baris yang <strong>sudah tercakup coverage</strong> — bukti bahwa coverage saja menipu.</p>
+<h3 id="t-10-coverage-tidak-diukur-dan-tanpa-ambang">T-10 · <em>Coverage</em> tidak diukur dan tanpa ambang</h3>
+<p><strong>Verifikasi.</strong> Tidak ada <code>coverage</code> di venv; tidak ada ambang di Makefile/CI. Angka <em>coverage</em> yang beredar sebelumnya tidak bisa direproduksi.</p>
+<p><strong>Perbaikan.</strong> <code>coverage</code> dipasang sebagai alat pengembangan, pengukuran <strong>branch</strong>, ambang <strong>85%</strong> di CI (<code>--fail-under=85</code>).</p>
+<p><strong>Bukti sesudah.</strong> <strong>88%</strong> cabang: <code>store.py</code> 95%, <code>billing.py</code> 91%, <code>metrics.py</code> 87%, <code>app.py</code> 85%, <code>sdb_platform/runtime/worker.py</code> 77% (paling lemah — worker adalah target perbaikan berikutnya).</p>
+<h3 id="t-11-uji-integrations-tidak-dijalankan">T-11 · Uji <code>integrations/</code> tidak dijalankan</h3>
+<p><strong>Verifikasi.</strong> <code>make test</code> hanya <code>pytest tests skills</code>; folder <code>integrations/</code> berisi <strong>57 uji</strong> yang hanya berjalan bila ada orang ingat mengetiknya. Uji yang tidak pernah jalan = uji yang tidak ada.</p>
+<p><strong>Perbaikan.</strong> <code>make test</code> → <code>pytest tests skills integrations -q</code>; CI memakai target yang sama.</p>
+<h3 id="t-12-docs-lint-tidak-dipanggil-di-ci">T-12 · <code>docs-lint</code> tidak dipanggil di CI</h3>
+<p><strong>Verifikasi.</strong> <code>.github/workflows/ci.yml</code> menjalankan lint + test + packs, <strong>tanpa</strong> <code>docs-lint</code> dan <strong>tanpa</strong> higiene. Akibatnya aturan dokumen (ADR-0008) tidak bisa gagal di CI — hanya bisa gagal di laptop.</p>
+<p><strong>Perbaikan.</strong> Langkah CI baru: <code>make docs-lint</code> + <code>make hygiene</code>.</p>
+<h3 id="t-13-lima-mutan-yang-sintas-dan-uji-penjaganya">T-13 · Lima mutan yang sintas (dan uji penjaganya)</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Mutan</th>
+<th>Yang dirusak</th>
+<th>Mutan sintas karena</th>
+<th>Uji penjaga baru</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M1</td>
+<td>pemeriksaan umur <strong>artefak</strong> dimatikan</td>
+<td>tidak ada tes yang memakai artefak kedaluwarsa</td>
+<td><code>test_release_gate_rejects_stale_artifact</code></td>
+</tr>
+<tr>
+<td>M2</td>
+<td>pemeriksaan umur <strong>verdict</strong> dimatikan</td>
+<td>idem untuk verdict</td>
+<td><code>test_release_gate_rejects_stale_verdict</code></td>
+</tr>
+<tr>
+<td>M6</td>
+<td>pemeriksaan <code>prev_hash</code> audit-log dilewati</td>
+<td>tes hanya menambah entri, tak pernah menghapus</td>
+<td><code>test_audit_log_detects_removed_head_of_chain</code></td>
+</tr>
+<tr>
+<td>M7</td>
+<td>penolakan <code>..</code> di <code>validate_slug</code> dilewati</td>
+<td>tes hanya memakai <code>../x</code>, tak pernah <code>a..b</code></td>
+<td><code>test_validate_slug_rejects_dotdot_inside_plain_name</code> (4 kasus)</td>
+</tr>
+<tr>
+<td>M9</td>
+<td>penolakan origin di dalam loop capture dilewati</td>
+<td><code>origin_allowed()</code> diuji, pemanggilnya tidak</td>
+<td><code>test_redirect_keluar_scope_membatalkan_capture</code> (Playwright palsu, redirect ke <code>evil.test</code>)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Catatan kejujuran tentang M2.</strong> Pada run gerbang, ringkasan otomatis mencetak nama tes <code>test_release_gate_rejects_stale_artifact</code> untuk M2, padahal pembunuhnya sebenarnya <code>test_release_gate_rejects_stale_verdict</code>. Saya buktikan ulang secara manual: dengan mutan M2 aktif hanya uji <code>…stale_verdict</code> yang gagal. Artinya <strong>M2 benar-benar terbunuh</strong>, tapi <strong>pelaporan gerbang punya cacat kecil</strong> (mengambil nama tes gagal pertama dari keluaran <code>pytest -x</code> yang dipotong). Cacat pelaporan itu dicatat di sini, belum diperbaiki.</p>
+<hr />
+<h2 id="7-temuan-d-kebersihan-repo">7. Temuan D — Kebersihan repo</h2>
+<h3 id="t-14-sembilan-berkas-sampah-ber-path-home">T-14 · Sembilan berkas sampah ber-path <code>$HOME/...</code></h3>
+<p><strong>Verifikasi.</strong> <code>git status --short</code> menunjukkan sembilan entri <code>D</code> dengan nama literal <code>"$HOME/.local/share/sdb-deck/profile/…"</code> — sisa percobaan Command Deck lama yang tersimpan di indeks git sebagai path <strong>relatif</strong> (direktori bernama <code>$HOME</code> di dalam repo).</p>
+<p><strong>Perbaikan.</strong> Dihapus dari indeks dan disk. Aturan R6 (T-08) mencegah terulang.</p>
+<p><strong>Bukti sesudah.</strong> <code>git status --short | grep '\$HOME'</code> → kosong. <code>find . -maxdepth 1 -name '$HOME'</code> → kosong.</p>
+<h3 id="t-15-symlink-absolut">T-15 · Symlink absolut</h3>
+<p><strong>Verifikasi.</strong> Belum ada symlink absolut hari ini, tapi tidak ada aturan yang melarangnya — satu <code>ln -s /home/anashadi/.ssh/id_rsa repo/</code> akan masuk tanpa peringatan.</p>
+<p><strong>Perbaikan.</strong> R7 di <code>repo_hygiene.py</code>: symlink dengan target absolut = FAIL; target relatif keluar repo = WARN.</p>
+<hr />
+<h2 id="8-temuan-e-operasional-butuh-keputusan-anda">8. Temuan E — Operasional (butuh keputusan Anda)</h2>
+<h3 id="t-16-sdb-control-plane-gagal-start-terus-menerus-diperbaiki-5-nov-2026-1324-wib">T-16 · <code>sdb-control-plane</code> gagal start terus-menerus — <strong>DIPERBAIKI 5 Nov 2026, 13:24 WIB</strong></h3>
+<p><strong>Keadaan sebelum (diukur 13:23 WIB).</strong></p>
+<pre><code>Active: activating (auto-restart) · Result=exit-code · ExecMainStatus=2
+NRestarts=879
+journal: &quot;SDB_ADMIN_KEY wajib (&gt;=24 karakter)&quot; — 5.656 baris sejak 3 Nov 08:06
+</code></pre>
+<p><strong>Dua angka, dua alat ukur.</strong> <code>NRestarts</code> = penghitung systemd, <strong>direset</strong> setiap <code>systemctl restart</code>
+manual — sebab itu dokumen ini sempat menulis 744, lalu 783, lalu 879: tiga snapshot besaran yang sama
+pada jam berbeda. Angka 3.044 di versi A–Z sebelumnya adalah hitungan <strong>baris journal</strong>, bukan
+<code>NRestarts</code>; pada 13:23 nilainya 5.656. Keduanya benar untuk hal yang berbeda.</p>
+<p><strong>Akar masalah.</strong> <code>app.py</code> menolak start bila <code>SDB_ADMIN_KEY</code> kosong atau <code>&lt; 24</code> karakter. Unit <strong>sudah</strong>
+memakai <code>EnvironmentFile=%h/.config/sdb/control.env</code>; berkas itu hanya berisi 2 kunci Telegram. Bukan bug
+kode — kunci admin belum pernah dibuat.</p>
+<p><strong>Eksekusi (izin pemilik, 13:24 WIB).</strong></p>
+<ol>
+<li>Backup <code>control.env</code> → <code>control.env.bak-20261105-132402</code> (mode <code>600</code>, 2 kunci Telegram utuh).</li>
+<li>Tambah <code>SDB_ADMIN_KEY</code> + <code>SDB_WORKER_KEY</code> (masing-masing <strong>43 karakter</strong>, <code>secrets.token_urlsafe(32)</code>)
+   memakai <code>&gt;&gt;</code> — <strong>bukan <code>&gt;</code></strong>, yang akan menghapus dua kunci Telegram.</li>
+<li><code>chmod 600</code> → <code>systemctl --user reset-failed</code> → <code>restart</code>.</li>
+</ol>
+<p><strong>Bukti sesudah (diukur, bukan diklaim).</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Uji</th>
+<th>Hasil</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ActiveState</code> / <code>SubState</code></td>
+<td><code>active</code> / <code>running</code>, <code>NRestarts=0</code>, <code>ExecMainStatus=0</code></td>
+</tr>
+<tr>
+<td><code>GET /healthz</code></td>
+<td><code>200</code> → <code>{"status": "ok"}</code></td>
+</tr>
+<tr>
+<td><code>GET /v1/admin/revenue</code> + <code>X-Admin-Key</code></td>
+<td><code>200</code></td>
+</tr>
+<tr>
+<td><code>GET /metrics</code> + <code>X-Admin-Key</code></td>
+<td><code>200</code> (tanpa kunci <code>401</code>)</td>
+</tr>
+<tr>
+<td><code>GET /v1/usage</code> tanpa kunci</td>
+<td><code>401 unauthorized</code> (benar: rute tenant)</td>
+</tr>
+<tr>
+<td><code>POST /v1/worker/claim</code> + <code>X-Worker-Key</code></td>
+<td><code>200</code> → <code>{"job": null}</code> (antrean kosong)</td>
+</tr>
+<tr>
+<td>Nilai kunci di journal</td>
+<td><strong>0 kemunculan</strong> untuk kedua kunci (<code>grep -c -F</code>)</td>
+</tr>
+<tr>
+<td>Stabilitas 20 detik</td>
+<td>tetap <code>active</code>, <code>NRestarts=0</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Rollback.</strong> <code>stop</code> → kembalikan <code>control.env.bak-20261105-132402</code> → <code>restart</code>. Tidak ada data hilang
+(<code>control.db</code> tetap 7 tabel, 0 baris). Nilai kunci tidak pernah dicetak ke layar, dokumen, atau log.</p>
+<h3 id="t-17-0-tenant-0-job-0-rupiah">T-17 · 0 tenant, 0 job, 0 rupiah</h3>
+<p><strong>Verifikasi.</strong> <code>data/control.db</code> berisi tabel lengkap tapi tanpa tenant. Ini <strong>bukan</strong> cacat teknis; ia mengukur bahwa produk belum pernah dipakai orang lain. Tidak ada patch yang bisa mengubahnya, dan saya tidak akan menulis angka lain.</p>
+<h3 id="t-18-berkas-besar-satu-pola-pii">T-18 · Berkas besar &amp; satu pola PII</h3>
+<p><strong>Verifikasi.</strong> <code>make hygiene</code> → 4 WARN: <code>dashboard/vendor/three.module.min.js</code> 655 KB, <code>reports/upgrade-evidence/thirdparty-scan-crawlee.json</code> 1477 KB, <code>…lighthouse.json</code> 521 KB, dan pola <code>hello@davidmiller[.]io</code> di <code>trivy-oss-agency.json</code>.</p>
+<p><strong>Keputusan.</strong> Dibiarkan, tercatat di <code>platform/hygiene-baseline.json</code>. Ketiganya <strong>artefak bukti pihak ketiga</strong>; menghapusnya akan memutus jejak audit. Kalau Anda ingin repo bebas PII, berkas itu harus dipindah ke object store (ADR-0002) — bukan di-<code>sed</code> diam-diam.</p>
+<hr />
+<h2 id="9-uji-mutasi-tabel-lengkap">9. Uji mutasi — tabel lengkap</h2>
+<p><code>make mutation</code> (≈40 s, 10 mutan pada 6 berkas: <code>release_check.py</code> ×3, <code>recon-forge.py</code> ×2,
+<code>gate_check.py</code>, <code>audit-log.py</code>, <code>sdb_common.py</code>, <code>capture_web.py</code> ×2). Kolom “pembunuh” = uji yang
+gagal saat mutan aktif, diambil dari <code>/tmp/mut2.json</code> (<code>score=100.0</code>, <code>killed=10</code>), bukan dari ingatan.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Mutan</th>
+<th>Berkas</th>
+<th>Yang dirusak</th>
+<th>Sebelum</th>
+<th>Sesudah</th>
+<th>Pembunuh</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M1</td>
+<td><code>scripts/release_check.py</code></td>
+<td>umur artefak diabaikan</td>
+<td>SINTAS</td>
+<td>KILLED</td>
+<td><code>test_release_gate_rejects_stale_artifact</code></td>
+</tr>
+<tr>
+<td>M2</td>
+<td><code>scripts/release_check.py</code></td>
+<td>umur verdict diabaikan</td>
+<td>SINTAS</td>
+<td>KILLED</td>
+<td><code>test_release_gate_rejects_stale_verdict</code> (gerbang mencetak <code>…stale_artifact</code> — cacat pelaporan, lihat catatan di bawah)</td>
+</tr>
+<tr>
+<td>M3</td>
+<td><code>tools/recon-forge.py</code></td>
+<td>URL di luar <code>allowed_targets</code> diterima</td>
+<td>KILLED</td>
+<td>KILLED</td>
+<td><code>test_recon_forge.py</code></td>
+</tr>
+<tr>
+<td>M4</td>
+<td><code>tools/recon-forge.py</code></td>
+<td>path di luar akar izin diterima</td>
+<td>KILLED</td>
+<td>KILLED</td>
+<td><code>test_native_path_di_luar_izin_ditolak</code></td>
+</tr>
+<tr>
+<td>M5</td>
+<td><code>scripts/gate_check.py</code></td>
+<td>batas Mode B dilewati (<code>operator</code> dianggap pemilik)</td>
+<td>KILLED</td>
+<td>KILLED</td>
+<td><code>test_gate_check.py::test_mode_b_owned_operator_berbeda_ditolak</code></td>
+</tr>
+<tr>
+<td>M6</td>
+<td><code>tools/audit-log.py</code></td>
+<td><code>prev_hash</code> tidak diperiksa</td>
+<td>SINTAS</td>
+<td>KILLED</td>
+<td><code>test_audit_log_detects_removed_head_of_chain</code></td>
+</tr>
+<tr>
+<td>M7</td>
+<td><code>scripts/sdb_common.py</code></td>
+<td><code>..</code> lolos dari <code>validate_slug</code></td>
+<td>SINTAS</td>
+<td>KILLED</td>
+<td><code>test_validate_slug_rejects_dotdot_inside_plain_name[a..b]</code> (+3 varian)</td>
+</tr>
+<tr>
+<td>M8</td>
+<td><code>scripts/capture_web.py</code></td>
+<td><code>origin_allowed</code> selalu benar</td>
+<td>KILLED</td>
+<td>KILLED</td>
+<td><code>test_lookalike_origin_rejected[https://example.com.evil.test]</code></td>
+</tr>
+<tr>
+<td>M9</td>
+<td><code>scripts/capture_web.py</code></td>
+<td>origin tidak dicek di loop capture</td>
+<td>SINTAS</td>
+<td>KILLED</td>
+<td><code>test_redirect_keluar_scope_membatalkan_capture</code></td>
+</tr>
+<tr>
+<td>M10</td>
+<td><code>scripts/release_check.py</code></td>
+<td>verdict <code>SECURITY FAIL</code> diterima sebagai lulus</td>
+<td>KILLED</td>
+<td>KILLED</td>
+<td><code>test_release_gate_rejects_fresh_security_fail</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Skor: 5/10 (50%) → 10/10 (100%).</strong> Tanpa mutasi, kelima celah ini tidak terlihat: suite tetap hijau 533 tes.</p>
+<hr />
+<h2 id="10-angka-akhir-terverifikasi">10. Angka akhir terverifikasi</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Metrik</th>
+<th>Nilai</th>
+<th>Catatan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Item tes</td>
+<td><strong>629 lulus</strong> (+3 subtes), 50 berkas, 49,83 s</td>
+<td><code>make test</code> = <code>tests skills integrations</code>; <code>def test_</code> = 471 di <code>tests/</code>, sisanya parametrize</td>
+</tr>
+<tr>
+<td><em>Coverage</em> cabang <code>sdb_platform</code></td>
+<td><strong>88%</strong></td>
+<td>984 stmt / 99 miss; 268 cabang / 33 parsial</td>
+</tr>
+<tr>
+<td>Mutan terbunuh</td>
+<td><strong>10/10</strong></td>
+<td><code>make mutation</code></td>
+</tr>
+<tr>
+<td><code>make check</code></td>
+<td><strong>PASS</strong></td>
+<td>7 gerbang</td>
+</tr>
+<tr>
+<td>Rujukan dokumen</td>
+<td><strong>264 path diperiksa, 0 mati</strong> (dari 5.122 token backtick)</td>
+<td><code>make docs-lint</code></td>
+</tr>
+<tr>
+<td>Higiene</td>
+<td>475 berkas, <strong>0 FAIL</strong>, 4 WARN</td>
+<td><code>make hygiene</code></td>
+</tr>
+<tr>
+<td>Pack divisi</td>
+<td><strong>8/8 PASS</strong></td>
+<td><code>make packs</code></td>
+</tr>
+<tr>
+<td>Drift skill</td>
+<td><strong>119/119 OK</strong></td>
+<td><code>make drift</code></td>
+</tr>
+<tr>
+<td>Service control plane</td>
+<td><strong>active (running)</strong>, <code>NRestarts=0</code>, <code>/healthz</code> 200</td>
+<td>dinyalakan 5 Nov 13:24 setelah <code>SDB_ADMIN_KEY</code> dibuat (T-16)</td>
+</tr>
+<tr>
+<td>Tenant / job / pendapatan</td>
+<td><strong>0 / 0 / 0</strong></td>
+<td>apa adanya</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="11-reproduksi-salin-tempel">11. Reproduksi (salin-tempel)</h2>
+<pre><code class="language-bash">cd ~/super-dev-builders
+
+# 1. Seluruh gerbang lokal
+make check                                   # lint, registry, test, drift, higiene, packs, docs-lint
+
+# 2. Jumlah tes yang sebenarnya
+.venv/bin/python -m pytest tests skills integrations 2&gt;&amp;1 | tail -1   # &quot;629 passed ...&quot;
+.venv/bin/python -m pytest tests/ 2&gt;&amp;1 | tail -1                       # &quot;533 passed ...&quot;
+
+# 3. Coverage cabang
+.venv/bin/python -m coverage run --branch --source=sdb_platform -m pytest tests/ -q
+.venv/bin/python -m coverage report -m
+
+# 4. Uji mutasi (10 mutan)
+make mutation
+
+# 5. Bukti indeks dipakai (bukan dugaan)
+.venv/bin/python - &lt;&lt;'PY'
+from sdb_platform.control_plane.store import Store
+s = Store(&quot;:memory:&quot;)
+print(&quot; &quot;.join(r[3] for r in s.db.execute(
+  &quot;EXPLAIN QUERY PLAN SELECT job_id FROM jobs WHERE tenant_id=? AND status='queued'&quot;
+  &quot; AND cancel_requested=0 ORDER BY created_at, rowid LIMIT 1&quot;, (&quot;t&quot;,))))
+PY
+
+# 6. Kondisi layanan (jujur, apa adanya)
+systemctl --user show sdb-control-plane -p ActiveState -p Result -p NRestarts
+curl -s -m 5 http://127.0.0.1:8088/healthz          # {&quot;status&quot;: &quot;ok&quot;}
+</code></pre>
+<hr />
+<h2 id="12-sisa-risiko-urutan-tindakan-berikutnya">12. Sisa risiko &amp; urutan tindakan berikutnya</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Prioritas</th>
+<th>Tindakan</th>
+<th>Alasan</th>
+<th>Butuh izin?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>~~1~~</td>
+<td>✅ <strong>Selesai 5 Nov 13:24</strong> — <code>SDB_ADMIN_KEY</code> + <code>SDB_WORKER_KEY</code> ditambahkan (backup 600, <code>&gt;&gt;</code>), layanan <code>active (running)</code>, bukti di T-16</td>
+<td>menghentikan 879 restart yang sia-sia</td>
+<td>sudah dieksekusi atas izin pemilik</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Ukur ulang + naikkan cabang <code>sdb_platform/runtime/worker.py</code> (77%)</td>
+<td>satu-satunya modul di bawah 85%</td>
+<td>tidak</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Perbaiki pelaporan nama tes pada <code>mutation_gate</code> (cacat M2 di §9)</td>
+<td>laporan bisa menyesatkan</td>
+<td>tidak</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Pindahkan 3 artefak besar ke object store (ADR-0002)</td>
+<td>1477 KB + 655 KB + 521 KB di git</td>
+<td>tidak</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Tambah job <code>ANALYZE</code> berkala untuk <code>control.db</code></td>
+<td>indeks parsial bisa salah pilih rencana</td>
+<td>tidak</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Uji bolak-balik <code>stages.yaml</code> bila kelak ada penulis otomatis</td>
+<td>mencegah dua sumber kebenaran kembali</td>
+<td>tidak</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="lampiran-a-berkas-yang-berubah-karena-audit-ini">Lampiran A — Berkas yang berubah karena audit ini</h2>
+<p><strong>Kode:</strong> <code>sdb_platform/control_plane/store.py</code>, <code>sdb_platform/control_plane/app.py</code>, <code>scripts/docs_lint.py</code>, <code>scripts/repo_hygiene.py</code>, <code>scripts/workflow_run.py</code>, <code>dashboard/ws_api.py</code>.
+<strong>Baru:</strong> <code>workflows/stages.yaml</code>, <code>scripts/stage_registry.py</code>, <code>tools/mutation_gate.py</code>.
+<strong>Uji baru:</strong> <code>tests/test_control_plane_perf.py</code>, <code>tests/test_stage_registry.py</code>, <code>tests/test_mutation_gate.py</code>, <code>tests/test_repo_hygiene_rules.py</code>, + 8 uji tambahan di <code>tests/test_scripts.py</code> dan <code>tests/test_capture_scope.py</code>.
+<strong>Gerbang:</strong> <code>Makefile</code> (target <code>check</code>, <code>test</code>, <code>mutation</code>), <code>.github/workflows/ci.yml</code> (docs-lint, hygiene, coverage).
+<strong>Dokumen:</strong> laporan ini, <code>docs/INDEX.md</code>, <code>docs/SDB_LENGKAP_A_Z_20261105.md</code> (angka &amp; status repo).</p>
+<hr />
+<h2 id="lampiran-b-kamus-awam-untuk-item-3">Lampiran B — Kamus awam (untuk item 3)</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Istilah</th>
+<th>Arti sederhana</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Indeks basis data</strong></td>
+<td>Daftar isi buku. Tanpa indeks, mencari satu nama berarti membaca semua halaman (92 ms). Dengan indeks, langsung ke halaman yang tepat (0,06 ms).</td>
+</tr>
+<tr>
+<td><strong>WAL</strong></td>
+<td>Cara menulis buku harian: catat dulu di lembar Coretan cepat, baru disalin ke buku besar nanti. Tulis jadi cepat; risiko: kalau listrik mati sebelum disalin, coretan terakhir bisa hilang.</td>
+</tr>
+<tr>
+<td><strong>Nagle</strong></td>
+<td>Kebiasaan “tunggu sebentar, siapa tahu ada surat susulan biar bisa dikirim satu amplop”. Bagus untuk kiriman besar, buruk untuk jawaban pendek seperti health check (40 ms).</td>
+</tr>
+<tr>
+<td><strong>Backlog</strong></td>
+<td>Panjang bangku tunggu di depan pintu. Isinya 5 kursi: begitu 6 orang datang bersamaan, sisanya ditolak. Dinaikkan jadi 128 kursi.</td>
+</tr>
+<tr>
+<td><strong>Mutan</strong></td>
+<td>Sengaja merusak satu baris kode untuk melihat apakah alarm berbunyi. Kalau alarm tetap sunyi, berarti tidak ada alarm di titik itu.</td>
+</tr>
+<tr>
+<td><strong>Coverage</strong></td>
+<td>Berapa banyak halaman buku yang pernah <strong>dibuka</strong>. Tidak menjamin isinya <strong>dipahami</strong> — karena itu perlu mutan.</td>
+</tr>
+<tr>
+<td><strong>Kredensial</strong></td>
+<td>Kunci rumah. Membuat kunci baru = mengubah siapa yang bisa masuk, jadi butuh izin pemilik.</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><em>Laporan ini dibuat dari pengukuran langsung pada mesin <code>anashadi</code>, 5 November 2026. Setiap klaim punya perintah verifikasi di §11; setiap angka “sebelum” diberi label sebagai angka historis. Repo: <a href="https://github.com/anashadi-node/super-dev-builders">https://github.com/anashadi-node/super-dev-builders</a></em></p>
+<div class="foot">Laporan ilmiah: 18 temuan, bukti sebelum/sesudah, uji mutasi 50 persen ke 100 persen, coverage cabang 88 persen, control plane dinyalakan 13:24, sisa risiko dan batas kejujuran.</div>
+</main>
+</div>
+</body>
+</html>

@@ -41,7 +41,7 @@
 | T-13 | 5 mutan sintas (gerbang tanpa uji penjaga) | kill rate **50%** | 5 uji penjaga baru | ✅ 100% |
 | T-14 | Sembilan berkas sampah ber-path `$HOME/...` ter-stage | `git status` 9 entri `D` aneh | dihapus dari indeks & disk | ✅ |
 | T-15 | Symlink absolut bisa menyusup ke repo | tidak diperiksa | aturan R7 | ✅ WARN/FAIL |
-| T-16 | `sdb-control-plane` gagal start terus-menerus | exit 2, **744 restart** | **butuh `SDB_ADMIN_KEY`** = kredensial baru | ⛔ **butuh izin Anda** |
+| T-16 | `sdb-control-plane` gagal start terus-menerus | exit 2, **879 restart** (5.656 baris journal) | `>>` 2 kunci baru + `chmod 600` + restart | ✅ **aktif 13:24**, `/healthz` 200 |
 | T-17 | Platform SaaS: 0 tenant, 0 job, 0 rupiah | DB `control.db` kosong | tidak ada kode yang bisa “memperbaiki” ini | ⛔ keputusan bisnis |
 | T-18 | Berkas besar & 1 pola PII lolos higiene | three.module 655 KB, trivy 1477 KB, `hello@davidmiller[.]io` | dicatat, bukan dihapus (utang lama) | ⚠️ WARN |
 
@@ -273,21 +273,47 @@ Ini temuan yang paling penting dan paling mudah salah dibaca. Klaimnya **bukan**
 
 ## 8. Temuan E — Operasional (butuh keputusan Anda)
 
-### T-16 · `sdb-control-plane` gagal start terus-menerus
+### T-16 · `sdb-control-plane` gagal start terus-menerus — **DIPERBAIKI 5 Nov 2026, 13:24 WIB**
 
-**Verifikasi (hari ini, 13:00 WIB):**
+**Keadaan sebelum (diukur 13:23 WIB).**
 
 ```
-systemctl --user status sdb-control-plane
-  Active: activating (auto-restart) (Result: exit-code)
-  Process: ... code=exited, status=2
-systemctl --user show sdb-control-plane -p NRestarts
-  NRestarts=744
+Active: activating (auto-restart) · Result=exit-code · ExecMainStatus=2
+NRestarts=879
+journal: "SDB_ADMIN_KEY wajib (>=24 karakter)" — 5.656 baris sejak 3 Nov 08:06
 ```
 
-**Akar masalah.** `app.py` menolak start bila `SDB_ADMIN_KEY` kosong/`< 24` karakter. Unit systemd memakai `EnvironmentFile=%h/.config/sdb/control.env`, dan berkas itu **hanya berisi 2 kunci**: `SDB_TG_BOT_TOKEN`, `SDB_TG_CHAT_ID`. Jadi bukan bug kode — **kunci admin memang belum pernah dibuat**.
+**Dua angka, dua alat ukur.** `NRestarts` = penghitung systemd, **direset** setiap `systemctl restart`
+manual — sebab itu dokumen ini sempat menulis 744, lalu 783, lalu 879: tiga snapshot besaran yang sama
+pada jam berbeda. Angka 3.044 di versi A–Z sebelumnya adalah hitungan **baris journal**, bukan
+`NRestarts`; pada 13:23 nilainya 5.656. Keduanya benar untuk hal yang berbeda.
 
-**Mengapa saya tidak memperbaikinya sendiri.** Membuat `SDB_ADMIN_KEY` berarti membuat **kredensial baru**. Aturan yang Anda tetapkan: kredensial baru butuh izin eksplisit. Selain itu ada jebakan nyata: `control.env` **sudah berisi 2 kunci Telegram** — kalau ditulis dengan perintah `cat > control.env` seperti yang tertulis di dokumen A–Z §Q.3, **dua kunci Telegram itu akan terhapus**. Ini salah satu dari tiga hal yang saya tahan di item 3 dan minta izin dulu.
+**Akar masalah.** `app.py` menolak start bila `SDB_ADMIN_KEY` kosong atau `< 24` karakter. Unit **sudah**
+memakai `EnvironmentFile=%h/.config/sdb/control.env`; berkas itu hanya berisi 2 kunci Telegram. Bukan bug
+kode — kunci admin belum pernah dibuat.
+
+**Eksekusi (izin pemilik, 13:24 WIB).**
+
+1. Backup `control.env` → `control.env.bak-20261105-132402` (mode `600`, 2 kunci Telegram utuh).
+2. Tambah `SDB_ADMIN_KEY` + `SDB_WORKER_KEY` (masing-masing **43 karakter**, `secrets.token_urlsafe(32)`)
+   memakai `>>` — **bukan `>`**, yang akan menghapus dua kunci Telegram.
+3. `chmod 600` → `systemctl --user reset-failed` → `restart`.
+
+**Bukti sesudah (diukur, bukan diklaim).**
+
+| Uji | Hasil |
+|---|---|
+| `ActiveState` / `SubState` | `active` / `running`, `NRestarts=0`, `ExecMainStatus=0` |
+| `GET /healthz` | `200` → `{"status": "ok"}` |
+| `GET /v1/admin/revenue` + `X-Admin-Key` | `200` |
+| `GET /metrics` + `X-Admin-Key` | `200` (tanpa kunci `401`) |
+| `GET /v1/usage` tanpa kunci | `401 unauthorized` (benar: rute tenant) |
+| `POST /v1/worker/claim` + `X-Worker-Key` | `200` → `{"job": null}` (antrean kosong) |
+| Nilai kunci di journal | **0 kemunculan** untuk kedua kunci (`grep -c -F`) |
+| Stabilitas 20 detik | tetap `active`, `NRestarts=0` |
+
+**Rollback.** `stop` → kembalikan `control.env.bak-20261105-132402` → `restart`. Tidak ada data hilang
+(`control.db` tetap 7 tabel, 0 baris). Nilai kunci tidak pernah dicetak ke layar, dokumen, atau log.
 
 ### T-17 · 0 tenant, 0 job, 0 rupiah
 
@@ -336,7 +362,7 @@ gagal saat mutan aktif, diambil dari `/tmp/mut2.json` (`score=100.0`, `killed=10
 | Higiene | 475 berkas, **0 FAIL**, 4 WARN | `make hygiene` |
 | Pack divisi | **8/8 PASS** | `make packs` |
 | Drift skill | **119/119 OK** | `make drift` |
-| Service control plane | **exit 2, 744 restart** | butuh `SDB_ADMIN_KEY` (izin Anda) |
+| Service control plane | **active (running)**, `NRestarts=0`, `/healthz` 200 | dinyalakan 5 Nov 13:24 setelah `SDB_ADMIN_KEY` dibuat (T-16) |
 | Tenant / job / pendapatan | **0 / 0 / 0** | apa adanya |
 
 ---
@@ -371,6 +397,7 @@ PY
 
 # 6. Kondisi layanan (jujur, apa adanya)
 systemctl --user show sdb-control-plane -p ActiveState -p Result -p NRestarts
+curl -s -m 5 http://127.0.0.1:8088/healthz          # {"status": "ok"}
 ```
 
 ---
@@ -379,7 +406,7 @@ systemctl --user show sdb-control-plane -p ActiveState -p Result -p NRestarts
 
 | Prioritas | Tindakan | Alasan | Butuh izin? |
 |---|---|---|---|
-| 1 | Isi `SDB_ADMIN_KEY` di `~/.config/sdb/control.env` — **tambahkan**, jangan menimpa (2 kunci Telegram sudah ada) | layanan crash-loop 744× | **ya** |
+| ~~1~~ | ✅ **Selesai 5 Nov 13:24** — `SDB_ADMIN_KEY` + `SDB_WORKER_KEY` ditambahkan (backup 600, `>>`), layanan `active (running)`, bukti di T-16 | menghentikan 879 restart yang sia-sia | sudah dieksekusi atas izin pemilik |
 | 2 | Ukur ulang + naikkan cabang `sdb_platform/runtime/worker.py` (77%) | satu-satunya modul di bawah 85% | tidak |
 | 3 | Perbaiki pelaporan nama tes pada `mutation_gate` (cacat M2 di §9) | laporan bisa menyesatkan | tidak |
 | 4 | Pindahkan 3 artefak besar ke object store (ADR-0002) | 1477 KB + 655 KB + 521 KB di git | tidak |

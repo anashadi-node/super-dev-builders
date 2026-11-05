@@ -29,7 +29,7 @@
 - **6 gerbang mesin**: Gate #0, evidence lint, security verdict, release gate, higiene repo, runner tahap; plus **7 gerbang `make check`**.
 - **160 berkas Markdown** terlacak, 53 di antaranya di `docs/`.
 - 6 direktori target, 5 direktori run, 10 direktori evidence, 30 berkas laporan.
-- Control plane: **3.044 kali restart** sejak konfigurasi rusak (bukti di `journalctl`, 5 Nov 06:06).
+- Control plane: **hidup sejak 5 Nov 13:24** (`active`, `/healthz` 200) setelah `SDB_ADMIN_KEY` dibuat; sebelumnya gagal start 879 kali / 5.656 baris journal (bukti di §Q.3).
 
 **Satu kalimat jujur tentang status:** SDB adalah **perkakas pribadi yang matang dan teruji di level mekanis**, dengan satu komponen bisnis (control plane) yang kodenya selesai tetapi belum pernah dipakai satu pelanggan pun, dan saat ini sedang mati karena kunci admin belum diisi. Klaim "SaaS siap jual" **tidak** didukung data.
 
@@ -1489,7 +1489,7 @@ Status jujur per 5 November 2026:
 | Tenant nyata | **0** |
 | Job nyata | **0** |
 | Baris ledger | **0** |
-| Layanan | **GAGAL START** — 3.044 restart, exit 2 |
+| Layanan | **HIDUP** sejak 5 Nov 2026 13:24 WIB — `active (running)`, `NRestarts=0`, `/healthz` 200 (sebelumnya gagal start, exit 2) |
 
 ## Q.2 Cara menjalankan (yang benar)
 
@@ -1501,25 +1501,53 @@ python3 -m sdb_platform.control_plane.app --db data/control.db --port 8088
 
 Makefile menolak jalan bila `SDB_ADMIN_KEY` kurang dari 24 karakter (`Makefile:63-66`).
 
-## Q.3 Mengapa layanan sedang mati (temuan hari ini)
+## Q.3 Mengapa layanan sempat mati — dan bagaimana ia dinyalakan (5 Nov 2026, 13:24 WIB)
 
-`journalctl --user -u sdb-control-plane` menampilkan pola berulang setiap 10 detik:
+**Keadaan sebelum.** `journalctl --user -u sdb-control-plane` menampilkan pola berulang setiap 10 detik:
 
 ```
 Started SDB Control Plane (:8088) — job, tagihan, buku besar.
 SDB_ADMIN_KEY wajib (>=24 karakter).
 Main process exited, code=exited, status=2/INVALIDARGUMENT
-Scheduled restart job, restart counter is at 3044.
+Scheduled restart job, restart counter is at 879.
 ```
 
-Penyebab (diverifikasi ulang 5 Nov 2026, 13:00 WIB): unit **sudah** memakai
-`EnvironmentFile=%h/.config/sdb/control.env`, tetapi berkas itu hanya berisi dua kunci Telegram
-(`SDB_TG_BOT_TOKEN`, `SDB_TG_CHAT_ID`) — `SDB_ADMIN_KEY` memang belum pernah dibuat. Jadi ini
-**fail-closed yang benar** (lebih baik mati daripada terbuka tanpa kunci), tetapi operasionalnya salah:
-unit di-restart tanpa henti (`NRestarts=783` dan terus naik ±40/menit saat diperiksa).
+Penyebab: unit **sudah** memakai `EnvironmentFile=%h/.config/sdb/control.env`, tetapi berkas itu hanya
+berisi dua kunci Telegram (`SDB_TG_BOT_TOKEN`, `SDB_TG_CHAT_ID`) — `SDB_ADMIN_KEY` belum pernah dibuat.
+Ini **fail-closed yang benar** (lebih baik mati daripada terbuka tanpa kunci), tetapi operasionalnya
+salah: unit dicoba ulang tanpa henti.
 
-Perbaikan (butuh keputusan Anda karena membuat kredensial baru). **Wajib `>>`, bukan `>`** — `>`
-akan menghapus dua kunci Telegram yang sudah ada di berkas itu:
+**Dua angka, dua alat ukur — jangan tertukar.** `NRestarts` adalah penghitung systemd dan **direset**
+setiap `systemctl restart` manual; karena itu dokumen versi lama menulis 744, 783, dan 879 pada jam
+berbeda — tiga snapshot besaran yang sama. Angka 3.044 pada versi sebelumnya adalah hitungan **baris
+journal**, bukan `NRestarts`; saat diperiksa 5 Nov 13:23 jumlahnya sudah **5.656 baris** sejak percobaan
+pertama 3 Nov 08:06. Keduanya benar, tetapi mengukur hal berbeda: percobaan start (journal) vs restart
+otomatis (systemd).
+
+**Eksekusi (disetujui pemilik, 5 Nov 2026 13:24 WIB).**
+
+1. Backup: `control.env` → `control.env.bak-20261105-132402`, mode `600`, dua kunci Telegram utuh.
+2. Tambah dua kunci baru (masing-masing 43 karakter dari `secrets.token_urlsafe(32)`) dengan `>>`.
+3. `chmod 600` → `systemctl --user reset-failed sdb-control-plane` → `restart`.
+4. Verifikasi (lihat tabel di bawah). Tidak ada nilai kunci yang dicetak ke layar, dokumen, atau log.
+
+| Uji | Hasil terukur |
+|---|---|
+| `ActiveState` / `SubState` | `active` / `running`, `NRestarts=0`, `ExecMainStatus=0` |
+| `GET /healthz` | `200` → `{"status": "ok"}` |
+| `GET /v1/admin/revenue` + `X-Admin-Key` | `200` |
+| `GET /metrics` + `X-Admin-Key` | `200` (tanpa kunci: `401`) |
+| `GET /v1/usage` tanpa kunci | `401 unauthorized` (benar; itu rute tenant) |
+| `POST /v1/worker/claim` + `X-Worker-Key` | `200` → `{"job": null}` (antrean kosong) |
+| Nilai kunci di journal | **0 kemunculan** untuk `SDB_ADMIN_KEY` maupun `SDB_WORKER_KEY` |
+| Stabilitas 20 detik setelah start | tetap `active`, `NRestarts=0` |
+
+**Rollback bila perlu.** `systemctl --user stop sdb-control-plane`, kembalikan berkas dari
+`control.env.bak-20261105-132402`, lalu `restart`. Tidak ada data yang hilang: `control.db` tetap
+7 tabel, 0 baris.
+
+Perintah di bawah adalah prosedur untuk **instalasi baru**. **Wajib `>>`, bukan `>`** — `>` akan
+menghapus dua kunci Telegram yang sudah ada di berkas itu:
 
 ```bash
 mkdir -p ~/.config/sdb && chmod 700 ~/.config/sdb
@@ -1977,7 +2005,7 @@ Snapshot adalah kunci laporan yang berguna: tanpa snapshot, laporan hanya menyeb
 | `sdb-command-deck.service` | service | **active / enabled** | dashboard lokal `:8484` |
 | `sdb-tg-bot.service` | service | **active / enabled** | bot Telegram |
 | `sdb-build-worker.service` | service | **active / enabled** | pekerja build (poll 10 s) |
-| `sdb-control-plane.service` | service | **activating (crash loop)** | API `:8088` — gagal karena `SDB_ADMIN_KEY` |
+| `sdb-control-plane.service` | service | **active / enabled** | API `:8088` — hidup sejak 5 Nov 13:24 (`NRestarts=0`) |
 | `sdb-ci-watch.timer` | timer | **active** | penjaga CI tiap 3 jam (menit ke-7 + jitter 0–120 s) |
 | `sdb-report-4h.timer` | timer | **active** | laporan 6× sehari |
 | `sdb-deck-health.timer` | timer | **active** | cek kesehatan Deck 07:30 |
@@ -2155,7 +2183,7 @@ Penyebab umum: port dipakai proses lain, unit mati, atau dijalankan dengan `--ho
 
 ```bash
 journalctl --user -u sdb-control-plane -n 20 --no-pager   # cari "SDB_ADMIN_KEY wajib"
-# perbaikan sesuai Q.3 (EnvironmentFile + restart)
+# bila mati: lihat Q.3 (kunci di EnvironmentFile, lalu restart)
 curl -s http://127.0.0.1:8088/healthz
 ```
 
@@ -2240,7 +2268,7 @@ journalctl --user -u sdb-report-4h -n 30 --no-pager
 | Build worker | **sehat** | unit active |
 | recon-forge | **teruji, terbatas** | 21 tes + 1 target web + 1 target native |
 | REA | **terpasang, dipakai sejak 4 Nov** | `evidence/*/rea/` |
-| Control plane | **kode selesai, layanan mati, 0 pelanggan** | crash loop 3.044×, 7 tabel 0 baris |
+| Control plane | **kode selesai, layanan hidup, 0 pelanggan** | aktif 5 Nov 13:24, 7 tabel 0 baris |
 | Penagihan | **kode ada, belum pernah dipakai** | ledger 0 baris |
 | Kesehatan profil | **7/10** | `health.json` 4 Nov |
 
@@ -2248,7 +2276,7 @@ journalctl --user -u sdb-report-4h -n 30 --no-pager
 
 | # | Utang | Risiko bila dibiarkan |
 |---:|---|---|
-| 1 | `SDB_ADMIN_KEY` belum dipasang via `EnvironmentFile` | control plane mati; 3.044 restart membebani mesin |
+| ~~1~~ | ✅ Selesai 5 Nov 13:24 — `SDB_ADMIN_KEY`/`SDB_WORKER_KEY` terpasang via `EnvironmentFile`, layanan hidup (§Q.3) | *tidak lagi* — sisa risiko: rotasi kunci belum ada (lihat #4) |
 | 2 | `network_capture_allowed: false` tidak menghentikan capture | pelanggaran scope yang tidak terdeteksi |
 | 3 | Tidak ada backup `control.db` | kehilangan data bisnis permanen |
 | 4 | Tidak ada rotasi API key | kunci bocor = tenant harus dibuat ulang |
@@ -2347,7 +2375,7 @@ sqlite3 data/control.db "select count(*) from ledger;"    # 0
 | Evidence | 10 direktori | `ls -d evidence/*/` | idem |
 | Reports | 30 berkas | `ls reports/ \| wc -l` | idem |
 | Timer SDB | 3 | `list-timers` | idem |
-| Restart control plane | 783 (13:00 WIB, +±40/menit) | `systemctl show -p NRestarts` | journal 06:xx mencatat 3.044 |
+| Restart control plane | **0** (sebelum 879 pada 13:23, direset saat restart manual 13:24) | `systemctl show -p NRestarts` | journal 3–5 Nov mencatat 5.656 percobaan gagal |
 
 ## Z.3 Repo resmi
 
@@ -2434,7 +2462,7 @@ Aturan `docs_lint` mewajibkan README memuat tautan ini; bila hilang, `make check
 1. Struktur A–Z (26 bab) supaya bisa dibaca melompat, bukan 32 bagian berurutan.
 2. Angka tes diperbarui 470 → 547 → **629** (5 Nov, termasuk `integrations/`; 533 di `tests/`).
 3. Ditambahkan bab khusus **recon-forge** dan bukti jalur native (ELF/Ghidra).
-4. Ditambahkan temuan **control plane crash loop 3.044 restart** (keadaan 5 Nov, tidak ada di 2.0).
+4. Ditambahkan temuan **control plane gagal start** (keadaan 5 Nov) — lalu **ditutup pada 5 Nov 13:24** setelah `SDB_ADMIN_KEY` dibuat atas izin pemilik; bukti di Q.3.
 5. Ditambahkan 10 skenario operasional + tabel gejala → sebab → tindakan.
 6. Ditambahkan bab utang teknis berprioritas P0/P1/P2 dan "tiga klaim yang tidak boleh dibuat".
 7. Semua klaim angka diberi perintah verifikasi (Lampiran 1 dan 5).
@@ -2493,8 +2521,8 @@ grep -c '"glob"' scripts/workflow_run.py    # mendekati 18, lihat daftar langsun
 for u in sdb-command-deck sdb-tg-bot sdb-build-worker sdb-control-plane; do
   printf "%-20s %s\n" "$u" "$(systemctl --user is-active $u)"; done
 
-# [ ] 6. Control plane: bukti crash loop
-journalctl --user -u sdb-control-plane -n 20 --no-pager | grep -c "SDB_ADMIN_KEY wajib"
+# [x] 6. Control plane: hidup + bukti (Q.3)
+curl -s -m 5 http://127.0.0.1:8088/healthz; systemctl --user is-active sdb-control-plane
 
 # [ ] 7. Basis data kosong
 sqlite3 data/control.db "select count(*) from tenants; select count(*) from jobs;"

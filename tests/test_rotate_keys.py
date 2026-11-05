@@ -150,11 +150,45 @@ def test_verifikasi_lolos_bila_baru_200_dan_lama_401(tmp_path, capsys, stub_serv
     handler.good_key = "admin" + "a" * 38
 
     base = f"http://127.0.0.1:{srv.server_address[1]}"
-    rc = rot.main(["--env", str(target), "--verify-url", base + "/v1/admin/revenue",
-                   "--verify-header", "X-Admin-Key", "--healthz", base + "/healthz"])
+    rc = rot.main(["--env", str(target), "--verify", f"GET {base}/v1/admin/revenue X-Admin-Key",
+                   "--healthz", base + "/healthz"])
     out = capsys.readouterr().out
     assert rc == 0, out
     assert "baru=200 lama=401" in out
+
+
+def test_parse_verify_mempertahankan_badan_json():
+    (method, _url, header, key_name, body), = rot.parse_verify(
+        ['POST http://127.0.0.1:8088/v1/worker/claim X-Worker-Key {"worker_id":"w1"}'])
+    assert (method, header, key_name) == ("POST", "X-Worker-Key", "SDB_WORKER_KEY")
+    assert body == b'{"worker_id":"w1"}'
+
+
+def test_spesifikasi_verify_tidak_lengkap_ditolak_tanpa_menyentuh_berkas(tmp_path, capsys):
+    target = tmp_path / "control.env"
+    target.write_text(SAMPLE)
+    rc = rot.main(["--env", str(target), "--verify", "GET saja"])
+    assert rc == 2
+    assert "GAGAL" in capsys.readouterr().out
+    assert target.read_text() == SAMPLE  # validasi mendahului rotasi
+
+
+def test_header_tidak_dikenal_ditolak(tmp_path, capsys):
+    target = tmp_path / "control.env"
+    target.write_text(SAMPLE)
+    rc = rot.main(["--env", str(target), "--verify", "GET http://127.0.0.1:9/x X-Lain"])
+    assert rc == 2
+    assert "tidak dikenali" in capsys.readouterr().out
+
+
+def test_wait_ready_benar_saat_koneksi_diterima(stub_server):
+    srv, _handler = stub_server
+    assert rot.wait_ready(f"http://127.0.0.1:{srv.server_address[1]}/healthz", timeout=2.0) is True
+
+
+def test_wait_ready_menyerah_saat_porta_mati():
+    # porta 9 (discard) biasanya menolak koneksi -> harus berhenti, bukan menggantung
+    assert rot.wait_ready("http://127.0.0.1:9/healthz", timeout=0.6, pause=0.1) is False
 
 
 def test_verifikasi_gagal_bila_kunci_lama_masih_diterima(tmp_path, capsys, stub_server, monkeypatch):
@@ -167,8 +201,8 @@ def test_verifikasi_gagal_bila_kunci_lama_masih_diterima(tmp_path, capsys, stub_
     handler.good_key = "admin-lama-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"  # server masih percaya kunci lama
 
     base = f"http://127.0.0.1:{srv.server_address[1]}"
-    rc = rot.main(["--env", str(target), "--verify-url", base + "/v1/admin/revenue",
-                   "--verify-header", "X-Admin-Key", "--healthz", base + "/healthz"])
+    rc = rot.main(["--env", str(target), "--verify", f"GET {base}/v1/admin/revenue X-Admin-Key",
+                   "--healthz", base + "/healthz"])
     out = capsys.readouterr().out
     assert rc == 1
     assert "GAGAL" in out

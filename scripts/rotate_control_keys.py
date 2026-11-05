@@ -15,9 +15,8 @@ Contoh:
   python3 scripts/rotate_control_keys.py --dry-run
   python3 scripts/rotate_control_keys.py \
       --restart sdb-control-plane --restart sdb-build-worker --restart sdb-tg-bot \
-      --verify-url http://127.0.0.1:8088/v1/admin/revenue --verify-header X-Admin-Key \
-      --verify-url http://127.0.0.1:8088/v1/worker/claim --verify-header X-Worker-Key \
-      --verify-method POST --verify-body '{"worker_id":"rotate-check"}'
+      --verify 'GET http://127.0.0.1:8088/v1/admin/revenue X-Admin-Key' \
+      --verify 'POST http://127.0.0.1:8088/v1/worker/claim X-Worker-Key {"worker_id":"rotate-check"}'
 
 Keamanan: tidak ada jalur kode yang mencetak nilai kredensial; keluaran hanya
 nama kunci, panjang, dan status (BERUBAH/UTUH). Stdlib saja.
@@ -123,6 +122,36 @@ def probe(url: str, header: str, key: str, method: str = "GET", body: bytes | No
         return 0
 
 
+def wait_ready(url: str, timeout: float = 30.0, pause: float = 0.5) -> bool:
+    """Tunggu control plane menerima koneksi (systemd restart tidak menunggu listen)."""
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        if probe(url, "X-Probe", "-") != 0:
+            return True
+        time.sleep(pause)
+    return False
+
+
+def parse_verify(specs: list[str]) -> list[tuple[str, str, str, str, bytes | None]]:
+    """Ubah 'METODE URL HEADER [BODY]' jadi (metode, url, header, nama_kunci, body)."""
+    parsed: list[tuple[str, str, str, str, bytes | None]] = []
+    for spec in specs:
+        # split(None, 3): badan JSON dipertahankan apa adanya (shlex akan membuang tanda kutip)
+        parts = spec.split(None, 3)
+        if len(parts) < 3:
+            raise ValueError(f"--verify butuh 'METODE URL HEADER [BODY]': {spec}")
+        method, url, header = parts[0].upper(), parts[1], parts[2]
+        if "Admin" in header:
+            key_name = "SDB_ADMIN_KEY"
+        elif "Worker" in header:
+            key_name = "SDB_WORKER_KEY"
+        else:
+            raise ValueError(f"header {header} tidak dikenali (harus X-Admin-Key/X-Worker-Key)")
+        body = parts[3].encode() if len(parts) > 3 else None
+        parsed.append((method, url, header, key_name, body))
+    return parsed
+
+
 def restart_units(units: list[str]) -> list[tuple[str, str]]:
     results = []
     for unit in units:
@@ -143,15 +172,19 @@ def main(argv=None) -> int:
     ap.add_argument("--env", default=str(DEFAULT_ENV))
     ap.add_argument("--dry-run", action="store_true", help="hitung perubahan, jangan tulis/restart")
     ap.add_argument("--restart", action="append", default=[], metavar="UNIT")
-    ap.add_argument("--verify-url", action="append", default=[], metavar="URL")
-    ap.add_argument("--verify-header", action="append", default=[], metavar="HEADER")
-    ap.add_argument("--verify-method", default="GET")
-    ap.add_argument("--verify-body", default="")
+    ap.add_argument("--verify", action="append", default=[], metavar='"METODE URL HEADER [BODY]"',
+                    help='satu uji per argumen, mis. "GET http://127.0.0.1:8088/v1/admin/revenue X-Admin-Key"')
     ap.add_argument("--backup", help="berkas env lama untuk uji penolakan (default: cadangan baru)")
     ap.add_argument("--healthz", default="http://127.0.0.1:8088/healthz")
     args = ap.parse_args(argv)
 
     env_path = Path(args.env).expanduser()
+    try:
+        verifications = parse_verify(args.verify)
+    except ValueError as exc:
+        print(failure(str(exc)))
+        return 2
+
     if not env_path.is_file():
         print(failure(f"berkas env tidak ada: {env_path}"))
         return 2
@@ -179,31 +212,35 @@ def main(argv=None) -> int:
     for unit, state in restart_units(args.restart):
         print(f"[ROTASI] restart {unit}: {state}")
 
-    if args.verify_url:
-        ok = True
+    if args.restart:
+        ready = wait_ready(args.healthz)
+        print(f"[ROTASI] siap menerima koneksi: {'ya' if ready else 'TIDAK (30 detik)'}")
+        if not ready:
+            print(failure("control plane tidak menerima koneksi setelah restart"))
+            return 1
+
+    ok = True
+    if args.verify:
         old_tokens = parse_env(Path(args.backup).expanduser().read_text()) if args.backup \
             else parse_env(kept.read_text())
         old_values = env_values(old_tokens)
-        headers = args.verify_header or []
-        body = args.verify_body.encode() if args.verify_body else None
-        for url, header in zip(args.verify_url, headers):
-            key_name = "SDB_ADMIN_KEY" if "Admin" in header else "SDB_WORKER_KEY"
+        for method, url, header, key_name, body in verifications:
             old_key = old_values.get(key_name, "")
-            new_status = probe(url, header, changed[key_name][1], args.verify_method, body)
-            old_status = probe(url, header, old_key, args.verify_method, body)
-            good = new_status in (200, 201, 204) and old_status == 401
+            new_status = probe(url, header, changed[key_name][1], method, body)
+            old_status = probe(url, header, old_key, method, body)
+            good = 200 <= new_status < 300 and old_status == 401
             ok &= good
-            print(f"[ROTASI] {url} [{header}]: baru={new_status} lama={old_status} "
+            print(f"[ROTASI] {method} {url} [{header}]: baru={new_status} lama={old_status} "
                   f"-> {'OK' if good else 'TIDAK VALID'}")
             if not old_key:
                 print("[ROTASI] peringatan: kunci lama tidak ditemukan di cadangan")
 
     health = probe(args.healthz, "X-Probe", "-")
     print(f"[ROTASI] healthz={health}")
-    if health != 200 and args.verify_url:
+    if health != 200 and args.verify:
         print(failure("control plane tidak sehat setelah rotasi"))
         return 1
-    if args.verify_url and not ok:
+    if args.verify and not ok:
         print(failure("kunci baru tidak diterima atau kunci lama masih diterima"))
         return 1
     print("[ROTASI] selesai")

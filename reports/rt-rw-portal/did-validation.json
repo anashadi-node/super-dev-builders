@@ -1,27 +1,27 @@
 {
  "schema": "sdb.did.validation/1",
- "generated_at": "2026-11-06T22:54:05+07:00",
+ "generated_at": "2026-11-07T05:39:32+07:00",
  "handoff": "runs/rt-rw-portal/did/handoff.json",
  "passed": true,
  "metrics": {
   "target": "rt-rw-portal",
   "type": "web",
   "depth": "L2",
-  "findings": 12,
-  "observed": 10,
+  "findings": 17,
+  "observed": 15,
   "inferred": 2,
   "unknowns": 2,
   "blocking_unknowns": 0,
-  "features": 8,
-  "must_features": 7,
+  "features": 14,
+  "must_features": 13,
   "coverage_required": 7,
-  "coverage_covered": 6,
-  "evidence_files": 17,
-  "evidence_bytes": 1830380,
+  "coverage_covered": 7,
+  "evidence_files": 31,
+  "evidence_bytes": 2152907,
   "checks": 27,
   "failed": 0,
-  "observed_ratio": 0.833,
-  "unknown_ratio": 0.143,
+  "observed_ratio": 0.882,
+  "unknown_ratio": 0.105,
   "quality_bar": {
    "min_observed_ratio": 0.7,
    "max_unknown_ratio": 0.3,
@@ -58,7 +58,7 @@
    "id": "R04a_manifest",
    "ok": true,
    "severity": "error",
-   "detail": "17 entri evidence"
+   "detail": "31 entri evidence"
   },
   {
    "id": "R04b_exists",
@@ -184,13 +184,13 @@
    "id": "R12_builders_ready",
    "ok": true,
    "severity": "error",
-   "detail": "builders_ready=False, blocking_unknowns=0"
+   "detail": "builders_ready=True, blocking_unknowns=0"
   },
   {
    "id": "R13_quality_bar",
    "ok": true,
    "severity": "warn",
-   "detail": "observed 0.83, unknown 0.14, coverage 86%"
+   "detail": "observed 0.88, unknown 0.11, coverage 100%"
   }
  ]
 }

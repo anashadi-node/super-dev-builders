@@ -1,0 +1,41 @@
+{
+  "schema": "sdb.did.state_probes/1",
+  "target": "rt-rw-portal",
+  "base_url": "http://127.0.0.1:8091",
+  "login": {"path": "/api/login", "method": "POST"},
+  "empty_markers": ["Belum ada", "Tidak ada", "belum ada", "tidak ada", "Belum tercatat", "kosong", "Empty"],
+  "roles": [
+    {
+      "name": "warga",
+      "email_env": "RT_WARGA_EMAIL",
+      "password_env": "RT_WARGA_PASS",
+      "pages": ["/beranda", "/iuran", "/pengaduan", "/pengumuman", "/profil", "/surat", "/akun"],
+      "error_probes": [
+        {"path": "/api/complaints", "method": "POST", "body": {}, "expect_status_min": 400},
+        {"path": "/api/dues", "method": "POST", "body": {"amount": -5}, "expect_status_min": 400}
+      ]
+    },
+    {
+      "name": "ketua_rt",
+      "email_env": "RT_KETUA_EMAIL",
+      "password_env": "RT_KETUA_PASS",
+      "pages": ["/beranda", "/warga", "/iuran", "/kas", "/laporan", "/pengaduan", "/surat", "/keamanan"]
+    },
+    {
+      "name": "bendahara",
+      "email_env": "RT_BENDAHARA_EMAIL",
+      "password_env": "RT_BENDAHARA_PASS",
+      "pages": ["/kas", "/iuran", "/laporan", "/lintas-rt"]
+    },
+    {
+      "name": "ketua_rw",
+      "email_env": "RT_RW_EMAIL",
+      "password_env": "RT_RW_PASS",
+      "pages": ["/beranda", "/lintas-rt", "/audit", "/warga", "/laporan", "/ops"]
+    }
+  ],
+  "anon": [
+    {"path": "/iuran", "expect_status": 200, "expect_text": ["Masuk"]},
+    {"path": "/warga", "expect_status": 200, "expect_text": ["Masuk"]}
+  ]
+}

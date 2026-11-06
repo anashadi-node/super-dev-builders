@@ -14,6 +14,7 @@ Pemakaian:
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import shutil
 import sys
@@ -154,8 +155,20 @@ def main(argv=None) -> int:
 
     manifest_path = repo_path("reports", "installed-skills.json")
     if not args.dry_run:
-        write_json(manifest_path, {"at": now_iso(), "uninstall": args.uninstall,
-                                   "operations": log, "missing_profiles": missing_profiles})
+        payload = {"uninstall": args.uninstall, "operations": log,
+                   "missing_profiles": missing_profiles}
+        # Jangan tulis ulang bila isinya sama: timestamp volatile membuat
+        # `git status` kotor setiap kali installer dijalankan, dan commit
+        # "chore: timestamp" menutupi perubahan nyata di review.
+        lama = {}
+        if os.path.isfile(manifest_path):
+            try:
+                with open(manifest_path, encoding="utf-8") as fh:
+                    lama = json.load(fh)
+            except (json.JSONDecodeError, OSError):
+                lama = {}
+        if {k: v for k, v in lama.items() if k != "at"} != payload:
+            write_json(manifest_path, {"at": now_iso(), **payload})
     action = "uninstall" if args.uninstall else "install"
     print(f"{action}: {len(log)} operasi" + (" (dry-run)" if args.dry_run else f" | manifest: {manifest_path}"))
     for item in log[:60]:

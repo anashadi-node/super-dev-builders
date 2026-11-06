@@ -203,6 +203,21 @@ def test_bench_pisahkan_ekstra_dari_halusinasi():
     assert res["hallucination_rate"] == pytest.approx(0.5)
 
 
+def test_bench_frasa_label_panjang_tetap_cocok():
+    """Regresi: label yang digabung jadi satu string tidak pernah jadi substring.
+
+    Versi lama menggabung name+keywords+aliases lalu menguji substring utuh,
+    sehingga label panjang selalu "tidak cocok" dan recall jatuh ke 0 palsu.
+    """
+    handoff = {"features": [{"id": "C1", "name": "Fungsi penjumlahan dua bilangan",
+                             "status": "OBSERVED", "evidence": ["E-1"]}]}
+    truth = {"features": [{"id": "G3", "name": "tambah mengembalikan a+b",
+                           "keywords": ["tambah"], "aliases": ["penjumlahan", "jumlah"]}]}
+    res = dv.bench(handoff, truth)
+    assert res["true_positives"] == 1, res
+    assert res["recall"] == pytest.approx(1.0)
+
+
 def test_profiles_konsisten():
     prof = dv.profiles(ROOT)
     assert {"L1", "L2", "L3", "L4"} <= set((prof.get("depths") or {}))

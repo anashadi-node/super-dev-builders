@@ -134,8 +134,13 @@ cat runs/<t>/did/SPEC_DID.md
 
 | Target | Profil/depth | Validasi | Benchmark (label independen) |
 |---|---|---|---|
-| `elf-demo` | binary / L3 | PASS · 27 cek · coverage 5/6 | — (tak ada label) |
+| `elf-demo` | binary / L3 | PASS · 8 temuan · must 4 · coverage 5/6 | **P 1,000 · R 1,000 · F1 1,000** · halusinasi 0 (6 label dari `demo.c` + `nm`) |
 | `e1-app` | api / L2 | PASS · 13 temuan · must 8 · coverage 4/5 | **P 0,909 · R 1,000 · F1 0,952 · halusinasi 0,000** (10 label SPEC, 1 ekstra: bentuk error seragam) |
+
+Sebelum diperbaiki, handoff `elf-demo` hanya menangkap 2 dari 6 perilaku (**recall 0,333**) dan
+mengklaim program “mencetak hasil penjumlahan dua konstanta” — klaim itu **salah**: `main` mencetak
+konstanta `0x2a` (42) dan simbol `tambah` punya **0 call site** (dead code). Kesalahan ditemukan dari
+cross-check `objdump -d`, bukan dari skor lexical — lihat catatan di skill `did-benchmark`.
 
 `e1-app` diuji lewat HTTP nyata (`127.0.0.1:8110`, 18 probe, token diredaksi), bukan dari kode.
 Skor `hallucinated 0` berarti tidak ada fitur yang diklaim OBSERVED tanpa bukti; ekstra dipisah

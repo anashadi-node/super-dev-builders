@@ -1,0 +1,83 @@
+{
+ "target": "elf-demo",
+ "labeler": "sumber targets/elf-demo/demo.c (2026-11-05) + simbol nm + objdump, ditulis sebelum pembandingan DID",
+ "labeled_at": "2026-11-05",
+ "note": "Alias diambil dari kosakata sumber demo.c/objdump (bukan dari teks handoff DID).",
+ "features": [
+  {
+   "id": "G1",
+   "name": "Mencetak literal elf-demo 42 (konstanta 0x2a)",
+   "keywords": [
+    "elf-demo 42",
+    "0x2a"
+   ],
+   "aliases": [
+    "printf",
+    "cetak",
+    "format elf-demo %d",
+    "42"
+   ]
+  },
+  {
+   "id": "G2",
+   "name": "Kode keluar 0",
+   "keywords": [
+    "exit 0",
+    "kode keluar 0"
+   ],
+   "aliases": [
+    "return 0",
+    "kode keluar"
+   ]
+  },
+  {
+   "id": "G3",
+   "name": "Simbol tambah(int,int) mengembalikan a+b",
+   "keywords": [
+    "tambah",
+    "param_1"
+   ],
+   "aliases": [
+    "penjumlahan",
+    "jumlah",
+    "fungsi tambah"
+   ]
+  },
+  {
+   "id": "G4",
+   "name": "tambah tanpa pemanggil (dead code)",
+   "keywords": [
+    "tanpa pemanggil",
+    "dead code"
+   ],
+   "aliases": [
+    "tidak dipanggil",
+    "dead"
+   ]
+  },
+  {
+   "id": "G5",
+   "name": "main tanpa argumen, tidak membaca argv",
+   "keywords": [
+    "main(void)",
+    "argv"
+   ],
+   "aliases": [
+    "main void",
+    "tanpa argumen"
+   ]
+  },
+  {
+   "id": "G6",
+   "name": "Dependensi hanya libc (__printf_chk, __libc_start_main)",
+   "keywords": [
+    "__printf_chk",
+    "libc.so.6"
+   ],
+   "aliases": [
+    "printf_chk",
+    "dependensi dinamis"
+   ]
+  }
+ ]
+}

@@ -1,34 +1,33 @@
 {
  "schema": "sdb.did.validation/1",
- "generated_at": "2026-11-06T17:39:10+07:00",
+ "generated_at": "2026-11-06T19:03:56+07:00",
  "handoff": "runs/elf-demo/did/handoff.json",
  "passed": true,
  "metrics": {
   "target": "elf-demo",
   "type": "binary",
   "depth": "L3",
-  "findings": 7,
-  "observed": 5,
-  "inferred": 1,
-  "unknowns": 2,
+  "findings": 8,
+  "observed": 8,
+  "inferred": 0,
+  "unknowns": 1,
   "blocking_unknowns": 0,
-  "features": 2,
-  "must_features": 1,
+  "features": 6,
+  "must_features": 4,
   "coverage_required": 6,
   "coverage_covered": 5,
-  "evidence_files": 7,
-  "evidence_bytes": 15400,
+  "evidence_files": 10,
+  "evidence_bytes": 17025,
   "checks": 27,
   "failed": 0,
-  "observed_ratio": 0.714,
-  "unknown_ratio": 0.222,
+  "observed_ratio": 1.0,
+  "unknown_ratio": 0.111,
   "quality_bar": {
    "min_observed_ratio": 0.75,
    "max_unknown_ratio": 0.25,
    "min_coverage_pct": 85
   },
   "quality_warnings": [
-   "observed 0.71 < 0.75",
    "coverage 83% < 85%"
   ]
  },
@@ -61,7 +60,7 @@
    "id": "R04a_manifest",
    "ok": true,
    "severity": "error",
-   "detail": "7 entri evidence"
+   "detail": "10 entri evidence"
   },
   {
    "id": "R04b_exists",
@@ -115,7 +114,7 @@
    "id": "R06_unknowns_complete",
    "ok": true,
    "severity": "error",
-   "detail": "2 unknown lengkap"
+   "detail": "1 unknown lengkap"
   },
   {
    "id": "R07a_coverage_present",
@@ -193,7 +192,7 @@
    "id": "R13_quality_bar",
    "ok": false,
    "severity": "warn",
-   "detail": "observed 0.71 < 0.75; coverage 83% < 85%"
+   "detail": "coverage 83% < 85%"
   }
  ]
 }

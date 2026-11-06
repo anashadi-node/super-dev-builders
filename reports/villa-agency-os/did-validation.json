@@ -1,6 +1,6 @@
 {
  "schema": "sdb.did.validation/1",
- "generated_at": "2026-11-07T06:23:53+07:00",
+ "generated_at": "2026-11-07T06:34:30+07:00",
  "handoff": "runs/villa-agency-os/did/handoff.json",
  "passed": true,
  "metrics": {

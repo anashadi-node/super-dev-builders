@@ -352,12 +352,13 @@ def bangun(run_dir: str, db: str, source: str) -> dict:
     if baseline:
         findings.append(
             {"id": "F-015", "status": "OBSERVED",
-             "claim": (f"Baseline uji target pada HEAD 555bc82 (3806 test terkumpul, run 12 worker): "
-                       f"{baseline['failed']} gagal — {', '.join(baseline['failed_ids'])}. "
-                       f"Dua-duanya bukan cacat halaman: preflight menolak karena anchor terbitan berumur 46 hari "
-                       f"melewati batas 45 (VERDICT: NO-GO, murni data/waktu), dan test_refresh_fx_rate lulus 37/37 "
-                       f"saat dijalankan sendiri sehingga terbukti flaky/paralel-sensitif. Build ulang tidak boleh "
-                       f"mewarisi kedua kegagalan ini sebagai ekspektasi."),
+             "claim": (f"Baseline uji target pada HEAD 555bc82: 3806 test terkumpul / 4 skip; run pertama "
+                       f"(12 worker) {baseline['failed']} gagal — {', '.join(baseline['failed_ids'])}; run ulang "
+                       f"penuh memberi 2 gagal (menambah test_refresh_fx_rate). Keduanya bukan cacat halaman: "
+                       f"preflight menolak karena anchor terbitan berumur 46 hari melewati batas 45 (VERDICT: NO-GO, "
+                       f"murni data/waktu), dan test_refresh_fx_rate lulus 37/37 saat dijalankan sendiri sehingga "
+                       f"terbukti flaky/paralel-sensitif. Build ulang tidak boleh mewarisi kedua kegagalan ini "
+                       f"sebagai ekspektasi."),
              "locator": "E-010 short summary + VERDICT",
              "evidence": ["E-010", "E-007"]})
 

@@ -139,6 +139,14 @@ cat runs/<t>/did/SPEC_DID.md
 |---|---|---|---|
 | `elf-demo` | binary / L3 | PASS · 8 temuan · must 4 · coverage 5/6 | **P 1,000 · R 1,000 · F1 1,000** · halusinasi 0 (6 label dari `demo.c` + `nm`) |
 | `e1-app` | api / L2 | PASS · 13 temuan · must 8 · coverage 4/5 | **P 0,909 · R 1,000 · F1 0,952 · halusinasi 0,000** (10 label SPEC, 1 ekstra: bentuk error seragam) |
+| `rt-rw-portal` (target nyata, 6 Nov) | web / L2 | PASS · 12 temuan (10 OBSERVED, 2 INFERRED) · must 7 · coverage 6/7 · unknown 2 non-blocking | belum ada label independen — benchmark menyusul setelah state terautentikasi direkam |
+
+Target nyata pertama lewat jalur ini: **Portal Warga RT-RW v2.0.0** (produk milik Owner, mode A).
+Bukti: 18 rute halaman + 2 darurat, 60 endpoint `/api`, 18 fungsi `view*`, 25 tabel, 37 token desain,
+23 dari 24 path loopback membalas 200 (`/setup` 401 sesuai desain), suite uji repo target 430 lulus / 5 dilewati / 4 subtest (332 detik).
+Handoff: `runs/rt-rw-portal/did/handoff.json` (17 berkas bukti ber-hash) → `SPEC_DID.md`.
+Yang **belum** ditutup dan tidak boleh diklaim: state terautentikasi (empty/error per modul) belum
+dirender, dan integrasi pembayaran/CCTV baru diuji konfigurasinya (dua `unknown` non-blocking).
 
 Sebelum diperbaiki, handoff `elf-demo` hanya menangkap 2 dari 6 perilaku (**recall 0,333**) dan
 mengklaim program “mencetak hasil penjumlahan dua konstanta” — klaim itu **salah**: `main` mencetak

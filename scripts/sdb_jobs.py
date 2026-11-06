@@ -110,15 +110,26 @@ def set_status(job_id: int, status: str, note: str = "") -> None:
                         (job_id, time.time(), status, note[:4000]))
 
 
+# Nama kolom TIDAK PERNAH masuk ke string SQL: tiap kolom punya pernyataan utuh
+# sendiri. Semgrep/ruff menandai f-string SQL di sini sebagai vektor injeksi; cara
+# termurah menutupnya adalah menghapus interpolasi, bukan menandainya "diterima".
+_SET_FIELD_SQL = {
+    "model": "UPDATE jobs SET model=?, updated=? WHERE id=?",
+    "session_spec": "UPDATE jobs SET session_spec=?, updated=? WHERE id=?",
+    "session_build": "UPDATE jobs SET session_build=?, updated=? WHERE id=?",
+    "error": "UPDATE jobs SET error=?, updated=? WHERE id=?",
+    "dir": "UPDATE jobs SET dir=?, updated=? WHERE id=?",
+    "title": "UPDATE jobs SET title=?, updated=? WHERE id=?",
+}
+
+
 def set_field(job_id: int, **fields) -> None:
-    allowed = {"model", "session_spec", "session_build", "error", "dir", "title"}
-    cols = {k: v for k, v in fields.items() if k in allowed}
+    cols = {k: v for k, v in fields.items() if k in _SET_FIELD_SQL}
     if not cols:
         return
-    sets = ", ".join(f"{k}=?" for k in cols)
     with connect() as con:
-        con.execute(f"UPDATE jobs SET {sets}, updated=? WHERE id=?",
-                    (*cols.values(), time.time(), job_id))
+        for nama, nilai in cols.items():
+            con.execute(_SET_FIELD_SQL[nama], (nilai, time.time(), job_id))
 
 
 def add_event(job_id: int, kind: str, text: str) -> None:

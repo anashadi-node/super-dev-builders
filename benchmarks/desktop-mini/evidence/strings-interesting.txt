@@ -1,0 +1,5 @@
+https://updates.mini.example/v1/desktop
+~/.local/share/mini-desktop/mini.db
+stable
+/tmp/mini-desktop.sock
+update=%s channel=%s

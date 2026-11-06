@@ -1,0 +1,6 @@
+                 w __cxa_finalize
+                 w __gmon_start__
+                 w _ITM_deregisterTMCloneTable
+                 w _ITM_registerTMCloneTable
+00000000000010f9 T mini_sign
+0000000000001113 T mini_size

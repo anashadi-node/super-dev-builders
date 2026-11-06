@@ -1,0 +1,124 @@
+{
+ "target": "android-mini",
+ "labeler": "fixtures/android-mini/src (manifest + assets/config.json + libmini.c), ditulis 2026-11-06 sebelum handoff dibandingkan",
+ "labeled_at": "2026-11-06",
+ "note": "Fixture format-sederhana: manifest TEKS, tanpa classes.dex. Label menyatakan hal itu apa adanya.",
+ "features": [
+  {
+   "id": "G1",
+   "name": "Package io.mini.demo versi 2.1.0 (versionCode 21)",
+   "keywords": [
+    "io.mini.demo",
+    "2.1.0"
+   ],
+   "aliases": [
+    "package",
+    "versionName",
+    "versionCode"
+   ]
+  },
+  {
+   "id": "G2",
+   "name": "Permission INTERNET",
+   "keywords": [
+    "INTERNET"
+   ],
+   "aliases": [
+    "uses-permission",
+    "android.permission.INTERNET"
+   ]
+  },
+  {
+   "id": "G3",
+   "name": "Permission CAMERA",
+   "keywords": [
+    "CAMERA"
+   ],
+   "aliases": [
+    "android.permission.CAMERA"
+   ]
+  },
+  {
+   "id": "G4",
+   "name": "Dua activity: MainActivity exported dan SettingsActivity tidak exported",
+   "keywords": [
+    "MainActivity",
+    "SettingsActivity"
+   ],
+   "aliases": [
+    "activity",
+    "exported",
+    "LAUNCHER"
+   ]
+  },
+  {
+   "id": "G5",
+   "name": "URL update https://updates.mini.example/v1/android",
+   "keywords": [
+    "updates.mini.example/v1/android"
+   ],
+   "aliases": [
+    "UPDATE_URL",
+    "meta-data"
+   ]
+  },
+  {
+   "id": "G6",
+   "name": "Penyimpanan sqlite mini.db di direktori files/",
+   "keywords": [
+    "mini.db",
+    "sqlite"
+   ],
+   "aliases": [
+    "storage",
+    "files/"
+   ]
+  },
+  {
+   "id": "G7",
+   "name": "API base https://api.mini.example/v2",
+   "keywords": [
+    "api.mini.example/v2"
+   ],
+   "aliases": [
+    "api_base"
+   ]
+  },
+  {
+   "id": "G8",
+   "name": "Pustaka native lib/x86_64/libmini.so dengan simbol mini_sign dan mini_size",
+   "keywords": [
+    "libmini.so",
+    "mini_sign",
+    "mini_size"
+   ],
+   "aliases": [
+    "ELF",
+    "x86_64",
+    "shared object"
+   ]
+  },
+  {
+   "id": "G9",
+   "name": "APK memuat sumber C jni/libmini.c di dalam paket",
+   "keywords": [
+    "jni/libmini.c"
+   ],
+   "aliases": [
+    "kebocoran sumber",
+    "source shipped"
+   ]
+  },
+  {
+   "id": "G10",
+   "name": "APK tidak memuat classes.dex",
+   "keywords": [
+    "classes.dex"
+   ],
+   "aliases": [
+    "dex",
+    "tanpa dex"
+   ]
+  }
+ ]
+}

@@ -392,6 +392,167 @@
    "sebab": "urlopen hanya ke https://api.telegram.org setelah skema+host diperiksa; token tidak dicetak, galat dilaporkan tanpa URL",
    "pemilik": "D8",
    "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "scripts/docs_lint.py",
+   "sebab": "memanggil git dengan argv list tetap, shell=False; argumen path dari variabel internal",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S607",
+   "berkas": "scripts/docs_lint.py",
+   "sebab": "git diambil dari PATH lingkungan dev; bukan input pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "scripts/provider_snapshot.py",
+   "sebab": "_run() menerima argv list dari pemanggil internal; shell=False",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S607",
+   "berkas": "scripts/provider_snapshot.py",
+   "sebab": "bwrap dicari dari PATH untuk uji sandbox; gagal = fitur ditandai tidak tersedia",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S310",
+   "berkas": "scripts/rotate_control_keys.py",
+   "sebab": "urlopen hanya ke endpoint kontrol 127.0.0.1:8088 (healthz/verify), skema http lokal",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "scripts/rotate_control_keys.py",
+   "sebab": "systemctl --user restart/is-active dengan unit dari daftar internal",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S607",
+   "berkas": "scripts/rotate_control_keys.py",
+   "sebab": "systemctl diambil dari PATH; unit bukan input pengguna",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S310",
+   "berkas": "scripts/sdb_build_worker.py",
+   "sebab": "urlopen ke https://api.telegram.org (host tetap, bukan input pengguna)",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "scripts/sdb_build_worker.py",
+   "sebab": "Popen agen CLI dengan argv tetap; token bot dibuang dari env sebelum spawn",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "scripts/sdb_report.py",
+   "sebab": "run() memanggil argv list internal (git/gh) tanpa shell",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S310",
+   "berkas": "scripts/sdb_report.py",
+   "sebab": "urlopen ke https://api.telegram.org (host tetap)",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "scripts/sdb_tg_bot.py",
+   "sebab": "memanggil CLI agen dengan argv tetap; prompt lewat stdin, bukan argv",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S101",
+   "berkas": "scripts/stage_registry.py",
+   "sebab": "assert setelah guard ValueError; hanya menyempitkan tipe, bukan validasi input",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "tests/test_did_gate.py",
+   "sebab": "subprocess di uji memakai sys.executable absolut + argv tetap",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "tests/test_docs_lint.py",
+   "sebab": "subprocess di uji memakai sys.executable absolut + argv tetap",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S607",
+   "berkas": "tests/test_docs_lint.py",
+   "sebab": "git diambil dari PATH pada uji; repo uji dibuat di tmp_path",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S310",
+   "berkas": "tests/test_inbox_api.py",
+   "sebab": "urlopen ke server uji lokal ThreadingHTTPServer 127.0.0.1 port acak",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "tests/test_repo_hygiene_rules.py",
+   "sebab": "subprocess git pada fixture tmp_path dengan argv tetap",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S607",
+   "berkas": "tests/test_repo_hygiene_rules.py",
+   "sebab": "git diambil dari PATH pada uji; repo uji di tmp_path",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "tools/mutation_gate.py",
+   "sebab": "subprocess pytest dengan argv internal tetap",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "tools/recon-forge.py",
+   "sebab": "chrome/node dipanggil dengan jalur absolut hasil resolve, argv list",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "scripts/build_fixtures.py",
+   "sebab": "gcc diambil via shutil.which (jalur absolut) + argv list tetap, shell=False",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
+  },
+  {
+   "kode": "S603",
+   "berkas": "scripts/release_rehearsal.py",
+   "sebab": "subprocess dengan python/git jalur absolut dan argv list tetap, shell=False",
+   "pemilik": "D8",
+   "kedaluwarsa": "2027-01-31"
   }
  ]
 }

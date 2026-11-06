@@ -1,0 +1,480 @@
+{
+ "schema": "sdb.did.handoff/1",
+ "generated_at": "2026-11-06T20:41:59+07:00",
+ "target": {
+  "slug": "desktop-mini",
+  "name": "desktop-mini (ELF x86-64 + installer + kanal update)",
+  "type": "desktop",
+  "authorization": {
+   "gate0_verdict": "PASS",
+   "manifest": "evidence/desktop-mini/authorization.yaml"
+  }
+ },
+ "scope": {
+  "depth": "L3",
+  "profile": "desktop",
+  "in_scope": [
+   "header & segmen ELF",
+   "simbol statis",
+   "string menarik",
+   "disassembly main",
+   "installer & kanal update",
+   "eksekusi lokal tanpa argumen"
+  ],
+  "out_of_scope": [
+   "network live ke updates.mini.example",
+   "GUI toolkit",
+   "packaging MSI/dmg"
+  ]
+ },
+ "providers": [
+  {
+   "id": "binutils",
+   "version": "readelf/objdump/nm"
+  },
+  {
+   "id": "file",
+   "version": "5.41"
+  }
+ ],
+ "evidence_manifest": [
+  {
+   "id": "E-001",
+   "path": "benchmarks/desktop-mini/evidence/readelf-header.txt",
+   "sha256": "98eeb4ed273308b8054768306ba418fabf5b4ddb72efb17447255048b3b48343",
+   "captured_at": "2026-11-06T20:41:40+07:00",
+   "status": "OBSERVED",
+   "authority": "readelf -h"
+  },
+  {
+   "id": "E-002",
+   "path": "benchmarks/desktop-mini/evidence/readelf-dynamic.txt",
+   "sha256": "2334ac014207fd70467fc540b6c9d9494a4a466ce7c4f4c6b3df52ddf609bf40",
+   "captured_at": "2026-11-06T20:41:40+07:00",
+   "status": "OBSERVED",
+   "authority": "readelf -d"
+  },
+  {
+   "id": "E-003",
+   "path": "benchmarks/desktop-mini/evidence/symbols.txt",
+   "sha256": "05e7e5927d36c119f8250e80707da69426854bdafbf23099eb4f9feac64fb5b9",
+   "captured_at": "2026-11-06T20:41:40+07:00",
+   "status": "OBSERVED",
+   "authority": "nm"
+  },
+  {
+   "id": "E-004",
+   "path": "benchmarks/desktop-mini/evidence/strings-interesting.txt",
+   "sha256": "00fe34a2bcd9d95744817ee711e087ddcfb1927eac3998e073b50cbe84059c4c",
+   "captured_at": "2026-11-06T20:41:40+07:00",
+   "status": "OBSERVED",
+   "authority": "strings"
+  },
+  {
+   "id": "E-005",
+   "path": "benchmarks/desktop-mini/evidence/objdump-main.txt",
+   "sha256": "6d017dc812589e6f72035f93b82d97b7388673f99d97e06588b816716176710e",
+   "captured_at": "2026-11-06T20:41:40+07:00",
+   "status": "OBSERVED",
+   "authority": "objdump -d"
+  },
+  {
+   "id": "E-006",
+   "path": "benchmarks/desktop-mini/evidence/run.txt",
+   "sha256": "55ab1e5fb88e15a5b7f19423c2c85311a5505ce03eb8ece7aedc53126b952547",
+   "captured_at": "2026-11-06T20:41:40+07:00",
+   "status": "OBSERVED",
+   "authority": "eksekusi nyata"
+  },
+  {
+   "id": "E-007",
+   "path": "benchmarks/desktop-mini/evidence/installer.sh.txt",
+   "sha256": "da0b9acf1e6ef6c4acfdb2eb7ee7d12e0547bcd017ee064ede3bb3fd0cfa3713",
+   "captured_at": "2026-11-06T20:41:40+07:00",
+   "status": "OBSERVED",
+   "authority": "baca sumber installer"
+  },
+  {
+   "id": "E-008",
+   "path": "benchmarks/desktop-mini/evidence/update-channel.json",
+   "sha256": "c012ecd21abc429efd182bfab0c28719077da6f3582c65ce6c7c2d5a3dbe8f6f",
+   "captured_at": "2026-11-06T20:41:40+07:00",
+   "status": "OBSERVED",
+   "authority": "baca berkas kanal"
+  }
+ ],
+ "findings": [
+  {
+   "id": "F-001",
+   "status": "OBSERVED",
+   "claim": "ELF64 x86-64 tipe DYN (PIE) dengan entry point dan RELRO aktif.",
+   "locator": "readelf-header.txt + readelf-dynamic.txt",
+   "evidence": [
+    "E-001",
+    "E-002"
+   ]
+  },
+  {
+   "id": "F-002",
+   "status": "OBSERVED",
+   "claim": "String biner memuat https://updates.mini.example/v1/desktop dan kanal stable.",
+   "locator": "strings-interesting.txt",
+   "evidence": [
+    "E-004"
+   ]
+  },
+  {
+   "id": "F-003",
+   "status": "OBSERVED",
+   "claim": "IPC memakai unix socket /tmp/mini-desktop.sock; state disimpan di ~/.local/share/mini-desktop/mini.db.",
+   "locator": "strings-interesting.txt",
+   "evidence": [
+    "E-004"
+   ]
+  },
+  {
+   "id": "F-004",
+   "status": "OBSERVED",
+   "claim": "Simbol global: cek_update, kanal, alamat_ipc, path_state, main.",
+   "locator": "symbols.txt",
+   "evidence": [
+    "E-003"
+   ]
+  },
+  {
+   "id": "F-005",
+   "status": "OBSERVED",
+   "claim": "main memanggil puts sekali lalu __printf_chk dua kali (versi, lalu update/ipc/store), return 0.",
+   "locator": "objdump-main.txt",
+   "evidence": [
+    "E-005"
+   ]
+  },
+  {
+   "id": "F-006",
+   "status": "OBSERVED",
+   "claim": "Eksekusi nyata: cetak 'mini-desktop 1.4.2', update=https://updates.mini.example/v1/desktop channel=stable, ipc/store; exit 0.",
+   "locator": "run.txt",
+   "evidence": [
+    "E-007"
+   ]
+  },
+  {
+   "id": "F-007",
+   "status": "OBSERVED",
+   "claim": "installer.sh idempoten: memakai cmp, salin hanya bila berkas terpasang berbeda.",
+   "locator": "installer.sh.txt",
+   "evidence": [
+    "E-008"
+   ]
+  },
+  {
+   "id": "F-008",
+   "status": "OBSERVED",
+   "claim": "update-channel.json: channel stable, check_url .../desktop/stable.json, poll 3600 detik.",
+   "locator": "update-channel.json",
+   "evidence": [
+    "E-008"
+   ]
+  }
+ ],
+ "unknowns": [
+  {
+   "id": "U-001",
+   "question": "Apakah ada jalur update otomatis yang mengunduh dan mengeksekusi payload?",
+   "impact": "non-blocking",
+   "probe": "jalankan dengan strace dan blokir egress; bila tidak ada connect(), tidak ada auto-update aktif"
+  },
+  {
+   "id": "U-002",
+   "question": "Apakah IPC socket menerima perintah dengan validasi?",
+   "impact": "non-blocking",
+   "probe": "buat socket dummy di /tmp dan kirim payload; catat apakah proses membuka socket (dugaan: string saja, tanpa implementasi)"
+  }
+ ],
+ "coverage": [
+  {
+   "category": "installer",
+   "status": "COVERED",
+   "found": 1,
+   "evidence": [
+    "E-008"
+   ]
+  },
+  {
+   "category": "update_channel",
+   "status": "COVERED",
+   "found": 2,
+   "evidence": [
+    "E-004",
+    "E-008"
+   ]
+  },
+  {
+   "category": "ipc",
+   "status": "COVERED",
+   "found": 1,
+   "evidence": [
+    "E-004",
+    "E-003"
+   ]
+  },
+  {
+   "category": "storage",
+   "status": "COVERED",
+   "found": 1,
+   "evidence": [
+    "E-004"
+   ]
+  },
+  {
+   "category": "network",
+   "status": "COVERED",
+   "found": 1,
+   "evidence": [
+    "E-004"
+   ]
+  },
+  {
+   "category": "internals",
+   "status": "COVERED",
+   "found": 6,
+   "evidence": [
+    "E-001",
+    "E-003",
+    "E-005"
+   ]
+  }
+ ],
+ "features": [
+  {
+   "id": "FT-01",
+   "name": "ELF64 x86-64 PIE (tipe DYN), RELRO aktif",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-001"
+   ],
+   "evidence": [
+    "E-001",
+    "E-002"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "artefak fixture",
+     "when": "bukti yang dirujuk diperiksa",
+     "then": "pernyataan pada nama fitur terverifikasi"
+    }
+   ]
+  },
+  {
+   "id": "FT-02",
+   "name": "URL update https://updates.mini.example/v1/desktop",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-002"
+   ],
+   "evidence": [
+    "E-004"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "artefak fixture",
+     "when": "bukti yang dirujuk diperiksa",
+     "then": "pernyataan pada nama fitur terverifikasi"
+    }
+   ]
+  },
+  {
+   "id": "FT-03",
+   "name": "Kanal update stable dengan check_url stable.json dan poll 3600 detik",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-002",
+    "F-008"
+   ],
+   "evidence": [
+    "E-004",
+    "E-008"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "artefak fixture",
+     "when": "bukti yang dirujuk diperiksa",
+     "then": "pernyataan pada nama fitur terverifikasi"
+    }
+   ]
+  },
+  {
+   "id": "FT-04",
+   "name": "IPC lewat unix socket /tmp/mini-desktop.sock",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-003"
+   ],
+   "evidence": [
+    "E-004"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "artefak fixture",
+     "when": "bukti yang dirujuk diperiksa",
+     "then": "pernyataan pada nama fitur terverifikasi"
+    }
+   ]
+  },
+  {
+   "id": "FT-05",
+   "name": "Penyimpanan ~/.local/share/mini-desktop/mini.db",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-003"
+   ],
+   "evidence": [
+    "E-004"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "artefak fixture",
+     "when": "bukti yang dirujuk diperiksa",
+     "then": "pernyataan pada nama fitur terverifikasi"
+    }
+   ]
+  },
+  {
+   "id": "FT-06",
+   "name": "Installer idempoten: cmp sebelum menyalin",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-007"
+   ],
+   "evidence": [
+    "E-008"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "artefak fixture",
+     "when": "bukti yang dirujuk diperiksa",
+     "then": "pernyataan pada nama fitur terverifikasi"
+    }
+   ]
+  },
+  {
+   "id": "FT-07",
+   "name": "Simbol cek_update, kanal, alamat_ipc, path_state",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-004"
+   ],
+   "evidence": [
+    "E-003"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "artefak fixture",
+     "when": "bukti yang dirujuk diperiksa",
+     "then": "pernyataan pada nama fitur terverifikasi"
+    }
+   ]
+  },
+  {
+   "id": "FT-08",
+   "name": "main mencetak versi 1.4.2 lalu update/ipc/store dan exit 0",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-005",
+    "F-006"
+   ],
+   "evidence": [
+    "E-005",
+    "E-007"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "artefak fixture",
+     "when": "bukti yang dirujuk diperiksa",
+     "then": "pernyataan pada nama fitur terverifikasi"
+    }
+   ]
+  }
+ ],
+ "build_seeds": {
+  "entities": [
+   {
+    "name": "desktop-mini app",
+    "status": "OBSERVED",
+    "evidence": [
+     "E-001"
+    ]
+   }
+  ],
+  "api": [
+   {
+    "endpoint": "https://updates.mini.example/v1/desktop",
+    "status": "OBSERVED",
+    "evidence": [
+     "E-004"
+    ]
+   }
+  ],
+  "states": [
+   {
+    "name": "kanal stable",
+    "status": "OBSERVED",
+    "evidence": [
+     "E-008"
+    ]
+   }
+  ],
+  "design_tokens": {},
+  "non_functional": [
+   {
+    "item": "PIE + RELRO; tanpa NX-hardening tambahan",
+    "status": "OBSERVED",
+    "evidence": [
+     "E-001",
+     "E-002"
+    ]
+   }
+  ],
+  "functions": [
+   {
+    "name": "cek_update",
+    "status": "OBSERVED",
+    "behavior": "mengembalikan UPDATE_URL",
+    "evidence": [
+     "E-003"
+    ]
+   }
+  ]
+ },
+ "handoff": {
+  "next_division": "sdb-builder",
+  "summary": "Fixture desktop: 8 temuan, 6 kategori profil COVERED, dua unknown non-blocking (tak ada auto-update aktif).",
+  "open_questions": [
+   "implementasi IPC belum ada; string saja — jangan dianggap fitur jadi"
+  ],
+  "builders_ready": true
+ },
+ "budget": {
+  "used": {
+   "tool_calls": 11,
+   "minutes": 14,
+   "evidence_bytes": 4474
+  },
+  "limits_note": "profil L3: 120 panggilan / 180 menit"
+ },
+ "discipline": {
+  "replica_skill_used": false,
+  "wrote_code": false,
+  "mcp_registered": false,
+  "redaction_applied": true
+ }
+}

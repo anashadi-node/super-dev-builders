@@ -1,0 +1,5 @@
+{
+  "channel": "stable",
+  "check_url": "https://updates.mini.example/v1/desktop/stable.json",
+  "poll_seconds": 3600
+}

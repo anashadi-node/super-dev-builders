@@ -1,0 +1,11 @@
+{
+  "gate": "gate0",
+  "verdict": "PASS",
+  "checked_at": "2026-11-06T20:41:29+0700",
+  "manifest": "/home/anashadi/super-dev-builders/evidence/android-mini/authorization.yaml",
+  "target": "android-mini",
+  "mode": "B",
+  "fail": [],
+  "blocked": [],
+  "warn": []
+}

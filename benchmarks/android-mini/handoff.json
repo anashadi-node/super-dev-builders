@@ -1,0 +1,479 @@
+{
+ "schema": "sdb.did.handoff/1",
+ "generated_at": "2026-11-06T20:41:50+07:00",
+ "target": {
+  "slug": "android-mini",
+  "name": "android-mini (APK fixture: manifest teks + pustaka native)",
+  "type": "mobile",
+  "authorization": {
+   "gate0_verdict": "PASS",
+   "manifest": "evidence/android-mini/authorization.yaml"
+  }
+ },
+ "scope": {
+  "depth": "L3",
+  "profile": "mobile",
+  "in_scope": [
+   "inventaris zip APK",
+   "isi AndroidManifest.xml",
+   "assets/config.json",
+   "pustaka native .so"
+  ],
+  "out_of_scope": [
+   "decompile DEX (JDK/JADX tidak ada di mesin ini)",
+   "runtime trace",
+   "jaringan"
+  ]
+ },
+ "providers": [
+  {
+   "id": "unzip",
+   "version": "6.00"
+  },
+  {
+   "id": "file/readelf/nm",
+   "version": "binutils"
+  }
+ ],
+ "evidence_manifest": [
+  {
+   "id": "E-001",
+   "path": "benchmarks/android-mini/evidence/apk-inventory.txt",
+   "sha256": "3d9d69e88c2c55acce39633f46fad000b8664dc2b46c58e83c7aef8a932370d8",
+   "captured_at": "2026-11-06T20:41:40+07:00",
+   "status": "OBSERVED",
+   "authority": "unzip -l"
+  },
+  {
+   "id": "E-002",
+   "path": "benchmarks/android-mini/evidence/manifest.xml",
+   "sha256": "3e23ce42194970875b47b29936efe3681601ab48adc09f54638d92ee92ef04d4",
+   "captured_at": "2026-11-06T20:41:40+07:00",
+   "status": "OBSERVED",
+   "authority": "unzip -p AndroidManifest.xml"
+  },
+  {
+   "id": "E-003",
+   "path": "benchmarks/android-mini/evidence/assets-config.json",
+   "sha256": "b4a449614ff563e46db8afe337427995757a2158de9e4eaf01d35d3e5afc4d30",
+   "captured_at": "2026-11-06T20:41:40+07:00",
+   "status": "OBSERVED",
+   "authority": "unzip -p assets/config.json"
+  },
+  {
+   "id": "E-004",
+   "path": "benchmarks/android-mini/evidence/native-file.txt",
+   "sha256": "789de2f810713fd3c0daecac1e633e4dab59372440cc747fae9ac1ab8c250ac2",
+   "captured_at": "2026-11-06T20:41:40+07:00",
+   "status": "OBSERVED",
+   "authority": "file + readelf -h"
+  },
+  {
+   "id": "E-005",
+   "path": "benchmarks/android-mini/evidence/native-symbols.txt",
+   "sha256": "e83040ee4661858d133501b16fcd006d5c27b04c1a8502d94d874860e4fa0907",
+   "captured_at": "2026-11-06T20:41:40+07:00",
+   "status": "OBSERVED",
+   "authority": "nm -D"
+  }
+ ],
+ "findings": [
+  {
+   "id": "F-001",
+   "status": "OBSERVED",
+   "claim": "Manifest menyatakan package io.mini.demo, versionName 2.1.0, versionCode 21.",
+   "locator": "manifest.xml:3",
+   "evidence": [
+    "E-002"
+   ]
+  },
+  {
+   "id": "F-002",
+   "status": "OBSERVED",
+   "claim": "Dua permission diminta: INTERNET dan CAMERA.",
+   "locator": "manifest.xml uses-permission",
+   "evidence": [
+    "E-002"
+   ]
+  },
+  {
+   "id": "F-003",
+   "status": "OBSERVED",
+   "claim": "Dua activity: .MainActivity (exported=true, LAUNCHER) dan .SettingsActivity (exported=false).",
+   "locator": "manifest.xml activity",
+   "evidence": [
+    "E-002"
+   ]
+  },
+  {
+   "id": "F-004",
+   "status": "OBSERVED",
+   "claim": "meta-data io.mini.UPDATE_URL berisi https://updates.mini.example/v1/android.",
+   "locator": "manifest.xml meta-data",
+   "evidence": [
+    "E-002"
+   ]
+  },
+  {
+   "id": "F-005",
+   "status": "OBSERVED",
+   "claim": "assets/config.json: api_base https://api.mini.example/v2, storage sqlite mini.db di files/, endpoint upload https://upload.mini.example/v2/photo.",
+   "locator": "assets-config.json",
+   "evidence": [
+    "E-003"
+   ]
+  },
+  {
+   "id": "F-006",
+   "status": "OBSERVED",
+   "claim": "APK memuat lib/x86_64/libmini.so 15136 byte, ELF shared object x86-64 dengan simbol mini_sign dan mini_size.",
+   "locator": "apk-inventory.txt + native-file.txt + native-symbols.txt",
+   "evidence": [
+    "E-001",
+    "E-004",
+    "E-005"
+   ]
+  },
+  {
+   "id": "F-007",
+   "status": "OBSERVED",
+   "claim": "APK juga memuat jni/libmini.c — sumber C ikut terkirim di dalam paket (kebocoran sumber).",
+   "locator": "apk-inventory.txt",
+   "evidence": [
+    "E-001"
+   ]
+  },
+  {
+   "id": "F-008",
+   "status": "OBSERVED",
+   "claim": "Tidak ada classes.dex di dalam APK; enam entri saja.",
+   "locator": "apk-inventory.txt",
+   "evidence": [
+    "E-001"
+   ]
+  }
+ ],
+ "unknowns": [
+  {
+   "id": "U-001",
+   "question": "Apakah manifest biner (AXML) berbeda isinya dari teks ini?",
+   "impact": "non-blocking",
+   "probe": "jalankan aapt2 dump xmltree pada APK asli bila aapt2 tersedia (tidak ada di mesin ini)"
+  },
+  {
+   "id": "U-002",
+   "question": "Apakah DEX akan menambah permission/endpoint tersembunyi?",
+   "impact": "non-blocking",
+   "probe": "bila JDK tersedia: jadx -d out apk lalu bandingkan konstanta URL/permission"
+  }
+ ],
+ "coverage": [
+  {
+   "category": "manifest",
+   "status": "COVERED",
+   "found": 8,
+   "evidence": [
+    "E-002"
+   ]
+  },
+  {
+   "category": "permissions",
+   "status": "COVERED",
+   "found": 2,
+   "evidence": [
+    "E-002"
+   ]
+  },
+  {
+   "category": "screens",
+   "status": "COVERED",
+   "found": 2,
+   "evidence": [
+    "E-002"
+   ]
+  },
+  {
+   "category": "storage",
+   "status": "COVERED",
+   "found": 1,
+   "evidence": [
+    "E-003"
+   ]
+  },
+  {
+   "category": "network",
+   "status": "COVERED",
+   "found": 3,
+   "evidence": [
+    "E-002",
+    "E-003"
+   ]
+  },
+  {
+   "category": "internals",
+   "status": "COVERED",
+   "found": 6,
+   "evidence": [
+    "E-001",
+    "E-004",
+    "E-005"
+   ]
+  }
+ ],
+ "features": [
+  {
+   "id": "FT-01",
+   "name": "Manifest: package io.mini.demo versi 2.1.0 (versionCode 21)",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-001"
+   ],
+   "evidence": [
+    "E-002"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "artefak fixture",
+     "when": "bukti yang dirujuk diperiksa",
+     "then": "pernyataan pada nama fitur terverifikasi"
+    }
+   ]
+  },
+  {
+   "id": "FT-02",
+   "name": "Permission INTERNET diminta",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-002"
+   ],
+   "evidence": [
+    "E-002"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "artefak fixture",
+     "when": "bukti yang dirujuk diperiksa",
+     "then": "pernyataan pada nama fitur terverifikasi"
+    }
+   ]
+  },
+  {
+   "id": "FT-03",
+   "name": "Permission CAMERA diminta",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-002"
+   ],
+   "evidence": [
+    "E-002"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "artefak fixture",
+     "when": "bukti yang dirujuk diperiksa",
+     "then": "pernyataan pada nama fitur terverifikasi"
+    }
+   ]
+  },
+  {
+   "id": "FT-04",
+   "name": "Dua activity: MainActivity exported dan SettingsActivity tidak exported",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-003"
+   ],
+   "evidence": [
+    "E-002"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "artefak fixture",
+     "when": "bukti yang dirujuk diperiksa",
+     "then": "pernyataan pada nama fitur terverifikasi"
+    }
+   ]
+  },
+  {
+   "id": "FT-05",
+   "name": "URL update https://updates.mini.example/v1/android",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-004"
+   ],
+   "evidence": [
+    "E-002"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "artefak fixture",
+     "when": "bukti yang dirujuk diperiksa",
+     "then": "pernyataan pada nama fitur terverifikasi"
+    }
+   ]
+  },
+  {
+   "id": "FT-06",
+   "name": "Penyimpanan sqlite mini.db di direktori files/",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-005"
+   ],
+   "evidence": [
+    "E-003"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "artefak fixture",
+     "when": "bukti yang dirujuk diperiksa",
+     "then": "pernyataan pada nama fitur terverifikasi"
+    }
+   ]
+  },
+  {
+   "id": "FT-07",
+   "name": "API base https://api.mini.example/v2 dan endpoint upload",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-005"
+   ],
+   "evidence": [
+    "E-003"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "artefak fixture",
+     "when": "bukti yang dirujuk diperiksa",
+     "then": "pernyataan pada nama fitur terverifikasi"
+    }
+   ]
+  },
+  {
+   "id": "FT-08",
+   "name": "Pustaka native lib/x86_64/libmini.so dengan simbol mini_sign dan mini_size",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-006"
+   ],
+   "evidence": [
+    "E-001",
+    "E-004",
+    "E-005"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "artefak fixture",
+     "when": "bukti yang dirujuk diperiksa",
+     "then": "pernyataan pada nama fitur terverifikasi"
+    }
+   ]
+  },
+  {
+   "id": "FT-09",
+   "name": "Sumber jni/libmini.c ikut terkirim di APK",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-007"
+   ],
+   "evidence": [
+    "E-001"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "artefak fixture",
+     "when": "bukti yang dirujuk diperiksa",
+     "then": "pernyataan pada nama fitur terverifikasi"
+    }
+   ]
+  },
+  {
+   "id": "FT-10",
+   "name": "APK tidak memuat classes.dex",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-008"
+   ],
+   "evidence": [
+    "E-001"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "artefak fixture",
+     "when": "bukti yang dirujuk diperiksa",
+     "then": "pernyataan pada nama fitur terverifikasi"
+    }
+   ]
+  }
+ ],
+ "build_seeds": {
+  "entities": [
+   {
+    "name": "Mini Demo app",
+    "status": "OBSERVED",
+    "evidence": [
+     "E-002"
+    ]
+   }
+  ],
+  "api": [
+   {
+    "endpoint": "https://api.mini.example/v2",
+    "status": "OBSERVED",
+    "evidence": [
+     "E-003"
+    ]
+   }
+  ],
+  "states": [
+   {
+    "name": "launcher MainActivity",
+    "status": "OBSERVED",
+    "evidence": [
+     "E-002"
+    ]
+   }
+  ],
+  "design_tokens": {},
+  "non_functional": [
+   {
+    "item": "sumber C ikut dalam APK (harus dihapus sebelum rilis)",
+    "status": "OBSERVED",
+    "evidence": [
+     "E-001"
+    ]
+   }
+  ],
+  "functions": []
+ },
+ "handoff": {
+  "next_division": "sdb-builder",
+  "summary": "Fixture mobile: 8 temuan, seluruh kategori profil COVERED; dua unknown non-blocking karena tak ada JDK.",
+  "open_questions": [
+   "hapus jni/libmini.c dari paket sebelum dipakai sebagai contoh produksi"
+  ],
+  "builders_ready": true
+ },
+ "budget": {
+  "used": {
+   "tool_calls": 9,
+   "minutes": 12,
+   "evidence_bytes": 3007
+  },
+  "limits_note": "profil L3: 120 panggilan / 180 menit"
+ },
+ "discipline": {
+  "replica_skill_used": false,
+  "wrote_code": false,
+  "mcp_registered": false,
+  "redaction_applied": true
+ }
+}

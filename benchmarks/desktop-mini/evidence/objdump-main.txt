@@ -1,0 +1,21 @@
+0000000000001199 <main>:
+    1199:	endbr64
+    119d:	sub    $0x8,%rsp
+    11a1:	lea    0xeca(%rip),%rdi        # 2072 <_IO_stdin_used+0x72>
+    11a8:	call   1060 <puts@plt>
+    11ad:	lea    0xea0(%rip),%rcx        # 2054 <_IO_stdin_used+0x54>
+    11b4:	lea    0xe4d(%rip),%rdx        # 2008 <_IO_stdin_used+0x8>
+    11bb:	lea    0xec3(%rip),%rsi        # 2085 <_IO_stdin_used+0x85>
+    11c2:	mov    $0x2,%edi
+    11c7:	mov    $0x0,%eax
+    11cc:	call   1070 <__printf_chk@plt>
+    11d1:	lea    0xe58(%rip),%rcx        # 2030 <_IO_stdin_used+0x30>
+    11d8:	lea    0xe7c(%rip),%rdx        # 205b <_IO_stdin_used+0x5b>
+    11df:	lea    0xeb5(%rip),%rsi        # 209b <_IO_stdin_used+0x9b>
+    11e6:	mov    $0x2,%edi
+    11eb:	mov    $0x0,%eax
+    11f0:	call   1070 <__printf_chk@plt>
+    11f5:	mov    $0x0,%eax
+    11fa:	add    $0x8,%rsp
+    11fe:	ret
+

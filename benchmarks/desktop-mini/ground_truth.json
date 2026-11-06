@@ -1,0 +1,98 @@
+{
+ "target": "desktop-mini",
+ "labeler": "fixtures/desktop-mini/src (desktop-mini.c + installer.sh + update-channel.json), ditulis 2026-11-06 sebelum handoff",
+ "labeled_at": "2026-11-06",
+ "note": "ELF x86-64 hasil gcc; tidak ada toolkit GUI. Label mengikuti sumber, bukan teks handoff.",
+ "features": [
+  {
+   "id": "G1",
+   "name": "ELF64 x86-64 PIE (tipe DYN)",
+   "keywords": [
+    "ELF64",
+    "DYN"
+   ],
+   "aliases": [
+    "PIE",
+    "executable"
+   ]
+  },
+  {
+   "id": "G2",
+   "name": "URL update https://updates.mini.example/v1/desktop",
+   "keywords": [
+    "updates.mini.example/v1/desktop"
+   ],
+   "aliases": [
+    "UPDATE_URL"
+   ]
+  },
+  {
+   "id": "G3",
+   "name": "Kanal update stable (update-channel.json + string biner)",
+   "keywords": [
+    "stable"
+   ],
+   "aliases": [
+    "channel",
+    "update_channel"
+   ]
+  },
+  {
+   "id": "G4",
+   "name": "IPC lewat unix socket /tmp/mini-desktop.sock",
+   "keywords": [
+    "mini-desktop.sock"
+   ],
+   "aliases": [
+    "IPC_SOCKET",
+    "unix socket"
+   ]
+  },
+  {
+   "id": "G5",
+   "name": "Penyimpanan ~/.local/share/mini-desktop/mini.db",
+   "keywords": [
+    "mini.db"
+   ],
+   "aliases": [
+    "STORE_PATH",
+    "sqlite"
+   ]
+  },
+  {
+   "id": "G6",
+   "name": "Installer idempoten: cmp sebelum menyalin",
+   "keywords": [
+    "installer.sh",
+    "cmp"
+   ],
+   "aliases": [
+    "idempoten",
+    "cp"
+   ]
+  },
+  {
+   "id": "G7",
+   "name": "Simbol cek_update, kanal, alamat_ipc, path_state",
+   "keywords": [
+    "cek_update",
+    "alamat_ipc"
+   ],
+   "aliases": [
+    "kanal",
+    "path_state"
+   ]
+  },
+  {
+   "id": "G8",
+   "name": "main mencetak versi 1.4.2 lalu update/ipc/store, exit 0",
+   "keywords": [
+    "1.4.2"
+   ],
+   "aliases": [
+    "exit 0",
+    "printf"
+   ]
+  }
+ ]
+}

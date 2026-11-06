@@ -141,6 +141,18 @@ did-bench:
 		--json-out "reports/$$slug/did-bench.json"; \
 	cat "reports/$$slug/did-bench.json"
 
+# fixtures: bangun ulang fixture DID mobile/desktop dari sumber yang ikut git.
+# fixtures-verify: buktikan build-nya deterministik (hash sama dengan catatan).
+fixtures:
+	@$(PY_SYS) scripts/build_fixtures.py
+
+fixtures-verify:
+	@$(PY_SYS) scripts/build_fixtures.py --verify
+
+# release-rehearsal: jalankan rantai rilis sungguhan lalu uji gerbangnya (PASS + negatif).
+release-rehearsal:
+	@$(PY_SYS) scripts/release_rehearsal.py
+
 # did-suite: semua benchmark berlabel sekaligus, DENGAN ambang gagal.
 # Skor yang hanya dicetak tidak mencegah kemunduran; target ini memberi exit code.
 did-suite:

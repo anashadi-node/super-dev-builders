@@ -81,12 +81,12 @@ def main(argv=None) -> int:
     with open(args.json_out, "w", encoding="utf-8") as handle:
         json.dump(data, handle, indent=1, ensure_ascii=False)
 
-    print(f"{'target':<12}{'status':<8}{'P':>7}{'R':>7}{'F1':>7}{'extras':>8}{'halusinasi':>11}")
+    print(f"{'target':<15}{'status':<8}{'P':>7}{'R':>7}{'F1':>7}{'extras':>8}{'halusinasi':>11}")
     for row in data["results"]:
         if row["status"] == "SKIP":
-            print(f"{row['target']:<12}{'SKIP':<8}  {row['reason']}")
+            print(f"{row['target']:<15}{'SKIP':<8}  {row['reason']}")
             continue
-        print(f"{row['target']:<12}{row['status']:<8}{row['precision']:>7.3f}{row['recall']:>7.3f}"
+        print(f"{row['target']:<15}{row['status']:<8}{row['precision']:>7.3f}{row['recall']:>7.3f}"
               f"{row['f1']:>7.3f}{row['extras']:>8}{row['hallucinated']:>11}")
         for alasan in row["alasan"]:
             print(f"  - {alasan}")

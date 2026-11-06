@@ -17,7 +17,7 @@
   "in_scope": [
    "instance dashboard milik Owner di loopback 127.0.0.1:8285 - 8300",
    "sumber src/*.py dan src/schema/*.sql",
-   "snapshot HTML 72 halaman (2 dataset  x  36)",
+   "snapshot HTML 101 halaman (48 dataset kosong + 53 berisi)",
    "rute, status HTTP, peta peran, token CSS, skema SQLite"
   ],
   "out_of_scope": [
@@ -33,32 +33,32 @@
    "path": "runs/villa-agency-os/did/evidence/states-empty.json",
    "kind": "http-states",
    "sha256": "e5590031aa61fccdcfc2e051a9986db26d258599f14ae25d8d431053dc4a3a5b",
-   "note": "36 halaman  x  6 peran pada DB kosong; anon 401; 2 probe 404",
-   "captured_at": "2026-11-07T06:17:03+07:00"
+   "note": "48 permintaan halaman (matriks izin) pada DB kosong; anon 401; 2 probe 404",
+   "captured_at": "2026-11-07T06:23:51+07:00"
   },
   {
    "id": "E-002",
    "path": "runs/villa-agency-os/did/evidence/states-populated.json",
    "kind": "http-states",
    "sha256": "3d463e1f2d079d3d90c5735c69911613825977c62cf94f879ecc26992f0053c7",
-   "note": "36 halaman  x  6 peran pada DB berisi (data demo nyata)",
-   "captured_at": "2026-11-07T06:17:03+07:00"
+   "note": "53 permintaan halaman pada DB berisi (data demo nyata)",
+   "captured_at": "2026-11-07T06:23:51+07:00"
   },
   {
    "id": "E-003",
    "path": "runs/villa-agency-os/did/evidence/snapshots-manifest.json",
    "kind": "html-snapshots",
    "sha256": "77fb8a2c9897bfe44dd6e2502d90e8535039a039683e4cc48699d29060d6b0ac",
-   "note": "72 snapshot HTML mentah + sha256 per berkas",
-   "captured_at": "2026-11-07T06:17:03+07:00"
+   "note": "101 snapshot HTML mentah + sha256 per berkas",
+   "captured_at": "2026-11-07T06:23:51+07:00"
   },
   {
    "id": "E-004",
    "path": "runs/villa-agency-os/did/evidence/facts-design.json",
    "kind": "design-facts",
    "sha256": "209e93dd4a4139b18b1dd5244d14313262299e2d0673bbbfef89cd2c9c635cb0",
-   "note": "token CSS, media query, kelas komponen, tag aset dari 72 snapshot",
-   "captured_at": "2026-11-07T06:17:03+07:00"
+   "note": "token CSS, media query, kelas komponen, tag aset dari 101 snapshot",
+   "captured_at": "2026-11-07T06:23:51+07:00"
   },
   {
    "id": "E-005",
@@ -66,7 +66,7 @@
    "kind": "sqlite-schema",
    "sha256": "d7d2db7994c338581e213fc33570a6a578be3c22c50f40444955b538145fc4ed",
    "note": "tabel/kolom/baris skema terkini hasil salinan data demo",
-   "captured_at": "2026-11-07T06:17:03+07:00"
+   "captured_at": "2026-11-07T06:23:51+07:00"
   },
   {
    "id": "E-006",
@@ -74,7 +74,7 @@
    "kind": "source-map",
    "sha256": "dd741996ed56c84d04f72f22ab368a305fdf5c1fa7c7a718323948a6c2bedb54",
    "note": "PAGE_ROLES + tabel rute hasil parse src/dashboard.py",
-   "captured_at": "2026-11-07T06:17:03+07:00"
+   "captured_at": "2026-11-07T06:23:51+07:00"
   },
   {
    "id": "E-007",
@@ -82,7 +82,7 @@
    "kind": "test-inventory",
    "sha256": "7fbbd99854b03b2904105c6ee25521a9ee65f42bcf374f608bd97a65bd2701d7",
    "note": "jumlah berkas uji dan fungsi test target",
-   "captured_at": "2026-11-07T06:17:03+07:00"
+   "captured_at": "2026-11-07T06:23:51+07:00"
   },
   {
    "id": "E-008",
@@ -90,7 +90,7 @@
    "kind": "gate0",
    "sha256": "8e8c119d60794b14a616c63812913b699d4f5a4afc4be3b655a86e7703343342",
    "note": "verdict Gate #0 dari scripts/gate_check.py",
-   "captured_at": "2026-11-07T06:17:03+07:00"
+   "captured_at": "2026-11-07T06:23:51+07:00"
   },
   {
    "id": "E-009",
@@ -98,7 +98,7 @@
    "kind": "authorization",
    "sha256": "3b982b89850617d7939c3a7bfb7bebfb137ae37a829c07bdbdf35cc7a4b5a9ec",
    "note": "manifest otorisasi mode A untuk target milik Owner",
-   "captured_at": "2026-11-07T06:17:03+07:00"
+   "captured_at": "2026-11-07T06:23:51+07:00"
   },
   {
    "id": "E-010",
@@ -106,7 +106,7 @@
    "kind": "test-baseline",
    "sha256": "d4fca885d3ccc481e004235647a442192e1ce0a869cd9cf900ef0ce29bdc5732",
    "note": "log pytest penuh target pada HEAD 555bc82",
-   "captured_at": "2026-11-07T06:17:03+07:00"
+   "captured_at": "2026-11-07T06:23:51+07:00"
   }
  ],
  "findings": [
@@ -249,7 +249,7 @@
    "id": "F-014",
    "status": "INFERRED",
    "confidence": 85,
-   "claim": "PAGE_ROLES adalah satu-satunya penentu otorisasi halaman: 36 izin dan 24 penolakan konsisten penuh dengan matriks sumber, tanpa pengecualian yang menyimpang.",
+   "claim": "PAGE_ROLES adalah satu-satunya penentu otorisasi halaman: 48 izin dan 24 penolakan konsisten penuh dengan matriks sumber, tanpa pengecualian yang menyimpang.",
    "locator": "E-006 page_roles vs E-001 denied",
    "falsification": {
     "test": "Tambahkan peran baru di src/dashboard.py tanpa mendaftarkannya pada PAGE_ROLES, jalankan ulang capture, lalu periksa apakah peran itu mendapat 200 pada halaman mana pun.",
@@ -503,7 +503,7 @@
    ],
    "acceptance_tests": [
     {
-     "given": "snapshot 72 halaman",
+     "given": "snapshot 101 halaman",
      "when": "kelas komponen diekstrak",
      "then": "16 kelas unik terdaftar dan dipakai ulang antarhalaman"
     }
@@ -1024,7 +1024,7 @@
    "minutes": 88,
    "evidence_bytes": 967310
   },
-  "note": "Perkiraan konservatif untuk run ini; batas L2: 60 panggilan / 90 menit / 50 MB."
+  "note": "tool_calls dan minutes adalah ESTIMASI run ini, bukan hasil ukur; evidence_bytes dihitung dari berkas nyata. Batas L2: 60 panggilan / 90 menit / 50 MB."
  },
  "discipline": {
   "replica_skill_used": false,
@@ -1035,7 +1035,7 @@
  "handoff": {
   "builders_ready": true,
   "blocking_unknowns": 0,
-  "summary": "villa-agency-os (web, milik Owner): 12 rute halaman  x  6 peran. Terbukti: anonim 401, 24/24 penolakan 403 lintas-peran, 48/48 probe izin 200 pada dataset kosong dan 53/53 pada berisi, empty state eksplisit (48/48) vs state berisi (20/53), dan 404 pada dua rute tak dikenal. Render 100% server-side (0 panggilan klien), tema 11 token CSS, skema 72 tabel. Tiga pertanyaan non-blocking (TTL token, responsif 390px, brute-force) dicatat dengan probe."
+  "summary": "villa-agency-os (web, milik Owner): 12 rute halaman  x  6 peran. Terbukti: anonim 401, 24/24 penolakan 403 lintas-peran, 48/48 probe izin 200 pada dataset kosong dan 53/53 pada berisi, empty state eksplisit (48/48) vs state berisi (20/53), dan 404 pada dua rute tak dikenal. Render 100% server-side (0 panggilan klien), tema 11 token CSS, skema 72 tabel. 4 pertanyaan non-blocking dicatat dengan probe."
  },
  "benchmark": {
   "truth_features": 15,
@@ -1061,6 +1061,6 @@
   "labeling": "POST-HOC — label ditulis setelah capture, jadi angka ini indikatif dan SENGAJA tidak dimasukkan ke gerbang `make did-suite` (lihat field gate).",
   "caveat": "Recall 1.0 dicapai setelah memecah fitur gabungan menjadi per-modul; itu keputusan penyajian, bukan penemuan baru. Precision < 1 karena empat fitur sah (404, render server-side, inventaris komponen, halaman properti) tidak punya label padanan — bukan klaim palsu."
  },
- "generated_at": "2026-11-07T06:17:03+07:00",
+ "generated_at": "2026-11-07T06:23:51+07:00",
  "generator": "sdb-did/1.0 (skrip did_handoff_villa_agency.py)"
 }

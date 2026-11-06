@@ -264,13 +264,13 @@ def bangun(run_dir: str, db: str, source: str) -> dict:
 
     evidence = [
         ev_item("E-001", os.path.join(ev, "states-empty.json"), "http-states",
-                "36 halaman  x  6 peran pada DB kosong; anon 401; 2 probe 404"),
+                f"{e['pages']} permintaan halaman (matriks izin) pada DB kosong; anon 401; 2 probe 404"),
         ev_item("E-002", os.path.join(ev, "states-populated.json"), "http-states",
-                "36 halaman  x  6 peran pada DB berisi (data demo nyata)"),
+                f"{p['pages']} permintaan halaman pada DB berisi (data demo nyata)"),
         ev_item("E-003", os.path.join(ev, "snapshots-manifest.json"), "html-snapshots",
-                "72 snapshot HTML mentah + sha256 per berkas"),
+                f"{snap['files']} snapshot HTML mentah + sha256 per berkas"),
         ev_item("E-004", os.path.join(ev, "facts-design.json"), "design-facts",
-                "token CSS, media query, kelas komponen, tag aset dari 72 snapshot"),
+                f"token CSS, media query, kelas komponen, tag aset dari {snap['files']} snapshot"),
         ev_item("E-005", os.path.join(ev, "facts-schema.json"), "sqlite-schema",
                 "tabel/kolom/baris skema terkini hasil salinan data demo"),
         ev_item("E-006", os.path.join(ev, "facts-source.json"), "source-map",
@@ -363,7 +363,8 @@ def bangun(run_dir: str, db: str, source: str) -> dict:
 
     findings.append(
         {"id": "F-014", "status": "INFERRED", "confidence": 85,
-         "claim": "PAGE_ROLES adalah satu-satunya penentu otorisasi halaman: 36 izin dan 24 penolakan konsisten penuh dengan matriks sumber, tanpa pengecualian yang menyimpang.",
+         "claim": (f"PAGE_ROLES adalah satu-satunya penentu otorisasi halaman: {sumber['allowed_pairs']} izin dan "
+                   f"{e['denied']} penolakan konsisten penuh dengan matriks sumber, tanpa pengecualian yang menyimpang."),
          "locator": "E-006 page_roles vs E-001 denied",
          "falsification": {
              "test": "Tambahkan peran baru di src/dashboard.py tanpa mendaftarkannya pada PAGE_ROLES, jalankan ulang capture, lalu periksa apakah peran itu mendapat 200 pada halaman mana pun.",
@@ -417,7 +418,7 @@ def bangun(run_dir: str, db: str, source: str) -> dict:
          "priority": "should", "status": "OBSERVED", "findings": ["F-013"],
          "evidence": ["E-004"],
          "acceptance_tests": [
-             {"given": "snapshot 72 halaman", "when": "kelas komponen diekstrak",
+             {"given": f"snapshot {snap['files']} halaman", "when": "kelas komponen diekstrak",
               "then": f"{n_kelas} kelas unik terdaftar dan dipakai ulang antarhalaman"}]},
         {"id": "FT-08", "name": "Tata letak adaptif (viewport + grid/flex)",
          "priority": "should", "status": "PARTIAL", "findings": ["F-008"],
@@ -581,7 +582,7 @@ def bangun(run_dir: str, db: str, source: str) -> dict:
             "in_scope": [
                 "instance dashboard milik Owner di loopback 127.0.0.1:8285 - 8300",
                 "sumber src/*.py dan src/schema/*.sql",
-                "snapshot HTML 72 halaman (2 dataset  x  36)",
+                f"snapshot HTML {snap['files']} halaman ({e['pages']} dataset kosong + {p['pages']} berisi)",
                 "rute, status HTTP, peta peran, token CSS, skema SQLite",
             ],
             "out_of_scope": [
@@ -598,7 +599,8 @@ def bangun(run_dir: str, db: str, source: str) -> dict:
         "features": must,
         "build_seeds": seeds,
         "budget": {"used": {"tool_calls": 58, "minutes": 88, "evidence_bytes": bukti_bytes},
-                   "note": "Perkiraan konservatif untuk run ini; batas L2: 60 panggilan / 90 menit / 50 MB."},
+                   "note": ("tool_calls dan minutes adalah ESTIMASI run ini, bukan hasil ukur; evidence_bytes "
+                            "dihitung dari berkas nyata. Batas L2: 60 panggilan / 90 menit / 50 MB.")},
         "discipline": {"replica_skill_used": False, "wrote_code": False,
                        "mcp_registered": False, "redaction_applied": True},
         "handoff": {
@@ -610,7 +612,7 @@ def bangun(run_dir: str, db: str, source: str) -> dict:
                 f"empty state eksplisit ({e['kosong']}/{e['pages']}) vs state berisi ({p['berisi']}/{p['pages']}), "
                 f"dan 404 pada dua rute tak dikenal. Render 100% server-side "
                 f"({snap['client_network_calls']} panggilan klien), tema {n_token} token CSS, skema {n_tabel} tabel. "
-                f"Tiga pertanyaan non-blocking (TTL token, responsif 390px, brute-force) dicatat dengan probe."
+                f"{len(unknowns)} pertanyaan non-blocking dicatat dengan probe."
             ),
         },
         "benchmark": _bench_block(),

@@ -50,9 +50,29 @@ def _klien():
     return urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar)), jar
 
 
-def _minta(opener, url: str, method: str = "GET", body: dict | None = None, timeout: int = 20):
+def _kepala_auth(role: dict, rahasia: list[str]) -> dict:
+    """Header statis untuk target yang tidak punya endpoint login.
+
+    Dashboard internal sering memakai token per peran (header), bukan sesi
+    cookie. Tanpa jalur ini, state terautentikasi target semacam itu hanya bisa
+    diklaim — persis yang dilarang kontrak DID.
+    """
+    auth = role.get("auth") or {}
+    if not auth:
+        return {}
+    if auth.get("type", "header") != "header":
+        raise SystemExit("did_capture_states: auth.type hanya 'header' yang didukung")
+    nilai = _isi_env(auth["value"])
+    rahasia.append(nilai)
+    return {auth.get("name", "Authorization"): nilai}
+
+
+def _minta(opener, url: str, method: str = "GET", body: dict | None = None, timeout: int = 20,
+           headers: dict | None = None):
     data = None
     header = {"Accept": "text/html,application/json"}
+    if headers:
+        header.update(headers)
     if body is not None:
         data = json.dumps(body).encode()
         header["Content-Type"] = "application/json"
@@ -71,7 +91,8 @@ def _loopback_saja(base: str, boleh_remote: bool) -> None:
     raise SystemExit(f"did_capture_states: {host} bukan loopback — pakai --allow-remote bila memang diizinkan")
 
 
-def tangkap(cfg: dict, boleh_remote: bool = False, timeout: int = 20) -> dict:
+def tangkap(cfg: dict, boleh_remote: bool = False, timeout: int = 20,
+            snap_dir: str | None = None) -> dict:
     base = cfg["base_url"].rstrip("/")
     _loopback_saja(base, boleh_remote)
     marker = cfg.get("empty_markers") or TAKSIR_MARKER
@@ -80,22 +101,39 @@ def tangkap(cfg: dict, boleh_remote: bool = False, timeout: int = 20) -> dict:
     rahasia: list[str] = []
 
     for role in cfg.get("roles") or []:
-        email = _isi_env(role["email"]) if role.get("email") else _isi_env("${%s}" % role["email_env"])
-        sandi = _isi_env(role["password"]) if role.get("password") else _isi_env("${%s}" % role["password_env"])
-        rahasia += [email, sandi]
-        opener, jar = _klien()
-        login = cfg.get("login") or {"path": "/api/login", "method": "POST"}
-        body = {"email": email, "password": sandi}
-        status, teks = _minta(opener, base + login["path"], login.get("method", "POST"), body, timeout)
-        masuk = {"role": role["name"], "login_status": status, "cookies": len(jar),
-                 "ok": status == 200 and len(jar) > 0, "pages": []}
-        if status != 200:
-            masuk["pesan"] = teks[:200]
+        dasar = (role.get("base_url") or base).rstrip("/")
+        _loopback_saja(dasar, boleh_remote)
+        kepala = _kepala_auth(role, rahasia)
+        if kepala:
+            opener, jar = _klien()
+            masuk = {"role": role["name"], "auth": role.get("auth", {}).get("type", "header"),
+                     "login_status": None, "cookies": 0, "ok": None, "pages": []}
+        else:
+            email = _isi_env(role["email"]) if role.get("email") else _isi_env("${%s}" % role["email_env"])
+            sandi = _isi_env(role["password"]) if role.get("password") else _isi_env("${%s}" % role["password_env"])
+            rahasia += [email, sandi]
+            opener, jar = _klien()
+            login = cfg.get("login") or {"path": "/api/login", "method": "POST"}
+            body = {"email": email, "password": sandi}
+            status, teks = _minta(opener, dasar + login["path"], login.get("method", "POST"), body, timeout)
+            masuk = {"role": role["name"], "login_status": status, "cookies": len(jar),
+                     "ok": status == 200 and len(jar) > 0, "pages": []}
+            if status != 200:
+                masuk["pesan"] = teks[:200]
         for path in role.get("pages") or []:
-            st, html = _minta(opener, base + path, timeout=timeout)
+            st, html = _minta(opener, dasar + path, timeout=timeout, headers=kepala)
             ketemu = sorted({m for m in marker if m in html})
+            snap = None
+            if snap_dir and st == 200 and not any(r and r in html for r in rahasia):
+                nama = re.sub(r"[^a-z0-9]+", "-", f"{role['name']}{path}".lower()).strip("-") + ".html"
+                os.makedirs(snap_dir, exist_ok=True)
+                with open(os.path.join(snap_dir, nama), "w", encoding="utf-8") as fh:
+                    fh.write(html)
+                snap = nama
             masuk["pages"].append({"path": path, "status": st, "bytes": len(html),
                                    "sha256": hashlib.sha256(html.encode()).hexdigest(),
+                                   "ditolak": st in (401, 403), "tr": html.count("<tr"),
+                                   "snapshot": snap,
                                    "empty_markers": ketemu})
         # SPA: semua rute mengembalikan shell yang sama, jadi penanda "kosong" di HTML
         # berasal dari bundel JS, bukan dari state halaman. Jangan klaim kosong.
@@ -103,9 +141,18 @@ def tangkap(cfg: dict, boleh_remote: bool = False, timeout: int = 20) -> dict:
         masuk["spa_shell"] = len(masuk["pages"]) > 1 and len(unik) == 1
         for x in masuk["pages"]:
             x["kosong"] = None if masuk["spa_shell"] else bool(x["empty_markers"])
+        if kepala:
+            masuk["ok"] = all(p["status"] == 200 for p in masuk["pages"]) and bool(masuk["pages"])
+        masuk["denied"] = []
+        for d in role.get("denied") or []:
+            st, teks = _minta(opener, dasar + d["path"], timeout=timeout, headers=kepala)
+            masuk["denied"].append({"path": d["path"], "status": st,
+                                    "harap": d.get("expect_status", 403),
+                                    "cocok": st == d.get("expect_status", 403),
+                                    "bytes": len(teks)})
         for probe in role.get("error_probes") or []:
-            st, teks = _minta(opener, base + probe["path"], probe.get("method", "POST"),
-                              probe.get("body") or {}, timeout)
+            st, teks = _minta(opener, dasar + probe["path"], probe.get("method", "POST"),
+                              probe.get("body") or {}, timeout, headers=kepala)
             masuk.setdefault("error_probes", []).append(
                 {"path": probe["path"], "method": probe.get("method", "POST"), "status": st,
                  "min_status": probe.get("expect_status_min", 400),
@@ -134,10 +181,11 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--out", required=True)
     p.add_argument("--allow-remote", action="store_true")
     p.add_argument("--timeout", type=int, default=20)
+    p.add_argument("--snapshot-dir", help="simpan HTML 200 per halaman (bukti mentah)")
     a = p.parse_args(argv)
 
     cfg = json.load(open(a.config, encoding="utf-8"))
-    hasil = tangkap(cfg, a.allow_remote, a.timeout)
+    hasil = tangkap(cfg, a.allow_remote, a.timeout, a.snapshot_dir)
     if not hasil["redaction_ok"]:
         print("did_capture_states: RAHASIA BOCOR ke keluaran — berkas tidak ditulis", file=sys.stderr)
         return 2

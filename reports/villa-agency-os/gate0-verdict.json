@@ -1,0 +1,11 @@
+{
+  "gate": "gate0",
+  "verdict": "PASS",
+  "checked_at": "2026-11-07T06:01:04+0700",
+  "manifest": "/home/anashadi/super-dev-builders/evidence/villa-agency-os/authorization.yaml",
+  "target": "villa-agency-os",
+  "mode": "A",
+  "fail": [],
+  "blocked": [],
+  "warn": []
+}

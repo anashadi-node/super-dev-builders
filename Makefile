@@ -25,7 +25,7 @@ PY_DOC ?= $(shell \
 # TARGET lewat lingkungan (bukan interpolasi make ke shell): nilai ber-kutip/`;`/`$(...)` tetap data.
 export TARGET
 
-.PHONY: help check lint drift doctor inventory test gate-init lint-registry release-check skills-list install-main workflow install-dry-run clean-pyc docs-tutorial docs-lint mutation did did-providers did-bench
+.PHONY: help check lint drift doctor inventory test gate-init lint-registry release-check skills-list install-main workflow install-dry-run clean-pyc docs-tutorial docs-lint mutation did did-providers did-bench pr-merge
 
 help:
 	@grep -E "^[a-z-]+:" Makefile | sed "s/:.*//" | column -c 80
@@ -140,6 +140,13 @@ did-bench:
 	$(PY_SYS) scripts/did_validate.py bench --handoff "runs/$$slug/did/handoff.json" --truth "$$TRUTH" \
 		--json-out "reports/$$slug/did-bench.json"; \
 	cat "reports/$$slug/did-bench.json"
+
+# pr-merge: jalur merge yang benar — CI wajib hijau, squash, branch dihapus.
+pr-merge:
+	@num="$${PR:-}"; \
+	if [ -z "$$num" ]; then echo "pakai: make pr-merge PR=<nomor>"; exit 2; fi; \
+	gh pr checks "$$num" --watch --interval 20 && \
+	gh pr merge "$$num" --squash --admin --delete-branch
 
 release-check:
 	@slug="$${TARGET:-}"; \

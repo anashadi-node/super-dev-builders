@@ -43,6 +43,17 @@
    "extras": 0,
    "hallucinated": 0,
    "alasan": []
+  },
+  {
+   "target": "rt-rw-portal",
+   "status": "PASS",
+   "handoff": "benchmarks/rt-rw-portal/handoff.json",
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "extras": 0,
+   "hallucinated": 0,
+   "alasan": []
   }
  ],
  "failed": 0,

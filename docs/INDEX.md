@@ -54,6 +54,8 @@ tanggalnya menang — dan yang kalah **harus** dipindahkan ke `docs/archive/`, b
 | `EVIDENCE_TAXONOMY.md` | label FACT/INFERRED/UNKNOWN |
 | `EVIDENCE_SCHEMA.md` | bentuk evidence |
 | `HANDOFF_CONTRACTS.md` | serah-terima antar divisi |
+| `BUILD_PACK.md` | handoff DID → backlog Builders + gerbang B01..B06 |
+| `STATE_PROBES.md` | rekam state terautentikasi (loopback, tanpa rahasia di bukti) |
 | `PIPELINE_E2E_EVIDENCE.md` | bukti pipeline ujung-ke-ujung |
 | `WORKFLOW_SKENARIO.md` | alur kerja per skenario (web, mobile, desktop, backend, audit) beserta gate-nya |
 | `RECON_NATIVE.md` | jalur biner (ELF/PE/Mach-O/APK/firmware): dua saklar izin, contoh terbukti, jebakan |

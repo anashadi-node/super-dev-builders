@@ -1,0 +1,1782 @@
+{
+ "schema": "sdb.did.handoff/1",
+ "target": {
+  "slug": "rt-rw-portal",
+  "name": "Portal Warga RT-RW (v2.0.0)",
+  "type": "web",
+  "authorization": {
+   "gate0_verdict": "PASS",
+   "manifest": "evidence/rt-rw-portal/authorization.yaml",
+   "approved_by": "Mas Anas (Owner)",
+   "approved_at": "2026-10-10T23:24:50+07:00"
+  }
+ },
+ "scope": {
+  "depth": "L2",
+  "profile": "web",
+  "in_scope": [
+   "aplikasi WSGI milik Owner di loopback 127.0.0.1:8091",
+   "sumber real_system/*.py",
+   "aset statis",
+   "rute, API, status HTTP"
+  ],
+  "out_of_scope": [
+   "data warga nyata",
+   "kredensial integrasi pelanggan",
+   "instance Railway produksi",
+   "capture jaringan"
+  ]
+ },
+ "evidence_manifest": [
+  {
+   "id": "E-001",
+   "path": "runs/rt-rw-portal/did/evidence/static-routes.json",
+   "sha256": "d97097fd3ca6f0e66cb8d02c42be150cd5a98882f10ce4c3278a5f7c4870ec0e",
+   "captured_at": "2026-11-06T22:46:07+07:00",
+   "status": "OBSERVED",
+   "note": "static-routes.json"
+  },
+  {
+   "id": "E-002",
+   "path": "runs/rt-rw-portal/did/evidence/api.json",
+   "sha256": "c868359f737b5093526b8ef8f83ef2e262c7b877d67219ff68427ec6470f7f9c",
+   "captured_at": "2026-11-06T22:45:13+07:00",
+   "status": "OBSERVED",
+   "note": "api.json"
+  },
+  {
+   "id": "E-003",
+   "path": "runs/rt-rw-portal/did/evidence/components.json",
+   "sha256": "b6503a8a28338f75ffcf56a84545254e72dfb44a8662bfacd444736a9f750bb0",
+   "captured_at": "2026-11-06T22:45:28+07:00",
+   "status": "OBSERVED",
+   "note": "components.json"
+  },
+  {
+   "id": "E-004",
+   "path": "runs/rt-rw-portal/did/evidence/design-tokens.json",
+   "sha256": "9e271743823cdd62865f91284151966ba60be3ca9f53842c1427831ca36ae627",
+   "captured_at": "2026-11-06T22:45:13+07:00",
+   "status": "OBSERVED",
+   "note": "design-tokens.json"
+  },
+  {
+   "id": "E-005",
+   "path": "runs/rt-rw-portal/did/evidence/states-responsive.json",
+   "sha256": "b4036b71211b284b895a65bfcd5a57e6d444e69d1c330b37857f352a00017efa",
+   "captured_at": "2026-11-06T22:45:13+07:00",
+   "status": "OBSERVED",
+   "note": "states-responsive.json"
+  },
+  {
+   "id": "E-006",
+   "path": "runs/rt-rw-portal/did/evidence/assets.json",
+   "sha256": "ef6b0d73ee2e06b9609dc2b3d86499dd6b7847f0757eeb21b3a87f858173e4e9",
+   "captured_at": "2026-11-06T22:45:24+07:00",
+   "status": "OBSERVED",
+   "note": "assets.json"
+  },
+  {
+   "id": "E-007",
+   "path": "runs/rt-rw-portal/did/evidence/entities.json",
+   "sha256": "2367fcb10c8118814092eddd44fc9635d95fe8e324c5ab3e68fad49126184fb8",
+   "captured_at": "2026-11-06T22:45:35+07:00",
+   "status": "OBSERVED",
+   "note": "entities.json"
+  },
+  {
+   "id": "E-008",
+   "path": "runs/rt-rw-portal/did/evidence/http-loopback.json",
+   "sha256": "9ab087ee7a33dcbd1711bab201cef69630560a5928a75966dadc100a52910ebf",
+   "captured_at": "2026-11-06T22:45:13+07:00",
+   "status": "OBSERVED",
+   "note": "http-loopback.json"
+  },
+  {
+   "id": "E-009",
+   "path": "runs/rt-rw-portal/did/evidence/tests-baseline.log",
+   "sha256": "251043cc857fab44f17c9575e1c8c93882533e3e15a63700b00cb6fc25fb5afc",
+   "captured_at": "2026-11-06T22:50:51+07:00",
+   "status": "OBSERVED",
+   "note": "tests-baseline.log"
+  },
+  {
+   "id": "E-010",
+   "path": "runs/rt-rw-portal/did/evidence/test-baseline.json",
+   "sha256": "6304acc5be3b428903a89dbb280eb4bdf1f9f24776b3e64741781a1104738409",
+   "captured_at": "2026-11-06T22:46:46+07:00",
+   "status": "OBSERVED",
+   "note": "test-baseline.json"
+  },
+  {
+   "id": "E-011",
+   "path": "runs/rt-rw-portal/did/evidence/home-desktop.png",
+   "sha256": "462aed02f4f424558c18e5fe19c4bb384f78a872296a3996eb22fe9aa698eb71",
+   "captured_at": "2026-11-06T22:44:41+07:00",
+   "status": "OBSERVED",
+   "note": "home-desktop.png"
+  },
+  {
+   "id": "E-012",
+   "path": "runs/rt-rw-portal/did/evidence/home-mobile.png",
+   "sha256": "749015291404c765ba88967d980f73618e4423ec1660769605681d247eb5904d",
+   "captured_at": "2026-11-06T22:44:41+07:00",
+   "status": "OBSERVED",
+   "note": "home-mobile.png"
+  },
+  {
+   "id": "E-013",
+   "path": "runs/rt-rw-portal/did/evidence/home-tablet.png",
+   "sha256": "2b9d743caf096326063a67d10dd4482721bdc77d6e46580ea568dc5246f99e3d",
+   "captured_at": "2026-11-06T22:44:41+07:00",
+   "status": "OBSERVED",
+   "note": "home-tablet.png"
+  },
+  {
+   "id": "E-014",
+   "path": "runs/rt-rw-portal/did/evidence/route_masuk.png",
+   "sha256": "459530d1dfc73040bcf084567a115bc2d4bb712f67cad8440aecd6e301d65a88",
+   "captured_at": "2026-11-06T22:44:51+07:00",
+   "status": "OBSERVED",
+   "note": "route_masuk.png"
+  },
+  {
+   "id": "E-015",
+   "path": "runs/rt-rw-portal/did/evidence/route_iuran.png",
+   "sha256": "1619db17f1a942b5615720c699589da7334f679d2b9277015112c549c70b9440",
+   "captured_at": "2026-11-06T22:44:53+07:00",
+   "status": "OBSERVED",
+   "note": "route_iuran.png"
+  },
+  {
+   "id": "E-016",
+   "path": "runs/rt-rw-portal/did/evidence/route_cctv.png",
+   "sha256": "4fd9ed0ad71a6394306123e29002db267e996b21497661fdd4702a46b1e8d351",
+   "captured_at": "2026-11-06T22:44:54+07:00",
+   "status": "OBSERVED",
+   "note": "route_cctv.png"
+  },
+  {
+   "id": "E-017",
+   "path": "runs/rt-rw-portal/did/evidence/route_darurat.png",
+   "sha256": "d84e33fb5c1e2b542f2b929778dc1dcd1b5ed7fab81039fd612c6551faa6b948",
+   "captured_at": "2026-11-06T22:44:59+07:00",
+   "status": "OBSERVED",
+   "note": "route_darurat.png"
+  },
+  {
+   "id": "E-018",
+   "path": "runs/rt-rw-portal/did/evidence/states-auth.json",
+   "sha256": "1feb01a276c1a174ebfac580e6b027de55cebe21b8e6e68f9f4bb2fa62d714aa",
+   "captured_at": "2026-11-07T05:25:44+07:00",
+   "status": "OBSERVED",
+   "note": "states-auth.json"
+  },
+  {
+   "id": "E-019",
+   "path": "runs/rt-rw-portal/did/evidence/states-rendered.json",
+   "sha256": "9cdd9d696069c9af6282f3260b59476c25d4d01ffae0b87dc553b7b4d3639dbc",
+   "captured_at": "2026-11-07T05:27:39+07:00",
+   "status": "OBSERVED",
+   "note": "states-rendered.json"
+  },
+  {
+   "id": "E-020",
+   "path": "runs/rt-rw-portal/did/evidence/state-warga_iuran.txt",
+   "sha256": "d6ba3bf818a4d2a37b315fcdd2784341f85357f7d05481cde91f0fe18dd44ff6",
+   "captured_at": "2026-11-07T05:26:54+07:00",
+   "status": "OBSERVED",
+   "note": "state-warga_iuran.txt"
+  },
+  {
+   "id": "E-021",
+   "path": "runs/rt-rw-portal/did/evidence/state-warga_surat.txt",
+   "sha256": "2885c42f1c1966f7d65c2c85073ac5c39489250f015d789fbb39dbfaa2b0c982",
+   "captured_at": "2026-11-07T05:27:03+07:00",
+   "status": "OBSERVED",
+   "note": "state-warga_surat.txt"
+  },
+  {
+   "id": "E-022",
+   "path": "runs/rt-rw-portal/did/evidence/state-ketua_rt_kas.txt",
+   "sha256": "7d84f1547c452aeb2dbd3e154241921c9b78571254a24469d9ab429734e3b07f",
+   "captured_at": "2026-11-07T05:27:13+07:00",
+   "status": "OBSERVED",
+   "note": "state-ketua_rt_kas.txt"
+  },
+  {
+   "id": "E-023",
+   "path": "runs/rt-rw-portal/did/evidence/state-bendahara_lintas-rt.txt",
+   "sha256": "ab1c20127680cf8804de960e32aa67a64a5075c244362195fa8322d8386ffc69",
+   "captured_at": "2026-11-07T05:27:27+07:00",
+   "status": "OBSERVED",
+   "note": "state-bendahara_lintas-rt.txt"
+  },
+  {
+   "id": "E-024",
+   "path": "runs/rt-rw-portal/did/evidence/state-warga_pengaduan-error.txt",
+   "sha256": "b818d025cef929899eb37b776f308fc9c5cf44e6072732a18b8305847100d4f8",
+   "captured_at": "2026-11-07T05:28:19+07:00",
+   "status": "OBSERVED",
+   "note": "state-warga_pengaduan-error.txt"
+  },
+  {
+   "id": "E-025",
+   "path": "runs/rt-rw-portal/did/evidence/state-unknown-route.txt",
+   "sha256": "5fa1cdd619b6b5bbb25c2d4ce52f8ade0c52d530dd7a8b9f45af0c924b303cc8",
+   "captured_at": "2026-11-07T05:28:21+07:00",
+   "status": "OBSERVED",
+   "note": "state-unknown-route.txt"
+  },
+  {
+   "id": "E-026",
+   "path": "runs/rt-rw-portal/did/evidence/state-warga_iuran.png",
+   "sha256": "326b59bfaa7524096dcfbc580d87c4f94e7ed08b05b053cffbb0ffb381ad976b",
+   "captured_at": "2026-11-07T05:26:54+07:00",
+   "status": "OBSERVED",
+   "note": "state-warga_iuran.png"
+  },
+  {
+   "id": "E-027",
+   "path": "runs/rt-rw-portal/did/evidence/state-bendahara_lintas-rt.png",
+   "sha256": "19b3a0202d7bb29883fbabb52e3d4e37cd8ff825e9f0b4258e661960c77b2b3d",
+   "captured_at": "2026-11-07T05:27:27+07:00",
+   "status": "OBSERVED",
+   "note": "state-bendahara_lintas-rt.png"
+  },
+  {
+   "id": "E-028",
+   "path": "runs/rt-rw-portal/did/evidence/state-warga_pengaduan-error.png",
+   "sha256": "6115cc6758f7dd5fd8ef51e840ef68050dbebcf4385692d290e949d5c58c0e85",
+   "captured_at": "2026-11-07T05:28:19+07:00",
+   "status": "OBSERVED",
+   "note": "state-warga_pengaduan-error.png"
+  },
+  {
+   "id": "E-029",
+   "path": "runs/rt-rw-portal/did/evidence/state-warga_pengumuman.txt",
+   "sha256": "f04f5d7bce0aab8171884d8f8f6b19b6ae3346ac0ccd52bf39d9986689591d26",
+   "captured_at": "2026-11-07T05:26:58+07:00",
+   "status": "OBSERVED",
+   "note": "state-warga_pengumuman.txt"
+  },
+  {
+   "id": "E-030",
+   "path": "runs/rt-rw-portal/did/evidence/state-ketua_rt_warga.txt",
+   "sha256": "6b36825d7513ee99fd14d32a42b54d950e682c183fd6bd3b814d2ad73ca9e407",
+   "captured_at": "2026-11-07T05:27:08+07:00",
+   "status": "OBSERVED",
+   "note": "state-ketua_rt_warga.txt"
+  },
+  {
+   "id": "E-031",
+   "path": "runs/rt-rw-portal/did/evidence/state-ketua_rw_audit.txt",
+   "sha256": "cbea81c518e16f641d3c9d13b9d4885786598134dad85305643bed9e84c66cc8",
+   "captured_at": "2026-11-07T05:27:35+07:00",
+   "status": "OBSERVED",
+   "note": "state-ketua_rw_audit.txt"
+  }
+ ],
+ "findings": [
+  {
+   "id": "F-001",
+   "status": "OBSERVED",
+   "claim": "20 rute halaman dilayani (18 halaman aplikasi + 2 darurat); 23 dari 24 path membalas 200 di loopback (/setup 401 sesuai desain).",
+   "locator": "real_system/app.py PAGE_ROUTES/EMERGENCY_ROUTES",
+   "evidence": [
+    "E-001",
+    "E-008"
+   ]
+  },
+  {
+   "id": "F-002",
+   "status": "OBSERVED",
+   "claim": "60 endpoint /api terdaftar di router WSGI; tiap endpoint punya metode dan nomor baris.",
+   "locator": "real_system/app.py route()",
+   "evidence": [
+    "E-002"
+   ]
+  },
+  {
+   "id": "F-003",
+   "status": "OBSERVED",
+   "claim": "Shell SPA tampil untuk semua rute tanpa sesi, tetapi isi modul terkunci di balik 'Masuk'; /setup membalas 401 sebelum wizard disahkan.",
+   "locator": "/ (innerText), /setup 401",
+   "evidence": [
+    "E-008",
+    "E-014",
+    "E-011"
+   ]
+  },
+  {
+   "id": "F-004",
+   "status": "OBSERVED",
+   "claim": "18 fungsi tampilan klien (view*) memetakan 1:1 ke 18 rute halaman.",
+   "locator": "real_system/ui_app.py template JS",
+   "evidence": [
+    "E-003",
+    "E-001"
+   ]
+  },
+  {
+   "id": "F-005",
+   "status": "OBSERVED",
+   "claim": "37 token desain CSS terdefinisi; primer #0b5f4f, radius 16px, font sistem sans-serif.",
+   "locator": "theme_v4.py / ui_app.py :root",
+   "evidence": [
+    "E-004",
+    "E-011"
+   ]
+  },
+  {
+   "id": "F-006",
+   "status": "OBSERVED",
+   "claim": "Tata letak responsif terbukti pada 1440x900, 768x1024, dan 390x844; media query eksplisit ada di CSS.",
+   "locator": "CSS @media",
+   "evidence": [
+    "E-005",
+    "E-013",
+    "E-012"
+   ]
+  },
+  {
+   "id": "F-007",
+   "status": "OBSERVED",
+   "claim": "State kosong, error validasi, error izin, dan rute tak dikenal teramati langsung pada render klien: 21 halaman di 4 peran (warga, ketua RT, bendahara, ketua RW), 3 empty state berteks ('Belum ada pengajuan surat.', 'Belum ada permintaan.'), toast validasi 'Judul laporan belum diisi', dan rute tak dikenal membalas JSON not_found.",
+   "locator": "render klien 4 peran, 21 halaman",
+   "evidence": [
+    "E-019",
+    "E-021",
+    "E-024"
+   ]
+  },
+  {
+   "id": "F-008",
+   "status": "OBSERVED",
+   "claim": "Model data: 25 tabel (dues, complaints, letters, cash_ledger, cctv_cameras, panic_events, audit_log, …).",
+   "locator": "real_system/*.py CREATE TABLE",
+   "evidence": [
+    "E-007"
+   ]
+  },
+  {
+   "id": "F-009",
+   "status": "OBSERVED",
+   "claim": "PWA aktif: /manifest.webmanifest dan /sw.js membalas 200 dengan tipe konten benar.",
+   "locator": "app.py rute static/PWA",
+   "evidence": [
+    "E-008"
+   ]
+  },
+  {
+   "id": "F-010",
+   "status": "OBSERVED",
+   "claim": "Suite uji repo milik target: 430 lulus, 5 dilewati, 4 subtest lulus dalam 332 detik pada salinan kerja (baseline tersimpan sebelumnya: 375 fungsi uji di 26 berkas, commit 6dfe724, kontainer terisolasi).",
+   "locator": "pytest tests (baseline tersimpan, commit 6dfe724)",
+   "evidence": [
+    "E-010",
+    "E-009"
+   ]
+  },
+  {
+   "id": "F-011",
+   "status": "INFERRED",
+   "claim": "Tiap rute punya tampilan klien padanan (viewX) dan modul API sendiri; menambah modul berarti menambah rute + fungsi view + endpoint.",
+   "confidence": 72,
+   "falsification": {
+    "test": "Cocokkan 18 rute vs 18 fungsi view vs 60 endpoint; cari rute tanpa view dan tanpa endpoint /api terkait.",
+    "expected": "Jika ditemukan ≥1 rute tanpa view dan tanpa endpoint, klaim gugur."
+   },
+   "locator": "korelasi static-routes.json ↔ components.json",
+   "evidence": [
+    "E-001",
+    "E-003"
+   ]
+  },
+  {
+   "id": "F-012",
+   "status": "INFERRED",
+   "claim": "Fitur CCTV bergantung pada ffmpeg di host; tanpa ffmpeg, stream MJPEG tidak tersedia walau rute membalas 200.",
+   "confidence": 65,
+   "falsification": {
+    "test": "GET /api/cctv/health dan periksa field modules.cctv_ffmpeg pada /api/health saat ffmpeg tidak tersedia.",
+    "expected": "Jika stream tetap berjalan tanpa ffmpeg, klaim gugur."
+   },
+   "locator": "/api/health modules.cctv_ffmpeg",
+   "evidence": [
+    "E-002",
+    "E-008"
+   ]
+  },
+  {
+   "id": "F-013",
+   "status": "OBSERVED",
+   "severity": "medium",
+   "claim": "Kontradiksi state pada /lintas-rt sebagai bendahara: toast 'Gagal memuat lintasrt: Peran Anda tidak diizinkan untuk aksi ini.' tampil, tetapi panel yang sama tetap menulis 'Belum ada permintaan.' — pengguna membaca 'tidak ada data', padahal permintaan ditolak izin. Dua peran (bendahara, ketua RW) merender halaman ini; hanya yang berwenang boleh melihat isinya.",
+   "locator": "render klien /lintas-rt peran bendahara",
+   "evidence": [
+    "E-023",
+    "E-027"
+   ]
+  },
+  {
+   "id": "F-014",
+   "status": "OBSERVED",
+   "severity": "low",
+   "claim": "Rute klien tak dikenal tidak punya halaman 404: /tidak-ada-halaman membalas badan JSON mentah {\"error\":\"not_found\",\"message\":\"Rute /tidak-ada-halaman tidak dikenal.\"} tanpa shell aplikasi.",
+   "locator": "GET /tidak-ada-halaman (tanpa sesi dan dengan sesi)",
+   "evidence": [
+    "E-025"
+   ]
+  },
+  {
+   "id": "F-015",
+   "status": "OBSERVED",
+   "severity": "info",
+   "claim": "/pengumuman merender broadcast resmi dengan penulis dan waktu (teks broadcast resmi RW. 07, penulis H. Sugeng Riyadi · 2026-11-06 22:24); modul ini terpisah dari pengaduan/surat.",
+   "locator": "render klien /pengumuman peran warga",
+   "evidence": [
+    "E-029",
+    "E-019"
+   ]
+  },
+  {
+   "id": "F-016",
+   "status": "OBSERVED",
+   "severity": "info",
+   "claim": "/warga (pengurus RT) menampilkan 7 data warga dengan NIK tersamar (34********0003) dan aturan retensi: warga pindah/meninggal dinonaktifkan, tidak dihapus, agar riwayat iuran utuh.",
+   "locator": "render klien /warga peran ketua RT",
+   "evidence": [
+    "E-030"
+   ]
+  },
+  {
+   "id": "F-017",
+   "status": "OBSERVED",
+   "severity": "info",
+   "claim": "/audit (ketua RW) menampilkan jejak permanen berkolom WAKTU/AKSI/RINGKASAN/AKTOR, contoh auth.login.success untuk akun rw_admin.",
+   "locator": "render klien /audit peran ketua RW",
+   "evidence": [
+    "E-031"
+   ]
+  }
+ ],
+ "unknowns": [
+  {
+   "id": "U-001",
+   "question": "Apakah integrasi payment gateway berfungsi sungguhan (bukan hanya konfigurasi)?",
+   "impact": "non-blocking",
+   "probe": "POST /api/admin/integrations/payment/test dengan kredensial sandbox di loopback; catat kode balasan."
+  },
+  {
+   "id": "U-002",
+   "question": "Berapa kamera CCTV simultan yang masih stabil pada perangkat pelanggan?",
+   "impact": "non-blocking",
+   "probe": "Beban 1/2/4 klien MJPEG paralel selama 60 detik; catat frame drop dan CPU."
+  }
+ ],
+ "coverage": [
+  {
+   "category": "routes",
+   "status": "COVERED",
+   "found": 20,
+   "evidence": [
+    "E-001",
+    "E-008"
+   ]
+  },
+  {
+   "category": "states",
+   "status": "COVERED",
+   "found": 5,
+   "evidence": [
+    "E-019",
+    "E-018",
+    "E-021",
+    "E-024",
+    "E-025"
+   ],
+   "observed": [
+    "anon_shell",
+    "authenticated_ready",
+    "empty_berteks",
+    "validation_error",
+    "permission_error",
+    "not_found"
+   ]
+  },
+  {
+   "category": "components",
+   "status": "COVERED",
+   "found": 18,
+   "evidence": [
+    "E-003"
+   ]
+  },
+  {
+   "category": "network",
+   "status": "COVERED",
+   "found": 60,
+   "evidence": [
+    "E-002",
+    "E-008"
+   ]
+  },
+  {
+   "category": "auth_flow",
+   "status": "COVERED",
+   "found": 1,
+   "evidence": [
+    "E-008",
+    "E-014"
+   ]
+  },
+  {
+   "category": "assets",
+   "status": "COVERED",
+   "found": 7,
+   "evidence": [
+    "E-006"
+   ]
+  },
+  {
+   "category": "responsive",
+   "status": "COVERED",
+   "found": 3,
+   "evidence": [
+    "E-005",
+    "E-012",
+    "E-013",
+    "E-011"
+   ]
+  }
+ ],
+ "features": [
+  {
+   "id": "FT-01",
+   "name": "Masuk dan sesi pengguna",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-003",
+    "F-002"
+   ],
+   "evidence": [
+    "E-014"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "pengguna anonim membuka /iuran",
+     "when": "halaman dimuat",
+     "then": "shell tampil dengan ajakan Masuk, data iuran tidak dikirim"
+    },
+    {
+     "given": "kredensial demo bendahara",
+     "when": "POST /api/login",
+     "then": "sesi dibuat dan /api/dues membalas 200 dengan data"
+    }
+   ]
+  },
+  {
+   "id": "FT-14",
+   "name": "Peran dan matriks akses (warga, ketua RT/RW, bendahara, satpam, ops)",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-013"
+   ],
+   "evidence": [
+    "E-023",
+    "E-019"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "bendahara membuka /lintas-rt",
+     "when": "server memeriksa izin",
+     "then": "aksi ditolak dengan pesan izin; panel tidak menampilkan data lintas RT"
+    },
+    {
+     "given": "sesi warga",
+     "when": "memanggil endpoint pengurus",
+     "then": "balasan 403 dan data pengurus tidak terkirim"
+    }
+   ]
+  },
+  {
+   "id": "FT-02",
+   "name": "Beranda ringkas (statistik organisasi + pintasan modul)",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-004",
+    "F-005"
+   ],
+   "evidence": [
+    "E-011"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "pengguna login",
+     "when": "membuka / atau /beranda",
+     "then": "kartu statistik dan pintasan modul tampil tanpa error konsol"
+    }
+   ]
+  },
+  {
+   "id": "FT-03",
+   "name": "Iuran & tagihan warga",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-002",
+    "F-008"
+   ],
+   "evidence": [
+    "E-015"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "warga punya tagihan bulan ini",
+     "when": "membuka /iuran",
+     "then": "daftar tagihan, status bayar, dan total terlihat"
+    },
+    {
+     "given": "tidak ada tagihan",
+     "when": "membuka /iuran",
+     "then": "state kosong tampil, bukan tabel kosong tanpa pesan"
+    }
+   ]
+  },
+  {
+   "id": "FT-04",
+   "name": "Pengaduan warga",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-002",
+    "F-008",
+    "F-007"
+   ],
+   "evidence": [
+    "E-002",
+    "E-024"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "warga mengirim pengaduan",
+     "when": "POST /api/complaints",
+     "then": "pengaduan tersimpan dan muncul di daftar dengan status baru"
+    },
+    {
+     "given": "judul laporan kosong",
+     "when": "warga menekan Kirim Laporan",
+     "then": "toast 'Judul laporan belum diisi' tampil dan tidak ada data tersimpan"
+    }
+   ]
+  },
+  {
+   "id": "FT-13",
+   "name": "Surat warga (pengajuan dan riwayat)",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-007"
+   ],
+   "evidence": [
+    "E-021",
+    "E-019"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "warga belum pernah mengajukan surat",
+     "when": "membuka /surat",
+     "then": "tampil 'Belum ada pengajuan surat.' sebagai empty state berteks"
+    },
+    {
+     "given": "warga mengajukan surat",
+     "when": "form dikirim",
+     "then": "pengajuan tercatat pada riwayat dengan status awal"
+    }
+   ]
+  },
+  {
+   "id": "FT-05",
+   "name": "CCTV lingkungan (stream + kontrol akses)",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-002",
+    "F-012"
+   ],
+   "evidence": [
+    "E-016"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "kamera aktif dan ffmpeg tersedia",
+     "when": "membuka /cctv",
+     "then": "daftar kamera tampil dan stream dapat dibuka sesuai izin peran"
+    }
+   ]
+  },
+  {
+   "id": "FT-06",
+   "name": "Kas transparan (buku kas + laporan)",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-008",
+    "F-002"
+   ],
+   "evidence": [
+    "E-002"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "ada transaksi kas",
+     "when": "membuka /kas",
+     "then": "saldo, pemasukan, pengeluaran, dan riwayat konsisten dengan /api/cash"
+    }
+   ]
+  },
+  {
+   "id": "FT-07",
+   "name": "Nomor darurat & panic (halaman publik)",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-001"
+   ],
+   "evidence": [
+    "E-017"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "pengguna tanpa login",
+     "when": "membuka /darurat",
+     "then": "nomor darurat tampil dan tombol panggil berfungsi"
+    }
+   ]
+  },
+  {
+   "id": "FT-08",
+   "name": "PWA offline",
+   "priority": "should",
+   "status": "OBSERVED",
+   "findings": [
+    "F-009"
+   ],
+   "evidence": [
+    "E-008"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "halaman pernah dibuka",
+     "when": "jaringan diputus",
+     "then": "/offline tampil dari service worker"
+    }
+   ]
+  },
+  {
+   "id": "FT-09",
+   "name": "State per peran: kosong, validasi, izin, 404",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-007",
+    "F-013",
+    "F-014"
+   ],
+   "evidence": [
+    "E-019",
+    "E-021",
+    "E-023",
+    "E-025"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "warga tanpa pengajuan surat",
+     "when": "membuka /surat",
+     "then": "tampil teks empty 'Belum ada pengajuan surat.' (bukan halaman kosong tanpa pesan)"
+    },
+    {
+     "given": "bendahara membuka /lintas-rt",
+     "when": "server menolak karena izin",
+     "then": "panel menampilkan pesan izin dan TIDAK menampilkan 'Belum ada permintaan.'"
+    },
+    {
+     "given": "pengguna membuka rute tak dikenal",
+     "when": "rute tidak ada",
+     "then": "shell aplikasi tampil dengan pesan 404 ramah, bukan badan JSON mentah"
+    },
+    {
+     "given": "warga menekan 'Kirim Laporan' tanpa judul",
+     "when": "submit",
+     "then": "toast 'Judul laporan belum diisi' tampil dan tidak ada data tersimpan"
+    }
+   ]
+  },
+  {
+   "id": "FT-10",
+   "name": "Pengumuman & broadcast pengurus",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-015"
+   ],
+   "evidence": [
+    "E-029",
+    "E-019"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "warga membuka /pengumuman",
+     "when": "halaman dirender",
+     "then": "daftar pengumuman tampil dengan teks 'Broadcast' sebagai penanda modul"
+    },
+    {
+     "given": "belum ada pengumuman",
+     "when": "warga membuka /pengumuman",
+     "then": "tampil pesan empty, bukan panel kosong tanpa teks"
+    }
+   ]
+  },
+  {
+   "id": "FT-11",
+   "name": "Manajemen warga & Kartu Keluarga (NIK tersamar)",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-016"
+   ],
+   "evidence": [
+    "E-030"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "pengurus RT membuka /warga",
+     "when": "daftar dirender",
+     "then": "NIK tampil tersamar (34********0003), bukan angka penuh"
+    },
+    {
+     "given": "warga pindah/meninggal",
+     "when": "pengurus menonaktifkan",
+     "then": "data tidak dihapus (riwayat iuran tetap utuh) dan status jadi nonaktif"
+    }
+   ]
+  },
+  {
+   "id": "FT-12",
+   "name": "Audit trail permanen (login, bayar, approval, panic, kamera)",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-017"
+   ],
+   "evidence": [
+    "E-031"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "ketua RW membuka /audit",
+     "when": "halaman dirender",
+     "then": "log memuat waktu, aksi, ringkasan, aktor (mis. auth.login.success)"
+    }
+   ]
+  }
+ ],
+ "build_seeds": {
+  "entities": [
+   {
+    "table": "account_activations",
+    "columns": [
+     "user_id",
+     "code_hash",
+     "status",
+     "'used'",
+     "'revoked'))",
+     "attempts",
+     "expires_at",
+     "created_at",
+     "used_at",
+     "sent_wa",
+     "sent_email",
+     "last_channel"
+    ],
+    "locator": "real_system/accounts.py"
+   },
+   {
+    "table": "announcements",
+    "columns": [
+     "id",
+     "title",
+     "body",
+     "channel",
+     "created_by",
+     "created_at"
+    ],
+    "locator": "real_system/core.py"
+   },
+   {
+    "table": "audit_log",
+    "columns": [
+     "id",
+     "actor_user_id",
+     "actor_role",
+     "action",
+     "summary",
+     "ip",
+     "user_agent",
+     "created_at"
+    ],
+    "locator": "real_system/core.py"
+   },
+   {
+    "table": "cash_ledger",
+    "columns": [
+     "id",
+     "entry_at",
+     "kind",
+     "'expense'))",
+     "source",
+     "description",
+     "amount",
+     "ref_table",
+     "ref_id",
+     "created_by",
+     "category",
+     "reverses_id"
+    ],
+    "locator": "real_system/core.py"
+   },
+   {
+    "table": "cctv_access_log",
+    "columns": [
+     "id",
+     "camera_code",
+     "user_id",
+     "user_role",
+     "action",
+     "ip",
+     "created_at"
+    ],
+    "locator": "real_system/cctv.py"
+   },
+   {
+    "table": "cctv_cameras",
+    "columns": [
+     "id",
+     "code",
+     "name",
+     "location",
+     "zone",
+     "visibility",
+     "'resident'",
+     "'restricted'))",
+     "kind",
+     "source_url",
+     "resolution",
+     "fps",
+     "recording",
+     "ptz",
+     "night_vision",
+     "enabled",
+     "purpose",
+     "installed_at"
+    ],
+    "locator": "real_system/cctv.py"
+   },
+   {
+    "table": "complaints",
+    "columns": [
+     "id",
+     "resident_id",
+     "title",
+     "severity",
+     "status",
+     "created_at"
+    ],
+    "locator": "real_system/core.py"
+   },
+   {
+    "table": "dues",
+    "columns": [
+     "id",
+     "resident_id",
+     "period",
+     "category",
+     "amount",
+     "status",
+     "'paid'",
+     "'waived'))",
+     "paid_at",
+     "method",
+     "created_at"
+    ],
+    "locator": "real_system/core.py"
+   },
+   {
+    "table": "letters",
+    "columns": [
+     "id",
+     "resident_id",
+     "type",
+     "purpose",
+     "status",
+     "'approved_rt'",
+     "'issued'",
+     "'rejected'))",
+     "number",
+     "html",
+     "requested_at",
+     "updated_at"
+    ],
+    "locator": "real_system/core.py"
+   },
+   {
+    "table": "notification_config",
+    "columns": [
+     "id",
+     "mode",
+     "wa_provider",
+     "wa_sender",
+     "wa_endpoint",
+     "wa_token_enc",
+     "email_from",
+     "email_from_name",
+     "smtp_host",
+     "smtp_port",
+     "smtp_username",
+     "smtp_password_enc",
+     "smtp_use_tls",
+     "enabled",
+     "updated_at",
+     "updated_by"
+    ],
+    "locator": "real_system/notify_gateway.py"
+   },
+   {
+    "table": "notification_log",
+    "columns": [
+     "id",
+     "channel",
+     "provider",
+     "kind",
+     "target_masked",
+     "subject",
+     "status",
+     "provider_ref",
+     "error",
+     "attempts",
+     "actor_id",
+     "created_at"
+    ],
+    "locator": "real_system/notify_gateway.py"
+   },
+   {
+    "table": "org",
+    "columns": [
+     "id",
+     "name",
+     "rw",
+     "rt_scope",
+     "village",
+     "district",
+     "regency",
+     "province",
+     "address",
+     "phone",
+     "email",
+     "rw_chair"
+    ],
+    "locator": "real_system/core.py"
+   },
+   {
+    "table": "panic_events",
+    "columns": [
+     "id",
+     "user_id",
+     "resident_id",
+     "community",
+     "zone",
+     "contact",
+     "note",
+     "status",
+     "opened_at",
+     "ack_by",
+     "ack_at",
+     "resolved_by",
+     "resolved_at",
+     "resolution"
+    ],
+    "locator": "real_system/panic.py"
+   },
+   {
+    "table": "panic_pins",
+    "columns": [
+     "user_id",
+     "pin_hash",
+     "failed_count",
+     "locked_until",
+     "updated_at"
+    ],
+    "locator": "real_system/panic.py"
+   },
+   {
+    "table": "patrol_logs",
+    "columns": [
+     "id",
+     "status",
+     "scanned_at",
+     "guard_name"
+    ],
+    "locator": "real_system/core.py"
+   },
+   {
+    "table": "payment_attempts",
+    "columns": [
+     "id",
+     "invoice_id",
+     "provider",
+     "method",
+     "reference",
+     "amount",
+     "status",
+     "created_by",
+     "created_at"
+    ],
+    "locator": "real_system/payments.py"
+   },
+   {
+    "table": "payment_events",
+    "columns": [
+     "id",
+     "provider",
+     "event_id",
+     "event_type",
+     "signature_valid",
+     "invoice_no",
+     "external_ref",
+     "amount",
+     "status",
+     "processed",
+     "reason",
+     "raw_digest",
+     "received_at",
+     "event_id)"
+    ],
+    "locator": "real_system/payments.py"
+   },
+   {
+    "table": "payment_invoices",
+    "columns": [
+     "id",
+     "invoice_no",
+     "due_id",
+     "resident_id",
+     "amount",
+     "period",
+     "category",
+     "status",
+     "provider",
+     "external_ref",
+     "expires_at",
+     "created_at",
+     "updated_at"
+    ],
+    "locator": "real_system/payments.py"
+   },
+   {
+    "table": "payment_provider_config",
+    "columns": [
+     "id",
+     "mode",
+     "bank_name",
+     "bank_account",
+     "bank_holder",
+     "instructions",
+     "qris_asset",
+     "provider",
+     "environment",
+     "merchant_id",
+     "enabled",
+     "updated_at",
+     "updated_by"
+    ],
+    "locator": "real_system/payments.py"
+   },
+   {
+    "table": "residents",
+    "columns": [
+     "id",
+     "kk_no",
+     "nik_masked",
+     "name",
+     "gender",
+     "rt",
+     "block",
+     "house_no",
+     "phone",
+     "occupation",
+     "status",
+     "user_id"
+    ],
+    "locator": "real_system/core.py"
+   },
+   {
+    "table": "rt_access_requests",
+    "columns": [
+     "id",
+     "requester_id",
+     "requester_rt",
+     "target_rt",
+     "reason",
+     "status",
+     "'approved'",
+     "'denied'",
+     "'revoked'))",
+     "requested_at",
+     "decided_by",
+     "decided_at",
+     "expires_at",
+     "decision_note"
+    ],
+    "locator": "real_system/core.py"
+   },
+   {
+    "table": "sessions",
+    "columns": [
+     "id",
+     "user_id",
+     "user_agent",
+     "csrf_token",
+     "created_at",
+     "last_seen_at"
+    ],
+    "locator": "real_system/core.py"
+   },
+   {
+    "table": "tenant_branding",
+    "columns": [
+     "id",
+     "app_title",
+     "logo_text",
+     "logo_url",
+     "favicon_url",
+     "accent",
+     "accent_2",
+     "footer",
+     "custom_domain",
+     "updated_at"
+    ],
+    "locator": "real_system/tenant.py"
+   },
+   {
+    "table": "tenant_config",
+    "columns": [
+     "id",
+     "mode",
+     "org_name",
+     "org_short",
+     "rw_label",
+     "rt_scope",
+     "rt_list",
+     "letter_code",
+     "village",
+     "district",
+     "regency",
+     "province",
+     "address",
+     "phone",
+     "email",
+     "chair_rw",
+     "chair_rt",
+     "service_hours",
+     "social_instagram",
+     "social_threads",
+     "social_youtube",
+     "privacy_notice",
+     "cctv_notice",
+     "retention_months",
+     "timezone",
+     "locale",
+     "setup_complete",
+     "feature_flags",
+     "updated_at",
+     "updated_by"
+    ],
+    "locator": "real_system/tenant.py"
+   },
+   {
+    "table": "users",
+    "columns": [
+     "id",
+     "email",
+     "name",
+     "role",
+     "'rt_admin'",
+     "'security'",
+     "'resident'",
+     "'treasurer'",
+     "'ops_admin'))",
+     "rt",
+     "block",
+     "password_hash",
+     "active",
+     "created_at"
+    ],
+    "locator": "real_system/core.py"
+   }
+  ],
+  "api": [
+   {
+    "path": "/api/activation",
+    "method": "POST",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:426"
+   },
+   {
+    "path": "/api/health",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:458"
+   },
+   {
+    "path": "/api/emergency",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:473"
+   },
+   {
+    "path": "/api/emergency/search",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:475"
+   },
+   {
+    "path": "/api/public/stats",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:477"
+   },
+   {
+    "path": "/api/health/ready",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:482"
+   },
+   {
+    "path": "/api/tenant",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:500"
+   },
+   {
+    "path": "/api/setup",
+    "method": "POST",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:502"
+   },
+   {
+    "path": "/api/login",
+    "method": "POST",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:507"
+   },
+   {
+    "path": "/api/logout",
+    "method": "POST",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:533"
+   },
+   {
+    "path": "/api/me",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:591"
+   },
+   {
+    "path": "/api/admin/payment-config",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:593"
+   },
+   {
+    "path": "/api/admin/integrations/payment/test",
+    "method": "POST",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:603"
+   },
+   {
+    "path": "/api/payments/invoices",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:610"
+   },
+   {
+    "path": "/api/payments/invoices",
+    "method": "POST",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:612"
+   },
+   {
+    "path": "/api/panic/pin",
+    "method": "POST",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:634"
+   },
+   {
+    "path": "/api/panic/status",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:638"
+   },
+   {
+    "path": "/api/panic/events",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:640"
+   },
+   {
+    "path": "/api/panic/trigger",
+    "method": "POST",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:643"
+   },
+   {
+    "path": "/api/cctv/allowed",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:654"
+   },
+   {
+    "path": "/api/admin/cameras",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:656"
+   },
+   {
+    "path": "/api/admin/notification-config",
+    "method": "ANY",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:669"
+   },
+   {
+    "path": "/api/admin/integrations/notify/test",
+    "method": "POST",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:677"
+   },
+   {
+    "path": "/api/admin/notification-log",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:682"
+   },
+   {
+    "path": "/api/admin/notifications/broadcast",
+    "method": "POST",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:684"
+   },
+   {
+    "path": "/api/admin/payment-events",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:691"
+   },
+   {
+    "path": "/api/dashboard",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:708"
+   },
+   {
+    "path": "/api/profile",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:710"
+   },
+   {
+    "path": "/api/dues",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:714"
+   },
+   {
+    "path": "/api/letters",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:729"
+   },
+   {
+    "path": "/api/letters",
+    "method": "POST",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:731"
+   },
+   {
+    "path": "/api/announcements",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:755"
+   },
+   {
+    "path": "/api/announcements",
+    "method": "POST",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:757"
+   },
+   {
+    "path": "/api/complaints",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:762"
+   },
+   {
+    "path": "/api/complaints",
+    "method": "POST",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:764"
+   },
+   {
+    "path": "/api/patrol",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:773"
+   },
+   {
+    "path": "/api/patrol",
+    "method": "POST",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:775"
+   },
+   {
+    "path": "/api/admin/residents/import-template.csv",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:780"
+   },
+   {
+    "path": "/api/admin/residents/import",
+    "method": "POST",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:786"
+   },
+   {
+    "path": "/api/residents",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:795"
+   },
+   {
+    "path": "/api/residents",
+    "method": "POST",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:797"
+   },
+   {
+    "path": "/api/cash",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:808"
+   },
+   {
+    "path": "/api/cash",
+    "method": "POST",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:810"
+   },
+   {
+    "path": "/api/rt-sharing",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:816"
+   },
+   {
+    "path": "/api/rt-sharing/policy",
+    "method": "POST",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:818"
+   },
+   {
+    "path": "/api/rt-access",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:820"
+   },
+   {
+    "path": "/api/rt-access",
+    "method": "POST",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:822"
+   },
+   {
+    "path": "/api/audit",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:830"
+   },
+   {
+    "path": "/api/directory",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:832"
+   },
+   {
+    "path": "/api/cctv",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:836"
+   },
+   {
+    "path": "/api/cctv/health",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:847"
+   },
+   {
+    "path": "/api/cctv/access",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:849"
+   },
+   {
+    "path": "/api/ops",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:871"
+   },
+   {
+    "path": "/api/ops/export",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:873"
+   },
+   {
+    "path": "/api/ops/backup",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:888"
+   },
+   {
+    "path": "/api/ops/cameras",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:900"
+   },
+   {
+    "path": "/api/ops/cameras",
+    "method": "POST",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:904"
+   },
+   {
+    "path": "/api/accounts",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:918"
+   },
+   {
+    "path": "/api/accounts/activation-info",
+    "method": "GET",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:924"
+   },
+   {
+    "path": "/api/accounts",
+    "method": "POST",
+    "status": "OBSERVED",
+    "locator": "real_system/app.py:926"
+   }
+  ],
+  "states": [
+   {
+    "name": "empty",
+    "status": "OBSERVED"
+   },
+   {
+    "name": "error",
+    "status": "OBSERVED"
+   },
+   {
+    "name": "loading",
+    "status": "OBSERVED"
+   },
+   {
+    "name": "offline",
+    "status": "OBSERVED"
+   }
+  ],
+  "design_tokens": {
+   "--ink-0": "#070f0c",
+   "--ink-1": "#0a1512",
+   "--ink-2": "#101b18",
+   "--ink-3": "#13211d",
+   "--glass": "rgba(255,255,255,.05)",
+   "--glass-2": "rgba(255,255,255,.08)",
+   "--line": "rgba(255,255,255,.10)",
+   "--line-2": "rgba(255,255,255,.17)",
+   "--txt": "#eafff8",
+   "--txt-2": "#c3d8d1",
+   "--muted": "#8fa8a1",
+   "--brand": "#3fc39f",
+   "--brand-600": "#2fb28e",
+   "--brand-700": "#7ee0c3",
+   "--brand2": "#3fc39f",
+   "--accent": "#f5c451",
+   "--kpi-num": "#7ee0c3",
+   "--on-brand": "#062018",
+   "--c1": "#3fc39f",
+   "--c2": "#2fb28e",
+   "--c3": "#f5c451",
+   "--c4": "#f0b429",
+   "--c5": "#4ade80",
+   "--danger": "#ef6a5b",
+   "--warn": "#f0b429",
+   "--ok": "#4ade80",
+   "--chart-in": "#3fc39f",
+   "--chart-in-soft": "rgba(63,195,159,.16)",
+   "--chart-out": "#f472b6",
+   "--grad": "linear-gradient(118deg,#0f8a70 0%,#12a37f 100%)",
+   "--grad-soft": "linear-gradient(135deg,rgba(63,195,159,.16),rgba(18,163,127,.10))",
+   "--r-s": "12px",
+   "--r-m": "16px",
+   "--r-l": "18px",
+   "--r-xl": "22px",
+   "--shadow": "0 20px 54px rgba(0,0,0,.5)",
+   "--shadow-s": "0 10px 28px rgba(0,0,0,.35)"
+  },
+  "non_functional": [
+   "Python 3.12 + WSGI stdlib (tanpa framework)",
+   "SQLite /data/portal.sqlite3",
+   "proses non-root uid 10001",
+   "rootfs read-only, PORT dari env"
+  ]
+ },
+ "handoff": {
+  "builders_ready": true,
+  "blocking_unknowns": 0,
+  "summary": "Portal Warga v2.0.0: aplikasi WSGI milik Owner dengan 18 rute halaman + 2 rute darurat, 60 endpoint /api, 18 fungsi view klien, 25 tabel data, PWA aktif, dan tata letak responsif 3 breakpoint. State terautentikasi kini terbukti pada render klien: 21 halaman × 4 peran, empty state berteks, error validasi, error izin, dan rute tak dikenal. Dua pertanyaan integrasi (payment, beban CCTV) tetap non-blocking dan tidak menghalangi build.",
+  "next_actions": [
+   "Builders: pakai build_seeds + acceptance_tests FT-01..FT-08; perbaiki F-013 (kontradiksi empty vs izin) dan F-014 (404 klien).",
+   "Uji /api/cctv/health dan beban stream untuk menutup U-002.",
+   "Jalankan payment test sandbox untuk menutup U-001."
+  ]
+ },
+ "budget": {
+  "used": {
+   "tool_calls": 18,
+   "minutes": 46,
+   "evidence_bytes": 2152907
+  }
+ },
+ "discipline": {
+  "replica_skill_used": false,
+  "wrote_code": false,
+  "mcp_registered": false,
+  "redaction_applied": true
+ },
+ "generated_at": "2026-11-07T05:39:32+07:00",
+ "generator": "sdb-did/1.0 (profil sdb-induk)"
+}

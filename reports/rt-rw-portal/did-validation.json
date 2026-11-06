@@ -1,0 +1,196 @@
+{
+ "schema": "sdb.did.validation/1",
+ "generated_at": "2026-11-07T05:39:32+07:00",
+ "handoff": "runs/rt-rw-portal/did/handoff.json",
+ "passed": true,
+ "metrics": {
+  "target": "rt-rw-portal",
+  "type": "web",
+  "depth": "L2",
+  "findings": 17,
+  "observed": 15,
+  "inferred": 2,
+  "unknowns": 2,
+  "blocking_unknowns": 0,
+  "features": 14,
+  "must_features": 13,
+  "coverage_required": 7,
+  "coverage_covered": 7,
+  "evidence_files": 31,
+  "evidence_bytes": 2152907,
+  "checks": 27,
+  "failed": 0,
+  "observed_ratio": 0.882,
+  "unknown_ratio": 0.105,
+  "quality_bar": {
+   "min_observed_ratio": 0.7,
+   "max_unknown_ratio": 0.3,
+   "min_coverage_pct": 85
+  },
+  "quality_warnings": []
+ },
+ "checks": [
+  {
+   "id": "R01_schema",
+   "ok": true,
+   "severity": "error",
+   "detail": "schema='sdb.did.handoff/1' (harus sdb.did.handoff/1)"
+  },
+  {
+   "id": "R01b_target",
+   "ok": true,
+   "severity": "error",
+   "detail": "slug target='rt-rw-portal'"
+  },
+  {
+   "id": "R02_profile",
+   "ok": true,
+   "severity": "error",
+   "detail": "target type='web'; dikenal: api, binary, desktop, game, mobile, source, web"
+  },
+  {
+   "id": "R03_gate0",
+   "ok": true,
+   "severity": "error",
+   "detail": "disk=PASS; handoff=PASS"
+  },
+  {
+   "id": "R04a_manifest",
+   "ok": true,
+   "severity": "error",
+   "detail": "31 entri evidence"
+  },
+  {
+   "id": "R04b_exists",
+   "ok": true,
+   "severity": "error",
+   "detail": "semua ada"
+  },
+  {
+   "id": "R04c_inside_repo",
+   "ok": true,
+   "severity": "error",
+   "detail": "aman"
+  },
+  {
+   "id": "R04d_hash",
+   "ok": true,
+   "severity": "error",
+   "detail": "cocok"
+  },
+  {
+   "id": "R04e_no_secret",
+   "ok": true,
+   "severity": "error",
+   "detail": "bersih"
+  },
+  {
+   "id": "R05a_status",
+   "ok": true,
+   "severity": "error",
+   "detail": "status tak dikenal: []"
+  },
+  {
+   "id": "R05b_observed_has_evidence",
+   "ok": true,
+   "severity": "error",
+   "detail": "OBSERVED tanpa evidence: []"
+  },
+  {
+   "id": "R05c_refs_valid",
+   "ok": true,
+   "severity": "error",
+   "detail": "rujukan menggantung: []"
+  },
+  {
+   "id": "R05d_inferred_conf+falsify",
+   "ok": true,
+   "severity": "error",
+   "detail": "INFERRED tanpa confidence: [] | tanpa falsifikasi: []"
+  },
+  {
+   "id": "R06_unknowns_complete",
+   "ok": true,
+   "severity": "error",
+   "detail": "2 unknown lengkap"
+  },
+  {
+   "id": "R07a_coverage_present",
+   "ok": true,
+   "severity": "error",
+   "detail": "kategori belum dilaporkan: []"
+  },
+  {
+   "id": "R07b_coverage_filled",
+   "ok": true,
+   "severity": "error",
+   "detail": "kategori MISSING: []"
+  },
+  {
+   "id": "R08a_must_has_observed",
+   "ok": true,
+   "severity": "error",
+   "detail": "must tanpa bukti OBSERVED: []"
+  },
+  {
+   "id": "R08b_must_has_tests",
+   "ok": true,
+   "severity": "error",
+   "detail": "must tanpa acceptance test lengkap: []"
+  },
+  {
+   "id": "R09a_api_probe",
+   "ok": true,
+   "severity": "error",
+   "detail": "API INFERRED tanpa probe: []"
+  },
+  {
+   "id": "R09b_seeds_present",
+   "ok": true,
+   "severity": "error",
+   "detail": "seed wajib kosong: []"
+  },
+  {
+   "id": "R10a_no_replica",
+   "ok": true,
+   "severity": "error",
+   "detail": "replica_skill_used=False"
+  },
+  {
+   "id": "R10b_readonly",
+   "ok": true,
+   "severity": "error",
+   "detail": "wrote_code=False"
+  },
+  {
+   "id": "R10c_no_mcp",
+   "ok": true,
+   "severity": "error",
+   "detail": "mcp_registered=False"
+  },
+  {
+   "id": "R10d_redacted",
+   "ok": true,
+   "severity": "error",
+   "detail": "redaction_applied=True"
+  },
+  {
+   "id": "R11_budget",
+   "ok": true,
+   "severity": "error",
+   "detail": "dalam anggaran"
+  },
+  {
+   "id": "R12_builders_ready",
+   "ok": true,
+   "severity": "error",
+   "detail": "builders_ready=True, blocking_unknowns=0"
+  },
+  {
+   "id": "R13_quality_bar",
+   "ok": true,
+   "severity": "warn",
+   "detail": "observed 0.88, unknown 0.11, coverage 100%"
+  }
+ ]
+}

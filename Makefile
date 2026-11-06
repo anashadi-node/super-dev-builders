@@ -141,6 +141,13 @@ did-bench:
 		--json-out "reports/$$slug/did-bench.json"; \
 	cat "reports/$$slug/did-bench.json"
 
+# did-pack: ubah handoff menjadi backlog Builders — hanya bila gerbang B01..B06 lulus.
+# `builders_ready` yang diakui tanpa diperiksa tidak membuktikan apa pun; target ini menghitungnya.
+did-pack:
+	@slug="$${TARGET:-}"; \
+	if [ -z "$$slug" ]; then echo "pakai: make did-pack TARGET=<slug>"; exit 2; fi; \
+	$(PY_SYS) scripts/did_build_pack.py --handoff "runs/$$slug/did/handoff.json" --out-dir "runs/$$slug/did"
+
 # fixtures: bangun ulang fixture DID mobile/desktop dari sumber yang ikut git.
 # fixtures-verify: buktikan build-nya deterministik (hash sama dengan catatan).
 fixtures:

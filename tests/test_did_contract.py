@@ -188,6 +188,27 @@ def test_bench_matematika():
     assert res["hallucination_rate"] == pytest.approx(0.5)
 
 
+def test_bench_label_jatuh_ke_fitur_paling_spesifik():
+    """Regresi: fitur yang hanya *menyebut* modul lain tak boleh mencuri labelnya.
+
+    Dulu pencocokan memakai "yang pertama cocok", sehingga fitur beranda (yang
+    menyebut iuran/kas dalam ringkasannya) mendapat label kas dan fitur kas
+    sendiri tercatat sebagai ekstra — recall tampak lebih tinggi dari kenyataan.
+    """
+    handoff = {"features": [
+        {"id": "C1", "name": "Beranda ringkas (statistik, pintasan iuran dan kas)",
+         "status": "OBSERVED", "evidence": ["E-1"]},
+        {"id": "C2", "name": "Kas transparan (buku kas + laporan)",
+         "status": "OBSERVED", "evidence": ["E-2"]},
+    ]}
+    truth = {"features": [{"id": "F01", "name": "Kas transparan dan laporan", "keywords": ["kas", "buku kas"]}]}
+    res = dv.bench(handoff, truth)
+    assert res["true_positives"] == 1
+    assert res["missed"] == []
+    assert res["extras"] == ["C1"], res
+    assert res["precision"] == pytest.approx(0.5)
+
+
 def test_bench_pisahkan_ekstra_dari_halusinasi():
     """Fitur OBSERVED ber-bukti yang tak ada di label = ekstra, bukan karangan."""
     handoff = {"features": [

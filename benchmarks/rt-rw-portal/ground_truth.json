@@ -1,0 +1,22 @@
+{
+  "target": "rt-rw-portal",
+  "labeler": "Modul & nama uji milik target (~/rt-rw-portal/tests, 33 berkas; README modul per peran), ditulis sebelum handoff DID dirilis",
+  "labeled_at": "2026-11-07",
+  "note": "Label perilaku per modul yang wajib ada di SPEC. Diturunkan dari nama uji dan label modul aplikasi, bukan dari nama fitur handoff. Hardening (escape HTML, formula CSV, traversal statis) sengaja tidak dijadikan label modul: itu properti keamanan yang diuji pemilik, bukan modul yang dibangun ulang.",
+  "features": [
+    {"id": "L01", "name": "Masuk dan sesi pengguna", "keywords": ["masuk", "sesi", "login"]},
+    {"id": "L02", "name": "Matriks akses per peran", "keywords": ["matriks akses", "akses per peran", "satpam"]},
+    {"id": "L03", "name": "Iuran dan tagihan warga", "keywords": ["iuran", "tagihan", "kwitansi"]},
+    {"id": "L04", "name": "Pengaduan warga", "keywords": ["pengaduan"]},
+    {"id": "L05", "name": "Kas transparan dan laporan", "keywords": ["kas", "buku kas"]},
+    {"id": "L06", "name": "Surat warga", "keywords": ["surat", "pengajuan surat"]},
+    {"id": "L07", "name": "Pengumuman dan broadcast", "keywords": ["pengumuman", "broadcast"]},
+    {"id": "L08", "name": "CCTV lingkungan", "keywords": ["cctv", "stream", "snapshot"]},
+    {"id": "L09", "name": "Nomor darurat dan panic", "keywords": ["darurat", "panic"]},
+    {"id": "L10", "name": "PWA offline", "keywords": ["offline", "pwa"]},
+    {"id": "L11", "name": "Manajemen warga dan kartu keluarga", "keywords": ["kartu keluarga", "nik tersamar", "data pribadi"]},
+    {"id": "L12", "name": "Audit trail", "keywords": ["audit trail", "jejak permanen"]},
+    {"id": "L13", "name": "Beranda ringkas", "keywords": ["beranda", "statistik organisasi", "pintasan modul"]},
+    {"id": "L14", "name": "State kosong, izin, dan 404", "keywords": ["state per peran", "empty state", "rute tak dikenal"]}
+  ]
+}

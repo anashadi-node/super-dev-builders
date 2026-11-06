@@ -384,23 +384,36 @@ def bench(handoff: dict, truth: dict) -> dict:
 
     keys_of = [(label_phrases(tf), _tokens(label_text(tf)), tf) for tf in truth_feats]
 
-    taken, matched_truth = set(), []
-    for cf in claimed:
+    # Cocokkan dengan skor, bukan "yang pertama cocok". Uji pertama-cocok pernah
+    # memberi label kas kepada fitur beranda (yang hanya menyebut modul lain dalam
+    # ringkasannya), sehingga fitur kas sendiri tercatat sebagai ekstra dan recall
+    # tampak lebih tinggi daripada kenyataan.
+    kandidat = []
+    for i, cf in enumerate(claimed):
         b = blob(cf)
         bt = _tokens(blob(cf))
         for keys, lt, tf in keys_of:
-            if tf.get("id") in taken:
-                continue
+            hits = [k for k in keys if len(k) >= 3 and k in b]
             jac = len(bt & lt) / max(len(bt | lt), 1)
-            if any(k in b for k in keys if len(k) >= 3) or jac >= 0.34:
-                taken.add(tf.get("id"))
-                matched_truth.append(tf.get("id"))
-                cf["_hit"] = True
-                break
+            if hits:
+                # frasa lebih panjang = lebih spesifik = skor lebih tinggi
+                skor = 2.0 + max(len(k) for k in hits) / 100.0
+            elif jac >= 0.60:
+                skor = jac
+            else:
+                continue
+            kandidat.append((skor, i, tf.get("id")))
+    kandidat.sort(key=lambda x: (-x[0], x[1], str(x[2])))
 
-    unmatched = [c for c in claimed if not c.get("_hit")]
-    for c in claimed:
-        c.pop("_hit", None)
+    taken, matched_truth, hit = set(), [], set()
+    for skor, i, tid in kandidat:
+        if tid in taken or i in hit:
+            continue
+        taken.add(tid)
+        hit.add(i)
+        matched_truth.append(tid)
+
+    unmatched = [c for i, c in enumerate(claimed) if i not in hit]
     hallucinated = [c.get("id") for c in unmatched
                     if str(c.get("status", "")).upper() == "OBSERVED"
                     and not (c.get("evidence") or c.get("findings"))]

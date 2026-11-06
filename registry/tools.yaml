@@ -123,7 +123,7 @@ present:
     provenance: "SLSA v1 attestation, publisher GitHub Actions OIDC"
     evidence: "reports/REA_AUDIT_20261026.md (scan IOC 0 temuan, 29 temuan scanner = 100% FP, uji fixture 1,83 s)"
     policy: "Gate #0 PASS wajib; tier T0 statis default, T1 capture, T2 debug/frida, T3 perangkat = approval per aksi; MCP (229 tool / 3,79 MB) TIDAK didaftarkan"
-    note: "engine native (ghidra/ida/jadx/hopper) belum terpasang -> hanya JS/Electron, web, artefak statis, EVM yang tersedia; node host 26.7.0 di luar `engines` namun terbukti berjalan"
+    note: "VERIFIED 2026-11-06: ghidra 12.1.4 + JDK 21 terpasang di ~/.local/opt dan provider ghidra REA available=true (bukti: `bash scripts/rea doctor` + evidence/elf-demo/rea-inspect.json). ida/hopper/jadx tetap belum ada. node host kini 26.13.0 (>=26.12.1) memenuhi `engines`; wrapper memilih node secara otomatis"
     license: MIT
     approved_by: mas anas
     approved_at: 2026-10-26
@@ -170,7 +170,7 @@ quarantine:
   - id: ghidra
     role: native_disassembly
     mode: B_only_heavy
-    note: "cek security advisory versi sebelum pakai"
+    note: "TERPASANG 12.1.4 (2026-11-06); cek security advisory versi sebelum pakai"
 
 deferred:
   - id: backstopjs

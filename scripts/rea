@@ -6,7 +6,28 @@ set -euo pipefail
 
 REA_VERSION="6.8.0"
 REA_PREFIX="${REA_PREFIX:-$HOME/.hermes/tools/rea-$REA_VERSION}"
-REA_NODE="${REA_NODE_BIN:-$HOME/.hermes/tools/node-26.7.0-linux-x64/bin/node}"
+# Node: REA 6.8.0 mendukung 22.23.4+ / 24.22.1+ / 26.12.1+. Versi lama sempat dipaku manual
+# dan membuat `rea doctor` melaporkan healthy:false. Sekarang pilih otomatis yang memenuhi,
+# dengan fallback ke pin lama bila tidak ada kandidat (perilaku lama dipertahankan).
+_node_ok() {  # $1 = path node
+  local v
+  v="$("$1" -p 'process.versions.node' 2>/dev/null)" || return 1
+  case "$v" in
+    2[6-9].*|3[0-9].*) printf '%s\n%s\n' "26.12.1" "$v" | sort -V -C ;;
+    24.*)             printf '%s\n%s\n' "24.22.1" "$v" | sort -V -C ;;
+    22.*)             printf '%s\n%s\n' "22.23.4" "$v" | sort -V -C ;;
+    *) return 1 ;;
+  esac
+}
+_pick_node() {
+  local d
+  for d in "$HOME"/.local/opt/node-v*-linux-x64 "$HOME"/.hermes/tools/node-*-linux-x64; do
+    [ -x "$d/bin/node" ] || continue
+    if _node_ok "$d/bin/node"; then echo "$d/bin/node"; return 0; fi
+  done
+  return 1
+}
+REA_NODE="${REA_NODE_BIN:-$(_pick_node || echo "$HOME/.hermes/tools/node-26.7.0-linux-x64/bin/node")}"
 REA_ENTRY="$REA_PREFIX/node_modules/rea-agents/scripts/rea.mjs"
 
 if [ ! -x "$REA_NODE" ]; then

@@ -16,7 +16,7 @@
 #   brief     instruksi satu paragraf untuk agen (tahap doc)
 #   human     true bila tahap ini butuh keputusan manusia (tidak bisa self-approve)
 version: 1
-updated: "2026-11-05"
+updated: "2026-11-06"
 stages:
   - code: "01"
     name: "USER OBJECTIVE"
@@ -53,6 +53,23 @@ stages:
     brief: >-
       Panen bukti dengan alat (REA/capture_web) dan simpan manifest ber-hash.
       Berkas JSON tanpa hash bukan bukti.
+
+  - code: "01C"
+    name: "DID: INVESTIGASI MENDALAM + HANDOFF"
+    artifacts:
+      - "runs/{t}/did/handoff.json"
+      - "runs/{t}/did/SPEC_DID.md"
+      - "reports/{t}/did-validation.json"
+    tool: "did_validate.py"
+    profile: "cc-capture-forensics"
+    kind: "exec"
+    human: false
+    brief: >-
+      Hanya bila target butuh kedalaman (did_scope menyebut type + depth L1-L4).
+      Panen bukti dengan REA/capture_web, tandai OBSERVED/INFERRED/UNKNOWN, lalu terbitkan
+      runs/{t}/did/handoff.json. Tahap ini TIDAK SAH bila `did_validate.py` belum PASS:
+      jalankan `python3 scripts/did_validate.py validate --target {t} --render`.
+      Dilarang menulis kode produk, memakai Replica Skill, atau mendaftarkan MCP.
 
   - code: "02"
     name: "ORCHESTRATOR: KLARIFIKASI"

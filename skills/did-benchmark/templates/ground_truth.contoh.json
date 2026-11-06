@@ -1,0 +1,88 @@
+{
+ "target": "e1-app",
+ "labeler": "Owner",
+ "labeled_at": "2026-11-06",
+ "note": "Label fitur inti e1-app, ditulis dari SPEC.md sebelum investigasi baru dijalankan.",
+ "features": [
+  {
+   "id": "F01",
+   "name": "Daftar produk",
+   "keywords": [
+    "daftar produk",
+    "product list"
+   ]
+  },
+  {
+   "id": "F02",
+   "name": "Filter harga",
+   "keywords": [
+    "filter harga",
+    "price range"
+   ]
+  },
+  {
+   "id": "F03",
+   "name": "Pencarian",
+   "keywords": [
+    "pencarian",
+    "search"
+   ]
+  },
+  {
+   "id": "F04",
+   "name": "Detail produk",
+   "keywords": [
+    "detail produk",
+    "product detail"
+   ]
+  },
+  {
+   "id": "F05",
+   "name": "Keranjang",
+   "keywords": [
+    "keranjang",
+    "cart"
+   ]
+  },
+  {
+   "id": "F06",
+   "name": "Checkout",
+   "keywords": [
+    "checkout",
+    "pembayaran"
+   ]
+  },
+  {
+   "id": "F07",
+   "name": "Login pengguna",
+   "keywords": [
+    "login",
+    "masuk akun"
+   ]
+  },
+  {
+   "id": "F08",
+   "name": "Riwayat pesanan",
+   "keywords": [
+    "riwayat pesanan",
+    "order history"
+   ]
+  },
+  {
+   "id": "F09",
+   "name": "Ulasan produk",
+   "keywords": [
+    "ulasan",
+    "review"
+   ]
+  },
+  {
+   "id": "F10",
+   "name": "Halaman admin",
+   "keywords": [
+    "admin",
+    "kelola produk"
+   ]
+  }
+ ]
+}

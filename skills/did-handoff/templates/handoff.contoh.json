@@ -1,0 +1,296 @@
+{
+ "_contoh": true,
+ "_catatan": "CONTOH bentuk, bukan hasil investigasi nyata. Salin ke runs/<target>/did/handoff.json lalu ganti seluruh nilai.",
+ "schema": "sdb.did.handoff/1",
+ "generated_at": "2026-11-06T10:00:00+07:00",
+ "target": {
+  "slug": "contoh-web",
+  "name": "Katalog Contoh",
+  "type": "web",
+  "authorization": {
+   "gate0_verdict": "PASS",
+   "manifest": "evidence/contoh-web/authorization.yaml"
+  }
+ },
+ "scope": {
+  "depth": "L2",
+  "profile": "web",
+  "in_scope": [
+   "halaman publik",
+   "alur pencarian",
+   "keranjang tanpa checkout"
+  ],
+  "out_of_scope": [
+   "area login",
+   "pembayaran"
+  ]
+ },
+ "providers": [
+  {
+   "id": "rea",
+   "version": "6.8.0",
+   "snapshot": "evidence/providers/providers-20261106.json"
+  }
+ ],
+ "evidence_manifest": [
+  {
+   "id": "E-001",
+   "path": "evidence/contoh-web/rea/inventory.json",
+   "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+   "captured_at": "2026-11-06T09:10:00+07:00",
+   "status": "OBSERVED",
+   "authority": "rea capture"
+  },
+  {
+   "id": "E-002",
+   "path": "evidence/contoh-web/network/search.json",
+   "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+   "captured_at": "2026-11-06T09:20:00+07:00",
+   "status": "OBSERVED",
+   "authority": "playwright har"
+  }
+ ],
+ "findings": [
+  {
+   "id": "F-001",
+   "status": "OBSERVED",
+   "claim": "12 kartu produk dirender di /katalog dengan filter harga dua slider.",
+   "locator": "/katalog",
+   "evidence": [
+    "E-001"
+   ]
+  },
+  {
+   "id": "F-002",
+   "status": "OBSERVED",
+   "claim": "Pencarian memanggil GET /api/products?q=&min=&max= dan mengembalikan array items.",
+   "locator": "response GET /api/products",
+   "evidence": [
+    "E-002"
+   ]
+  },
+  {
+   "id": "F-003",
+   "status": "INFERRED",
+   "confidence": 78,
+   "claim": "Pagination memakai parameter page (1-based) karena tombol 2 memicu page=2.",
+   "locator": "response GET /api/products?page=2",
+   "evidence": [
+    "E-002"
+   ],
+   "falsification": {
+    "test": "Buka /api/products?page=0 dan page=2, bandingkan items[0].id",
+    "expected": "page=0 mengulang page=1; page=2 melanjutkan"
+   }
+  },
+  {
+   "id": "F-004",
+   "status": "UNKNOWN",
+   "claim": "Batas maksimum hasil per halaman tidak teramati.",
+   "evidence": []
+  }
+ ],
+ "unknowns": [
+  {
+   "id": "U-001",
+   "question": "Berapa page_size maksimum yang diterima API?",
+   "impact": "non-blocking",
+   "probe": "Uji page_size 24/48/96 dalam lingkup otorisasi; catat respons"
+  },
+  {
+   "id": "U-002",
+   "question": "Apakah checkout memakai antrean pembayaran pihak ketiga?",
+   "impact": "blocking",
+   "probe": "Tidak diuji: di luar lingkup. Minta otorisasi atau tunda fitur"
+  }
+ ],
+ "coverage": [
+  {
+   "category": "routes",
+   "status": "COVERED",
+   "found": 6,
+   "evidence": [
+    "E-001"
+   ]
+  },
+  {
+   "category": "states",
+   "status": "COVERED",
+   "found": 4,
+   "evidence": [
+    "E-001"
+   ]
+  },
+  {
+   "category": "components",
+   "status": "COVERED",
+   "found": 9,
+   "evidence": [
+    "E-001"
+   ]
+  },
+  {
+   "category": "network",
+   "status": "COVERED",
+   "found": 5,
+   "evidence": [
+    "E-002"
+   ]
+  },
+  {
+   "category": "auth_flow",
+   "status": "OUT_OF_SCOPE",
+   "found": 0,
+   "evidence": []
+  },
+  {
+   "category": "assets",
+   "status": "COVERED",
+   "found": 14,
+   "evidence": [
+    "E-001"
+   ]
+  },
+  {
+   "category": "responsive",
+   "status": "PARTIAL",
+   "found": 2,
+   "evidence": [
+    "E-001"
+   ]
+  }
+ ],
+ "features": [
+  {
+   "id": "FT-01",
+   "name": "Katalog dengan filter harga",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-001",
+    "F-002"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "12 produk",
+     "when": "filter min=100000 max=200000",
+     "then": "hanya produk dalam rentang tampil"
+    }
+   ]
+  },
+  {
+   "id": "FT-02",
+   "name": "Pagination katalog",
+   "priority": "should",
+   "status": "INFERRED",
+   "findings": [
+    "F-003"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "hasil > 1 halaman",
+     "when": "klik halaman 2",
+     "then": "items berbeda dan tombol aktif berpindah"
+    }
+   ]
+  }
+ ],
+ "build_seeds": {
+  "entities": [
+   {
+    "name": "Product",
+    "status": "OBSERVED",
+    "fields": [
+     {
+      "name": "id",
+      "type": "string",
+      "status": "OBSERVED"
+     },
+     {
+      "name": "price",
+      "type": "number",
+      "status": "OBSERVED"
+     }
+    ]
+   }
+  ],
+  "api": [
+   {
+    "method": "GET",
+    "path": "/api/products",
+    "status": "OBSERVED",
+    "evidence": [
+     "E-002"
+    ],
+    "request": {
+     "q": "string?",
+     "min": "number?",
+     "max": "number?",
+     "page": "number?"
+    },
+    "response": {
+     "items": "Product[]",
+     "total": "number"
+    }
+   },
+   {
+    "method": "GET",
+    "path": "/api/products/{id}",
+    "status": "INFERRED",
+    "evidence": [
+     "E-002"
+    ],
+    "probe": "Buka detail produk dan rekam request"
+   }
+  ],
+  "states": [
+   {
+    "name": "katalog-kosong",
+    "status": "OBSERVED",
+    "evidence": [
+     "E-001"
+    ]
+   }
+  ],
+  "design_tokens": {
+   "colors": [
+    "#111827",
+    "#f9fafb"
+   ],
+   "spacing": [
+    "8px",
+    "16px",
+    "24px"
+   ]
+  },
+  "non_functional": [
+   {
+    "item": "LCP < 2.5s di 4G",
+    "status": "INFERRED",
+    "confidence": 60
+   }
+  ]
+ },
+ "handoff": {
+  "builders_ready": false,
+  "blocking_unknowns": 1,
+  "summary": "Katalog publik terpetakan penuh; checkout belum boleh dibangun sebelum otorisasi.",
+  "next_actions": [
+   "Minta otorisasi checkout",
+   "Uji page_size untuk menutup U-001"
+  ]
+ },
+ "budget": {
+  "used": {
+   "tool_calls": 18,
+   "minutes": 42,
+   "evidence_bytes": 3145728
+  }
+ },
+ "discipline": {
+  "replica_skill_used": false,
+  "wrote_code": false,
+  "mcp_registered": false,
+  "redaction_applied": true
+ }
+}

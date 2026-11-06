@@ -285,8 +285,8 @@ sdb workflow nama-target-saya --require-all   # exit non-nol bila ada yang MISSI
 `--require-all` dipakai ketika runner ini dijadikan gate (harus lengkap), bukan
 sekadar laporan.
 
-> Catatan jujur: saat ini **2 dari 18 tahap punya tool deterministik**
-> (`gate_check.py` dan `release_check.py`). Sisanya masih dijalankan oleh agen /
+> Catatan jujur: saat ini **3 dari 19 tahap punya tool deterministik**
+> (`gate_check.py`, `did_validate.py`, `release_check.py`). Sisanya masih dijalankan oleh agen /
 > manusia. Ini keterbatasan yang diketahui, bukan klaim palsu bahwa semuanya
 > sudah otomatis.
 

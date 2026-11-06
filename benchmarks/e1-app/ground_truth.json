@@ -1,0 +1,88 @@
+{
+ "target": "e1-app",
+ "labeler": "SPEC e1 (benchmarks/e1/checks.py, ditulis 2026-10-30, sebelum investigasi DID)",
+ "labeled_at": "2026-10-30",
+ "note": "Label perilaku dari SPEC/uji buta, bukan dari handoff DID.",
+ "features": [
+  {
+   "id": "F01",
+   "name": "Health check status ok",
+   "keywords": [
+    "health",
+    "status ok"
+   ]
+  },
+  {
+   "id": "F02",
+   "name": "Daftar item id 1-3, completed boolean",
+   "keywords": [
+    "daftar item",
+    "items list"
+   ]
+  },
+  {
+   "id": "F03",
+   "name": "Buat item dengan token 201",
+   "keywords": [
+    "buat item",
+    "create item"
+   ]
+  },
+  {
+   "id": "F04",
+   "name": "Detail item 200 dan 404",
+   "keywords": [
+    "detail item",
+    "item 987654"
+   ]
+  },
+  {
+   "id": "F05",
+   "name": "Ubah item butuh token, 401 tanpa token",
+   "keywords": [
+    "ubah item",
+    "patch 401"
+   ]
+  },
+  {
+   "id": "F06",
+   "name": "Hapus item 204 lalu 404",
+   "keywords": [
+    "hapus item",
+    "delete 204"
+   ]
+  },
+  {
+   "id": "F07",
+   "name": "Login benar 200, salah 401",
+   "keywords": [
+    "login benar",
+    "token"
+   ]
+  },
+  {
+   "id": "F08",
+   "name": "Nama kosong 422",
+   "keywords": [
+    "nama kosong",
+    "422"
+   ]
+  },
+  {
+   "id": "F09",
+   "name": "Paginasi limit offset",
+   "keywords": [
+    "paginasi",
+    "limit offset"
+   ]
+  },
+  {
+   "id": "F10",
+   "name": "Filter completed true/false",
+   "keywords": [
+    "filter completed",
+    "completed true"
+   ]
+  }
+ ]
+}

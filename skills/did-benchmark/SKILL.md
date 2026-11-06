@@ -46,6 +46,15 @@ python3 scripts/did_validate.py bench \
 ```
 Keluaran: `precision`, `recall`, `f1`, `hallucination_rate`, `missed` (label tak tertangkap), `extras` (temuan sah di luar cakupan label), `hallucinated` (fitur `OBSERVED` tanpa bukti apa pun).
 
+Pencocokan memakai tiga lapis: frasa label (name/keywords/aliases) dicek satu per satu sebagai
+substring, lalu Jaccard token ≥ 0,34, dengan stem ringan imbuhan ID/EN. Alias **wajib** diambil dari
+kosakata target (kode sumber, simbol, teks UI), bukan dari kalimat handoff — kalau tidak, pengukuran
+berubah jadi uji kemiripan gaya tulisan.
+
+**Batas yang harus diakui:** skor tinggi bukan bukti klaim benar. Matcher lexical hanya mengukur
+*cakupan* terhadap label; klaim yang salah tapi memakai kata yang sama tetap lolos. Kesalahan isi
+harus ditangkap verifikasi deterministik (disassembly, eksekusi, respons HTTP), bukan oleh skor.
+
 `extras` **bukan** halusinasi: label SPEC tidak lengkap secara definisi. Menghukum ekstra membuat agen belajar berhenti menemukan hal baru — persis kebalikan dari tujuan divisi investigasi.
 
 ## Ambang yang dipakai SDB

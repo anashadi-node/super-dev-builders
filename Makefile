@@ -145,7 +145,17 @@ did-bench:
 pr-merge:
 	@num="$${PR:-}"; \
 	if [ -z "$$num" ]; then echo "pakai: make pr-merge PR=<nomor>"; exit 2; fi; \
-	gh pr checks "$$num" --watch --interval 20 && \
+	ok=0; tries=0; \
+	while [ "$$ok" = "0" ] && [ "$$tries" -lt 40 ]; do \
+		tries=$$((tries + 1)); \
+		if gh pr checks "$$num" --watch --interval 20; then ok=1; continue; fi; \
+		msg=$$(gh pr checks "$$num" 2>&1 || true); \
+		case "$$msg" in \
+			*"no checks reported"*) echo "CI belum mulai (percobaan $$tries) — tunggu 15 dtk"; sleep 15 ;; \
+			*) echo "$$msg"; exit 1 ;; \
+		esac; \
+	done; \
+	[ "$$ok" = "1" ] || { echo "CI tidak pernah muncul setelah $$tries percobaan"; exit 1; }; \
 	gh pr merge "$$num" --squash --admin --delete-branch
 
 release-check:

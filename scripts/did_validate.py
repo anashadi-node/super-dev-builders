@@ -335,8 +335,28 @@ def render_md(h: dict, rep: Report) -> str:
 
 
 # ---------------------------------------------------------------- bench
+_STOP = {"dan", "yang", "untuk", "dengan", "pada", "dari", "ini", "itu", "the", "and", "with", "for"}
+
+
 def _norm(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", " ", str(s).lower()).strip()
+
+
+def _stem(tok: str) -> str:
+    """Stem ringan Indonesia/Inggris: cukup untuk menyamakan imbuhan, bukan NLP penuh."""
+    for pre in ("memper", "menge", "meng", "meny", "men", "mem", "pen", "per", "ber", "ter", "di", "me", "pe"):
+        if tok.startswith(pre) and len(tok) - len(pre) >= 4:
+            tok = tok[len(pre):]
+            break
+    for suf in ("kannya", "nya", "kan", "an", "lah"):
+        if tok.endswith(suf) and len(tok) - len(suf) >= 4:
+            tok = tok[: -len(suf)]
+            break
+    return tok
+
+
+def _tokens(s: str) -> set:
+    return {_stem(t) for t in _norm(s).split() if t not in _STOP and len(t) > 2}
 
 
 def bench(handoff: dict, truth: dict) -> dict:
@@ -353,16 +373,26 @@ def bench(handoff: dict, truth: dict) -> dict:
         return _norm(" ".join([str(cf.get("name", "")), str(cf.get("claim", "")),
                                " ".join(cf.get("keywords") or [])]))
 
-    keys_of = [([_norm(k) for k in [tf.get("id", ""), tf.get("name", ""), *(tf.get("keywords") or [])] if k], tf)
-               for tf in truth_feats]
+    def label_phrases(tf: dict) -> list:
+        """Tiap frasa dicek sendiri-sendiri; menggabungnya jadi satu string membuat
+        pencocokan mustahil (bug: label panjang tak pernah jadi substring handoff)."""
+        raw = [str(tf.get("name", "")), *(tf.get("keywords") or []), *(tf.get("aliases") or [])]
+        return [_norm(x) for x in raw if x and len(_norm(x)) >= 3]
+
+    def label_text(tf: dict) -> str:
+        return " ".join([str(tf.get("id", "")), *(label_phrases(tf))])
+
+    keys_of = [(label_phrases(tf), _tokens(label_text(tf)), tf) for tf in truth_feats]
 
     taken, matched_truth = set(), []
     for cf in claimed:
         b = blob(cf)
-        for keys, tf in keys_of:
+        bt = _tokens(blob(cf))
+        for keys, lt, tf in keys_of:
             if tf.get("id") in taken:
                 continue
-            if any(k in b for k in keys):
+            jac = len(bt & lt) / max(len(bt | lt), 1)
+            if any(k in b for k in keys if len(k) >= 3) or jac >= 0.34:
                 taken.add(tf.get("id"))
                 matched_truth.append(tf.get("id"))
                 cf["_hit"] = True

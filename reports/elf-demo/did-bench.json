@@ -1,0 +1,12 @@
+{
+ "truth_features": 6,
+ "claimed_features": 6,
+ "true_positives": 6,
+ "missed": [],
+ "extras": [],
+ "hallucinated": [],
+ "precision": 1.0,
+ "recall": 1.0,
+ "f1": 1.0,
+ "hallucination_rate": 0.0
+}

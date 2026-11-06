@@ -101,6 +101,77 @@ def test_spa_tidak_diklaim_kosong(env):
     assert all(p["kosong"] is None for p in role["pages"])
 
 
+def _server_token():
+    """Target bergaya dashboard internal: token per peran di header, tanpa /api/login."""
+    class H(BaseHTTPRequestHandler):
+        def log_message(self, format, *args):
+            pass
+
+        def _kirim(self, code, body):
+            data = body.encode()
+            self.send_response(code)
+            self.send_header("Content-Type", "text/html")
+            self.send_header("Content-Length", str(len(data)))
+            self.end_headers()
+            self.wfile.write(data)
+
+        def do_GET(self):
+            tok = self.headers.get("X-Dashboard-Token")
+            if not tok:
+                return self._kirim(401, "<html>butuh token</html>")
+            if tok == "tok-rendah" and self.path == "/audit":
+                return self._kirim(403, "<html>tidak berwenang</html>")
+            if self.path == "/":
+                return self._kirim(200, "<html><body><h1>Command Center</h1><table><tr><td>1</td></tr></table></body></html>")
+            return self._kirim(404, "<html>tidak ada</html>")
+
+    srv = HTTPServer(("127.0.0.1", 0), H)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    return srv
+
+
+def _cfg_token(srv, token, pages=("/",), denied=()):
+    return {"schema": "sdb.did.state_probes/1", "target": "demo-token",
+            "base_url": f"http://127.0.0.1:{srv.server_port}",
+            "roles": [{"name": "gm", "pages": list(pages),
+                       "auth": {"type": "header", "name": "X-Dashboard-Token", "value": token},
+                       "denied": [{"path": d, "expect_status": 403} for d in denied]}],
+            "anon": [{"path": "/", "expect_status": 401}]}
+
+
+def test_peran_token_tanpa_login(monkeypatch):
+    monkeypatch.setenv("T_TOK", "tok-tinggi")
+    srv = _server_token()
+    try:
+        h = cs.tangkap(_cfg_token(srv, "${T_TOK}"))
+    finally:
+        srv.shutdown()
+    role = h["roles"][0]
+    assert role["login_status"] is None and role["ok"] is True
+    assert role["pages"][0]["status"] == 200
+
+
+def test_akses_ditolak_dicatat_bukan_dianggap_ok(monkeypatch):
+    monkeypatch.setenv("T_TOK", "tok-rendah")
+    srv = _server_token()
+    try:
+        h = cs.tangkap(_cfg_token(srv, "${T_TOK}", denied=("/audit",)))
+    finally:
+        srv.shutdown()
+    role = h["roles"][0]
+    assert role["denied"][0]["status"] == 403 and role["denied"][0]["cocok"] is True
+
+
+def test_token_tidak_boleh_muncul_di_html(monkeypatch):
+    monkeypatch.setenv("T_TOK", "tok-tinggi")
+    srv = _server_token()
+    try:
+        h = cs.tangkap(_cfg_token(srv, "${T_TOK}", pages=("/",)))
+    finally:
+        srv.shutdown()
+    assert h["redaction_ok"] is True
+
+
 def test_halaman_statistik_dinilai_per_halaman(env):
     srv = _server("murni")
     try:

@@ -140,6 +140,7 @@ cat runs/<t>/did/SPEC_DID.md
 | `elf-demo` | binary / L3 | PASS · 8 temuan · must 4 · coverage 5/6 | **P 1,000 · R 1,000 · F1 1,000** · halusinasi 0 (6 label dari `demo.c` + `nm`) |
 | `e1-app` | api / L2 | PASS · 13 temuan · must 8 · coverage 4/5 | **P 0,909 · R 1,000 · F1 0,952 · halusinasi 0,000** (10 label SPEC, 1 ekstra: bentuk error seragam) |
 | `rt-rw-portal` (target nyata, 6 Nov) | web / L2 | PASS · 12 temuan (10 OBSERVED, 2 INFERRED) · must 7 · coverage 6/7 · unknown 2 non-blocking | belum ada label independen — benchmark menyusul setelah state terautentikasi direkam |
+| `villa-agency-os` (target nyata, 7 Nov) | web / L2 | PASS · 15 temuan (14 OBSERVED, 1 INFERRED) · must 6 · coverage 6/7 · unknown 4 non-blocking | **P 0,789 · R 1,000 · F1 0,882 · halusinasi 0** — label **post-hoc**, sengaja di luar gerbang CI (lihat catatan di bawah) |
 
 Target nyata pertama lewat jalur ini: **Portal Warga RT-RW v2.0.0** (produk milik Owner, mode A).
 Bukti: 18 rute halaman + 2 darurat, 60 endpoint `/api`, 18 fungsi `view*`, 25 tabel, 37 token desain,
@@ -147,6 +148,18 @@ Bukti: 18 rute halaman + 2 darurat, 60 endpoint `/api`, 18 fungsi `view*`, 25 ta
 Handoff: `runs/rt-rw-portal/did/handoff.json` (17 berkas bukti ber-hash) → `SPEC_DID.md`.
 Yang **belum** ditutup dan tidak boleh diklaim: state terautentikasi (empty/error per modul) belum
 dirender, dan integrasi pembayaran/CCTV baru diuji konfigurasinya (dua `unknown` non-blocking).
+
+**Target nyata kedua: Villa Agency OS** (dashboard operasi agensi villa milik Owner, mode A).
+6 peran × 12 rute: 48 probe izin + 24 probe tolak pada DB kosong, 53 izin (termasuk detail kasus)
+pada DB berisi. Terbukti: anonim 401, **24/24 penolakan 403** lintas-peran, **48/48 dan 53/53 halaman 200**,
+empty state eksplisit 48/48 vs 20 halaman berisi data, 404 pada dua rute tak dikenal,
+**101 snapshot HTML** (0 tag `<script>`, 0 `fetch`) dan 72 tabel skema.
+Handoff: `runs/villa-agency-os/did/handoff.json`; snapshot beku: `benchmarks/villa-agency-os/handoff.json`.
+Benchmark target ini **post-hoc**: label diturunkan dari nama modul uji target *setelah* capture, sehingga
+angkanya indikatif dan **tidak** dipasang di `benchmarks/*/ground_truth.json`. Alasannya metodologis —
+memasangnya akan memaksa presisi ≥ 0,90 dan mendorong penambahan label demi lolos gerbang, persis yang
+dilarang skill `did-benchmark`. Empat "ekstra" (rute 404, render server-side, inventaris komponen,
+halaman properti) adalah temuan sah tanpa padanan label, bukan klaim palsu.
 
 Sebelum diperbaiki, handoff `elf-demo` hanya menangkap 2 dari 6 perilaku (**recall 0,333**) dan
 mengklaim program “mencetak hasil penjumlahan dua konstanta” — klaim itu **salah**: `main` mencetak

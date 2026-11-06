@@ -1,0 +1,257 @@
+{
+  "schema": "sdb.did.state_probes/1",
+  "target": "villa-agency-os-demo",
+  "base_url": "http://127.0.0.1:8298",
+  "empty_markers": [
+    "Tidak ada data",
+    "Belum ada data",
+    "belum ada data",
+    "No data available"
+  ],
+  "roles": [
+    {
+      "name": "reservation",
+      "base_url": "http://127.0.0.1:8295",
+      "auth": {
+        "type": "header",
+        "name": "Authorization",
+        "value": "Bearer ${VILLA_TOK_DEMO_RESERVATION}"
+      },
+      "pages": [
+        "/",
+        "/approvals",
+        "/cases",
+        "/cases/demo_case_rahma",
+        "/channels",
+        "/inventory",
+        "/marketing",
+        "/operations",
+        "/properties"
+      ],
+      "denied": [
+        {
+          "path": "/audit",
+          "expect_status": 403
+        },
+        {
+          "path": "/finance",
+          "expect_status": 403
+        },
+        {
+          "path": "/outbox",
+          "expect_status": 403
+        },
+        {
+          "path": "/shadow_eval",
+          "expect_status": 403
+        }
+      ]
+    },
+    {
+      "name": "operations",
+      "base_url": "http://127.0.0.1:8296",
+      "auth": {
+        "type": "header",
+        "name": "Authorization",
+        "value": "Bearer ${VILLA_TOK_DEMO_OPERATIONS}"
+      },
+      "pages": [
+        "/",
+        "/approvals",
+        "/cases",
+        "/cases/demo_case_rahma",
+        "/channels",
+        "/inventory",
+        "/marketing",
+        "/operations",
+        "/outbox",
+        "/properties",
+        "/shadow_eval"
+      ],
+      "denied": [
+        {
+          "path": "/audit",
+          "expect_status": 403
+        },
+        {
+          "path": "/finance",
+          "expect_status": 403
+        }
+      ]
+    },
+    {
+      "name": "finance",
+      "base_url": "http://127.0.0.1:8297",
+      "auth": {
+        "type": "header",
+        "name": "Authorization",
+        "value": "Bearer ${VILLA_TOK_DEMO_FINANCE}"
+      },
+      "pages": [
+        "/",
+        "/approvals",
+        "/finance",
+        "/properties"
+      ],
+      "denied": [
+        {
+          "path": "/audit",
+          "expect_status": 403
+        },
+        {
+          "path": "/cases",
+          "expect_status": 403
+        },
+        {
+          "path": "/channels",
+          "expect_status": 403
+        },
+        {
+          "path": "/inventory",
+          "expect_status": 403
+        },
+        {
+          "path": "/marketing",
+          "expect_status": 403
+        },
+        {
+          "path": "/operations",
+          "expect_status": 403
+        },
+        {
+          "path": "/outbox",
+          "expect_status": 403
+        },
+        {
+          "path": "/shadow_eval",
+          "expect_status": 403
+        }
+      ]
+    },
+    {
+      "name": "owner",
+      "base_url": "http://127.0.0.1:8298",
+      "auth": {
+        "type": "header",
+        "name": "Authorization",
+        "value": "Bearer ${VILLA_TOK_DEMO_OWNER}"
+      },
+      "pages": [
+        "/",
+        "/approvals",
+        "/audit",
+        "/cases",
+        "/cases/demo_case_rahma",
+        "/channels",
+        "/finance",
+        "/inventory",
+        "/marketing",
+        "/operations",
+        "/outbox",
+        "/properties",
+        "/shadow_eval"
+      ],
+      "denied": [],
+      "error_probes": [
+        {
+          "path": "/kasus-tidak-ada",
+          "method": "GET",
+          "expect_status_min": 400
+        },
+        {
+          "path": "/cases/xxx-tidak-ada",
+          "method": "GET",
+          "expect_status_min": 400
+        }
+      ]
+    },
+    {
+      "name": "auditor",
+      "base_url": "http://127.0.0.1:8299",
+      "auth": {
+        "type": "header",
+        "name": "Authorization",
+        "value": "Bearer ${VILLA_TOK_DEMO_AUDITOR}"
+      },
+      "pages": [
+        "/",
+        "/approvals",
+        "/audit",
+        "/cases",
+        "/cases/demo_case_rahma",
+        "/marketing",
+        "/outbox",
+        "/properties",
+        "/shadow_eval"
+      ],
+      "denied": [
+        {
+          "path": "/channels",
+          "expect_status": 403
+        },
+        {
+          "path": "/finance",
+          "expect_status": 403
+        },
+        {
+          "path": "/inventory",
+          "expect_status": 403
+        },
+        {
+          "path": "/operations",
+          "expect_status": 403
+        }
+      ]
+    },
+    {
+      "name": "gm",
+      "base_url": "http://127.0.0.1:8300",
+      "auth": {
+        "type": "header",
+        "name": "Authorization",
+        "value": "Bearer ${VILLA_TOK_DEMO_GM}"
+      },
+      "pages": [
+        "/",
+        "/approvals",
+        "/audit",
+        "/cases",
+        "/cases/demo_case_rahma",
+        "/finance",
+        "/properties"
+      ],
+      "denied": [
+        {
+          "path": "/channels",
+          "expect_status": 403
+        },
+        {
+          "path": "/inventory",
+          "expect_status": 403
+        },
+        {
+          "path": "/marketing",
+          "expect_status": 403
+        },
+        {
+          "path": "/operations",
+          "expect_status": 403
+        },
+        {
+          "path": "/outbox",
+          "expect_status": 403
+        },
+        {
+          "path": "/shadow_eval",
+          "expect_status": 403
+        }
+      ]
+    }
+  ],
+  "anon": [
+    {
+      "path": "/",
+      "expect_status": 401
+    }
+  ]
+}

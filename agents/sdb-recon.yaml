@@ -23,8 +23,8 @@ escalation: "out-of-scope access needed -> BLOCKED -> minta otorisasi Owner"
 
 model_routing:
   profile: cc-capture-forensics
-  primary: glm-5.3-flash                # D1 — RE & recon (multimodal, klasifikasi FACT/INFERRED)
-  available_now: z-ai/glm-5.3-flash (tokenrouter)   # ter-wire & terverifikasi 2026-10-09 (revisi 3)
+  primary: deepseek-flash               # D1 — Owner 2026-11-06: RE/recon pindah dari GLM
+  available_now: deepseek-flash (deepseek, api.deepseek.com)   # PONG 2026-11-06
   escalation: sonnet-5.5                # klasifikasi sulit / bukti ambigu
   stages: ["recon"]
-  notes: "Kualitas evidence menentukan segalanya; eskalasi bila klasifikasi tidak yakin."
+  notes: "Kualitas evidence menentukan segalanya; eskalasi bila klasifikasi gambar ambigu. Gambar masuk sebagai path lampiran (CONTEXT.md), bukan capture otomatis."

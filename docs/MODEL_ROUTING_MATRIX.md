@@ -16,18 +16,18 @@ Sumber: blueprint §8 (cheap model untuk rutin, strong model untuk arsitektur/de
 |---|---|---|---|---|
 | 01 | USER OBJECTIVE | D0 | DeepSeek V4.1 Flash | — |
 | 01A | AUTHORIZATION / SCOPE GATE | D0 + `gate_check.py` | **tool deterministik** (+ DeepSeek untuk ringkas) | — |
-| — | RE / RECONSTRUCTION | D1 | GLM 5.3 Flash | Sonnet 5.5 (klasifikasi sulit) |
+| — | RE / RECONSTRUCTION | D1 | DeepSeek Flash | Sonnet 5.5 (klasifikasi sulit / gambar padat) |
 | 02 | ORCHESTRATOR clarification | D0 | DeepSeek V4.1 Flash | — |
-| 03 | RESEARCH | D2 | DeepSeek V4.1 Flash | GLM 5.3 Flash (dokumen panjang/multibahasa) |
+| 03 | RESEARCH | D2 | DeepSeek V4.1 Flash | Sonnet 5.5 (dokumen sangat panjang) |
 | 04 | ARCHITECTURE + ADR | D3 | **Sonnet 5.5** | Opus 5.5 / GPT-5.6 Sol |
 | 05 | HUMAN DESIGN APPROVAL | (manusia) | — | — |
 | 06 | IMPLEMENTATION PLAN | D0/D3 | **DeepSeek V4.1 Flash** | Sonnet 5.5 (sistem besar) |
 | 07 | FRONTEND / BACKEND | D4/D5 | **DeepSeek V4.1 Flash** | Sonnet 5.5 (algoritma/desain sulit) |
-| 08 | CODE REVIEW | D6 | **Sonnet 5.5** (critical/high) · GLM 5.3 Flash (rutin) | Opus 5.5 / GPT-5.6 Sol (sengketa) |
-| 09 | QA / INTEGRATION / E2E | D7 | GLM 5.3 Flash | Sonnet 5.5 (kegagalan sulit ditriase) |
+| 08 | CODE REVIEW | D6 | **Sonnet 5.5** (critical/high) · DeepSeek Flash (rutin) | Opus 5.5 / GPT-5.6 Sol (sengketa) |
+| 09 | QA / INTEGRATION / E2E | D7 | DeepSeek Flash | Sonnet 5.5 (kegagalan sulit ditriase) |
 | 10 | SECURITY | D8 | **Opus 5.5** + SAST/dep/secret scan (keputusan Owner 2026-10-30) | GPT-5.6 Sol (cadangan bila Anthropic down) |
 | 11 | CODE AUDIT & ASSURANCE | D9 | **Opus 5.5 / GPT-5.6 Sol (WAJIB)** | — |
-| 12 | RELEASE GATE | D10 + `release_check.py` | **tool deterministik** (+ GLM 5.3 Flash) | — |
+| 12 | RELEASE GATE | D10 + `release_check.py` | **tool deterministik** (+ DeepSeek Flash) | — |
 | 13 | HUMAN APPROVAL produksi | (manusia) | — | — |
 | 14 | DEVOPS DEPLOY | D10 | **DeepSeek V4.1 Flash** | Sonnet 5.5 (perubahan infra rumit) |
 | 15 | OBSERVABILITY / SMOKE | D10 | **Sonnet 5.5** | Opus 5.5 / GPT-5.6 Sol |
@@ -61,17 +61,19 @@ Batas 5 model sebelumnya = efek **saldo kosong**, bukan batas tetap kunci.
 
 | Model | Penyedia utama (native) | Cadangan |
 |---|---|---|
-| DeepSeek V4.1 Flash | **DeepSeek API** — ID sah `deepseek-flash` (`deepseek-v4.1-flash` -> HTTP 400) | `opencode-go` -> `glm-5.3-flash` (DeepSeek **tidak** lewat perantara) |
+| DeepSeek Flash (`deepseek-flash`) | **DeepSeek API resmi** — provider `deepseek`, `api.deepseek.com` | `deepseek-v4-pro` (DeepSeek resmi) -> `opencode-go` `glm-5.3-flash` (hanya bila DeepSeek down) |
 | Sonnet 5.5 | **Anthropic** — `claude-sonnet-5-5` | `tokenrouter` -> `anthropic/claude-sonnet-5.5` |
 | Opus 5.5 | **Anthropic** — `claude-opus-5-5` | `tokenrouter` -> `anthropic/claude-opus-5.5` |
 | GPT-5.6 Sol | **OpenAI (Codex OAuth)** — `gpt-5.6-sol` | `tokenrouter` -> `openai/gpt-5.6-sol` |
-| GLM 5.3 Flash | **TokenRouter** — `z-ai/glm-5.3-flash` | `tokenharbor` -> `glm-5.3-flash` |
+
+> **Revisi 6 (2026-11-06):** GLM 5.3 Flash tidak lagi dipilih otomatis di jalur mana pun. Alias `tokenrouter` /
+> `tokenharbor` / `opencode-go` tetap terdaftar untuk pemakaian manual dan untuk fallback kegagalan DeepSeek.
 
 ### Pemetaan peran -> profil (TERPASANG & TERVERIFIKASI — 10 profil PONG)
 | Peran | Profil | Model | Utama | Cadangan |
 |---|---|---|---|---|
-| Research/recon | cc-capture-forensics | **GLM 5.3 Flash** | tokenrouter `z-ai/glm-5.3-flash` | tokenharbor `glm-5.3-flash` -> opencode-go `glm-5.3-flash` |
-| Frontend | cc-frontend | **GLM 5.3 Flash** | tokenrouter `z-ai/glm-5.3-flash` | tokenharbor `glm-5.3-flash` -> opencode-go `glm-5.3-flash` |
+| Research/recon | cc-capture-forensics | **DeepSeek Flash** | `deepseek-flash` (api.deepseek.com) | `deepseek-v4-pro` |
+| Frontend | cc-frontend | **DeepSeek Flash** | `deepseek-flash` (api.deepseek.com) | Sonnet 5.5 (desain rumit) |
 | Plan/intake/docs | cc-orchestrator | DeepSeek V4.1 Flash | **deepseek `deepseek-flash`** (API resmi) | opencode-go `glm-5.3-flash` |
 | Backend | cc-builder | **DeepSeek V4.1 Flash** | **deepseek `deepseek-flash`** (API resmi) | opencode-go `glm-5.3-flash` |
 | DevOps deploy/docs | cc-devops-docs | DeepSeek V4.1 Flash | **deepseek `deepseek-flash`** (API resmi) | opencode-go `glm-5.3-flash` |
@@ -139,6 +141,33 @@ yang diterima: biaya dan latensi D8 naik pada setiap task.
 **Catatan konflik prinsip.** Prinsip #5 di atas ("eskalasi hanya setelah kegagalan nyata") dilanggar secara sadar
 untuk D8 — ini pengecualian yang diputuskan Owner dengan alasan risiko, bukan kelalaian. Jangan "kembalikan" D8 ke
 Sonnet sebagai optimasi biaya tanpa persetujuan Owner.
+
+## Revisi 6 — 2026-11-06 (Owner): semua jalur GLM dialihkan ke DeepSeek Flash
+
+**Perintah Owner.** Seluruh proses/agent yang sebelumnya dijalankan GLM 5.3 Flash dipindahkan ke **DeepSeek Flash
+lewat API resmi DeepSeek** (`provider: deepseek`, `https://api.deepseek.com/v1`, model `deepseek-flash`).
+
+| Jalur | Sebelum | Sesudah |
+|---|---|---|
+| D1 recon / RE (`cc-capture-forensics`) | GLM 5.3 Flash | DeepSeek Flash |
+| D4 frontend (`cc-frontend`) | GLM 5.3 Flash | DeepSeek Flash |
+| D6 review rutin + D7 QA (`cc-reviewer-qa`) | GLM 5.3 Flash (rutin) | DeepSeek Flash (rutin) |
+| D2 riset eskalasi dokumen panjang | GLM 5.3 Flash | Sonnet 5.5 |
+| Tahap 12 sisa non-deterministik | GLM 5.3 Flash | DeepSeek Flash |
+
+**Yang TIDAK berubah:** D3 arsitektur (Sonnet 5.5), D5 backend (DeepSeek Flash), D6 critical/high (Sonnet 5.5),
+D8/D9 keamanan (Opus 5.5). GLM tetap terdaftar sebagai alias cadangan manual — tidak pernah dipilih otomatis.
+
+**Bukti runtime 2026-11-06** (bukan asumsi):
+- `hermes -p cc-frontend -z 'Balas HANYA: PONG' --usage-file /tmp/u1.json` → `PONG`;
+  usage file: `model=deepseek-flash`, `provider=deepseek`.
+- `~/.hermes/profiles/{cc-frontend,cc-capture-forensics,cc-builder,cc-orchestrator,cc-devops-docs}/config.yaml`
+  → `model.default: deepseek-flash`, `model.provider: deepseek`.
+- `scripts/sdb_build_worker.py` tidak memakai `-p`, jadi job memakai profil `default`
+  (`model.default: deepseek-flash`) — semua job sudah DeepSeek Flash sejak sebelum revisi ini.
+
+**Batas yang jujur:** GLM tidak lagi menjadi default di mana pun, tetapi alias `tokenrouter` / `tokenharbor` /
+`opencode-go` masih ada di config profil untuk pemakaian manual. Menghapus alias bukan bagian revisi ini.
 
 ## Aturan biaya
 - Jangan pakai model kuat untuk transformasi mekanis berulang; jangan pakai model lemah untuk verdict keamanan/arsitektur.

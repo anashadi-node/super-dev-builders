@@ -21,7 +21,7 @@ model_routing:
   profile: cc-reviewer-qa
   primary: sonnet-5.5                   # D6 — tahap 08 (critical/high)
   available_now: claude-sonnet-5-5 (anthropic)   # ter-wire & terverifikasi 2026-10-09 (revisi 3)
-  routine: glm-5.3-flash                # D6 rutin + D7 QA (mekanis, deterministik)
+  routine: deepseek-flash               # D6 rutin + D7 QA — Owner 2026-11-06 (GLM -> DeepSeek Flash)
   escalation: [opus-5.5, gpt-5.6-sol]   # review sengketa
   stages: ["08", "09"]
-  notes: "Review tidak boleh 'asal setuju'; QA deterministik boleh GLM."
+  notes: "Review tidak boleh 'asal setuju'. Rutin/QA mekanis: DeepSeek Flash lewat API resmi."

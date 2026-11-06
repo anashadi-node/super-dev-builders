@@ -19,9 +19,9 @@ escalation: "spec ambigu -> tanya D0/D3; temuan keamanan -> D8"
 
 model_routing:
   profile: cc-frontend
-  primary: glm-5.3-flash                 # D4 — keputusan Owner 2026-10-10
-  available_now: z-ai/glm-5.3-flash (tokenrouter)   # ter-wire & PONG 2026-10-10
-  fallback: [tokenharbor/glm-5.3-flash, opencode-go/glm-5.3-flash]
+  primary: deepseek-flash                # D4 — Owner 2026-11-06: semua jalur GLM -> DeepSeek Flash (API resmi)
+  available_now: deepseek-flash (deepseek, api.deepseek.com)   # PONG 2026-11-06
+  fallback: [opencode-go/glm-5.3-flash]
   escalation: sonnet-5.5                 # eskalasi desain UI rumit
   stages: ["07"]
-  notes: "Rantai GLM Owner: TokenRouter -> TokenHarbor -> OpenCode. Kuota OpenCode-go habis s/d 25 Okt (kunci valid, 429)."
+  notes: "DeepSeek hanya lewat API resmi (provider deepseek). GLM tinggal cadangan manual, bukan default."

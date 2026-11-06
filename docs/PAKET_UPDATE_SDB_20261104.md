@@ -612,7 +612,7 @@ Catatan: satu agen bisa memegang dua divisi. Contoh `sdb-reviewer` memegang D6 d
 | Kebutuhan | Model dipilih | Alasan praktis |
 |---|---|---|
 | Volume tinggi, penalaran sedang | deepseek | Murah dan cepat; cukup untuk tugas terstruktur |
-| Multimodal / klasifikasi visual | GLM | Menangani gambar dan teks sekaligus |
+| Multimodal / klasifikasi visual | DeepSeek Flash | Gambar+teks via API resmi (sejak Revisi 6, 2026-11-06; sebelumnya GLM) |
 | Arsitektur & review | Sonnet | Konsistensi penalaran lebih baik |
 | Audit keamanan | Opus/Sol (**wajib**) | Kesalahan di sini paling mahal |
 

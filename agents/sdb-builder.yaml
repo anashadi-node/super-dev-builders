@@ -18,7 +18,7 @@ escalation: "spec ambigu -> tanya D0/D3; temuan keamanan -> D8"
 
 model_routing:
   profile: cc-builder
-  primary: deepseek-v4.1-flash          # D5 — tahap 07 (keputusan Owner 2026-10-09; D4 pindah ke sdb-frontend/GLM 2026-10-10)
+  primary: deepseek-flash               # D5 — tahap 07 (Owner 2026-10-09; 2026-11-06 D4 ikut DeepSeek Flash)
   available_now: deepseek-flash (deepseek)   # ter-wire & terverifikasi 2026-10-09 (revisi 3)
   escalation: sonnet-5.5                # algoritma/desain komponen sulit
   stages: ["07"]

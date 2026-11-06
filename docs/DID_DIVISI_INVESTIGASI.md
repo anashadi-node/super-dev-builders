@@ -112,22 +112,34 @@ Klaim "DID bisa Android penuh" atau "DID bisa instrumentasi runtime" **tidak bol
 
 ```bash
 # 0. prasyarat
-python3 scripts/gate_check.py --target <t>            # wajib PASS
+python3 scripts/gate_check.py --target <t>     # wajib PASS
 
 # 1. bukti kapabilitas alat (sekali per sesi kerja)
-python3 scripts/provider_snapshot.py
+make did-providers
 
 # 2. investigasi (agent menulis evidence + handoff)
 #    ... REA/capture_web, normalisasi, evidence_lint ...
 
-# 3. gerbang mutu
-python3 scripts/did_validate.py validate --target <t> --render
-python3 scripts/did_validate.py bench --handoff runs/<t>/did/handoff.json \
-        --truth benchmarks/<t>/ground_truth.json
+# 3. gerbang mutu — exit 1 bila kontrak dilanggar
+make did TARGET=<t>
 
-# 4. hasil untuk Builders
+# 4. skor terhadap label independen (opsional, tapi ini yang membuat mutu terukur)
+make did-bench TARGET=<t> TRUTH=benchmarks/<t>/ground_truth.json
+
+# 5. hasil untuk Builders
 cat runs/<t>/did/SPEC_DID.md
 ```
+
+### Hasil terukur (6 November 2026)
+
+| Target | Profil/depth | Validasi | Benchmark (label independen) |
+|---|---|---|---|
+| `elf-demo` | binary / L3 | PASS · 27 cek · coverage 5/6 | — (tak ada label) |
+| `e1-app` | api / L2 | PASS · 13 temuan · must 8 · coverage 4/5 | **P 0,909 · R 1,000 · F1 0,952 · halusinasi 0,000** (10 label SPEC, 1 ekstra: bentuk error seragam) |
+
+`e1-app` diuji lewat HTTP nyata (`127.0.0.1:8110`, 18 probe, token diredaksi), bukan dari kode.
+Skor `hallucinated 0` berarti tidak ada fitur yang diklaim OBSERVED tanpa bukti; ekstra dipisah
+dari halusinasi supaya temuan sah di luar cakupan label tidak dihukum.
 
 ## 11. Uji yang mengunci perilaku
 

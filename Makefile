@@ -25,7 +25,7 @@ PY_DOC ?= $(shell \
 # TARGET lewat lingkungan (bukan interpolasi make ke shell): nilai ber-kutip/`;`/`$(...)` tetap data.
 export TARGET
 
-.PHONY: help check lint drift doctor inventory test gate-init lint-registry release-check skills-list install-main workflow install-dry-run clean-pyc docs-tutorial docs-lint mutation
+.PHONY: help check lint drift doctor inventory test gate-init lint-registry release-check skills-list install-main workflow install-dry-run clean-pyc docs-tutorial docs-lint mutation did did-providers did-bench
 
 help:
 	@grep -E "^[a-z-]+:" Makefile | sed "s/:.*//" | column -c 80
@@ -119,6 +119,27 @@ secrets-raw:
 	@printf '%s\n' '[extend]' 'useDefault = true' > state/gitleaks-nofilter.toml
 	@gitleaks detect --config state/gitleaks-nofilter.toml --no-banner --redact --log-opts="--all" --report-format json --report-path state/gitleaks-raw.json >/dev/null 2>&1 || true
 	@$(PY_SYS) -c "import json;d=json.load(open('state/gitleaks-raw.json'));print('temuan tanpa allowlist:',len(d));[print('  ',x['RuleID'],x['File']) for x in d]"
+
+# Divisi Investigasi (DID, tahap 01C). Tiga perintah sengaja dipisah agar
+# pemakaian harian jelas: bukti alat, gerbang mutu, lalu skor terhadap label.
+did-providers:
+	$(PY_SYS) scripts/provider_snapshot.py
+
+# validate: gagal (exit 1) bila handoff melanggar kontrak — jangan cuma "kelihatan rapi".
+did:
+	@slug="$${TARGET:-}"; \
+	if [ -z "$$slug" ]; then echo "pakai: make did TARGET=<slug>"; exit 2; fi; \
+	$(PY_SYS) scripts/did_validate.py validate --target "$$slug" --render
+
+# bench: butuh handoff + label independen; skor ditulis ke reports/<slug>/did-bench.json.
+did-bench:
+	@slug="$${TARGET:-}"; \
+	if [ -z "$$slug" ] || [ -z "$${TRUTH:-}" ]; then \
+		echo "pakai: make did-bench TARGET=<slug> TRUTH=benchmarks/<slug>/ground_truth.json"; exit 2; fi; \
+	mkdir -p "reports/$$slug"; \
+	$(PY_SYS) scripts/did_validate.py bench --handoff "runs/$$slug/did/handoff.json" --truth "$$TRUTH" \
+		--json-out "reports/$$slug/did-bench.json"; \
+	cat "reports/$$slug/did-bench.json"
 
 release-check:
 	@slug="$${TARGET:-}"; \

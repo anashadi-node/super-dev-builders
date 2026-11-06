@@ -182,7 +182,24 @@ def test_bench_matematika():
     assert res["precision"] == pytest.approx(0.5)
     assert res["recall"] == pytest.approx(0.5)
     assert res["f1"] == pytest.approx(0.5)
+    assert res["hallucinated"] == ["C2"]      # OBSERVED tanpa bukti
+    assert res["extras"] == []
+    assert res["missed"] == ["F03"]
+    assert res["hallucination_rate"] == pytest.approx(0.5)
+
+
+def test_bench_pisahkan_ekstra_dari_halusinasi():
+    """Fitur OBSERVED ber-bukti yang tak ada di label = ekstra, bukan karangan."""
+    handoff = {"features": [
+        {"id": "C1", "name": "Health check", "status": "OBSERVED", "evidence": ["E-001"]},
+        {"id": "C2", "name": "Mode gelap", "status": "OBSERVED"},
+    ]}
+    truth = {"features": [{"id": "F01", "name": "Health check", "keywords": ["health"]}]}
+    res = dv.bench(handoff, truth)
+    assert res["true_positives"] == 1
+    assert res["extras"] == []            # C1 cocok label; C2 tanpa bukti
     assert res["hallucinated"] == ["C2"]
+    assert res["precision"] == pytest.approx(0.5)
     assert res["hallucination_rate"] == pytest.approx(0.5)
 
 

@@ -340,38 +340,52 @@ def _norm(s: str) -> str:
 
 
 def bench(handoff: dict, truth: dict) -> dict:
+    """Precision/recall handoff vs label independen.
+
+    Ekstra yang tidak ada di label dipisah dua: `hallucinated` (diklaim OBSERVED
+    tanpa bukti apa pun) dan `extras` (temuan sah di luar cakupan label SPEC).
+    Tanpa pemisahan ini, fitur jujur yang kebetulan tidak diuji terlihat seperti karangan.
+    """
     claimed = [f for f in handoff.get("features") or [] if str(f.get("status", "")).upper() != "OUT_OF_SCOPE"]
     truth_feats = truth.get("features") or []
-    hit, false_pos = [], []
-    for tf in truth_feats:
-        keys = [tf.get("id", ""), tf.get("name", ""), *(tf.get("keywords") or [])]
-        keys = [_norm(k) for k in keys if k]
-        found = None
-        for cf in claimed:
-            blob = _norm(" ".join([str(cf.get("name", "")), str(cf.get("claim", "")),
-                                   " ".join(cf.get("keywords") or [])]))
-            if any(k and k in blob for k in keys):
-                found = cf
+
+    def blob(cf: dict) -> str:
+        return _norm(" ".join([str(cf.get("name", "")), str(cf.get("claim", "")),
+                               " ".join(cf.get("keywords") or [])]))
+
+    keys_of = [([_norm(k) for k in [tf.get("id", ""), tf.get("name", ""), *(tf.get("keywords") or [])] if k], tf)
+               for tf in truth_feats]
+
+    taken, matched_truth = set(), []
+    for cf in claimed:
+        b = blob(cf)
+        for keys, tf in keys_of:
+            if tf.get("id") in taken:
+                continue
+            if any(k in b for k in keys):
+                taken.add(tf.get("id"))
+                matched_truth.append(tf.get("id"))
+                cf["_hit"] = True
                 break
-        (hit if found else false_pos).append(tf.get("id"))
-    matched_claimed = set()
-    for tf in truth_feats:
-        keys = [_norm(k) for k in [tf.get("id", ""), tf.get("name", ""), *(tf.get("keywords") or [])] if k]
-        for cf in claimed:
-            blob = _norm(" ".join([str(cf.get("name", "")), str(cf.get("claim", "")),
-                                   " ".join(cf.get("keywords") or [])]))
-            if any(k and k in blob for k in keys):
-                matched_claimed.add(cf.get("id"))
-    unmatched_claim = [c.get("id") for c in claimed if c.get("id") not in matched_claimed]
-    tp = len(hit)
-    precision = tp / max(tp + len(unmatched_claim), 1)
+
+    unmatched = [c for c in claimed if not c.get("_hit")]
+    for c in claimed:
+        c.pop("_hit", None)
+    hallucinated = [c.get("id") for c in unmatched
+                    if str(c.get("status", "")).upper() == "OBSERVED"
+                    and not (c.get("evidence") or c.get("findings"))]
+    extras = [c.get("id") for c in unmatched if c.get("id") not in hallucinated]
+    missed = [tf.get("id") for tf in truth_feats if tf.get("id") not in taken]
+
+    tp = len(matched_truth)
+    precision = tp / max(tp + len(unmatched), 1)
     recall = tp / max(len(truth_feats), 1)
     f1 = 2 * precision * recall / max(precision + recall, 1e-9)
     return {
         "truth_features": len(truth_feats), "claimed_features": len(claimed),
-        "true_positives": tp, "missed": false_pos, "hallucinated": unmatched_claim,
+        "true_positives": tp, "missed": missed, "extras": extras, "hallucinated": hallucinated,
         "precision": round(precision, 3), "recall": round(recall, 3), "f1": round(f1, 3),
-        "hallucination_rate": round(len(unmatched_claim) / max(len(claimed), 1), 3),
+        "hallucination_rate": round(len(hallucinated) / max(len(claimed), 1), 3),
     }
 
 

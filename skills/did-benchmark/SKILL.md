@@ -36,12 +36,17 @@ Aturan: label ditulis **sebelum** investigasi dijalankan pada target itu, dan ti
 
 ## Cara mengukur
 ```bash
+# jalur harian (menulis reports/<slug>/did-bench.json)
+make did-bench TARGET=e1-app TRUTH=benchmarks/e1-app/ground_truth.json
+
+# jalur manual
 python3 scripts/did_validate.py bench \
   --handoff runs/e1-app/did/handoff.json \
-  --truth benchmarks/e1/ground_truth.json \
-  --json-out reports/e1-app/did-bench.json
+  --truth benchmarks/e1-app/ground_truth.json | tee reports/e1-app/did-bench.json
 ```
-Keluaran: `precision`, `recall`, `f1`, `hallucination_rate`, daftar `missed` (label tidak tertangkap), `hallucinated` (fitur diklaim tanpa label).
+Keluaran: `precision`, `recall`, `f1`, `hallucination_rate`, `missed` (label tak tertangkap), `extras` (temuan sah di luar cakupan label), `hallucinated` (fitur `OBSERVED` tanpa bukti apa pun).
+
+`extras` **bukan** halusinasi: label SPEC tidak lengkap secara definisi. Menghukum ekstra membuat agen belajar berhenti menemukan hal baru — persis kebalikan dari tujuan divisi investigasi.
 
 ## Ambang yang dipakai SDB
 | Metrik | Minimum | Alasan |

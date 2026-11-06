@@ -1,0 +1,14 @@
+{
+ "truth_features": 10,
+ "claimed_features": 11,
+ "true_positives": 10,
+ "missed": [],
+ "extras": [
+  "FT-11"
+ ],
+ "hallucinated": [],
+ "precision": 0.909,
+ "recall": 1.0,
+ "f1": 0.952,
+ "hallucination_rate": 0.0
+}

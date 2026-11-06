@@ -16,8 +16,8 @@
   ],
   "Commit": "b2d5d5c6b1396bc5b0e8dd92c693b106cfb7cee1",
   "CommitMsg": "Bootstrap 5.2.3 update\n\nUpgraded to Bootstrap 5.2.3 and adjusted for the changes to the scrollspy component",
-  "Author": "David Miller <hello@davidmiller.io>",
-  "Committer": "David Miller <hello@davidmiller.io>"
+  "Author": "David Miller <[REDACTED-EMAIL]>",
+  "Committer": "David Miller <[REDACTED-EMAIL]>"
  },
  "Results": [
   {

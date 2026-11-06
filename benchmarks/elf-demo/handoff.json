@@ -1,0 +1,456 @@
+{
+ "schema": "sdb.did.handoff/1",
+ "generated_at": "2026-11-06T19:03:54+07:00",
+ "target": {
+  "slug": "elf-demo",
+  "name": "elf-demo (biner demo 24 fungsi)",
+  "type": "binary",
+  "authorization": {
+   "gate0_verdict": "PASS",
+   "manifest": "evidence/elf-demo/authorization.yaml"
+  }
+ },
+ "scope": {
+  "depth": "L3",
+  "profile": "binary",
+  "in_scope": [
+   "header & segmen ELF",
+   "tabel dinamis & impor",
+   "string statis",
+   "pseudocode Ghidra"
+  ],
+  "out_of_scope": [
+   "eksekusi biner",
+   "dynamic tracing",
+   "jaringan"
+  ]
+ },
+ "providers": [
+  {
+   "id": "rea-workflow",
+   "version": "1",
+   "snapshot": "evidence/providers/providers-20261106.json"
+  },
+  {
+   "id": "ghidra",
+   "version": "12.1.4"
+  }
+ ],
+ "evidence_manifest": [
+  {
+   "id": "E-001",
+   "path": "evidence/elf-demo/did-20261106/readelf-header.txt",
+   "sha256": "2a2be43ea7544b6c73a27644c48d5a8ba36517e0c44b56500f07d44b65d8077c",
+   "captured_at": "2026-11-06T17:39:07+07:00",
+   "status": "OBSERVED",
+   "authority": "readelf/nm/strings"
+  },
+  {
+   "id": "E-002",
+   "path": "evidence/elf-demo/did-20261106/readelf-program.txt",
+   "sha256": "f240f38b885049ac4d88bae7d10ae7a62df03751acf5f9588427cd0d60f040e9",
+   "captured_at": "2026-11-06T17:39:07+07:00",
+   "status": "OBSERVED",
+   "authority": "readelf/nm/strings"
+  },
+  {
+   "id": "E-003",
+   "path": "evidence/elf-demo/did-20261106/readelf-dynamic.txt",
+   "sha256": "4a8db12caf3768c25041f4d431de322d3192a7cb48c2b007ffcbfe1b8fea5958",
+   "captured_at": "2026-11-06T17:39:07+07:00",
+   "status": "OBSERVED",
+   "authority": "readelf/nm/strings"
+  },
+  {
+   "id": "E-004",
+   "path": "evidence/elf-demo/did-20261106/nm-dynamic.txt",
+   "sha256": "5bd20225057367a2ecf1b32ffa6878279d867029a2a4dcd0525fbecbe8157c2b",
+   "captured_at": "2026-11-06T17:39:07+07:00",
+   "status": "OBSERVED",
+   "authority": "readelf/nm/strings"
+  },
+  {
+   "id": "E-005",
+   "path": "evidence/elf-demo/did-20261106/strings.txt",
+   "sha256": "df346bbc326cbebd546762c21eb10281bfa9f78a0984bd38f0e0c7746e494f1e",
+   "captured_at": "2026-11-06T17:39:07+07:00",
+   "status": "OBSERVED",
+   "authority": "readelf/nm/strings"
+  },
+  {
+   "id": "E-006",
+   "path": "evidence/elf-demo/rea-inspect.json",
+   "sha256": "cb123f03d43d26b6a9083d0bb99a0b026fe8858abc2b1835bec44538321c6e59",
+   "captured_at": "2026-11-06T17:39:07+07:00",
+   "status": "OBSERVED",
+   "authority": "REA inspect (Ghidra 12.1.4)"
+  },
+  {
+   "id": "E-007",
+   "path": "evidence/elf-demo/rea/20261104T233108-decompiled/functions/0x101149.c",
+   "sha256": "9ac797b17350bfafa90633aeff9d8c16863e0c203b7520a2edd957a3cfedffe5",
+   "captured_at": "2026-11-06T17:39:07+07:00",
+   "status": "OBSERVED",
+   "authority": "REA decompile_all"
+  },
+  {
+   "id": "E-008",
+   "path": "evidence/elf-demo/did-20261106/objdump-main.txt",
+   "sha256": "c41e432940d66e51da741246bbfcc942f74ee1044d0b2b8b53f7cad8b8146daa",
+   "captured_at": "2026-11-06T19:03:54+07:00",
+   "status": "OBSERVED",
+   "authority": "disassembly main & tambah + hitung call site"
+  },
+  {
+   "id": "E-009",
+   "path": "evidence/elf-demo/did-20261106/nm-symbols.txt",
+   "sha256": "fbbf45d9e1aa1641153acae4ec9e95a1e5f2030f22bfebab36128bb041b06487",
+   "captured_at": "2026-11-06T19:03:54+07:00",
+   "status": "OBSERVED",
+   "authority": "tabel simbol lengkap (biner tidak di-strip)"
+  },
+  {
+   "id": "E-010",
+   "path": "evidence/elf-demo/did-20261106/run.txt",
+   "sha256": "95ee2e7aeb25abd8f25d8b0d91c6d1e7fa871592d85ae3333765e04abd5e9820",
+   "captured_at": "2026-11-06T19:03:54+07:00",
+   "status": "OBSERVED",
+   "authority": "eksekusi langsung, tanpa jaringan"
+  }
+ ],
+ "findings": [
+  {
+   "id": "F-001",
+   "status": "OBSERVED",
+   "claim": "ELF64 x86-64, tipe DYN (PIE), entry 0x1060, 13 program header, 31 section header.",
+   "locator": "readelf -h/-l",
+   "evidence": [
+    "E-001",
+    "E-002"
+   ]
+  },
+  {
+   "id": "F-002",
+   "status": "OBSERVED",
+   "claim": "Dependensi dinamis hanya libc.so.6; impor terpakai __libc_start_main@2.34 dan __printf_chk@2.3.4.",
+   "locator": "readelf -d / nm -D",
+   "evidence": [
+    "E-003",
+    "E-004"
+   ]
+  },
+  {
+   "id": "F-003",
+   "status": "OBSERVED",
+   "claim": "Mitigasi: PIE aktif, NX aktif (GNU_STACK RW tanpa E), RELRO parsial (tanpa BIND_NOW); __stack_chk_fail tidak ada → stack protector tidak aktif.",
+   "locator": "readelf -l/-d, nm",
+   "evidence": [
+    "E-002",
+    "E-003",
+    "E-009"
+   ]
+  },
+  {
+   "id": "F-004",
+   "status": "OBSERVED",
+   "claim": "73 string; format 'elf-demo %d' ada di .rodata alamat 0x2004.",
+   "locator": "strings -a",
+   "evidence": [
+    "E-005",
+    "E-008"
+   ]
+  },
+  {
+   "id": "F-005",
+   "status": "OBSERVED",
+   "claim": "Simbol tambah (T, 0x1149) ada dan mengembalikan param_1+param_2 (lea (%rdi,%rsi,1),%eax), tetapi jumlah call site ke <tambah> = 0 → dead code.",
+   "locator": "nm + objdump -d",
+   "evidence": [
+    "E-008",
+    "E-009"
+   ]
+  },
+  {
+   "id": "F-006",
+   "status": "OBSERVED",
+   "claim": "main memuat konstanta 0x2a (42) ke edx lalu memanggil __printf_chk dengan format 0x2004 → mencetak 'elf-demo 42'. Tidak ada pemanggilan tambah dari main.",
+   "locator": "objdump -d <main>",
+   "evidence": [
+    "E-008"
+   ]
+  },
+  {
+   "id": "F-007",
+   "status": "OBSERVED",
+   "claim": "Eksekusi nyata: stdout 'elf-demo 42', stderr kosong, kode keluar 0.",
+   "locator": "./demo",
+   "evidence": [
+    "E-010"
+   ]
+  },
+  {
+   "id": "F-008",
+   "status": "OBSERVED",
+   "claim": "main tidak menerima argumen: prolog tanpa penyimpanan argc/argv, tidak ada akses ke stack argumen; perilaku identik tanpa argumen CLI.",
+   "locator": "objdump -d <main>",
+   "evidence": [
+    "E-008"
+   ]
+  }
+ ],
+ "unknowns": [
+  {
+   "id": "U-001",
+   "question": "Apakah biner berperilaku beda bila argumen CLI diberikan?",
+   "impact": "non-blocking",
+   "probe": "./demo 9 9 → bandingkan stdout dan exit code dengan run tanpa argumen (dugaan: identik karena main tanpa argumen)"
+  }
+ ],
+ "coverage": [
+  {
+   "category": "entrypoints",
+   "status": "COVERED",
+   "found": 1,
+   "evidence": [
+    "E-001"
+   ]
+  },
+  {
+   "category": "imports",
+   "status": "COVERED",
+   "found": 6,
+   "evidence": [
+    "E-004"
+   ]
+  },
+  {
+   "category": "strings",
+   "status": "COVERED",
+   "found": 73,
+   "evidence": [
+    "E-005"
+   ]
+  },
+  {
+   "category": "protocols",
+   "status": "PARTIAL",
+   "found": 0,
+   "evidence": [
+    "E-005"
+   ]
+  },
+  {
+   "category": "mitigations",
+   "status": "COVERED",
+   "found": 3,
+   "evidence": [
+    "E-002",
+    "E-009"
+   ]
+  },
+  {
+   "category": "internals",
+   "status": "COVERED",
+   "found": 24,
+   "evidence": [
+    "E-006",
+    "E-008",
+    "E-009"
+   ]
+  }
+ ],
+ "features": [
+  {
+   "id": "FT-01",
+   "name": "Mencetak literal 'elf-demo 42' (konstanta 0x2a, bukan hasil hitung)",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-004",
+    "F-006",
+    "F-007"
+   ],
+   "evidence": [
+    "E-005",
+    "E-008",
+    "E-010"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "dijalankan tanpa argumen",
+     "when": "program dieksekusi",
+     "then": "stdout tepat 'elf-demo 42\\n', stderr kosong"
+    }
+   ]
+  },
+  {
+   "id": "FT-02",
+   "name": "Kode keluar 0 (exit status 0)",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-007"
+   ],
+   "evidence": [
+    "E-010"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "dijalankan normal",
+     "when": "program selesai",
+     "then": "exit code 0"
+    }
+   ]
+  },
+  {
+   "id": "FT-03",
+   "name": "Simbol tambah(int,int) mengembalikan param_1+param_2",
+   "priority": "should",
+   "status": "OBSERVED",
+   "findings": [
+    "F-005"
+   ],
+   "evidence": [
+    "E-008",
+    "E-009"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "param_1=2, param_2=3",
+     "when": "tambah dipanggil langsung",
+     "then": "return 5"
+    }
+   ]
+  },
+  {
+   "id": "FT-04",
+   "name": "tambah tanpa pemanggil (dead code) — jangan dirangkai ke alur utama",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-005",
+    "F-006"
+   ],
+   "evidence": [
+    "E-008"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "disassembly penuh",
+     "when": "dihitung call site ke <tambah>",
+     "then": "jumlah = 0"
+    }
+   ]
+  },
+  {
+   "id": "FT-05",
+   "name": "main tanpa argumen; tidak membaca argv/argc",
+   "priority": "should",
+   "status": "OBSERVED",
+   "findings": [
+    "F-008"
+   ],
+   "evidence": [
+    "E-008"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "argumen CLI sembarang diberikan",
+     "when": "program dijalankan",
+     "then": "./demo 9 9 berperilaku sama seperti ./demo"
+    }
+   ]
+  },
+  {
+   "id": "FT-06",
+   "name": "Dependensi runtime hanya libc (__printf_chk, __libc_start_main)",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-002"
+   ],
+   "evidence": [
+    "E-003",
+    "E-004"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "ldd dijalankan",
+     "when": "pada biner asli",
+     "then": "hanya libc.so.6 + loader"
+    }
+   ]
+  }
+ ],
+ "build_seeds": {
+  "entities": [],
+  "api": [],
+  "states": [],
+  "design_tokens": {},
+  "non_functional": [
+   {
+    "item": "PIE + NX aktif, RELRO parsial, tanpa stack protector",
+    "status": "OBSERVED",
+    "evidence": [
+     "E-002",
+     "E-003"
+    ]
+   },
+   {
+    "item": "tidak ada I/O jaringan atau berkas",
+    "status": "OBSERVED",
+    "evidence": [
+     "E-004",
+     "E-008"
+    ]
+   }
+  ],
+  "functions": [
+   {
+    "name": "main",
+    "status": "OBSERVED",
+    "behavior": "printf(\"elf-demo %d\\n\", 42); return 0;",
+    "evidence": [
+     "E-008"
+    ]
+   },
+   {
+    "name": "tambah",
+    "status": "OBSERVED",
+    "behavior": "return a+b; tanpa pemanggil",
+    "evidence": [
+     "E-008",
+     "E-009"
+    ]
+   }
+  ]
+ },
+ "handoff": {
+  "builders_ready": true,
+  "blocking_unknowns": 0,
+  "summary": "Biner demo: main mencetak konstanta 42 lewat __printf_chk dan keluar 0; simbol tambah(a,b) ada tetapi tidak pernah dipanggil. PIE+NX, RELRO parsial, tanpa stack protector. Perilaku bisa direplika persis dari bukti ini.",
+  "next_actions": [
+   "Uji ./demo 9 9 untuk memastikan argumen diabaikan (U-001)"
+  ]
+ },
+ "budget": {
+  "used": {
+   "tool_calls": 15,
+   "minutes": 25,
+   "evidence_bytes": 15400
+  }
+ },
+ "discipline": {
+  "replica_skill_used": false,
+  "wrote_code": false,
+  "mcp_registered": false,
+  "redaction_applied": true
+ },
+ "frozen": {
+  "source": "runs/elf-demo/did/handoff.json",
+  "source_sha256": "52ea8d215252115f98d44d2824f8e98e414b7c2bccc4a5758b8101247c670772",
+  "frozen_at": "2026-11-06T19:40:00+07:00",
+  "commit": "f702fcf",
+  "note": "Snapshot beku untuk suite CI. Perbarui hanya bersama label; handoff lokal tetap sumber kerja."
+ }
+}

@@ -1,0 +1,29 @@
+{
+ "results": [
+  {
+   "target": "e1-app",
+   "status": "PASS",
+   "handoff": "benchmarks/e1-app/handoff.json",
+   "precision": 0.909,
+   "recall": 1.0,
+   "f1": 0.952,
+   "extras": 1,
+   "hallucinated": 0,
+   "alasan": []
+  },
+  {
+   "target": "elf-demo",
+   "status": "PASS",
+   "handoff": "benchmarks/elf-demo/handoff.json",
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "extras": 0,
+   "hallucinated": 0,
+   "alasan": []
+  }
+ ],
+ "failed": 0,
+ "min_recall": 0.9,
+ "min_precision": 0.9
+}

@@ -126,6 +126,9 @@ make did TARGET=<t>
 # 4. skor terhadap label independen (opsional, tapi ini yang membuat mutu terukur)
 make did-bench TARGET=<t> TRUTH=benchmarks/<t>/ground_truth.json
 
+# 4b. seluruh benchmark sekaligus — memberi exit code, dipakai CI
+make did-suite          # gagal bila halusinasi > 0 atau recall/presisi < 0,90
+
 # 5. hasil untuk Builders
 cat runs/<t>/did/SPEC_DID.md
 ```
@@ -141,6 +144,13 @@ Sebelum diperbaiki, handoff `elf-demo` hanya menangkap 2 dari 6 perilaku (**reca
 mengklaim program “mencetak hasil penjumlahan dua konstanta” — klaim itu **salah**: `main` mencetak
 konstanta `0x2a` (42) dan simbol `tambah` punya **0 call site** (dead code). Kesalahan ditemukan dari
 cross-check `objdump -d`, bukan dari skor lexical — lihat catatan di skill `did-benchmark`.
+
+### Gerbang CI, bukan laporan
+
+`make did-suite` membaca snapshot beku `benchmarks/<t>/handoff.json` (ikut git, dipakai CI) dan
+membandingkannya dengan label. Ambangnya tegas: **halusinasi harus 0**, recall dan presisi ≥ 0,90.
+Tanpa ambang ini, skor hanya dicetak lalu dilupakan — kemunduran mutu bisa masuk `master` tanpa
+ada yang menolak. Handoff kerja tetap di `runs/<t>/did/handoff.json`; yang dibekukan hanya snapshot.
 
 `e1-app` diuji lewat HTTP nyata (`127.0.0.1:8110`, 18 probe, token diredaksi), bukan dari kode.
 Skor `hallucinated 0` berarti tidak ada fitur yang diklaim OBSERVED tanpa bukti; ekstra dipisah

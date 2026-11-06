@@ -141,6 +141,11 @@ did-bench:
 		--json-out "reports/$$slug/did-bench.json"; \
 	cat "reports/$$slug/did-bench.json"
 
+# did-suite: semua benchmark berlabel sekaligus, DENGAN ambang gagal.
+# Skor yang hanya dicetak tidak mencegah kemunduran; target ini memberi exit code.
+did-suite:
+	@$(PY_SYS) scripts/did_suite.py
+
 # pr-merge: jalur merge yang benar — CI wajib hijau, squash, branch dihapus.
 pr-merge:
 	@num="$${PR:-}"; \

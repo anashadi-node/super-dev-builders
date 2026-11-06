@@ -57,6 +57,8 @@ tanggalnya menang — dan yang kalah **harus** dipindahkan ke `docs/archive/`, b
 | `PIPELINE_E2E_EVIDENCE.md` | bukti pipeline ujung-ke-ujung |
 | `WORKFLOW_SKENARIO.md` | alur kerja per skenario (web, mobile, desktop, backend, audit) beserta gate-nya |
 | `RECON_NATIVE.md` | jalur biner (ELF/PE/Mach-O/APK/firmware): dua saklar izin, contoh terbukti, jebakan |
+| `DID_FIXTURE_MOBILE_DESKTOP.md` | fixture profil mobile & desktop: artefak, batas, angka benchmark 4 target |
+| `RELEASE_REHEARSAL.md` | rehearsal gerbang rilis: artefak dari alat nyata, uji PASS + uji negatif |
 | `../workflows/*.yaml` | definisi workflow |
 
 ## Operasi

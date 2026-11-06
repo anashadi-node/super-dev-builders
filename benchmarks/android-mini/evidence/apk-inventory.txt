@@ -1,0 +1,11 @@
+Archive:  fixtures/android-mini/artifact/android-mini.apk
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+     1019  2026-11-06 09:00   AndroidManifest.xml
+      195  2026-11-06 09:00   assets/config.json
+      202  2026-11-06 09:00   jni/libmini.c
+    15136  2026-11-06 09:00   lib/x86_64/libmini.so
+       75  2026-11-06 09:00   res/layout/activity_main.xml
+      161  2026-11-06 09:00   res/values/strings.xml
+---------                     -------
+    16788                     6 files

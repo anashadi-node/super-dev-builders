@@ -1,6 +1,28 @@
 {
  "results": [
   {
+   "target": "android-mini",
+   "status": "PASS",
+   "handoff": "benchmarks/android-mini/handoff.json",
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "extras": 0,
+   "hallucinated": 0,
+   "alasan": []
+  },
+  {
+   "target": "desktop-mini",
+   "status": "PASS",
+   "handoff": "benchmarks/desktop-mini/handoff.json",
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1": 1.0,
+   "extras": 0,
+   "hallucinated": 0,
+   "alasan": []
+  },
+  {
    "target": "e1-app",
    "status": "PASS",
    "handoff": "benchmarks/e1-app/handoff.json",

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fixture: manifest TEKS, bukan AXML biner (tidak ada aapt di mesin ini). -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="io.mini.demo" android:versionName="2.1.0" android:versionCode="21">
+  <uses-permission android:name="android.permission.INTERNET"/>
+  <uses-permission android:name="android.permission.CAMERA"/>
+  <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="34"/>
+  <application android:label="Mini Demo" android:allowBackup="false">
+    <activity android:name=".MainActivity" android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN"/>
+        <category android:name="android.intent.category.LAUNCHER"/>
+      </intent-filter>
+    </activity>
+    <activity android:name=".SettingsActivity" android:exported="false"/>
+    <meta-data android:name="io.mini.UPDATE_URL"
+               android:value="https://updates.mini.example/v1/android"/>
+  </application>
+</manifest>

@@ -1,0 +1,5 @@
+{
+  "api_base": "https://api.mini.example/v2",
+  "storage": {"driver": "sqlite", "db": "mini.db", "dir": "files/"},
+  "upload": {"endpoint": "https://upload.mini.example/v2/photo", "retry": 2}
+}

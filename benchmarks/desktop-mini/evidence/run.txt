@@ -1,0 +1,3 @@
+mini-desktop 1.4.2
+update=https://updates.mini.example/v1/desktop channel=stable
+ipc=/tmp/mini-desktop.sock store=~/.local/share/mini-desktop/mini.db

@@ -1,0 +1,41 @@
+id: sdb-investigator
+hermes_profile: cc-capture-forensics   # profil yang sudah ada (tanpa profil baru = tanpa perubahan config Hermes)
+divisions: [D1]
+mission: >-
+  Investigasi teknis mendalam yang sah dan dapat diaudit: kumpulkan bukti, pisahkan
+  OBSERVED/INFERRED/UNKNOWN, lalu terbitkan paket spesifikasi (handoff) yang membuat
+  Divisi Builders dapat membangun produk premium tanpa menebak. Tidak menulis kode produk.
+permissions:
+  read: [target_public_surface, authorized_artifacts, evidence/<target>/, normalized/<target>/]
+  write: [evidence/<target>/, normalized/<target>/, runs/<target>/did/, reports/<target>/]
+  execute: [rea, provider_snapshot, capture_web, evidence_lint, redact_network,
+            normalize_capture, fidelity_compare, did_validate, semgrep, syft, trivy,
+            docker (isolated, read-only mount)]
+  network: restricted_egress
+  forbidden: [auth_bypass, captcha_bypass, paywall_bypass, rate_limit_bypass, drm_bypass,
+              pinning_bypass, brute_force_endpoints, credential_capture, secret_storage,
+              third_party_tls_interception, active_scan, write_product_code]
+inputs: [authorization_manifest_PASS, gate0_verdict_PASS, target_manifest, did_scope]
+outputs: [runs/<target>/did/handoff.json, runs/<target>/did/SPEC_DID.md,
+          reports/<target>/did-validation.json, evidence/providers/<tanggal>.json]
+evidence_rules:
+  require_status: [OBSERVED, INFERRED, UNKNOWN, OUT_OF_SCOPE]
+  require_confidence_when_inferred: true
+  require_falsification_when_inferred: true
+  require_probe_when_unknown: true
+  forbid_guessing_unknown: true
+  redact_before_llm_context: true
+  machine_gate: scripts/did_validate.py
+escalation: "out-of-scope access needed -> BLOCKED -> minta otorisasi Owner; kedalaman > L2 butuh alasan tertulis di did_scope"
+
+model_routing:
+  profile: cc-capture-forensics
+  primary: deepseek-flash               # Revisi 6 (2026-11-06): seluruh jalur GLM -> DeepSeek resmi
+  available_now: deepseek (api.deepseek.com)
+  escalation: sonnet-5.5                # klasifikasi bukti ambigu / keputusan kedalaman
+  stages: ["01C"]
+  notes: "Kualitas evidence menentukan seluruh produk turunan; ragu = INFERRED + probe, bukan tebakan."
+
+limits:
+  per_target: {tool_calls: 120, minutes: 180, evidence_bytes: 104857600}
+  stop_when: [coverage_wajib_terpenuhi, anggaran_habis, unknown_blocking_tersisa]

@@ -1,6 +1,7 @@
 """Registry tahap tunggal: workflow runner dan dashboard tidak boleh berbeda pendapat.
 
-Konteks: audit 2026-11-05 (AR1/WF1) menemukan 18 tahap di scripts/workflow_run.py
+Konteks: audit 2026-11-05 (AR1/WF1) menemukan 18 tahap di scripts/workflow_run.py (kini 19
+dengan tahap 01C DID, 2026-11-06)
 vs 16 tahap di dashboard/ws_api.py, dengan arti berbeda untuk nomor yang sama.
 Uji ini mengunci perbaikan: satu YAML, dua penurun, dan tidak boleh ada daftar kedua.
 """
@@ -22,11 +23,13 @@ import workflow_run as wf
 
 def test_registry_valid_dan_unik():
     rows = stage_registry.stages()
-    assert len(rows) == 18, f"registry berisi {len(rows)} tahap, perkiraan 18"
+    # 2026-11-06: 18 -> 19 (tahap 01C DID). Angka dikunci agar penambahan tahap
+    # selalu disengaja, bukan efek samping.
+    assert len(rows) == 19, f"registry berisi {len(rows)} tahap, perkiraan 19"
     codes = [r["code"] for r in rows]
     assert len(codes) == len(set(codes)), f"kode ganda: {codes}"
     assert codes[0] == "01" and codes[-1] == "16"
-    assert {"01A", "01B"} <= set(codes), "tahap gate/recon hilang dari registry"
+    assert {"01A", "01B", "01C"} <= set(codes), "tahap gate/recon/DID hilang dari registry"
 
 
 def test_runner_dan_dashboard_dari_sumber_sama():
@@ -35,7 +38,7 @@ def test_runner_dan_dashboard_dari_sumber_sama():
     assert [c[0] for c in cli] == [d[0] for d in dash]
     assert [c[1] for c in cli] == [d[1] for d in dash]
     assert wf.STAGES == cli
-    assert len(dash) == len(cli) == 18
+    assert len(dash) == len(cli) == 19
 
 
 def test_tahap_manusia_tidak_pernah_aman_dijalankan_web():

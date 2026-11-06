@@ -1,8 +1,8 @@
 # Skill Registry — Super Dev Builders Ecosystem V2.2
 # Status: KEEP | UPDATE | REPLACE | ADD | REMOVE | QUARANTINE | PENDING_APPROVAL | INSTALLED | REJECTED_BLUEPRINT | REJECTED_LICENSE | REJECTED_COVERED
 # Aturan: tidak ada skill pihak ketiga yang diaktifkan tanpa pipeline supply-chain + approval manusia.
-version: 2.2.0
-updated: 2026-10-11
+version: 2.3.0
+updated: 2026-11-06
 pipeline_required: [source_trust_check, pin_revision, hermes_native_scan, manual_source_review, sandbox_test, allowlist_tools, human_approval]
 # Jumlah custom skill yang disetujui Owner (21 blueprint + 6 pengganti security + 2 hasil riset lanjutan).
 # Dipakai registry_lint agar drift terdeteksi, bukan sekadar WARN dari angka blueprint.
@@ -15,7 +15,7 @@ pipeline_required: [source_trust_check, pin_revision, hermes_native_scan, manual
 # CATATAN AKURASI (ditemukan saat audit T11-1): komentar di baris atas berjumlah
 #   (21 + 6 + 2) = 29, BUKAN 37 -> rincian angka lama TIDAK dapat diverifikasi dari komentar itu
 #   sendiri. Rincian rinci 38 belum dikonfirmasi Owner; yang dikonfirmasi hanya TOTAL = 38.
-approved_custom_count: 40
+approved_custom_count: 43
 # 2026-10-26 — Owner via chat: 38 -> 39.
 #   Sebab: integrasi REA (order: "integrasikan Repo GitHub REA ke dalam Divisi SDB, audit scan
 #   analisa mendalam terlebih dahulu") menambah 1 custom skill `rea-reverse-engineering` yang
@@ -28,50 +28,54 @@ approved_custom_count: 40
 # (nol network/eval/symlink/secret; test upstream 39/39 PASS; laporan: reports/planora_audit_20261006.md).
 # Sumber: /home/anashadi/Documents/starter-clean-v1.4/starter-clean (.agents/skills, lisensi MIT).
 
+# 2026-11-06 — Owner via chat: 40 -> 43. Sebab: Divisi Investigasi (DID) v1 menambah 3 skill
+#   yang ditulis sendiri (did-evidence-ledger, did-handoff, did-benchmark) + 1 agent charter
+#   `sdb-investigator`. 11 skill lama ikut dipakai peran ini (bukan skill baru).
+#   Dasar: P0 read-only discovery 2026-11-06 + PRD DID v3.0. Desain: docs/DID_DIVISI_INVESTIGASI.md
 # ---------- A. Custom skills ekosistem (dibuat di repo ini, sumber tunggal: skills/) ----------
 custom:
   - id: reconstruction-scope-gate
     status: ADD
     divisions: [D0, D1, D8]
-    profiles: [sdb-orchestrator, sdb-recon, sdb-security]
+    profiles: [sdb-orchestrator, sdb-recon, sdb-security, sdb-investigator]
     path: skills/reconstruction-scope-gate
     scripts: [scripts/scope_gate_check.py]
   - id: target-inventory
     status: ADD
     divisions: [D1, D3]
-    profiles: [sdb-recon, sdb-architect]
+    profiles: [sdb-recon, sdb-architect, sdb-investigator]
     path: skills/target-inventory
   - id: ui-ux-state-mapper
     status: ADD
     divisions: [D1]
-    profiles: [sdb-recon]
+    profiles: [sdb-recon, sdb-investigator]
     path: skills/ui-ux-state-mapper
   - id: observed-network-contract
     status: ADD
     divisions: [D1]
-    profiles: [sdb-recon]
+    profiles: [sdb-recon, sdb-investigator]
     path: skills/observed-network-contract
     scripts: [scripts/redact_network.py]
   - id: technology-profiler
     status: ADD
     divisions: [D1, D3]
-    profiles: [sdb-recon]
+    profiles: [sdb-recon, sdb-investigator]
     path: skills/technology-profiler
   - id: evidence-normalizer
     status: ADD
     divisions: [D1]
-    profiles: [sdb-recon]
+    profiles: [sdb-recon, sdb-investigator]
     path: skills/evidence-normalizer
     scripts: [scripts/evidence_lint.py]
   - id: reconstruction-spec
     status: ADD
     divisions: [D1, D3]
-    profiles: [sdb-recon, sdb-architect]
+    profiles: [sdb-recon, sdb-architect, sdb-investigator]
     path: skills/reconstruction-spec
   - id: reconstruction-fidelity
     status: ADD
     divisions: [D1, D6, D7]
-    profiles: [sdb-recon, sdb-reviewer]
+    profiles: [sdb-recon, sdb-reviewer, sdb-investigator]
     path: skills/reconstruction-fidelity
     scripts: [scripts/fidelity_report.py]
   - id: architecture-decision-record
@@ -87,7 +91,7 @@ custom:
   - id: api-contract
     status: ADD
     divisions: [D4, D5, D3, D7]
-    profiles: [sdb-frontend, sdb-builder, sdb-architect, sdb-reviewer]
+    profiles: [sdb-frontend, sdb-builder, sdb-architect, sdb-reviewer, sdb-investigator]
     path: skills/api-contract
   - id: database-migration-safety
     status: ADD
@@ -97,7 +101,7 @@ custom:
   - id: authz-authn-review
     status: ADD
     divisions: [D5, D8]
-    profiles: [sdb-builder, sdb-security]
+    profiles: [sdb-builder, sdb-security, sdb-investigator]
     path: skills/authz-authn-review
   - id: accessibility-audit
     status: ADD
@@ -253,7 +257,7 @@ custom:
   - id: rea-reverse-engineering
     status: ADD
     divisions: [D1, D3, D7, D8]
-    profiles: [sdb-orchestrator, sdb-recon, sdb-architect, sdb-reviewer, sdb-security]
+    profiles: [sdb-orchestrator, sdb-recon, sdb-architect, sdb-reviewer, sdb-security, sdb-investigator]
     path: skills/rea-reverse-engineering
     scripts: [scripts/rea]
     tool: rea_agents
@@ -269,6 +273,27 @@ custom:
     upstream: "Jakeschincariol/replica-skill — pinned commit 77c9436 (MIT), vendored integrations/replica-skill/, audit 30 Okt 2026: 57 test PASS, 0 network sink"
     gate: "Gate #0 PASS + SPEC lolos G1 wajib sebelum membangun; G2 metrik (paritas>=90%, kontras>=4.5:1, 100% berbukti); G3 rilis butuh approval manusia"
     evidence: integrations/replica-skill/PINNED.md
+  - id: did-evidence-ledger
+    status: ADD
+    divisions: [D1]
+    profiles: [sdb-investigator]
+    path: skills/did-evidence-ledger
+    scripts: [scripts/did_validate.py]
+    note: "Ledger Finding/Unknown/Coverage; divalidasi mesin (R04-R06), bukan narasi bebas."
+  - id: did-handoff
+    status: ADD
+    divisions: [D1, D3]
+    profiles: [sdb-investigator]
+    path: skills/did-handoff
+    scripts: [scripts/did_validate.py]
+    note: "Kontrak serah terima ke Builders: handoff.json + SPEC_DID.md + laporan validasi."
+  - id: did-benchmark
+    status: ADD
+    divisions: [D1]
+    profiles: [sdb-investigator]
+    path: skills/did-benchmark
+    scripts: [scripts/did_validate.py]
+    note: "Precision/recall/hallucination terhadap ground truth; mencegah klaim akurasi tanpa angka."
 third_party:
   - repo: obra/superpowers
     url: https://github.com/obra/superpowers

@@ -192,5 +192,31 @@
    "test_runners",
    "local_linters"
   ]
+ },
+ "sdb-investigator": {
+  "profile": "cc-capture-forensics",
+  "divisions": [
+   "D1"
+  ],
+  "mission": "Investigasi mendalam yang sah & dapat diaudit; terbitkan handoff ber-bukti untuk Builders. Tidak menulis kode produk.",
+  "primary": "deepseek-flash",
+  "available_now": "deepseek (api.deepseek.com)",
+  "escalation": "sonnet-5.5",
+  "stages": [
+   "01C"
+  ],
+  "notes": "Kedalaman maksimum yang diotorisasi, bukan tanpa batas: OBSERVED/INFERRED/UNKNOWN wajib terpisah; handoff harus lolos did_validate.py.",
+  "gates": [
+   "gate0",
+   "did_validate"
+  ],
+  "permissions": [
+   "rea",
+   "capture_web",
+   "provider_snapshot",
+   "evidence_lint",
+   "did_validate",
+   "docker(isolated, ro)"
+  ]
  }
 }

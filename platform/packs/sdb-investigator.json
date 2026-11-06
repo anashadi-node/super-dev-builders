@@ -1,0 +1,106 @@
+{
+ "pack": "sdb-investigator",
+ "version": "1.0.0",
+ "role": "sdb-investigator",
+ "license": "BUSL-1.1",
+ "required_native": [
+  "source_trust_check",
+  "pin_revision",
+  "hermes_native_scan",
+  "manual_source_review",
+  "sandbox_test",
+  "allowlist_tools",
+  "human_approval"
+ ],
+ "source": {
+  "registry_version": "2.3.0",
+  "registry_updated": "2026-11-06",
+  "skill_count": 14
+ },
+ "skills": [
+  {
+   "id": "api-contract",
+   "path": "skills/api-contract",
+   "sha256": "39d95ba1f5ae15a7550bc8a9b8637f0b88cf0ae35bbd07bebd36a57153ce34cd",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "authz-authn-review",
+   "path": "skills/authz-authn-review",
+   "sha256": "ed393492248324d13b97575113f2397f98b86c8b28599e02a91fc608e272006c",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "did-benchmark",
+   "path": "skills/did-benchmark",
+   "sha256": "25fe17ee6bd6ecd624756ee8e19b353f172b585ac89b541f1077da9608bb5e39",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "did-evidence-ledger",
+   "path": "skills/did-evidence-ledger",
+   "sha256": "20f90ca31b7e4027ef54c33585e5c63915320bc7bffbb183ad54f72f7a7fb407",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "did-handoff",
+   "path": "skills/did-handoff",
+   "sha256": "bf2e6e05af20d1d47bf1cec0a0f778ee421e9ca2870d6124e64a240fecd92ec9",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "evidence-normalizer",
+   "path": "skills/evidence-normalizer",
+   "sha256": "c24dbc1048a8783d85ba86772a3c63bd2ca8d495dd6bd03513a7928c9eaa6550",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "observed-network-contract",
+   "path": "skills/observed-network-contract",
+   "sha256": "b6045259ae4f054cb851f13e5ba600825c182a4b45e9c112bdc8178c54f70c61",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "rea-reverse-engineering",
+   "path": "skills/rea-reverse-engineering",
+   "sha256": "5b852dc8e860a23279d5e6400cfa1e5eeabc26dd8bc66f9c4122df57a4b29ae2",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "reconstruction-fidelity",
+   "path": "skills/reconstruction-fidelity",
+   "sha256": "0500d60a0e218398fab61fdf1793cbfc387121b293f37856d4564c4bc2f37526",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "reconstruction-scope-gate",
+   "path": "skills/reconstruction-scope-gate",
+   "sha256": "733cc49220f40da7401f9a1b2a6b80daeb1e505b5d5c7149a9de46e38e45233c",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "reconstruction-spec",
+   "path": "skills/reconstruction-spec",
+   "sha256": "0698251330b036435f589b8b80d516e83af975dc63aa1a893f1f4a3e631fc655",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "target-inventory",
+   "path": "skills/target-inventory",
+   "sha256": "c359483b7f5c5e9ca7b0e448503fc75f9954f469b9b24518be8a4c07313bc2c6",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "technology-profiler",
+   "path": "skills/technology-profiler",
+   "sha256": "1f3094918c458e73336a4eeeaa842587fb13625d99e59186fc1af29f1402dcae",
+   "license": "BUSL-1.1"
+  },
+  {
+   "id": "ui-ux-state-mapper",
+   "path": "skills/ui-ux-state-mapper",
+   "sha256": "9d49a4789fc9d40c4b1f31bd45e9812c0554fda457a522cf1891bda29258a775",
+   "license": "BUSL-1.1"
+  }
+ ]
+}

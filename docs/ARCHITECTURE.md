@@ -82,7 +82,7 @@ D10 satu-satunya pemegang tool deploy; produksi selalu butuh approval manusia (b
 | Evidence store | `evidence/<target>/` (raw, redacted) -> `normalized/<target>/*.json` | provenance + confidence wajib |
 | Rebuild workspace | `reconstruction/<target>/` | clean implementation dari spec/evidence |
 | Verifikasi | `verification/<target>/` (visual, behavior, a11y, perf, API contract) | axe-core, Lighthouse, Playwright assertions |
-| Release gate | `scripts/release_check.py` + `docs/WORKFLOW_GATES.md` | wajib fresh evidence |
+| Release gate | `scripts/release_check.py` + `docs/WORKFLOW_GATES.md` | wajib fresh evidence; run DID ditolak lebih awal (exit 2), bukan tujuh baris "artefak tidak ditemukan" |
 | Deep analysis (Mode B) | MobSF/JADX/Apktool/Ghidra — isolated, on-demand | hanya artefak yang diotorisasi |
 
 ## 5. Aliran gate (ringkas)

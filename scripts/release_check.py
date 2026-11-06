@@ -54,6 +54,24 @@ def main(argv=None) -> int:
     max_age = args.max_age_hours if args.max_age_hours is not None else float(cfg.get("max_artifact_age_hours", 24))
     project = os.path.abspath(args.project)
 
+    # Run investigasi DID menyimpan did/handoff.json, bukan artefak rilis. Tanpa
+    # penjagaan ini, `make release-check` pada run DID mencetak tujuh baris
+    # "artefak tidak ditemukan" yang menyesatkan (terlihat seperti rilis rusak).
+    if os.path.isfile(os.path.join(project, "did", "handoff.json")):
+        hit = False
+        for patterns in required.values():
+            for pattern in ([patterns] if isinstance(patterns, str) else patterns or []):
+                if newest(os.path.join(project, pattern)):
+                    hit = True
+                    break
+            if hit:
+                break
+        if not hit:
+            print(f"FATAL: {os.path.basename(project)} adalah run investigasi DID "
+                  "(ada did/handoff.json, tanpa artefak rilis).", file=sys.stderr)
+            print("       Pakai TARGET=<slug run rilis>, atau jalankan: make did TARGET=<slug>", file=sys.stderr)
+            return 2
+
     failures, satisfied = [], []
     for gate, patterns in required.items():
         found = None

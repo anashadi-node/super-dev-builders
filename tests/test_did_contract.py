@@ -203,6 +203,29 @@ def test_bench_pisahkan_ekstra_dari_halusinasi():
     assert res["hallucination_rate"] == pytest.approx(0.5)
 
 
+def test_did_suite_menolak_klaim_tanpa_bukti(tmp_path):
+    """Suite wajib memberi exit gagal, bukan sekadar mencetak angka.
+
+    Tanpa ambang ini, benchmark hanya laporan: kemunduran kualitas (klaim
+    OBSERVED tanpa bukti) bisa masuk master tanpa ada yang menolak.
+    """
+    import json
+
+    import did_suite
+
+    bench = tmp_path / "benchmarks" / "demo"
+    bench.mkdir(parents=True)
+    (bench / "ground_truth.json").write_text(json.dumps(
+        {"features": [{"id": "G1", "name": "alpha", "keywords": ["alpha"]}]}), encoding="utf-8")
+    (bench / "handoff.json").write_text(json.dumps(
+        {"features": [{"id": "C1", "name": "beta", "status": "OBSERVED", "evidence": []}]}),
+        encoding="utf-8")
+
+    hasil = did_suite.jalankan(0.9, 0.9, root=str(tmp_path))
+    assert hasil["failed"] == 1
+    assert "halusinasi" in hasil["results"][0]["alasan"][0]
+
+
 def test_bench_frasa_label_panjang_tetap_cocok():
     """Regresi: label yang digabung jadi satu string tidak pernah jadi substring.
 

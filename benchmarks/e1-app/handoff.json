@@ -1,0 +1,612 @@
+{
+ "schema": "sdb.did.handoff/1",
+ "generated_at": "2026-11-06T18:16:00+07:00",
+ "target": {
+  "slug": "e1-app",
+  "name": "e1-app (API todo fixture)",
+  "type": "api",
+  "authorization": {
+   "gate0_verdict": "PASS",
+   "manifest": "evidence/e1-app/authorization.yaml"
+  }
+ },
+ "scope": {
+  "depth": "L2",
+  "profile": "api",
+  "in_scope": [
+   "GET/POST/PATCH/DELETE pada 127.0.0.1:8110"
+  ],
+  "out_of_scope": [
+   "data pengguna nyata (fixture)",
+   "pengujian beban >20 req",
+   "bypass auth"
+  ]
+ },
+ "providers": [
+  {
+   "id": "http-probe",
+   "version": "stdlib-urllib"
+  }
+ ],
+ "evidence_manifest": [
+  {
+   "id": "E-001",
+   "path": "evidence/e1-app/did-20261106/http-probes.json",
+   "sha256": "cf1a97437d4b76d2d36298f7f572a5b3bbbec144c808017e3bc3fa64931ffe3f",
+   "captured_at": "2026-11-06T18:16:00+07:00",
+   "status": "OBSERVED",
+   "authority": "probe HTTP langsung, token diredaksi"
+  }
+ ],
+ "findings": [
+  {
+   "id": "F-001",
+   "status": "OBSERVED",
+   "claim": "GET /health → 200 {\"status\":\"ok\"}",
+   "locator": "GET /health",
+   "evidence": [
+    "E-001"
+   ]
+  },
+  {
+   "id": "F-002",
+   "status": "OBSERVED",
+   "claim": "GET /api/items → larik 3 objek {id:int, name:str, completed:bool} dengan id 1..3.",
+   "locator": "GET /api/items",
+   "evidence": [
+    "E-001"
+   ]
+  },
+  {
+   "id": "F-003",
+   "status": "OBSERVED",
+   "claim": "GET /api/items/1 → 200 objek; GET /api/items/987654 → 404 {\"error\":\"not found\"}.",
+   "locator": "GET /api/items/{id}",
+   "evidence": [
+    "E-001"
+   ]
+  },
+  {
+   "id": "F-004",
+   "status": "OBSERVED",
+   "claim": "POST /api/login {\"password\"} benar → 200 {\"token\":<string>}; salah → 401 {\"error\":\"unauthorized\"}.",
+   "locator": "POST /api/login",
+   "evidence": [
+    "E-001"
+   ]
+  },
+  {
+   "id": "F-005",
+   "status": "OBSERVED",
+   "claim": "POST /api/items dengan Bearer token → 201 objek baru {id:4,...}; tanpa token → 401 unauthorized.",
+   "locator": "POST /api/items",
+   "evidence": [
+    "E-001"
+   ]
+  },
+  {
+   "id": "F-006",
+   "status": "OBSERVED",
+   "claim": "PATCH /api/items/4 dengan Bearer token → 200 objek dengan name baru; tanpa token → 401.",
+   "locator": "PATCH /api/items/{id}",
+   "evidence": [
+    "E-001"
+   ]
+  },
+  {
+   "id": "F-007",
+   "status": "OBSERVED",
+   "claim": "DELETE /api/items/4 dengan token → 204 tanpa body; pengulangan → 404 not found.",
+   "locator": "DELETE /api/items/{id}",
+   "evidence": [
+    "E-001"
+   ]
+  },
+  {
+   "id": "F-008",
+   "status": "OBSERVED",
+   "claim": "POST /api/items {\"name\":\"   \"} → 422 {\"error\":\"name wajib diisi\"}.",
+   "locator": "POST /api/items",
+   "evidence": [
+    "E-001"
+   ]
+  },
+  {
+   "id": "F-009",
+   "status": "OBSERVED",
+   "claim": "GET /api/items?limit=1&offset=1 → tepat 1 item (id 2): offset 0-based, urutan id menaik.",
+   "locator": "GET /api/items?limit&offset",
+   "evidence": [
+    "E-001"
+   ]
+  },
+  {
+   "id": "F-010",
+   "status": "OBSERVED",
+   "claim": "GET /api/items?completed=true|false menyaring berdasarkan boolean completed.",
+   "locator": "GET /api/items?completed",
+   "evidence": [
+    "E-001"
+   ]
+  },
+  {
+   "id": "F-011",
+   "status": "INFERRED",
+   "confidence": 74,
+   "claim": "Semua kesalahan memakai bentuk seragam {error: <pesan>} karena 404 rute tak dikenal dan 404 item sama bentuknya.",
+   "locator": "GET /nope vs GET /api/items/987654",
+   "evidence": [
+    "E-001"
+   ],
+   "falsification": {
+    "test": "Kirim body JSON rusak ke POST /api/items lalu bandingkan bentuk balasan",
+    "expected": "Tetap {\"error\": ...}; jika bukan, klaim gugur"
+   }
+  },
+  {
+   "id": "F-012",
+   "status": "INFERRED",
+   "confidence": 68,
+   "claim": "Tidak ada rate limit sampai 20 permintaan berurutan (tidak ada 429).",
+   "locator": "burst 20x GET /health",
+   "evidence": [
+    "E-001"
+   ],
+   "falsification": {
+    "test": "200 permintaan berurutan 10 dtk; hitung 429",
+    "expected": "Jika 429 muncul, klaim gugur"
+   }
+  },
+  {
+   "id": "F-013",
+   "status": "UNKNOWN",
+   "claim": "Masa berlaku token dan perilaku setelah kedaluwarsa belum diuji.",
+   "evidence": []
+  }
+ ],
+ "unknowns": [
+  {
+   "id": "U-001",
+   "question": "Berapa lama token berlaku?",
+   "impact": "blocking",
+   "probe": "Simpan token, ulangi GET /api/items tiap 5 menit sampai 401"
+  },
+  {
+   "id": "U-002",
+   "question": "Apakah skema Authorization selain Bearer diterima?",
+   "impact": "non-blocking",
+   "probe": "Uji header 'Token <x>' dan 'Basic ...' (dalam lingkup fixture)"
+  },
+  {
+   "id": "U-003",
+   "question": "Apakah penulisan bersamaan aman (race pada id)?",
+   "impact": "non-blocking",
+   "probe": "10 POST paralel, periksa id duplikat"
+  }
+ ],
+ "coverage": [
+  {
+   "category": "endpoints",
+   "status": "COVERED",
+   "found": 6,
+   "evidence": [
+    "E-001"
+   ]
+  },
+  {
+   "category": "schemas",
+   "status": "COVERED",
+   "found": 1,
+   "evidence": [
+    "E-001"
+   ]
+  },
+  {
+   "category": "errors",
+   "status": "COVERED",
+   "found": 4,
+   "evidence": [
+    "E-001"
+   ]
+  },
+  {
+   "category": "auth",
+   "status": "COVERED",
+   "found": 2,
+   "evidence": [
+    "E-001"
+   ]
+  },
+  {
+   "category": "rate_limits",
+   "status": "PARTIAL",
+   "found": 0,
+   "evidence": [
+    "E-001"
+   ]
+  }
+ ],
+ "features": [
+  {
+   "id": "FT-01",
+   "name": "Health check melaporkan status ok",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-001"
+   ],
+   "evidence": [
+    "E-001"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "server hidup",
+     "when": "GET /health",
+     "then": "200 dengan {\"status\":\"ok\"}"
+    }
+   ]
+  },
+  {
+   "id": "FT-02",
+   "name": "Daftar item dengan field id, name, completed",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-002"
+   ],
+   "evidence": [
+    "E-001"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "data awal 3 item",
+     "when": "GET /api/items",
+     "then": "larik 3 objek, completed bertipe boolean"
+    }
+   ]
+  },
+  {
+   "id": "FT-03",
+   "name": "Buat item butuh token dan mengembalikan 201",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-005"
+   ],
+   "evidence": [
+    "E-001"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "token valid",
+     "when": "POST /api/items {name}",
+     "then": "201 + objek dengan id integer"
+    }
+   ]
+  },
+  {
+   "id": "FT-04",
+   "name": "Detail item dan 404 untuk id tak ada",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-003"
+   ],
+   "evidence": [
+    "E-001"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "item id 1 ada",
+     "when": "GET /api/items/1",
+     "then": "200; id 987654 → 404 error not found"
+    }
+   ]
+  },
+  {
+   "id": "FT-05",
+   "name": "Ubah item butuh token (401 tanpa token)",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-006"
+   ],
+   "evidence": [
+    "E-001"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "item ada",
+     "when": "PATCH tanpa token",
+     "then": "401 unauthorized"
+    }
+   ]
+  },
+  {
+   "id": "FT-06",
+   "name": "Hapus item 204 dan 404 saat diulang",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-007"
+   ],
+   "evidence": [
+    "E-001"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "token valid",
+     "when": "DELETE item dua kali",
+     "then": "204 lalu 404"
+    }
+   ]
+  },
+  {
+   "id": "FT-07",
+   "name": "Login benar 200 token, salah 401",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-004"
+   ],
+   "evidence": [
+    "E-001"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "password benar/salah",
+     "when": "POST /api/login",
+     "then": "200 {token} / 401 unauthorized"
+    }
+   ]
+  },
+  {
+   "id": "FT-08",
+   "name": "Validasi nama kosong 422",
+   "priority": "must",
+   "status": "OBSERVED",
+   "findings": [
+    "F-008"
+   ],
+   "evidence": [
+    "E-001"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "token valid",
+     "when": "POST name hanya spasi",
+     "then": "422 name wajib diisi"
+    }
+   ]
+  },
+  {
+   "id": "FT-09",
+   "name": "Paginasi limit dan offset",
+   "priority": "should",
+   "status": "OBSERVED",
+   "findings": [
+    "F-009"
+   ],
+   "evidence": [
+    "E-001"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "3 item",
+     "when": "limit=1&offset=1",
+     "then": "satu item id 2"
+    }
+   ]
+  },
+  {
+   "id": "FT-10",
+   "name": "Filter completed true/false",
+   "priority": "should",
+   "status": "OBSERVED",
+   "findings": [
+    "F-010"
+   ],
+   "evidence": [
+    "E-001"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "campuran status",
+     "when": "completed=true",
+     "then": "semua completed true"
+    }
+   ]
+  },
+  {
+   "id": "FT-11",
+   "name": "Bentuk error seragam",
+   "priority": "should",
+   "status": "INFERRED",
+   "findings": [
+    "F-011"
+   ],
+   "evidence": [
+    "E-001"
+   ],
+   "acceptance_tests": [
+    {
+     "given": "rute/body tidak valid",
+     "when": "permintaan dikirim",
+     "then": "{\"error\": <pesan>}"
+    }
+   ]
+  }
+ ],
+ "build_seeds": {
+  "entities": [
+   {
+    "name": "Item",
+    "status": "OBSERVED",
+    "fields": [
+     {
+      "name": "id",
+      "type": "int",
+      "status": "OBSERVED"
+     },
+     {
+      "name": "name",
+      "type": "string",
+      "status": "OBSERVED"
+     },
+     {
+      "name": "completed",
+      "type": "bool",
+      "status": "OBSERVED"
+     }
+    ]
+   }
+  ],
+  "api": [
+   {
+    "method": "GET",
+    "path": "/health",
+    "status": "OBSERVED",
+    "evidence": [
+     "E-001"
+    ],
+    "response": {
+     "status": "string"
+    }
+   },
+   {
+    "method": "GET",
+    "path": "/api/items",
+    "status": "OBSERVED",
+    "evidence": [
+     "E-001"
+    ],
+    "request": {
+     "limit": "int?",
+     "offset": "int?",
+     "completed": "bool?"
+    },
+    "response": {
+     "items": "Item[]"
+    }
+   },
+   {
+    "method": "GET",
+    "path": "/api/items/{id}",
+    "status": "OBSERVED",
+    "evidence": [
+     "E-001"
+    ],
+    "response": {
+     "item": "Item",
+     "404": "{error}"
+    }
+   },
+   {
+    "method": "POST",
+    "path": "/api/login",
+    "status": "OBSERVED",
+    "evidence": [
+     "E-001"
+    ],
+    "request": {
+     "password": "string"
+    },
+    "response": {
+     "token": "string"
+    }
+   },
+   {
+    "method": "POST",
+    "path": "/api/items",
+    "status": "OBSERVED",
+    "evidence": [
+     "E-001"
+    ],
+    "auth": "Bearer",
+    "request": {
+     "name": "string"
+    },
+    "response": {
+     "201": "Item",
+     "422": "{error}"
+    }
+   },
+   {
+    "method": "PATCH",
+    "path": "/api/items/{id}",
+    "status": "OBSERVED",
+    "evidence": [
+     "E-001"
+    ],
+    "auth": "Bearer"
+   },
+   {
+    "method": "DELETE",
+    "path": "/api/items/{id}",
+    "status": "OBSERVED",
+    "evidence": [
+     "E-001"
+    ],
+    "auth": "Bearer",
+    "response": {
+     "204": "kosong",
+     "404": "{error}"
+    }
+   }
+  ],
+  "states": [
+   {
+    "name": "daftar kosong",
+    "status": "UNKNOWN"
+   },
+   {
+    "name": "token kedaluwarsa",
+    "status": "UNKNOWN"
+   }
+  ],
+  "design_tokens": {},
+  "non_functional": [
+   {
+    "item": "tanpa rate limit ≤20 req berurutan",
+    "status": "INFERRED",
+    "confidence": 68
+   },
+   {
+    "item": "application/json pada semua balasan JSON",
+    "status": "OBSERVED",
+    "evidence": [
+     "E-001"
+    ]
+   }
+  ]
+ },
+ "handoff": {
+  "builders_ready": false,
+  "blocking_unknowns": 1,
+  "summary": "API todo fixture terpetakan: 7 endpoint, model Item 3 field, auth Bearer, validasi 422, paginasi offset. Masa berlaku token belum diketahui sehingga replika belum boleh dikunci.",
+  "next_actions": [
+   "Uji kedaluwarsa token (U-001)",
+   "Pastikan bentuk error untuk body rusak (falsifikasi F-011)"
+  ]
+ },
+ "budget": {
+  "used": {
+   "tool_calls": 6,
+   "minutes": 18,
+   "evidence_bytes": 5050
+  }
+ },
+ "discipline": {
+  "replica_skill_used": false,
+  "wrote_code": false,
+  "mcp_registered": false,
+  "redaction_applied": true
+ },
+ "frozen": {
+  "source": "runs/e1-app/did/handoff.json",
+  "source_sha256": "be08a6fc4f1e59408b672d3d114701dcabf197428a3c14df42a9af9805406f4c",
+  "frozen_at": "2026-11-06T19:40:00+07:00",
+  "commit": "f702fcf",
+  "note": "Snapshot beku untuk suite CI. Perbarui hanya bersama label; handoff lokal tetap sumber kerja."
+ }
+}

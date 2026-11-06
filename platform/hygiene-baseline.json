@@ -23,10 +23,6 @@
    "reason": "artefak uji 2026-10-11 (akun uji), keluar dari git pada Fase 1"
   },
   {
-   "path": "reports/upgrade-evidence/trivy-oss-agency.json",
-   "reason": "email maintainer paket pihak ketiga di laporan scanner, bukan PII pelanggan"
-  },
-  {
    "path": "runs/rt-rw-portal/reports/raw/sbom-railway22-20261018-163931.json",
    "reason": "email maintainer paket pihak ketiga di SBOM, bukan PII pelanggan"
   }

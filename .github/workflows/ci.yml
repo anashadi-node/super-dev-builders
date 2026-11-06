@@ -87,6 +87,12 @@ jobs:
           python -m coverage run --branch --source=sdb_platform -m pytest tests -q -o addopts=
           python -m coverage report --include='sdb_platform/*' --fail-under=85
 
+      # Skor benchmark DID dipakai sebagai gerbang, bukan laporan: handoff beku di
+      # benchmarks/<target>/handoff.json dibandingkan label independen. Gagal bila
+      # ada klaim OBSERVED tanpa bukti atau recall/presisi turun di bawah ambang.
+      - name: Suite benchmark DID (halusinasi wajib 0)
+        run: make did-suite
+
       - name: Higiene artefak (ukuran, PII, jenis berkas)
         run: make hygiene
 

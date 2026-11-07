@@ -433,6 +433,31 @@ def bench(handoff: dict, truth: dict) -> dict:
 
 
 # ---------------------------------------------------------------- CLI
+POST_HOC_GATE = ("TIDAK masuk `make did-suite`: label ditulis setelah capture, jadi tidak sah sebagai "
+                 "pra-registrasi. Angka ini indikatif untuk perbaikan metode, bukan gerbang rilis.")
+POST_HOC_WHY = ("Bila label post-hoc dimasukkan ke benchmarks/*/ground_truth.json, CI akan menuntut presisi "
+                ">= 0,90 dan memaksa label ditambah demi lolos - pengukuran jadi rusak.")
+
+
+def _bench_provenance(truth_path: str) -> dict:
+    """Tandai asal label di berkas hasil.
+
+    Berkas di `benchmarks/` adalah label pra-registrasi (boleh jadi gerbang CI).
+    Berkas di tempat lain (mis. `runs/<t>/did/ground_truth-posthoc.json`) ditulis
+    setelah capture: hasilnya WAJIB tetap membawa status post-hoc meski perintah
+    `bench --json-out` dijalankan ulang. Tanpa ini, menjalankan ulang pengukuran
+    menghapus keterangan kejujuran dari laporan - pernah terjadi, dan angka
+    indikatif jadi tampak seperti gerbang rilis.
+    """
+    rel = os.path.relpath(os.path.abspath(truth_path), ROOT).replace(os.sep, "/")
+    pre_registered = rel.startswith("benchmarks/")
+    out = {"truth": rel, "post_hoc": not pre_registered}
+    if not pre_registered:
+        out["gate"] = POST_HOC_GATE
+        out["why_not_promoted"] = POST_HOC_WHY
+    return out
+
+
 def _resolve_handoff(args) -> str:
     if args.handoff:
         return args.handoff
@@ -471,10 +496,12 @@ def main(argv=None) -> int:
 
     if args.cmd == "bench":
         res = bench(_load(args.handoff), _load(args.truth))
+        res.update(_bench_provenance(args.truth))
         print(json.dumps(res, indent=1, ensure_ascii=False))
         if args.json_out:
             with open(args.json_out, "w", encoding="utf-8") as fh:
                 json.dump(res, fh, indent=1, ensure_ascii=False)
+                fh.write("\n")
         return 0
 
     path = _resolve_handoff(args)

@@ -14,8 +14,8 @@
  "recall": 1.0,
  "f1": 0.882,
  "hallucination_rate": 0.0,
- "post_hoc": true,
  "truth": "runs/villa-agency-os/did/ground_truth-posthoc.json",
+ "post_hoc": true,
  "gate": "TIDAK masuk `make did-suite`: label ditulis setelah capture, jadi tidak sah sebagai pra-registrasi. Angka ini indikatif untuk perbaikan metode, bukan gerbang rilis.",
- "why_not_promoted": "Bila label post-hoc dimasukkan ke benchmarks/*/ground_truth.json, CI akan menuntut presisi >= 0,90 dan memaksa label ditambah demi lolos — pengukuran jadi rusak."
+ "why_not_promoted": "Bila label post-hoc dimasukkan ke benchmarks/*/ground_truth.json, CI akan menuntut presisi >= 0,90 dan memaksa label ditambah demi lolos - pengukuran jadi rusak."
 }

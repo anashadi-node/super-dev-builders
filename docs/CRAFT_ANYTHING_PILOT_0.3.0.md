@@ -63,6 +63,28 @@ sebelum ini `doctor` hanya melihat PATH dan melaporkan "belum terpasang" padahal
 Uji regresi: `tests/test_recon_forge.py` (5 kasus: deteksi non-PATH, pin cocok, pin beda,
 pin hilang, `rebuild-combo` wajib pin).
 
+## Uji jalan nyata (2026-11-14)
+
+Bukan lagi hanya "terpasang": biner dipanggil dengan `env -i` pada target sendiri
+(`targets/sdb-local-demo`, gate0 PASS). Keluaran lengkap: `evidence/craft-anything-pilot/run-20261114/`
+(di-gitignore — bukti pilot lokal, bukan bukti target).
+
+| Perintah | Hasil |
+|---|---|
+| `triage index.html --format json` | `kind: script`, `next_steps: js_app_map`, exit 0 |
+| `js-app-map --input-path app.js --format file --output-format json` | 1 source file, 0 IPC, 0 window, **1 endpoint**, 0 route |
+| Endpoint yang dilaporkan | `GET /api/status` — `api: fetch`, `line: 2`, `literal: true` |
+
+Uji falsifikasi: `app.js` memang 5 baris dengan tepat satu `fetch('/api/status')` di baris 2
+→ klaim alat benar, tidak ada halusinasi pada berkas ini. Sampel sekecil ini **belum** cukup
+untuk menyimpulkan presisi pada target nyata.
+
+Jebakan pemakaian: pada `js-app-map`, `--format` adalah jenis input (`auto/asar/directory/zip/file`);
+format keluaran memakai `--output-format`. Salah pakai → `bad_input: unknown variant 'json'`.
+
+Belum jalan: `rebuild` — subperintah ini butuh AI backend (`ai add`), dan `ai list` masih kosong.
+Jadi kolom "dua mesin" baru terbukti untuk analisis, **bukan** untuk pembangunan ulang.
+
 ## Batas pemakaian (mengikat)
 
 1. **Read-only, pelengkap.** Tidak menggantikan `recon-forge`; tidak menjadi pemanggil pertama

@@ -84,6 +84,29 @@ class TestApiContract(unittest.TestCase):
         r = fc.dim_api(cap(api=a), cap(inter()))
         self.assertEqual(r["status"], "mismatch")
 
+    def test_host_port_berbeda_tetap_dibandingkan(self):
+        """Original di :8100 vs rebuild di :8101 — kunci pembanding harus path, bukan URL utuh."""
+        a = [{"url": "http://127.0.0.1:8100/api/status", "status": 200, "body": {"state": "ok", "ts": 1}}]
+        b = [{"url": "http://127.0.0.1:8101/api/status", "status": 200, "body": {"state": "ok", "ts": 2}}]
+        r = fc.dim_api(cap(api=a), cap(api=b))
+        self.assertEqual(r["status"], "ok")
+        self.assertEqual(r["coverage"], 1.0)
+
+    def test_path_api_sebagian_sama_partial(self):
+        a = [{"url": "http://127.0.0.1:8100/api/status", "status": 200, "body": {}},
+             {"url": "http://127.0.0.1:8100/api/extra", "status": 200, "body": {}}]
+        b = [{"url": "http://127.0.0.1:8101/api/status", "status": 200, "body": {}}]
+        r = fc.dim_api(cap(api=a), cap(api=b))
+        self.assertEqual(r["status"], "partial")
+        self.assertEqual(r["coverage"], 0.5)
+
+    def test_path_api_beda_semua_mismatch(self):
+        a = [{"url": "http://127.0.0.1:8100/api/status", "status": 200, "body": {}}]
+        b = [{"url": "http://127.0.0.1:8101/api/health", "status": 200, "body": {}}]
+        r = fc.dim_api(cap(api=a), cap(api=b))
+        self.assertEqual(r["status"], "mismatch")
+        self.assertEqual(r["coverage"], 0.0)
+
 
 class TestA11y(unittest.TestCase):
     def test_semua_fitur_original_terpenuhi(self):

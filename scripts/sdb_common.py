@@ -15,7 +15,25 @@ import re
 import sys
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-HERMES_HOME = os.environ.get("HERMES_HOME") or os.path.expanduser("~/.hermes")
+
+
+def hermes_root(raw: str | None = None) -> str:
+    """Direktori induk Hermes (~/.hermes), bukan direktori profil.
+
+    Hermes men-set `HERMES_HOME` ke direktori PROFIL saat perintah dijalankan dari
+    sesi berprofil (mis. `~/.hermes/profiles/sdb-induk`). Kalau nilai itu dipakai
+    apa adanya, `skills/` dan `profiles/` menunjuk ke tempat yang salah:
+    skill "main" dianggap berisi skill profil (COLLISION palsu) dan
+    `install_skills --main` menulis ke dalam profil. Jadi pola `.../profiles/<nama>`
+    dinaikkan satu tingkat. Path lain (mis. dir tmp pada test) dibiarkan apa adanya.
+    """
+    path = os.path.abspath(os.path.expanduser(raw or os.environ.get("HERMES_HOME") or "~/.hermes"))
+    if os.path.basename(os.path.dirname(path)) == "profiles":
+        path = os.path.dirname(os.path.dirname(path))
+    return path
+
+
+HERMES_HOME = hermes_root()
 PROFILES_DIR = os.path.join(HERMES_HOME, "profiles")
 SKILLS_DIR = os.path.join(HERMES_HOME, "skills")
 SKILL_NAMESPACE = "super-dev-builders"

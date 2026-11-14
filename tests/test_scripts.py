@@ -31,7 +31,29 @@ release = load("release_check")
 registry = load("registry_lint")
 
 
-# ---------------------------------------------------------------- YAML backend
+# ---------------------------------------------------------------- akar Hermes
+def test_hermes_root_menaikkan_direktori_profil(tmp_path):
+    """HERMES_HOME bisa berisi direktori profil; akar harus ~/.hermes, bukan profil.
+
+    Bila tidak dinaikkan: skill 'main' dibaca dari skills/ milik profil -> COLLISION
+    palsu, dan install_skills --main menulis ke dalam profil (bukan ke akar Hermes).
+    """
+    akar = tmp_path / "hermes"
+    profil = akar / "profiles" / "sdb-induk"
+    profil.mkdir(parents=True)
+    assert common.hermes_root(str(profil)) == str(akar)
+    assert common.hermes_root(str(akar)) == str(akar)
+    assert common.hermes_root(str(tmp_path)) == str(tmp_path)  # bukan pola profil
+
+
+def test_hermes_root_tidak_memakai_profil_saat_env_profil(tmp_path, monkeypatch):
+    akar = tmp_path / "hermes"
+    profil = akar / "profiles" / "cc-builder"
+    profil.mkdir(parents=True)
+    monkeypatch.setenv("HERMES_HOME", str(profil))
+    assert common.hermes_root() == str(akar)
+
+
 def test_fallback_yaml_matches_pyyaml_on_repo_files():
     """Parser fallback harus memberi hasil sama dengan PyYAML untuk semua YAML repo.
 

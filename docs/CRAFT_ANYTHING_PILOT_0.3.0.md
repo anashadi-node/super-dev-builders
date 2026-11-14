@@ -1,6 +1,6 @@
 # Uji Coba Terisolasi — Craft Anything v0.3.0
 
-Status: **pilot dilanjutkan, read-only pelengkap** · Diuji 2026-11-04 · Bukti: `evidence/craft-anything-pilot/`
+Status: **pilot AKTIF — tersambung ke `recon-forge` (pin sha256)** · Diuji 2026-11-04 · Disambungkan 2026-11-14 · Bukti: `evidence/craft-anything-pilot/`
 
 ## Kenapa diuji
 
@@ -17,7 +17,7 @@ SDB belum punya, atau hanya duplikat REA? Keputusan disandarkan pada satu berkas
 | SHA-256 terukur | `674ec59ffbdaefbd577917e07c9d464562043b275a3889ba4f60239a12f03d53` |
 | SHA-256 terbit (SHA256SUMS.txt) | sama — **cocok** |
 | Isi paket | 60 entri: 2 biner (`craft-anything` 98,7 MB GUI, `craft-anything-cli` 32,1 MB) + ikon |
-| Skrip instalasi | tidak ada · path absolut/`..` | tidak ada |
+| Skrip instalasi | tidak ada; tidak ada path absolut/`..` |
 | Lokasi | `~/.local/opt/craft-anything-0.3.0` (tanpa root, tanpa eksekusi skrip) |
 | Cara jalan sekarang | `env -i HOME=/tmp/ca-home …/craft-anything-cli` — tanpa kredensial apa pun |
 
@@ -38,6 +38,52 @@ dan tidak pernah dijalankan dengan kredensial.
 Kesimpulan pembandingan: **komplementer, bukan pengganti.** REA kuat pada biner/Ghidra (jalur
 native SDB). Craft Anything menangani berkas web/aset dan memuntahkan bukti ber-id + saran
 langkah berikutnya — bentuk keluaran yang cocok untuk laporan.
+
+## Sambungan ke recon-forge (2026-11-14)
+
+Pilot tidak lagi dipanggil manual dari shell. `recon-forge` sekarang mendeteksi biner ini dan
+memverifikasi integritasnya sebelum mengizinkan pemakaian:
+
+```bash
+python3 tools/recon-forge.py doctor                  # cari biner + cocokkan pin
+python3 tools/recon-forge.py build --target <t> --engine craft
+```
+
+| Keadaan | `doctor` | `build --engine craft` |
+|---|---|---|
+| biner tidak ada | `found=false` | exit 3 + instruksi pemasangan |
+| biner ada, sha256 = pin | `pinned=true`, `rebuild-combo=True` | jalan, sha256 dicatat ke audit-log |
+| biner ada, sha256 ≠ pin / pin hilang | `pinned=false` | **exit 4, ditolak** |
+
+Pin: `integrations/craft-anything/PINNED.json` (sha256 aset unduhan + kedua biner).
+Alasan: `SHA256SUMS.txt` hanya menjamin unduhan tidak rusak, bukan isi biner.
+Deteksi juga mencakup akar instalasi terisolasi (`~/.local/opt/craft-anything-*/bin/`), karena
+sebelum ini `doctor` hanya melihat PATH dan melaporkan "belum terpasang" padahal biner sudah ada.
+
+Uji regresi: `tests/test_recon_forge.py` (5 kasus: deteksi non-PATH, pin cocok, pin beda,
+pin hilang, `rebuild-combo` wajib pin).
+
+## Uji jalan nyata (2026-11-14)
+
+Bukan lagi hanya "terpasang": biner dipanggil dengan `env -i` pada target sendiri
+(`targets/sdb-local-demo`, gate0 PASS). Keluaran lengkap: `evidence/craft-anything-pilot/run-20261114/`
+(di-gitignore — bukti pilot lokal, bukan bukti target).
+
+| Perintah | Hasil |
+|---|---|
+| `triage index.html --format json` | `kind: script`, `next_steps: js_app_map`, exit 0 |
+| `js-app-map --input-path app.js --format file --output-format json` | 1 source file, 0 IPC, 0 window, **1 endpoint**, 0 route |
+| Endpoint yang dilaporkan | `GET /api/status` — `api: fetch`, `line: 2`, `literal: true` |
+
+Uji falsifikasi: `app.js` memang 5 baris dengan tepat satu `fetch('/api/status')` di baris 2
+→ klaim alat benar, tidak ada halusinasi pada berkas ini. Sampel sekecil ini **belum** cukup
+untuk menyimpulkan presisi pada target nyata.
+
+Jebakan pemakaian: pada `js-app-map`, `--format` adalah jenis input (`auto/asar/directory/zip/file`);
+format keluaran memakai `--output-format`. Salah pakai → `bad_input: unknown variant 'json'`.
+
+Belum jalan: `rebuild` — subperintah ini butuh AI backend (`ai add`), dan `ai list` masih kosong.
+Jadi kolom "dua mesin" baru terbukti untuk analisis, **bukan** untuk pembangunan ulang.
 
 ## Batas pemakaian (mengikat)
 

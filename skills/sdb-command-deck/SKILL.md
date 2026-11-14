@@ -19,10 +19,10 @@ Web usecase Super Dev Builders: ketik ide (web / Android / SaaS) → diskusi den
 11 karakter + barista; tiap agent punya karakter, ruangan, dan rutinitas sendiri.
 
 - `/` Workspace (kantor 3D + chat) · `/monitor` Command Deck lama (kartu LLM) · `/cast.html` galeri karakter.
-- URL lokal `http://127.0.0.1:8484` · LAN `http://192.168.1.9:8484` (HP: WiFi sama).
+- URL lokal `http://127.0.0.1:8484` · LAN DITUTUP 11-Nov-26 (audit keamanan; unit `--host 127.0.0.1`). Akses HP: kembalikan `--host 0.0.0.0` hanya bila perlu.
 - PIN untuk perangkat lain: tab **Tim** di PC server, atau `python3 dashboard/server.py --show-token`.
   Semua `/api/ws/*` wajib header `X-SDB-Token`; PIN hanya dibagikan ke klien 127.0.0.1.
-- Service: `systemctl --user status sdb-command-deck` (0.0.0.0:8484). Health harian: `sdb-deck-health.timer` 07:30
+- Service: `systemctl --user status sdb-command-deck` (127.0.0.1:8484). Health harian: `sdb-deck-health.timer` 07:30
   → `server.py --health-check` (PONG per profil → `dashboard/state/health.json`, valid 14 jam).
 - Data: `~/sdb-workspace/` (projects.json, chats/, projects/<id>/stages/*.md, `.token`). Bukan di git.
 - Shortcut desktop: `~/Desktop/sdb-command-deck.desktop` (Chrome app-window → `/`).

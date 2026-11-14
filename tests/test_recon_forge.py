@@ -339,5 +339,77 @@ def test_stamp_artifact_direktori_tidak_null(tmp_path):
     assert art["bytes"] == mod.tree_bytes(dec) > 0
 
 
+def _pasang_craft_isolasi(root: Path, sha_sah: str | None = None) -> Path:
+    """Bikin instalasi Craft Anything tiruan di akar terisolasi (bukan PATH)."""
+    opt = root / "home" / ".local" / "opt"
+    biner = opt / "craft-anything-0.3.0" / "craft-anything-0.3.0-linux-x86_64" / "bin" / "craft-anything-cli"
+    biner.parent.mkdir(parents=True, exist_ok=True)
+    biner.write_bytes(b"#!/bin/sh\necho craft-anything-cli 0.3.0\n")
+    biner.chmod(0o755)
+    if sha_sah is not None:
+        pin = root / "integrations" / "craft-anything" / "PINNED.json"
+        pin.parent.mkdir(parents=True, exist_ok=True)
+        pin.write_text(json.dumps({"release": "v0.3.0",
+                                   "binari": {"craft-anything-cli": {"sha256": sha_sah}}}),
+                       encoding="utf-8")
+    return biner
+
+
+def test_craft_ditemukan_dari_instalasi_terisolasi(tmp_path, monkeypatch):
+    """Deteksi tidak boleh bergantung PATH: pilot dipasang justru di luar PATH."""
+    root = fake_repo(tmp_path, {"gate": "gate0", "target": "uji", "verdict": "PASS"})
+    biner = _pasang_craft_isolasi(tmp_path)
+    mod = load_tool(root)
+    monkeypatch.setattr(mod.shutil, "which", lambda name: None)
+    monkeypatch.setattr(mod, "craft_roots", lambda: [tmp_path / "home" / ".local" / "opt"])
+    assert mod.craft_bin() == str(biner)
+
+
+def test_craft_pin_cocok_diterima(tmp_path, monkeypatch):
+    root = fake_repo(tmp_path, {"gate": "gate0", "target": "uji", "verdict": "PASS"})
+    mod = load_tool(root)
+    biner = _pasang_craft_isolasi(tmp_path, sha_sah="x")  # sha diisi setelah biner ada
+    sha = mod.sha256_file(biner)
+    _pasang_craft_isolasi(tmp_path, sha_sah=sha)
+    hasil = mod.craft_pin_check(str(biner))
+    assert hasil["pinned"] is True and hasil["sha256"] == sha
+
+
+def test_build_craft_pin_beda_ditolak(tmp_path, monkeypatch):
+    """Biner yang sha256-nya beda dari pin harus ditolak (fail-closed), bukan diperingatkan."""
+    root = fake_repo(tmp_path, {"gate": "gate0", "target": "uji", "verdict": "PASS"})
+    biner = _pasang_craft_isolasi(tmp_path, sha_sah="0" * 64)
+    mod = load_tool(root)
+    monkeypatch.setattr(mod, "craft_bin", lambda: str(biner))
+    args = type("A", (), {"target": "uji", "engine": "craft"})()
+    assert mod.cmd_build(args) == 4
+
+
+def test_build_craft_tanpa_pin_ditolak(tmp_path, monkeypatch):
+    root = fake_repo(tmp_path, {"gate": "gate0", "target": "uji", "verdict": "PASS"})
+    biner = _pasang_craft_isolasi(tmp_path)  # tanpa PINNED.json
+    mod = load_tool(root)
+    monkeypatch.setattr(mod, "craft_bin", lambda: str(biner))
+    args = type("A", (), {"target": "uji", "engine": "craft"})()
+    assert mod.cmd_build(args) == 4
+
+
+def test_doctor_rebuild_combo_butuh_pin(tmp_path, monkeypatch, capsys):
+    """rebuild-combo tidak boleh True hanya karena biner ada — pin wajib cocok."""
+    root = fake_repo(tmp_path, {"gate": "gate0", "target": "uji", "verdict": "PASS"})
+    biner = _pasang_craft_isolasi(tmp_path, sha_sah="0" * 64)
+    mod = load_tool(root)
+    monkeypatch.setattr(mod, "craft_bin", lambda: str(biner))
+    monkeypatch.setattr(mod, "rea_version", lambda: "6.8.0")
+    monkeypatch.setattr(mod, "chromium_bin", lambda: Path("/bin/true"))
+    args = type("A", (), {"json": True})()
+    assert mod.cmd_doctor(args) == 0
+    data = json.loads(capsys.readouterr().out)
+    assert data["engines"]["craft_anything"]["found"] is True
+    assert data["engines"]["craft_anything"]["pinned"] is False
+    assert data["verdict"]["rebuild_ready"] is False
+
+
 if __name__ == "__main__":
     sys.exit(__import__("pytest").main([__file__, "-q"]))
+

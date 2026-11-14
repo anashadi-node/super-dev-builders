@@ -412,6 +412,7 @@ sampai lolos gate.
 | `FATAL: PyYAML wajib` | PyYAML belum terpasang | `python3 -m pip install pyyaml` |
 | `FATAL: registry/skills.yaml tidak ada` | Dijalankan di luar root repo | `cd ~/super-dev-builders` dulu |
 | `No module named pytest` | Interpreter tidak punya pytest | pakai `.venv/bin/python -m pytest` atau `make test` |
+| Drift skill jadi `COLLISION` massal / `install_skills --main` tidak berefek | `HERMES_HOME` berisi direktori profil (`~/.hermes/profiles/<nama>`), jadi akar Hermes salah dibaca | jalankan `echo $HERMES_HOME`; `sdb_common.hermes_root()` otomatis menaikkan pola `.../profiles/<nama>` ke `~/.hermes`. Jika masih salah, set `HERMES_HOME=$HOME/.hermes` |
 | `ERROR: slug tidak sah: '...'` | Nama target mengandung `/` atau `..` | pakai nama satu segmen (lihat Langkah 4) |
 | `skill drift: ... 0 bermasalah` diikuti `DIFF` | Skill repo ≠ skill terpasang di profil | sinkronkan salinan profil, jalankan `make drift` lagi |
 | Gate #0 `BLOCKED` | `authorization.yaml` belum ada | salin dari `templates/`, isi, ulangi `sdb gate` |

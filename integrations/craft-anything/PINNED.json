@@ -1,0 +1,44 @@
+{
+  "tool": "craft-anything",
+  "sumber": "github.com/storytold/craft-anything",
+  "release": "v0.3.0",
+  "rilis_tanggal": "2026-11-02",
+  "dipin": "2026-11-14",
+  "dipin_oleh": "D1/D5 sdb-induk (sambung pilot ke recon-forge)",
+  "aset": {
+    "nama": "craft-anything-0.3.0-linux-x86_64.tar.gz",
+    "bytes": 66643318,
+    "sha256_terukur": "674ec59ffbdaefbd577917e07c9d464562043b275a3889ba4f60239a12f03d53",
+    "sha256_terbit_sha256sums_txt": "674ec59ffbdaefbd577917e07c9d464562043b275a3889ba4f60239a12f03d53",
+    "cocok": true
+  },
+  "binari": {
+    "craft-anything-cli": {
+      "sha256": "4db1afe78c0365f1192de776edf3a66a3e5c26fdc78f4b9d63128bf3d6d609eb",
+      "bytes": 32122320,
+      "fungsi": "CLI non-GUI yang dipanggil recon-forge build --engine craft"
+    },
+    "craft-anything": {
+      "sha256": "3e9c783ff7d0786be40dade8af5bc19228479deac6eaaf3619c278a5b110e0ad",
+      "bytes": 98708344,
+      "fungsi": "GUI desktop; TIDAK dipakai pipeline"
+    }
+  },
+  "instalasi": {
+    "akar": "~/.local/opt/craft-anything-0.3.0",
+    "direktori_paket": "~/.local/opt/craft-anything-0.3.0/craft-anything-0.3.0-linux-x86_64",
+    "biner_cli": "~/.local/opt/craft-anything-0.3.0/craft-anything-0.3.0-linux-x86_64/bin/craft-anything-cli",
+    "karantina": "~/.local/opt/_karantina/ca-0.3.0",
+    "di_PATH": false,
+    "tanpa_root": true,
+    "skrip_instalasi_dijalankan": false
+  },
+  "aturan": [
+    "Biner hanya boleh dipanggil bila sha256-nya sama dengan entri 'binari' di berkas ini.",
+    "sha256 berbeda = BLOCKED (exit 4): audit ulang rilis, jangan longgarkan pin.",
+    "Naik versi = kandidat baru: unduh dari rilis resmi + SHA256SUMS, buat PINNED.json baru, audit ulang.",
+    "--deep membaca isi target: hanya untuk target dengan manifest deep_analysis_allowed: true.",
+    "Tidak untuk target pihak ketiga selama audit sumber belum ada; hanya targets/ milik sendiri.",
+    "Dijalankan tanpa kredensial (env -i / HOME terpisah), tidak didaftarkan sebagai klien agen."
+  ]
+}

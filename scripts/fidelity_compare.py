@@ -78,11 +78,20 @@ def dim_interaction(oc, rc):
                        bool(o.get("status_text")), bool(r.get("status_text")))}
 
 
+def _url_path(url):
+    """Kunci pembanding API = path saja (host/port berbeda antara original dan rebuild)."""
+    try:
+        from urllib.parse import urlsplit
+        return urlsplit(url or "").path or "/"
+    except ValueError:
+        return url or ""
+
+
 def api_calls(cap):
     out = {}
     for p in cap.get("pages", []):
         for c in (p.get("interaction") or {}).get("api_calls") or []:
-            out[c.get("url")] = c
+            out.setdefault(_url_path(c.get("url")), c)
     return out
 
 
@@ -96,12 +105,17 @@ def dim_api(oc, rc):
         return {"dimension": "api_contract", "status": "mismatch", "coverage": 0.0,
                 "evidence": "capture.json#interaction.api_calls",
                 "note": "hanya satu sisi memanggil API (original=%d, rebuild=%d)" % (len(o), len(r))}
-    ok = o.keys() == r.keys() and all(o[k].get("status") == r[k].get("status") for k in o)
-    keys_same = all(set((o[k].get("body") or {}).keys()) == set((r[k].get("body") or {}).keys()) for k in o)
-    ok = ok and keys_same
-    return {"dimension": "api_contract", "status": "ok" if ok else "partial", "coverage": 1.0 if ok else 0.5,
+    shared = set(o) & set(r)
+    same_paths = set(o) == set(r)
+    same_status = all(o[k].get("status") == r[k].get("status") for k in shared)
+    same_body = all(set((o[k].get("body") or {})) == set((r[k].get("body") or {})) for k in shared)
+    ok = same_paths and same_status and same_body
+    return {"dimension": "api_contract",
+            "status": "ok" if ok else ("partial" if shared else "mismatch"),
+            "coverage": 1.0 if ok else (0.5 if shared else 0.0),
             "evidence": "capture.json#interaction.api_calls",
-            "note": "%d endpoint dibandingkan; status+kunci JSON sama=%s" % (len(o), keys_same)}
+            "note": "%d endpoint dibandingkan (kunci=path, irisan=%d); path sama=%s, status sama=%s, kunci JSON sama=%s"
+                    % (len(o), len(shared), same_paths, same_status, same_body)}
 
 
 def a11y_features(cap):

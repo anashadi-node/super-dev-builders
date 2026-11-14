@@ -82,8 +82,39 @@ untuk menyimpulkan presisi pada target nyata.
 Jebakan pemakaian: pada `js-app-map`, `--format` adalah jenis input (`auto/asar/directory/zip/file`);
 format keluaran memakai `--output-format`. Salah pakai → `bad_input: unknown variant 'json'`.
 
-Belum jalan: `rebuild` — subperintah ini butuh AI backend (`ai add`), dan `ai list` masih kosong.
+Belum jalan: — (`rebuild` sudah dijalankan 2026-11-14 memakai AI backend `hermes-deepseek`,
+yaitu model Hermes yang sedang aktif. Hasil paritasnya rendah: lihat
+`evidence/craft-anything-pilot/run-20261114/README.md` §Opsi A.)
 Jadi kolom "dua mesin" baru terbukti untuk analisis, **bukan** untuk pembangunan ulang.
+
+## Uji `rebuild` dengan model Hermes aktif (2026-11-14)
+
+Backend AI disambungkan lewat API OpenAI-compatible milik provider Hermes
+(`--kind openai_compatible`, `--base-url https://api.deepseek.com/v1`,
+`--model deepseek-flash`, kunci dibaca dari env `DEEPSEEK_API_KEY` — tidak pernah
+ditulis di argumen CLI). `ai test` → `latency_ms 560`, `reply: ready`.
+
+Jebakan 1: backend **tidak** dipilih otomatis. Tanpa `ai builder <nama>`, craft memilih
+`claude-code` (biner native tidak ada) dan gagal.
+Jebakan 2: `rebuild` berhenti di `[Check 1] No project to build found in app/ yet.`
+Craft mengharapkan proyek ber-manifest build; situs statis tidak memenuhinya, lalu sesi
+"Improving the build…" berputar tanpa kemajuan.
+
+Paritas hasil rebuild terhadap capture original (fidelity_compare 9 dimensi):
+
+| Dimensi | Status | Coverage |
+|---|---|---|
+| navigation | partial | 0.0 |
+| interaction | mismatch | 0.0 |
+| api_contract | partial | 0.5 |
+| functional | partial | 0.0 |
+| accessibility | ok | 1.0 |
+| performance | ok | 0.6395 |
+| visual / responsive / external_dependency | NOT_MEASURED | – |
+
+Kesimpulan: craft 0.3.0 **layak sebagai penganalisis**, **belum layak sebagai mesin
+rebuild**. Untuk klon tetap pakai jalur replicas (D5), bukan craft.
+
 
 ## Batas pemakaian (mengikat)
 

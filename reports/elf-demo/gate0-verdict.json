@@ -1,7 +1,7 @@
 {
   "gate": "gate0",
   "verdict": "PASS",
-  "checked_at": "2026-11-04T23:30:34+0700",
+  "checked_at": "2026-11-14T11:28:18+0700",
   "manifest": "/home/anashadi/super-dev-builders/evidence/elf-demo/authorization.yaml",
   "target": "elf-demo",
   "mode": "B",

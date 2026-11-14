@@ -1077,7 +1077,8 @@ Jalur biner diuji pada subjek milik sendiri (`targets/forge-demo/native/hello-el
 
 - Jalur `recon` mendukung **web** (CDP) dan **native** (`rea inspect`/`decompile-all`); native butuh provider decompiler, tanpa provider → exit 5 + penyebab.
 - Paritas baru bisa diukur setelah ada hasil bangun; tanpa rebuild → `UNPROVEN`.
-- `craft-anything` **belum terpasang**; pilot wajib dari rilis resmi v0.3.0 + checksum, di direktori terpisah, clean-room saja.
+- `craft-anything` **terpasang & di-pin** (v0.3.0, `~/.local/opt/craft-anything-0.3.0`, pin `integrations/craft-anything/PINNED.json`); `build --engine craft` menolak jalan bila sha256 ≠ pin.
+
 - `--decompile` menghasilkan digest pohon; verifikasi ulang butuh algoritma sama, bukan `sha256sum` satu berkas.
 - `mean_coverage` adalah rata-rata dimensi terukur; dimensi yang tidak terukur tidak dihitung nol (itu menyesatkan), tetapi juga tidak dianggap lulus.
 
@@ -2236,7 +2237,8 @@ journalctl --user -u sdb-report-4h -n 30 --no-pager
 | `gate` → BLOCKED | `approved_by`/`approved_at` kosong | isi manifest, jalankan ulang |
 | `gate` → FAIL | field wajib hilang / 8 aksi tidak lengkap | baca pesan per field |
 | `recon-forge` exit 2 | tidak ada verdict PASS | jalankan `sdb gate <t>` |
-| `recon-forge` exit 3 | mesin (craft-anything) belum terpasang | pasang dari rilis resmi + checksum |
+| `recon-forge` exit 3 | mesin (craft-anything) belum terpasang | pasang dari rilis resmi + checksum, lalu catat sha256 ke `integrations/craft-anything/PINNED.json` |
+| `recon-forge` exit 4 | sha256 biner ≠ pin (atau pin hilang) | audit ulang rilis, perbarui PINNED.json — jangan longgarkan pin |
 | `recon-forge` exit 5 | provider decompiler gagal | `python3 tools/recon-forge.py doctor` |
 | Paritas `UNPROVEN` | belum ada hasil build | jalankan `build` lalu `parity` |
 | `make packs` gagal | hash skill berubah | `python3 scripts/pack_build.py build --role …` |

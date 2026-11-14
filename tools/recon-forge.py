@@ -400,12 +400,92 @@ def deep_allowed(target: str) -> bool:
     return data.get("deep_analysis_allowed") is True
 
 
+CRAFT_NAMES = ("craft-anything-cli", "craft-anything")
+
+
+def craft_roots() -> list[Path]:
+    """Tempat instalasi terisolasi yang sah untuk pilot Craft Anything.
+
+    Pilot 2026-11-04 memasang paket resmi v0.3.0 di `~/.local/opt/craft-anything-0.3.0/`
+    (bukan di PATH, sengaja). `shutil.which` saja karena itu melaporkan "belum terpasang"
+    padahal binernya ada — verdict yang salah dan menyesatkan operator.
+    """
+    home = Path.home()
+    return [home / ".local" / "opt", home / ".local" / "bin", REPO / "vendor"]
+
+
+def craft_candidates() -> list[Path]:
+    """Biner Craft Anything yang ditemukan di akar instalasi terisolasi (urut nama)."""
+    hits: list[Path] = []
+    for root in craft_roots():
+        for pattern in ("craft-anything-*/bin/craft-anything-cli",
+                        "craft-anything*/bin/craft-anything-cli",
+                        "craft-anything-*/bin/craft-anything",
+                        "craft-anything*/*/bin/craft-anything-cli"):
+            hits.extend(sorted(root.glob(pattern)))
+    return [h for h in hits if h.is_file() and os.access(h, os.X_OK)]
+
+
 def craft_bin() -> str | None:
-    for name in ("craft-anything", "craft-anything-cli", "craft"):
+    for name in CRAFT_NAMES + ("craft",):
         found = shutil.which(name)
         if found:
             return found
+    for cand in craft_candidates():
+        return str(cand)
     return None
+
+
+def craft_pin_path() -> Path:
+    return REPO / "integrations" / "craft-anything" / "PINNED.json"
+
+
+def craft_pin() -> dict | None:
+    p = craft_pin_path()
+    if not p.is_file():
+        return None
+    try:
+        return json.loads(p.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+
+
+def craft_pin_check(binary: str | None) -> dict:
+    """Cocokkan sha256 biner dengan PINNED.json. Tanpa pin = tidak terverifikasi.
+
+    Integritas unduhan (SHA256SUMS rilis) hanya menjamin berkas tidak rusak saat diunduh;
+    ia tidak menjamin isi. Karena itu biner yang akan dipanggil harus sama persis dengan
+    yang pernah diverifikasi dan dicatat — bukan sekadar "ada di folder".
+    """
+    pin = craft_pin()
+    out = {"pinned": False, "sha256": None, "expected": None, "pin_version": None, "note": ""}
+    if pin:
+        out["pin_version"] = pin.get("release")
+    if not binary:
+        out["note"] = "biner tidak ditemukan"
+        return out
+    path = Path(binary)
+    try:
+        digest = sha256_file(path)
+    except OSError as exc:
+        out["note"] = f"gagal membaca biner: {exc}"
+        return out
+    out["sha256"] = digest
+    if not pin:
+        out["note"] = f"PINNED.json tidak ada ({repo_rel(craft_pin_path())}) — biner tak terverifikasi"
+        return out
+    binary_pins = pin.get("binari") or {}
+    expected = binary_pins.get(path.name)
+    if isinstance(expected, dict):
+        expected = expected.get("sha256")
+    out["expected"] = expected
+    if not expected:
+        out["note"] = f"nama biner '{path.name}' tidak ada di PINNED.json"
+        return out
+    out["pinned"] = digest == expected
+    out["note"] = "sha256 cocok dengan pin" if out["pinned"] else \
+        "sha256 BERBEDA dari pin — jangan dipakai sebelum diaudit ulang"
+    return out
 
 
 def chromium_bin() -> Path | None:
@@ -447,6 +527,7 @@ def cmd_doctor(args) -> int:
             rea["healthy"] = None
     craftp = craft_bin()
     craft = {"found": bool(craftp), "path": craftp, "version": None, "note": ""}
+    craft.update(craft_pin_check(craftp))
     if craftp:
         try:
             craft["version"] = (run([craftp, "--version"], timeout=60)["stdout"] or "").strip()[:80]
@@ -489,9 +570,9 @@ def cmd_doctor(args) -> int:
             "parity_ready": bool(all(scripts.values()) and chrome),
             "native_ready": bool(rea["found"] and any(p.get("ok") for p in providers.values())
                                  and not blockers),
-            "rebuild_ready": bool(rea["found"] and (craft["found"])),
-            "honest_note": ("craft_anything belum ada = Zona B hanya lewat replica-skill (agen); "
-                            "rea healthy=false berarti sebagian operasi bisa menolak jalan"),
+            "rebuild_ready": bool(rea["found"] and craft["found"] and craft.get("pinned")),
+            "honest_note": ("rebuild-combo hanya True bila sha256 biner craft-anything cocok dengan "
+                            "PINNED.json; rea healthy=false berarti sebagian operasi menolak jalan"),
         },
     }
     audit("D1", "recon-forge", "-", "doctor", "ok",
@@ -505,7 +586,9 @@ def cmd_doctor(args) -> int:
               f" sehat={e['rea'].get('healthy_required')} node={e['rea']['node']}"
               + (f" | healthy-lengkap={e['rea']['healthy']} karena opsional belum: "
                  f"{', '.join(gaps[:4])}{'…' if len(gaps) > 4 else ''}" if gaps else ""))
-        print(f"Craft Anything: {e['craft_anything']['version'] or 'belum terpasang (opsional)'}")
+        print(f"Craft Anything: {e['craft_anything']['version'] or 'belum terpasang (opsional)'}"
+              + (f"  pin={'ok' if e['craft_anything'].get('pinned') else 'TIDAK'} "
+                 f"({e['craft_anything'].get('path')})" if e['craft_anything']['found'] else ""))
         print(f"Chromium      : {e['chromium']['path'] or 'TIDAK ADA'}")
         print(f"Node (REA)    : {e['node']['version'] or 'TIDAK ADA'} "
               f"{e['node']['path'] or ''} memenuhi={e['node']['satisfies_rea']}")
@@ -891,13 +974,28 @@ def cmd_build(args) -> int:
         if not binary:
             print("Craft Anything belum terpasang. Jalur pilot (jangan cargo install dari HEAD):\n"
                   "  1) unduh rilis resmi v0.3.0 (aset linux-x86_64) + SHA256SUMS\n"
-                  "  2) verifikasi checksum, pasang ke ~/.local/opt/craft-anything/0.3.0/\n"
-                  "  3) ulangi perintah ini dengan --engine craft", file=sys.stderr)
+                  "  2) verifikasi checksum, pasang ke ~/.local/opt/craft-anything-0.3.0/\n"
+                  "  3) catat sha256 biner ke integrations/craft-anything/PINNED.json\n"
+                  "  4) ulangi perintah ini dengan --engine craft", file=sys.stderr)
             audit("D4", "craft-anything", args.target, "build", "blocked", "biner tidak ada")
             return 3
-        print(f"craft-anything: {binary} (jalankan manual: study → build → check; "
-              "output wajib di targets/<t>/ dan tidak boleh menyentuh evidence/ZX")
-        audit("D4", "craft-anything", args.target, "build", "manual", str(binary))
+        pin = craft_pin_check(binary)
+        if not pin["pinned"]:
+            print(f"Craft Anything DITOLAK jalan: {pin['note']}\n"
+                  f"  biner    : {binary}\n"
+                  f"  sha256   : {pin['sha256']}\n"
+                  f"  di pin   : {pin['expected']}\n"
+                  "Audit ulang rilisnya, lalu perbarui integrations/craft-anything/PINNED.json "
+                  "sebelum dipakai.", file=sys.stderr)
+            audit("D4", "craft-anything", args.target, "build", "blocked",
+                  f"pin mismatch sha256={pin['sha256']}")
+            return 4
+        out_dir = REPO / "targets" / args.target
+        print(f"craft-anything: {binary} sha256={pin['sha256']} pin={pin['pin_version']} OK\n"
+              f"  jalankan manual (study → build → check); output wajib di {repo_rel(out_dir)}/ "
+              "dan tidak boleh menyentuh evidence/<target>/ (Zona A)")
+        audit("D4", "craft-anything", args.target, "build", "manual",
+              f"{binary} sha256={pin['sha256']}")
         return 0
     spec = REPO / "reconstruction" / args.target / "SPEC.md"
     if not spec.exists():

@@ -138,8 +138,10 @@ penghambat jalur yang benar-benar dipakai.
   lewat `rea inspect` / `decompile-all`). Jalur native butuh provider decompiler;
   tanpa provider hasilnya exit 5 + penyebab, bukan manifest palsu.
 - Paritas baru bisa diukur setelah ada hasil bangun. Tanpa rebuild, `parity` = `UNPROVEN`.
-- `craft-anything` **belum terpasang** — pilot wajib dari rilis resmi v0.3.0 + checksum,
-  dijalankan di direktori terpisah, `clean-room` saja.
+- `craft-anything` **terpasang & di-pin** (v0.3.0, `integrations/craft-anything/PINNED.json`).
+  `doctor` mencari biner di PATH **dan** akar instalasi terisolasi `~/.local/opt/craft-anything-*/`;
+  `build --engine craft` menolak jalan (exit 4) bila sha256 biner ≠ pin atau pin tidak ada.
+  Integritas unduhan bukan jaminan isi — karena itu pin, bukan sekadar "ada di folder".
 - `--decompile` menghasilkan digest pohon direktori; verifikasi ulang butuh
   algoritma yang sama (relpath + isi berkas terurut), bukan `sha256sum` satu berkas.
 - Skor `mean_coverage` adalah rata-rata dimensi terukur; dimensi yang tidak terukur tidak

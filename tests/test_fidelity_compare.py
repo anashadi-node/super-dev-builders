@@ -34,6 +34,47 @@ def inter(selector=".portfolio-link", dialogs=1, aria=None, dom_delta=5, error=N
     return d
 
 
+class TestPagePath(unittest.TestCase):
+    """Regresi nyata 2026-11-15: `/index.html` vs `/` membuat visual NOT_MEASURED."""
+
+    def test_index_html_sama_dengan_root(self):
+        self.assertEqual(fc.page_path("/index.html"), "/")
+        self.assertEqual(fc.page_path("/"), "/")
+        self.assertEqual(fc.page_path("/index.htm"), "/")
+
+    def test_index_html_dalam_subdir(self):
+        self.assertEqual(fc.page_path("/blog/index.html"), "/blog/")
+        self.assertEqual(fc.page_path("/blog/index.htm"), "/blog/")
+
+    def test_query_dan_fragment_dibuang(self):
+        self.assertEqual(fc.page_path("/about.html?a=1#x"), "/about.html")
+
+    def test_pages_irisan_setelah_normalisasi(self):
+        a, b = cap(path="/index.html")["pages"][0], dict(cap(path="/")["pages"][0])
+        b["path"] = "/"
+        op, rp = fc.pages({"pages": [a]}), fc.pages({"pages": [b]})
+        self.assertEqual(set(op) & set(rp), {"/"})
+        self.assertEqual(len(op), 1)
+
+
+class TestNormHref(unittest.TestCase):
+    """Regresi nyata 2026-11-15: href absolut vs relatif membuat navigation = 0.0."""
+
+    def test_absolut_dan_relatif_identik(self):
+        self.assertEqual(fc.norm_href("/about.html", "/"), fc.norm_href("about.html", "/"))
+
+    def test_relatif_dari_subdir(self):
+        self.assertEqual(fc.norm_href("detail.html", "/blog/"), "/blog/detail.html")
+        self.assertEqual(fc.norm_href("../kontak.html", "/blog/"), "/kontak.html")
+
+    def test_anchor_dan_skema_non_navigasi_diabaikan(self):
+        for h in ("#top", "mailto:a@b.c", "tel:+620", "javascript:void(0)", ""):
+            self.assertIsNone(fc.norm_href(h, "/"))
+
+    def test_url_penuh_jadi_path(self):
+        self.assertEqual(fc.norm_href("http://127.0.0.1:8100/index.html", "/"), "/")
+
+
 class TestInteraction(unittest.TestCase):
     def test_dialog_di_kedua_sisi_ok(self):
         r = fc.dim_interaction(cap(inter(".portfolio-link")), cap(inter(".portfolio-link")))

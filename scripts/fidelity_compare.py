@@ -13,7 +13,7 @@ from __future__ import annotations
 import argparse
 import os
 import sys
-from urllib.parse import urlparse
+from urllib.parse import urljoin, urlsplit
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from sdb_common import read_json, repo_path, validate_slug, write_json
@@ -23,8 +23,52 @@ DIMS = ["visual", "navigation", "interaction", "responsive", "functional",
 LOCAL_HOSTS = {"127.0.0.1", "localhost", "::1"}
 
 
+def page_path(path):
+    """Kunci pembanding halaman: `/index.html` dan `/` adalah halaman yang sama.
+
+    Bug nyata (2026-11-15): server statis mengalihkan `/` ke `/index.html`, sehingga
+    capture original berkunci `/index.html` sementara rebuild berkunci `/`. Tanpa
+    normalisasi, irisan path kosong -> visual NOT_MEASURED dan navigation/functional
+    jatuh ke 0 walau halamannya identik. Aturan: buang `index.html`/`index.htm`
+    di ujung path (``/a/index.html`` -> ``/a/``, ``/index.html`` -> ``/``).
+    """
+    p = (path or "/").split("?")[0].split("#")[0]
+    for tail in ("/index.html", "/index.htm"):
+        if p.endswith(tail):
+            p = p[: -len("index.html" if tail.endswith("html") else "index.htm")]
+            break
+    if not p.startswith("/"):
+        p = "/" + p
+    return p
+
+
+def norm_href(href, base_path="/"):
+    """Tautan dinormalkan jadi path absolut, lalu lewat `page_path`.
+
+    Bug nyata (2026-11-15): capture original menyimpan href absolut (`/about.html`)
+    sedangkan rebuild relatif (`about.html`) — secara perilaku identik, tapi
+    perbandingan string mentah membuat navigation = 0.0. Tautan `#anchor`,
+    `mailto:`, `tel:`, `javascript:` diabaikan (bukan navigasi halaman).
+    """
+    h = (href or "").strip()
+    if not h or h.startswith(("#", "javascript:")):
+        return None
+    u = urlsplit(h)
+    if u.scheme in ("mailto", "tel", "sms", "data"):
+        return None
+    if u.scheme in ("http", "https") or u.netloc:
+        p = u.path or "/"
+    else:
+        p = urljoin(base_path if base_path.endswith("/") else base_path + "/", h)
+    return page_path(p)
+
+
 def pages(cap):
-    return {p["path"]: p for p in cap["pages"]}
+    """Peta path -> halaman. Path dinormalisasi; halaman pertama menang."""
+    out = {}
+    for p in cap["pages"]:
+        out.setdefault(page_path(p["path"]), p)
+    return out
 
 
 def pix_diff(a_png, b_png, out_png):
@@ -150,7 +194,7 @@ def external_requests(cap_or_path):
         urls = [p.get("url", "") for p in ((d or {}).get("pages") or [])]
     ext, hosts = 0, set()
     for u in urls:
-        h = urlparse(u).hostname or ""
+        h = urlsplit(u).hostname or ""
         if h and h not in LOCAL_HOSTS:
             ext += 1
             hosts.add(h)
@@ -202,15 +246,15 @@ def main(argv=None) -> int:
         rows.append({"dimension": "visual", "status": "NOT_MEASURED", "coverage": None, "evidence": "-",
                      "note": "tidak ada path halaman yang sama antara original dan rebuild"})
     else:
-        vis, vis_ok = pix_diff(repo_path(op[first]["screenshot"]), repo_path(rp[first]["screenshot"]),
+        vis, _diff_is_blank = pix_diff(repo_path(op[first]["screenshot"]), repo_path(rp[first]["screenshot"]),
                                os.path.join(diff_dir, "visual-index.png"))
-        rows.append({"dimension": "visual", "status": "ok" if vis_ok else "match",
+        rows.append({"dimension": "visual", "status": ("ok" if vis >= 0.9 else "partial" if vis >= 0.5 else "mismatch"),
                      "coverage": vis, "evidence": os.path.relpath(os.path.join(diff_dir, "visual-index.png"), repo_path()),
                      "note": "pixel diff full-page %s (coverage = 1 - rasio piksel berbeda; selisih gaya disengaja dilaporkan apa adanya)" % first})
 
     # navigation
-    ol = {lk["href"] for p in op.values() for lk in p["facts"]["links"]}
-    rl = {lk["href"] for p in rp.values() for lk in p["facts"]["links"]}
+    ol = {norm_href(lk["href"], k) for k, p in op.items() for lk in (p.get("facts") or {}).get("links") or []} - {None}
+    rl = {norm_href(lk["href"], k) for k, p in rp.items() for lk in (p.get("facts") or {}).get("links") or []} - {None}
     nav = len(ol & rl) / len(ol | rl) if (ol | rl) else 1.0
     rows.append({"dimension": "navigation", "status": "ok" if nav == 1 else "partial",
                  "coverage": round(nav, 4), "evidence": "normalized/%s/screens.json" % args.target,
@@ -229,12 +273,26 @@ def main(argv=None) -> int:
 
     # responsive
     if args.original_mobile and args.rebuilt_mobile:
-        om, rm = read_json(os.path.join(args.original_mobile, "capture.json")), read_json(os.path.join(args.rebuilt_mobile, "capture.json"))
-        rvis, _ = pix_diff(repo_path(om["pages"][0]["screenshot"]), repo_path(rm["pages"][0]["screenshot"]),
-                           os.path.join(diff_dir, "visual-mobile.png"))
-        rows.append({"dimension": "responsive", "status": "ok" if rvis > 0.5 else "partial", "coverage": rvis,
-                     "evidence": os.path.relpath(os.path.join(diff_dir, "visual-mobile.png"), repo_path()),
-                     "note": "pixel diff pada viewport mobile (dari capture --viewport yang dipakai)"})
+        om_raw, rm_raw = read_json(os.path.join(args.original_mobile, "capture.json")), read_json(os.path.join(args.rebuilt_mobile, "capture.json"))
+        om = pages(om_raw) if om_raw else {}
+        rm = pages(rm_raw) if rm_raw else {}
+        shared_m = sorted(set(om) & set(rm))
+        if not shared_m and om and rm:
+            pick_o, pick_r = next(iter(om.values())), next(iter(rm.values()))
+        elif shared_m:
+            pick_o, pick_r = om[shared_m[0]], rm[shared_m[0]]
+        else:
+            pick_o = pick_r = None
+        if pick_o is None:
+            rows.append({"dimension": "responsive", "status": "NOT_MEASURED", "coverage": None, "evidence": "-",
+                         "note": "capture mobile tidak terbaca"})
+        else:
+            rvis, _ = pix_diff(repo_path(pick_o["screenshot"]), repo_path(pick_r["screenshot"]),
+                               os.path.join(diff_dir, "visual-mobile.png"))
+            rows.append({"dimension": "responsive",
+                         "status": ("ok" if rvis >= 0.9 else "partial" if rvis >= 0.5 else "mismatch"), "coverage": rvis,
+                         "evidence": os.path.relpath(os.path.join(diff_dir, "visual-mobile.png"), repo_path()),
+                         "note": "pixel diff pada viewport mobile (dari capture --viewport yang dipakai); halaman=%s" % (shared_m[0] if shared_m else "pages[0]")})
     else:
         rows.append({"dimension": "responsive", "status": "NOT_MEASURED", "coverage": None, "evidence": "-",
                      "note": "capture mobile tidak dijalankan"})
@@ -248,8 +306,8 @@ def main(argv=None) -> int:
                  "note": "load original %.0f ms vs rebuild %.0f ms (coverage=rasio dibatasi 1.0)" % (o_ms, r_ms)})
 
     # dependensi pihak ketiga (dibaca dari evidence mentah kedua sisi)
-    rows.append(dim_external(repo_path("evidence", args.target, "capture", "network.json"),
-                             repo_path("evidence", args.target, "capture-rebuild", "network.json")))
+    rows.append(dim_external(os.path.join(args.original, "network.json"),
+                             os.path.join(args.rebuilt, "network.json")))
 
     out = args.out or repo_path("verification", args.target, "fidelity.json")
     os.makedirs(os.path.dirname(out), exist_ok=True)

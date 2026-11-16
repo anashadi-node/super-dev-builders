@@ -115,6 +115,43 @@ Paritas hasil rebuild terhadap capture original (fidelity_compare 9 dimensi):
 Kesimpulan: craft 0.3.0 **layak sebagai penganalisis**, **belum layak sebagai mesin
 rebuild**. Untuk klon tetap pakai jalur replicas (D5), bukan craft.
 
+## Ukur ulang paritas setelah 2 bug harness diperbaiki (2026-11-15)
+
+Dua angka di atas bukan sifat rebuild, melainkan **bug pembanding** yang ditemukan saat
+hendak menutup dimensi visual/responsive:
+
+1. **Kunci halaman tidak dinormalkan.** Server statis mengalihkan `/` → `/index.html`, jadi
+   capture original berkunci `/index.html` sementara rebuild `/`. Irisan path kosong ⇒ `visual`
+   NOT_MEASURED dan `functional` 0.0 padahal halaman sama. Perbaikan: `page_path()`
+   (`/a/index.html` → `/a/`).
+2. **Tautan dibandingkan mentah.** Original menyimpan href absolut (`/about.html`), rebuild
+   relatif (`about.html`) — identik secara perilaku, tapi `navigation` jadi 0.0. Perbaikan:
+   `norm_href()` (resolve relatif terhadap path halaman, `mailto:`/`tel:`/`#anchor` diabaikan).
+
+Bukti regresi: `tests/test_fidelity_compare.py` (`TestPagePath`, `TestNormHref`, 8 tes baru).
+Capture ulang 4 sisi (desktop + mobile `390x844`, original :8100 vs rebuild :8101) →
+`evidence/craft-anything-pilot/run-20261114/parity-rebuild.json` (lokal, git-ignored) dan salinan terlacak `reports/sdb-local-demo/fidelity-rebuild.json`:
+
+| Dimensi | Sebelum | Sesudah | Coverage |
+|---|---|---|---|
+| visual | NOT_MEASURED | ok | 1.0 (screenshot byte-identik, sha256 `67869dbd…`) |
+| responsive | NOT_MEASURED | ok | 1.0 (viewport mobile, sha256 `0ceaecfc…`) |
+| navigation | partial 0.0 | ok | 1.0 |
+| functional | partial 0.0 | ok | 1.0 |
+| accessibility | ok | ok | 1.0 |
+| performance | ok 0.6395 | ok | 1.0 |
+| api_contract | partial 0.5 | **mismatch** 0.0 | benar: original punya `/api/status`, rebuild statis tidak |
+| interaction | mismatch 0.0 | NOT_MEASURED | rebuild tak punya elemen yang sama untuk diklik |
+| external_dependency | NOT_MEASURED | NOT_OBSERVED | kedua sisi tanpa host pihak ketiga |
+
+Status jujur: **7 dari 9 dimensi kini terukur** (naik dari 4). Dua sisa memang tidak bisa diukur
+pada rebuild ini, bukan disembunyikan. `api_contract` turun ke mismatch karena rebuild tidak
+mengimplementasikan endpoint — itu temuan nyata, bukan kemunduran alat.
+
+Catatan penting: demo `sdb-local-demo` adalah halaman ~680 byte, sehingga visual 1.0 di sini
+**tidak** membuktikan paritas visual pada aplikasi nyata. Yang terbukti: harness sekarang bisa
+mengukur dimensi itu dengan angka.
+
 
 ## Batas pemakaian (mengikat)
 

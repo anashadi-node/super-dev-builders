@@ -117,8 +117,29 @@ Token **tidak pernah** diwariskan ke proses agen: worker dan `/ask` menghapus
 - Satu sesi agen punya batas turn, jadi build besar berjalan bertahap: 3 ronde kerja
   (default `SDB_BUILD_ROUNDS=3`) lalu satu ronde dokumentasi. Job yang belum tuntas
   berstatus `paused` (bukan `failed`) agar bisa dilanjutkan tanpa mengulang dari nol.
-- Job dianggap selesai jika `README.md` dan `VERIFY.md` benar-benar ada — bukan karena
-  agen mengaku selesai.
+- Job dianggap selesai hanya lewat **gerbang penyelesaian**: `README.md` dan `VERIFY.md`
+  harus berkas regular non-kosong, bukan symlink dan bukan hardlink (hardlink bisa
+  menautkan berkas rahasia ke dokumen), direktori kerja harus di dalam `SDB_BUILDS`,
+  bukan symlink, namanya sesuai ID job, dan `dir` di DB harus sama dengan job yang
+  diproses. Keberadaan dokumen saja tidak cukup, dan isi `VERIFY.md` tidak pernah
+  dianggap bukti mesin.
+- Kode penolakan ditulis ke kolom `error`: `WORKSPACE_INVALID`, `DOCS_INVALID`,
+  `UNVERIFIED`, `EVIDENCE_INVALID`, `VERIFY_FAIL`, `VERIFY_TIMEOUT`,
+  `COMPLETION_ERROR`. Job tetap `paused` (bukan `failed`) agar `/retry` bisa lanjut.
+- **Level bukti** dicatat pada event `completion`:
+  `ATTESTED` = dokumen diperiksa, pengujian TIDAK dijalankan mesin (bukan bukti
+  release independen); `VERIFIED` = ada event `verify` PASS yang terikat ke job,
+  direktori, dan sidik isi workspace saat itu.
+- **Sidik workspace** (`tree_sha256`) menghash isi semua berkas regular; direktori
+  dependensi/cache (`node_modules`, `.venv`, `.git`, cache) hanya dicatat
+  keberadaannya, jadi perubahan di dalamnya tidak mengubah sidik. Bila anggaran
+  byte/waktu hash habis, sidik ditandai **tidak lengkap** (`digest_complete=false`)
+  dan bukti `verified` ditolak — sidik parsial tidak dipakai sebagai bukti.
+- Kebijakan gerbang diatur `SDB_DONE_POLICY`. Default kode `attested` agar perilaku
+  lama tidak berubah saat deploy. Nilai `verified` menuntut bukti mesin (belum
+  tersedia sebelum C2-B); nilai kosong atau tak dikenal diperlakukan `verified`
+  (fail-closed). Mengubah ke `verified` butuh persetujuan Owner karena membuat build
+  tanpa bukti berhenti `paused`.
 - Build berjalan sebagai user `anashadi` dengan toolset penuh (perlu menulis
   kode, menjalankan tes). Pembatasnya: hanya direktori job, aturan keras di
   prompt, `--max-turns`, `--run-budget`, dan proses dimatikan paksa bila

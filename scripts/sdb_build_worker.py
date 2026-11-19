@@ -16,9 +16,11 @@ Jalankan: systemctl --user start sdb-build-worker   (atau python3 scripts/sdb_bu
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import signal
+import stat
 import subprocess
 import sys
 import time
@@ -37,6 +39,19 @@ SPEC_TURNS = int(os.environ.get("SDB_SPEC_TURNS", "40"))
 BUILD_TURNS = int(os.environ.get("SDB_BUILD_TURNS", "300"))
 POLL = int(os.environ.get("SDB_WORKER_POLL", "10"))
 ROUNDS = int(os.environ.get("SDB_BUILD_ROUNDS", "3"))
+
+# --- gerbang penyelesaian (C2-A) ---
+# Target kebijakan adalah `verified`, tetapi default kode sengaja `attested`:
+# mengaktifkan `verified` sebelum C2-B (verifier tersandbox) membuat semua build
+# berhenti `paused`. Aktivasi = set SDB_DONE_POLICY=verified, butuh persetujuan Owner.
+DONE_POLICY_DEFAULT = "attested"
+DONE_POLICIES = ("attested", "verified")
+DOC_MAX_BYTES = 200_000
+DIGEST_FILE_MAX = 20_000
+DIGEST_BYTE_MAX = 256 * 1024 * 1024
+DIGEST_TIME_MAX = 20.0
+DIGEST_SKIP_DIRS = frozenset({"node_modules", ".venv", ".git", "__pycache__",
+                              ".pytest_cache", ".mypy_cache", ".ruff_cache"})
 
 GUARD = """ATURAN KERAS (tidak bisa dinegosiasikan):
 - Bekerja HANYA di direktori kerja saat ini. Jangan menulis/menghapus di luar itu.
@@ -213,6 +228,277 @@ def listing(d: Path, limit: int = 25) -> str:
     return head + ("\n" + "\n".join(rows) if rows else "")
 
 
+# ---------- gerbang penyelesaian (C2-A) ----------
+# Prinsip: keberadaan dokumen tidak membuktikan apa pun. Yang diperiksa di sini
+# adalah identitas job, lokasi direktori, bentuk dokumen, dan (pada kebijakan
+# `verified`) bukti mesin yang terikat ke isi workspace saat ini.
+def done_policy() -> str:
+    """Kebijakan gerbang `done`. Hanya "tidak diset" yang memakai default.
+
+    Nilai kosong/spasi/tak dikenal = salah set -> fail-closed ke `verified`
+    (jangan pernah menurunkan gerbang secara diam-diam).
+    """
+    raw = os.environ.get("SDB_DONE_POLICY")
+    if raw is None:
+        return DONE_POLICY_DEFAULT
+    raw = raw.strip().lower()
+    return raw if raw in DONE_POLICIES else "verified"
+
+
+def resolve_workspace(job: dict) -> tuple[Path | None, str]:
+    """Direktori kerja sah untuk job ini, atau (None, kode) bila gagal."""
+    try:
+        jid = int(job.get("id") or 0)
+    except (TypeError, ValueError):
+        return None, "WORKSPACE_INVALID"
+    raw = str(job.get("dir") or "")
+    if not jid or not raw:
+        return None, "WORKSPACE_INVALID"
+    try:
+        baris = jobs.get(jid)  # identitas: dir di DB harus sama dengan job yang diproses
+    except Exception:  # noqa: BLE001 — DB rusak tidak boleh membuat job dianggap selesai
+        return None, "WORKSPACE_INVALID"
+    if not baris or str(baris.get("dir") or "") != raw:
+        return None, "WORKSPACE_INVALID"
+    p = Path(raw)
+    try:
+        if p.is_symlink():
+            return None, "WORKSPACE_INVALID"
+        real = p.resolve(strict=True)
+    except OSError:
+        return None, "WORKSPACE_INVALID"
+    if not real.is_dir():
+        return None, "WORKSPACE_INVALID"
+    try:
+        root = Path(jobs.BUILDS).resolve()
+    except OSError:
+        return None, "WORKSPACE_INVALID"
+    if real == root or root not in real.parents:
+        return None, "WORKSPACE_INVALID"
+    if not real.name.startswith(f"{jid:03d}-"):
+        return None, "WORKSPACE_INVALID"
+    return real, ""
+
+
+def _safe_read(p: Path, limit: int) -> str | None:
+    """Baca berkas regular tanpa mengikuti symlink. None bila tidak sah.
+
+    lstat -> open(O_NOFOLLOW|O_NONBLOCK) -> fstat menutup "periksa lalu baca":
+    symlink/hardlink ditolak, berkas yang ditukar antara lstat dan open ditolak
+    (dev/ino berbeda), dan FIFO tidak bisa menggantung worker.
+    """
+    try:
+        st = p.lstat()
+    except OSError:
+        return None
+    if stat.S_ISLNK(st.st_mode) or not stat.S_ISREG(st.st_mode):
+        return None
+    # Hardlink ditolak: user yang sama bisa menautkan berkas rahasia ke README.md
+    # atau VERIFY.md, sehingga isinya terbaca dan ikut terkirim ke Telegram.
+    if st.st_nlink > 1 or st.st_size > limit:
+        return None
+    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
+    try:
+        fd = os.open(p, flags)
+    except OSError:
+        return None
+    try:
+        dst = os.fstat(fd)
+        if (dst.st_dev, dst.st_ino) != (st.st_dev, st.st_ino):
+            return None
+        if not stat.S_ISREG(dst.st_mode):
+            return None
+        with os.fdopen(fd, "rb") as fh:
+            fd = -1
+            data = fh.read(limit + 1)
+    except OSError:
+        return None
+    finally:
+        if fd >= 0:
+            os.close(fd)
+    if len(data) > limit:
+        return None
+    return data.decode("utf-8", errors="replace").strip()
+
+
+def read_docs(d: Path) -> tuple[str, str, str]:
+    """(kode, readme, verify). kode "" berarti dokumen sah dan tidak kosong."""
+    readme = _safe_read(d / "README.md", DOC_MAX_BYTES)
+    verify = _safe_read(d / "VERIFY.md", DOC_MAX_BYTES)
+    if not readme:
+        return "DOCS_INVALID", "", ""
+    if not verify:
+        return "DOCS_INVALID", readme, ""
+    return "", readme, verify
+
+
+def tree_digest(d: Path) -> tuple[str, bool]:
+    """(sidik isi workspace, lengkap?) untuk berkas regular non-symlink.
+
+    Isi SEMUA berkas regular dihash (streaming, tanpa batas per-berkas) agar
+    perubahan sekecil apa pun menggugurkan bukti lama. Direktori dependensi/cache
+    hanya dicatat keberadaannya (`D <rel>`), jadi mutasi di dalamnya TIDAK
+    mengubah sidik — itu keterbatasan yang dicatat, bukan disamarkan.
+
+    Anggaran byte dan waktu mencegah satu job besar memblokir worker. Bila
+    anggaran habis, `lengkap` menjadi False dan bukti `verified` ditolak.
+    """
+    h = hashlib.sha256()
+    n = 0
+    dipakai = 0
+    lengkap = True
+    mulai = time.monotonic()
+    for root, dirs, files in os.walk(d, followlinks=False):
+        if time.monotonic() - mulai > DIGEST_TIME_MAX:
+            lengkap = False
+            break
+        rel_root = Path(root).relative_to(d)
+        sisa = []
+        for name in sorted(dirs):
+            p = Path(root) / name
+            rel = rel_root / name
+            if p.is_symlink():
+                h.update(f"L {rel}\n".encode())
+            elif name in DIGEST_SKIP_DIRS:
+                h.update(f"D {rel}\n".encode())
+            else:
+                sisa.append(name)
+        dirs[:] = sisa
+        for name in sorted(files):
+            p = Path(root) / name
+            rel = rel_root / name
+            try:
+                st = p.lstat()
+            except OSError:
+                lengkap = False
+                continue
+            if stat.S_ISLNK(st.st_mode):
+                h.update(f"L {rel}\n".encode())
+                continue
+            if not stat.S_ISREG(st.st_mode):
+                continue
+            n += 1
+            if n > DIGEST_FILE_MAX:
+                lengkap = False
+                break
+            h.update(f"F {rel} {st.st_size}\n".encode())
+            if dipakai + st.st_size > DIGEST_BYTE_MAX:
+                lengkap = False
+                continue
+            dipakai += st.st_size
+            try:
+                with open(p, "rb") as fh:
+                    for potong in iter(lambda: fh.read(65536), b""):
+                        h.update(potong)
+            except OSError:
+                h.update(b"UNREADABLE\n")
+                lengkap = False
+        if not lengkap:
+            break
+    if not lengkap:
+        h.update(b"PARTIAL\n")
+    return h.hexdigest(), lengkap
+
+
+def latest_evidence(jid: int) -> dict | None:
+    """Event `verify` terakhir untuk job ini. None = tidak ada; {} = tidak bisa dipakai.
+
+    Query langsung, bukan memindai N event terakhir: event `verify` bisa tertimbun
+    puluhan `build_output` dari ronde/retry sebelumnya.
+    """
+    try:
+        with jobs.connect() as con:
+            baris = con.execute(
+                "SELECT text FROM events WHERE job_id=? AND kind='verify' "
+                "ORDER BY id DESC LIMIT 1", (jid,)).fetchone()
+    except Exception:  # noqa: BLE001
+        return {}
+    if baris is None:
+        return None
+    try:
+        isi = json.loads(baris["text"] or "")
+    except (TypeError, ValueError, IndexError, KeyError):
+        return {}
+    return isi if isinstance(isi, dict) else {}
+
+
+def _as_int(v: object) -> int:
+    try:
+        return int(v)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return 0
+
+
+def evidence_ok(job: dict, real: Path, digest: str, lengkap: bool = True) -> tuple[bool, str]:
+    """Bukti mesin sah hanya bila PASS, terikat job + dir nyata + isi workspace.
+
+    `lengkap=False` (sidik sebagian) selalu ditolak: sidik parsial tidak bisa
+    membuktikan isi workspace tidak berubah.
+    """
+    if not lengkap:
+        return False, "EVIDENCE_INVALID"
+    ev = latest_evidence(int(job["id"]))
+    if ev is None:
+        return False, "UNVERIFIED"
+    if not ev:
+        return False, "EVIDENCE_INVALID"
+    verdict = ev.get("verdict")
+    if verdict in ("FAIL", "TIMEOUT"):
+        return False, "VERIFY_FAIL" if verdict == "FAIL" else "VERIFY_TIMEOUT"
+    skema = ev.get("schema")
+    if not isinstance(skema, int) or isinstance(skema, bool) or skema != 1:
+        return False, "EVIDENCE_INVALID"
+    if verdict != "PASS":
+        return False, "EVIDENCE_INVALID"
+    if _as_int(ev.get("job_id")) != int(job["id"]):
+        return False, "EVIDENCE_INVALID"
+    if str(ev.get("dir_real") or "") != str(real):
+        return False, "EVIDENCE_INVALID"
+    if str(ev.get("tree_sha256") or "") != digest:
+        return False, "EVIDENCE_INVALID"
+    return True, ""
+
+
+def assess_completion(job: dict, d: Path) -> dict:
+    """Hasil gerbang penyelesaian. `ok` False -> `code` berisi alasan (fail-closed).
+
+    Kegagalan tak terduga tidak boleh membuat worker mati dengan job tertinggal di
+    `building`; semuanya diterjemahkan menjadi kode dan status `paused`.
+    """
+    try:
+        return _assess_completion(job, d)
+    except Exception:  # noqa: BLE001
+        return {"ok": False, "code": "COMPLETION_ERROR", "level": "", "readme": "",
+                "verify": "", "dir_real": "", "tree_sha256": "", "digest_complete": False,
+                "policy": done_policy()}
+
+
+def _assess_completion(job: dict, d: Path) -> dict:
+    hasil = {"ok": False, "code": "WORKSPACE_INVALID", "level": "", "readme": "",
+             "verify": "", "dir_real": "", "tree_sha256": "", "digest_complete": False,
+             "policy": done_policy()}
+    real, kode = resolve_workspace(job)
+    if kode or real is None:
+        return hasil
+    kode, readme, verify = read_docs(real)
+    if kode:
+        hasil["code"] = kode
+        return hasil
+    sidik, lengkap = tree_digest(real)
+    hasil.update(readme=readme, verify=verify, dir_real=str(real),
+                 tree_sha256=sidik, digest_complete=lengkap)
+    if hasil["policy"] == "verified":
+        sah, kode = evidence_ok(job, real, sidik, lengkap)
+        if not sah:
+            hasil["code"] = kode
+            return hasil
+        hasil.update(code="", level="VERIFIED")
+    else:
+        hasil.update(code="", level="ATTESTED")
+    hasil["ok"] = True
+    return hasil
+
+
 # ---------- tahap ----------
 def do_spec(job: dict) -> None:
     jid, d = job["id"], Path(job["dir"])
@@ -265,7 +551,7 @@ def do_build(job: dict) -> None:
             session = sid
             jobs.set_field(jid, session_build=sid)
         # Penanda "SELESAI" sering terlewat; bukti dokumentasi lebih keras daripada klaim.
-        done = (d / "README.md").exists() and (d / "VERIFY.md").exists()
+        done = not read_docs(d)[0]
         if done:
             break
         if ronde < ROUNDS:
@@ -281,20 +567,52 @@ def do_build(job: dict) -> None:
             jobs.set_field(jid, session_build=sid2)
         if text2:
             text, rc = text2, rc2
-        done = (d / "README.md").exists() and (d / "VERIFY.md").exists()
-    if not done:
-        jobs.set_field(jid, error=f"belum tuntas setelah {ROUNDS} ronde (rc={rc})"[:200])
-        jobs.set_status(jid, "paused", text[-4000:])
-        notify(f"[#{jid}] {job['title']}\nBELUM TUNTAS setelah {ROUNDS} ronde.\n"
-               f"{text[-1100:] or '(tanpa output)'}\n\nLokasi: {d}\nLanjutkan: /retry {jid}")
+        done = not read_docs(d)[0]
+    # Gerbang penyelesaian: dokumen sah bukan bukti. Periksa identitas job, lokasi
+    # direktori, bentuk dokumen, dan pada kebijakan `verified` bukti mesin terikat.
+    # Jalur "belum tuntas" juga lewat sini agar kode alasannya spesifik.
+    hasil = assess_completion(job, d)
+    if not hasil["ok"]:
+        kode = hasil["code"]
+        alasan = {
+            "DOCS_INVALID": "README.md/VERIFY.md tidak ada, kosong, symlink, atau hardlink.",
+            "WORKSPACE_INVALID": "direktori kerja tidak sah (luar SDB_BUILDS/symlink/ID tak cocok).",
+            "UNVERIFIED": "belum ada bukti verifikasi mesin untuk kebijakan `verified`.",
+            "EVIDENCE_INVALID": "bukti tidak terikat job/isi workspace saat ini (atau rusak).",
+            "VERIFY_FAIL": "verifikasi mesin terakhir gagal.",
+            "VERIFY_TIMEOUT": "verifikasi mesin terakhir timeout.",
+        }.get(kode, "syarat penyelesaian belum terpenuhi.")
+        jobs.set_field(jid, error=kode[:200])
+        jobs.set_status(jid, "paused", f"gerbang penyelesaian menolak: {kode}\n{text[-3000:]}")
+        notify(f"[#{jid}] {job['title']}\nBELUM TUNTAS — gerbang penyelesaian menolak ({kode}).\n"
+               f"{alasan}\nIsi VERIFY.md tidak dianggap bukti mesin.\n"
+               f"Lokasi: {d}\nLanjutkan: /retry {jid}")
+        return
+    # Semua pembacaan setelah gerbang memakai direktori NYATA hasil validasi,
+    # bukan path dari kolom DB, agar rename/symlink setelah gerbang tidak dipakai.
+    dir_real = Path(hasil["dir_real"])
+    if not dir_real.is_dir():
+        jobs.set_field(jid, error="WORKSPACE_INVALID")
+        jobs.set_status(jid, "paused", "direktori berubah setelah gerbang penyelesaian")
+        notify(f"[#{jid}] gerbang lolos tetapi direktori kerja hilang/berubah. "
+               f"Lanjutkan: /retry {jid}")
         return
     jobs.set_status(jid, "done", text[-4000:])
-    verify = read_text(d / "VERIFY.md", 700)
-    gaps = read_text(d / "GAPS.md", 700)
-    body = (f"[#{jid}] {job['title']} — SELESAI\n\n{text[:1600]}\n\n"
-            f"Lokasi: {d}\n{listing(d)}\n")
+    jobs.set_field(jid, error="")
+    jobs.add_event(jid, "completion", json.dumps(
+        {"schema": 1, "job_id": jid, "level": hasil["level"], "policy": hasil["policy"],
+         "dir_real": hasil["dir_real"], "tree_sha256": hasil["tree_sha256"],
+         "digest_complete": hasil["digest_complete"], "ts": round(time.time(), 3)},
+        ensure_ascii=False))
+    verify = hasil["verify"][:700]
+    gaps = read_text(dir_real / "GAPS.md", 700)
+    body = f"[#{jid}] {job['title']} — SELESAI ({hasil['level']})\n"
+    if hasil["level"] == "ATTESTED":
+        body += ("LEVEL BUKTI: ATTESTED — dokumen diperiksa, TIDAK diverifikasi mesin. "
+                 "Bukan bukti release independen.\n")
+    body += f"\n{text[:1600]}\n\nLokasi: {dir_real}\n{listing(dir_real)}\n"
     if verify:
-        body += f"\nBUKTI VERIFIKASI:\n{verify}\n"
+        body += f"\nBUKTI VERIFIKASI (klaim agen, bukan hasil mesin):\n{verify}\n"
     if gaps:
         body += f"\nCATATAN GAPS:\n{gaps}\n"
     body += f"\nUbah lagi: /revise {jid} <arahan> · Log: /job {jid}"

@@ -1318,3 +1318,32 @@ def test_D19_exception_dari_transisi_tidak_menggantungkan_job(w, monkeypatch, ku
     assert any("/retry" in m for m in wk.sent)
     assert _events(jobs, jid, "done") == []
     assert _events(jobs, jid, "verify_accepted") == []
+
+
+def test_D20_level_acceptance_tanpa_acceptance_lulus_ditolak(w, monkeypatch, kunci):
+    """Rekomendasi review siklus 2 (b): `ACCEPTANCE_VERIFIED` tanpa acceptance True -> tolak."""
+    wk, jobs = w
+    jid, job = _buat_job(jobs)
+    jobs.set_status(jid, "building")
+    hasil = {"ok": True, "code": "", "level": "ACCEPTANCE_VERIFIED", "policy": "verified",
+             "dir_real": str(Path(job["dir"]).resolve()), "tree_sha256": "a" * 64,
+             "digest_complete": True,
+             "evidence": {"ok": True, "level": "ACCEPTANCE_VERIFIED", "acceptance": False}}
+    assert wk.finish_job(jid, "catatan", hasil) == (False, "ACCEPTANCE_NOT_MET")
+    assert _status(jobs, jid) == "building"
+    assert _events(jobs, jid, "verify_accepted") == []
+    assert _events(jobs, jid, "done") == []
+
+
+def test_D21_cas_menolak_job_fase_spesifikasi(w, monkeypatch, kunci):
+    """Rekomendasi review siklus 2 (c): `spec_running` tidak boleh ditutup sebagai `done`."""
+    wk, jobs = w
+    jid, job = _buat_job(jobs)
+    jobs.set_status(jid, "spec_running", "spesifikasi")
+    hasil = {"ok": True, "code": "", "level": "ACCEPTANCE_VERIFIED", "policy": "attested",
+             "dir_real": str(Path(job["dir"]).resolve()), "tree_sha256": "a" * 64,
+             "digest_complete": True,
+             "evidence": {"ok": True, "level": "ACCEPTANCE_VERIFIED", "acceptance": True}}
+    assert wk.finish_job(jid, "catatan", hasil) == (False, "DONE_CONFLICT")
+    assert _status(jobs, jid) == "spec_running"
+    assert _events(jobs, jid, "verify_accepted") == []

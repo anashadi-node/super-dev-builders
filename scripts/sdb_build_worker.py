@@ -879,7 +879,8 @@ def finish_job(jid: int, note: str, hasil: dict) -> tuple[bool, str]:
     antaranya membuat retry selalu `EVIDENCE_REPLAY` tanpa sebab yang jelas.
     Di sini keempat tulisan berada dalam satu transaksi `BEGIN IMMEDIATE`:
 
-    * CAS status (`WHERE status IN ('building','spec_running')`) — job yang sudah
+    * CAS status (`WHERE status='building'`) — hanya build yang sedang berjalan
+      boleh ditutup; `spec_running` (fase spesifikasi) dan status yang sudah
       dipindahkan proses lain (done/cancelled) tidak bisa ditimpa;
     * pemeriksaan nonce diulang DI DALAM kunci tulis, menutup jendela balapan;
     * kegagalan apa pun -> `rollback` -> nonce utuh -> `/retry` tetap mungkin.

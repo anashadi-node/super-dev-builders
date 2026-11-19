@@ -22,6 +22,7 @@ import json
 import os
 import re
 import shutil
+import sqlite3
 import subprocess
 import sys
 import tempfile
@@ -1297,3 +1298,23 @@ def test_D18_kebijakan_tak_dikenal_tetap_fail_closed(w, monkeypatch, kunci):
     assert wk.finish_job(jid, "catatan", hasil) == (False, "ACCEPTANCE_NOT_MET")
     assert _status(jobs, jid) == "building"
     assert _events(jobs, jid, "done") == []
+
+
+def test_D19_exception_dari_transisi_tidak_menggantungkan_job(w, monkeypatch, kunci):
+    """F1 siklus 1: exception apa pun dari `finish_job` -> `paused` + kode, bukan `building`."""
+    wk, jobs = w
+    monkeypatch.setenv("SDB_DONE_POLICY", "verified")
+    _mode_strict(monkeypatch, kunci)
+    jid, _job = _buat_job(jobs)
+    _bukti_sah(wk, jobs, jid, kunci)
+
+    def meledak(*a, **k):
+        raise sqlite3.OperationalError("database is locked")
+
+    monkeypatch.setattr(wk, "finish_job", meledak)
+    wk.do_build(jobs.get(jid))
+    assert _status(jobs, jid) == "paused"
+    assert jobs.get(jid)["error"] == "DONE_WRITE_FAILED"
+    assert any("/retry" in m for m in wk.sent)
+    assert _events(jobs, jid, "done") == []
+    assert _events(jobs, jid, "verify_accepted") == []

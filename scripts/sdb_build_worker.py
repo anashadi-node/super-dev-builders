@@ -565,13 +565,17 @@ def issue_nonce(jid: int) -> str:
     return nonce
 
 
-def _nonce_state(jid: int, exclude_event: int | None = None) -> tuple[dict[str, int], set[str]]:
+def _nonce_state(jid: int) -> tuple[dict[str, int], set[str]]:
     """(nonce -> batas berlaku, nonce yang sudah diterima) untuk job ini.
 
     Sumber "sudah dipakai" adalah event `verify_accepted` yang HANYA ditulis
-    worker setelah `validate()` sukses. Event `verify` mentah tidak dihitung:
+    worker bersama transisi `done`. Event `verify` mentah tidak dihitung:
     kalau dihitung, satu event sampah `{"request_nonce": <nonce>}` yang ditulis
     builder akan membakar nonce sah secara permanen (DoS jalur `verified`).
+
+    Catatan: parameter `exclude_event` dulu ada untuk mengabaikan event `verify`
+    yang sedang dinilai, tetapi query ini tidak pernah menarik `kind='verify'`,
+    jadi parameter itu mati dan dihapus (review D6, F7).
     """
     terbit: dict[str, int] = {}
     dipakai: set[str] = set()
@@ -583,8 +587,6 @@ def _nonce_state(jid: int, exclude_event: int | None = None) -> tuple[dict[str, 
     except Exception:  # noqa: BLE001
         return terbit, dipakai
     for r in baris:
-        if exclude_event is not None and int(r["id"]) == exclude_event:
-            continue
         try:
             isi = json.loads(r["text"] or "")
         except (TypeError, ValueError):
@@ -759,7 +761,7 @@ def evidence_detail(job: dict, real: Path, digest: str, lengkap: bool = True) ->
         return hasil
 
     if ev.get("schema") == evd.SCHEMA:
-        terbit, dipakai = _nonce_state(jid, exclude_event=eid)
+        terbit, dipakai = _nonce_state(jid)
         hasil = evd.validate(
             ev, job_id=jid, workspace_digest=digest, digest_complete=lengkap,
             now=int(time.time()), nonce_issued=terbit, nonce_used=dipakai,
@@ -1070,12 +1072,22 @@ def do_build(job: dict) -> None:
         return
     # N2: transisi `done` + penandaan nonce + event `completion` dalam satu
     # transaksi. Kalau gagal, job kembali ke `paused` dengan nonce utuh.
-    sukses, kode_commit = _db_retry(finish_job, jid, text[-4000:], hasil)
+    # F1 (review D6): exception apa pun dari transaksi ditangkap di sini. Tanpa
+    # ini job tertinggal `building` tanpa `error` dan `/retry` menolak sampai
+    # reaper (2 jam). Kode `DONE_WRITE_FAILED` = tulis status gagal, bukan
+    # penolakan bukti.
+    try:
+        sukses, kode_commit = _db_retry(finish_job, jid, text[-4000:], hasil)
+    except Exception as e:      # noqa: BLE001
+        sukses, kode_commit = False, "DONE_WRITE_FAILED"
+        print(f"job #{jid}: transisi done gagal: {type(e).__name__}: {e}", file=sys.stderr)
     if not sukses:
         alasan_commit = {
             "DONE_CONFLICT": "job sudah dipindahkan proses lain (tidak lagi building).",
             "EVIDENCE_REPLAY": "nonce evidence sudah dipakai penerimaan lain.",
             "ACCEPTANCE_NOT_MET": "bukti belum level penerimaan; `done` tidak boleh ditulis.",
+            "DONE_WRITE_FAILED": "penulisan status gagal (galat basis data); bukti tidak dipakai, "
+                                 "nonce utuh.",
         }.get(kode_commit, "penulisan status selesai gagal.")
         # F2/R-2: `paused` ditulis dengan CAS `status='building'` — kalau di antara
         # pemeriksaan dan penulisan ini proses lain sudah memindahkan job

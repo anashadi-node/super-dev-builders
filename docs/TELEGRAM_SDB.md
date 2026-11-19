@@ -195,7 +195,7 @@ Kode penolakan baru ditulis ke kolom `error`: `EVIDENCE_SCHEMA`,
 `EVIDENCE_SIGNATURE_ALG`, `EVIDENCE_UNTRUSTED_SIGNER`,
 `EVIDENCE_VERIFIER_UNAVAILABLE`, `EVIDENCE_SIGNER_STORE`,
 `EVIDENCE_LEGACY_REJECTED`, `EVIDENCE_MODE_REQUIRED`, `ACCEPTANCE_NOT_MET`,
-`EVIDENCE_LEVEL_UNKNOWN`, `DONE_CONFLICT`.
+`EVIDENCE_LEVEL_UNKNOWN`, `DONE_CONFLICT`, `DONE_WRITE_FAILED`.
 
 **Dua gerbang, bukan satu.** Di bawah `SDB_DONE_POLICY=verified`, bukti yang sah
 tetap bisa berhenti di level **eksekusi**: tanda tangan benar, `workspace_digest`
@@ -214,7 +214,10 @@ lain, atau penulisan gagal, transaksi di-rollback: **nonce tidak terbakar** dan
 kunci tulis, jadi dua penerimaan duplikat tidak bisa menghasilkan dua `done`.
 Saat transisi gagal, `paused` juga ditulis dengan CAS `status='building'`: job yang
 sudah dipindahkan proses lain (`done`, `cancelled`) **tidak** ditimpa dan tidak
-diberi kode error palsu — hanya satu notifikasi "diabaikan".
+diberi kode error palsu — hanya satu notifikasi "diabaikan". Galat basis data saat
+menulis (bukan penolakan bukti) dilaporkan sebagai `DONE_WRITE_FAILED` dengan
+`paused`, jadi `/retry` langsung bisa dipakai; job tidak menggantung `building`
+sampai reaper 2 jam.
 
 **Angka tidak berhingga.** `json.loads` menerima literal `NaN`/`Infinity`,
 sedangkan byte yang ditandatangani tidak boleh memuatnya. Payload seperti itu

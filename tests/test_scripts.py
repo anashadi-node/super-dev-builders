@@ -98,6 +98,45 @@ def test_fallback_yaml_block_scalar_matches_pyyaml():
         assert common.fallback_yaml_load(text) == yaml.safe_load(text)
 
 
+def test_fallback_yaml_scalar_sequence_item_dengan_titik_dua():
+    """CR-SDB-YAML-01: di dalam item sequence, titik dua hanya pemisah kunci bila
+    diikuti spasi. `- /tmp:size=64m` (compose rt-rw-portal) dulu jadi
+    {"/tmp": "size=64m"} sehingga parser fallback menyimpang dari PyYAML."""
+    yaml = pytest.importorskip("yaml")
+    kasus = [
+        "a:\n  - /tmp:size=64m\n",
+        "a:\n  - /srv/rtrw/data:/data\n",
+        "a:\n  - no-new-privileges:true\n",
+        "a:\n  - 8080:8080\n",
+        "a:\n  - key: value\n",          # tetap mapping (titik dua + spasi)
+        "a:\n  - k: v\n  - /tmp:size=64m\n",
+        "services:\n  app:\n    tmpfs:\n      - /tmp:size=64m,mode=1777\n",
+    ]
+    for text in kasus:
+        assert common.fallback_yaml_load(text) == yaml.safe_load(text), text
+
+
+def test_fallback_yaml_artefak_compose_rt_rw_portal():
+    """Regresi nyata: potongan compose yang membuat suite global merah harus
+    cocok byte-per-byte dengan PyYAML (tanpa membaca berkas ignored di runs/)."""
+    yaml = pytest.importorskip("yaml")
+    text = (
+        "services:\n"
+        "  app:\n"
+        "    tmpfs:\n"
+        "      - /tmp:size=64m,mode=1777\n"
+        "    security_opt:\n"
+        "      - no-new-privileges:true\n"
+        "    volumes:\n"
+        "      - /srv/rtrw/data:/data\n"
+    )
+    got = common.fallback_yaml_load(text)
+    assert got == yaml.safe_load(text)
+    assert got["services"]["app"]["tmpfs"] == ["/tmp:size=64m,mode=1777"]
+    assert got["services"]["app"]["security_opt"] == ["no-new-privileges:true"]
+    assert got["services"]["app"]["volumes"] == ["/srv/rtrw/data:/data"]
+
+
 def test_redaction_removes_secret_keys_and_values():
     payload = {
         "headers": {"Authorization": "Bearer abcdef1234567890", "Cookie": "session=xyz",

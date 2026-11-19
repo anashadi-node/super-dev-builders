@@ -615,7 +615,7 @@ def _db_retry(fn, *args, **kwargs):
             if percobaan == _DB_TRIES or not ("locked" in pesan or "busy" in pesan):
                 raise
             time.sleep(0.2 * percobaan)
-    return None
+    raise AssertionError("tak terjangkau")  # pragma: no cover
 
 
 def set_status(jid: int, status: str, note: str = "") -> None:
@@ -624,6 +624,26 @@ def set_status(jid: int, status: str, note: str = "") -> None:
 
 def set_field(jid: int, **fields) -> None:
     _db_retry(jobs.set_field, jid, **fields)
+
+
+def pause_if_building(jid: int, kode: str, note: str) -> bool:
+    """Pindahkan job ke `paused` HANYA bila masih `building`. True bila menang.
+
+    R-2 (review D6): `set_status` polos bisa menimpa `done`/`cancelled` yang ditulis
+    proses lain di antara pemeriksaan dan penulisan. CAS menutup jendela itu.
+    """
+    def _kerja() -> bool:
+        with contextlib.closing(jobs.connect()) as con:
+            cur = con.execute(
+                "UPDATE jobs SET status='paused', error=?, updated=?"
+                " WHERE id=? AND status='building'", (kode[:200], time.time(), jid))
+            menang = cur.rowcount == 1
+            con.commit()
+            return menang
+    if not bool(_db_retry(_kerja)):
+        return False
+    _db_retry(jobs.add_event, jid, "paused", note)
+    return True
 
 
 def _add_event(jid: int, kind: str, text: str) -> None:
@@ -746,16 +766,16 @@ def evidence_detail(job: dict, real: Path, digest: str, lengkap: bool = True) ->
             allowed_signers=allowed_signers_path(), verifier_ids=authorized_verifiers(),
             pinned_criteria_digest=pinned_criteria_digest())
         if hasil["ok"]:
-            # Nonce baru dianggap terpakai SETELAH validasi sukses. Kalau event
-            # mentah dihitung, builder bisa membakar nonce sah dengan satu event
-            # sampah dan mematikan jalur `verified` miliknya sendiri.
+            # N2: penandaan nonce TIDAK ditulis di sini. Menulisnya sebelum status
+            # `done` ter-commit membuat job yang gagal sesudahnya mustahil di-retry
+            # (nonce terbakar, retry selalu EVIDENCE_REPLAY). Payload penerimaan
+            # dikembalikan ke pemanggil dan ditulis bersama status oleh `finish_job`.
             verifier = ev.get("verifier")
-            _add_event(jid, "verify_accepted", json.dumps(
-                {"schema": evd.REQUEST_SCHEMA, "job_id": jid,
-                 "request_nonce": ev.get("request_nonce"),
-                 "verifier": verifier.get("id") if isinstance(verifier, dict) else None,
-                 "level": hasil["level"], "accepted_at": int(time.time())},
-                ensure_ascii=False))
+            hasil["accept"] = {
+                "schema": evd.REQUEST_SCHEMA, "job_id": jid,
+                "request_nonce": ev.get("request_nonce"),
+                "verifier": verifier.get("id") if isinstance(verifier, dict) else None,
+                "level": hasil["level"], "accepted_at": int(time.time())}
         return hasil
 
     # --- jalur legacy C2-A ---
@@ -828,20 +848,105 @@ def _assess_completion(job: dict, d: Path) -> dict:
         if not bukti["ok"]:
             hasil["code"] = bukti["code"]
             return hasil
-        # Level job membawa tingkat bukti yang sebenarnya: `EXECUTION_VERIFIED`
-        # bukan `ACCEPTANCE_VERIFIED`. Jangan diseragamkan menjadi "VERIFIED".
+        # Level job membawa tingkat bukti yang sebenarnya. `EXECUTION_VERIFIED`
+        # berarti "tes berjalan dan lulus", BUKAN "kriteria penerimaan terpenuhi";
+        # di bawah kebijakan `verified` hanya tingkat acceptance yang boleh `done`
+        # (N1). Tingkat yang tak dikenal ditolak, bukan diam-diam jadi "VERIFIED".
         tingkat = bukti["level"]
-        hasil.update(code="", level=tingkat if tingkat in (evd.LEVEL_EXECUTION,
-                                                          evd.LEVEL_ACCEPTANCE) else "VERIFIED")
+        if tingkat == evd.LEVEL_ACCEPTANCE:
+            hasil.update(code="", level=tingkat)
+        elif tingkat == evd.LEVEL_EXECUTION:
+            hasil.update(code="ACCEPTANCE_NOT_MET", level=tingkat)
+        else:
+            hasil.update(code="EVIDENCE_LEVEL_UNKNOWN", level="")
     else:
         hasil.update(code="", level="ATTESTED",
                      evidence={"ok": False, "code": "", "level": "", "acceptance": False,
                                "release_eligible": False, "reason": "kebijakan attested"})
-    hasil["ok"] = True
+    # `ok` diturunkan dari kode: penolakan level bukti (N1) juga berarti belum tuntas.
+    hasil["ok"] = not hasil["code"]
     return hasil
 
 
 # ---------- tahap ----------
+def finish_job(jid: int, note: str, hasil: dict) -> tuple[bool, str]:
+    """Transisi `done` secara ATOMIK: status + `verify_accepted` + `completion`.
+
+    N2: nonce hanya boleh dianggap terpakai bila job benar-benar menjadi `done`.
+    Sebelumnya event penerimaan ditulis lebih dulu, lalu status; kegagalan di
+    antaranya membuat retry selalu `EVIDENCE_REPLAY` tanpa sebab yang jelas.
+    Di sini keempat tulisan berada dalam satu transaksi `BEGIN IMMEDIATE`:
+
+    * CAS status (`WHERE status IN ('building','spec_running')`) — job yang sudah
+      dipindahkan proses lain (done/cancelled) tidak bisa ditimpa;
+    * pemeriksaan nonce diulang DI DALAM kunci tulis, menutup jendela balapan;
+    * kegagalan apa pun -> `rollback` -> nonce utuh -> `/retry` tetap mungkin.
+    """
+    bukti = hasil.get("evidence") or {}
+    terima = bukti.get("accept") if isinstance(bukti.get("accept"), dict) else None
+    # F1: penjaga kedua di dalam transisi. `finish_job` tidak boleh percaya begitu
+    # saja pada pemanggil — di bawah kebijakan selain `attested` (fail-closed: `verified`
+    # maupun nilai tak dikenal), `done` hanya sah untuk bukti tingkat penerimaan
+    # yang benar-benar lulus acceptance.
+    if hasil.get("policy") != "attested" and (
+            hasil.get("level") != evd.LEVEL_ACCEPTANCE or bukti.get("acceptance") is not True):
+        return False, "ACCEPTANCE_NOT_MET"
+    now = time.time()
+    kompl = json.dumps(
+        {"schema": 1, "job_id": jid, "level": hasil["level"], "policy": hasil["policy"],
+         "dir_real": hasil["dir_real"], "tree_sha256": hasil["tree_sha256"],
+         "digest_complete": hasil["digest_complete"],
+         # C2-B1: tingkat bukti dicatat terpisah dari status. `done` tetap berarti
+         # pekerjaan berhenti, bukan berarti siap rilis.
+         "evidence": {"level": bukti.get("level", ""),
+                      "acceptance": bool(bukti.get("acceptance")),
+                      "release_eligible": False},
+         "ts": round(now, 3)}, ensure_ascii=False)
+    con = jobs.connect()
+    try:
+        con.execute("BEGIN IMMEDIATE")
+        cur = con.execute(
+            "UPDATE jobs SET status='done', error='', updated=?"
+            " WHERE id=? AND status='building'", (now, jid))
+        if cur.rowcount != 1:
+            con.rollback()
+            return False, "DONE_CONFLICT"
+        if terima:
+            nonce = terima.get("request_nonce")
+            for baris in con.execute(
+                    "SELECT text FROM events WHERE job_id=? AND kind='verify_accepted'", (jid,)):
+                teks = baris["text"]
+                if not isinstance(teks, str):
+                    continue
+                try:
+                    isi = json.loads(teks)
+                except (ValueError, TypeError):
+                    continue
+                if not isinstance(isi, dict):
+                    continue
+                dipakai = isi.get("request_nonce")
+                if isinstance(dipakai, str) and dipakai and dipakai == nonce:
+                    con.rollback()
+                    return False, "EVIDENCE_REPLAY"
+            con.execute("INSERT INTO events(job_id,ts,kind,text) VALUES(?,?,?,?)",
+                        (jid, now, "verify_accepted",
+                         json.dumps(terima, ensure_ascii=False)[:8000]))
+        con.execute("INSERT INTO events(job_id,ts,kind,text) VALUES(?,?,?,?)",
+                    (jid, now, "done", note[:4000]))
+        con.execute("INSERT INTO events(job_id,ts,kind,text) VALUES(?,?,?,?)",
+                    (jid, now, "completion", kompl[:8000]))
+        con.commit()
+        return True, ""
+    except Exception:
+        try:
+            con.rollback()
+        except Exception:  # noqa: BLE001
+            pass
+        raise
+    finally:
+        con.close()
+
+
 def do_spec(job: dict) -> None:
     jid, d = job["id"], Path(job["dir"])
     d.mkdir(parents=True, exist_ok=True)
@@ -941,6 +1046,10 @@ def do_build(job: dict) -> None:
             "EVIDENCE_LEGACY_REJECTED": "mode strict menolak bukti tanpa tanda tangan.",
             "EVIDENCE_MODE_REQUIRED": "kebijakan `verified` menuntut SDB_EVIDENCE_MODE=strict.",
             "EVIDENCE_REQUEST_EXPIRED": "permintaan verifikasi (nonce) sudah kedaluwarsa.",
+            "ACCEPTANCE_NOT_MET": ("bukti hanya level eksekusi: tes berjalan, tetapi kriteria "
+                                  "penerimaan belum terpenuhi. `done` menuntut acceptance."),
+            "EVIDENCE_LEVEL_UNKNOWN": "tingkat bukti tidak dikenal (fail-closed).",
+            "DONE_CONFLICT": "job sudah dipindahkan proses lain (tidak lagi building).",
             "VERIFY_FAIL": "verifikasi mesin terakhir gagal.",
             "VERIFY_TIMEOUT": "verifikasi mesin terakhir timeout.",
         }.get(kode, "syarat penyelesaian belum terpenuhi.")
@@ -959,20 +1068,28 @@ def do_build(job: dict) -> None:
         notify(f"[#{jid}] gerbang lolos tetapi direktori kerja hilang/berubah. "
                f"Lanjutkan: /retry {jid}")
         return
-    set_status(jid, "done", text[-4000:])
-    set_field(jid, error="")
+    # N2: transisi `done` + penandaan nonce + event `completion` dalam satu
+    # transaksi. Kalau gagal, job kembali ke `paused` dengan nonce utuh.
+    sukses, kode_commit = _db_retry(finish_job, jid, text[-4000:], hasil)
+    if not sukses:
+        alasan_commit = {
+            "DONE_CONFLICT": "job sudah dipindahkan proses lain (tidak lagi building).",
+            "EVIDENCE_REPLAY": "nonce evidence sudah dipakai penerimaan lain.",
+            "ACCEPTANCE_NOT_MET": "bukti belum level penerimaan; `done` tidak boleh ditulis.",
+        }.get(kode_commit, "penulisan status selesai gagal.")
+        # F2/R-2: `paused` ditulis dengan CAS `status='building'` — kalau di antara
+        # pemeriksaan dan penulisan ini proses lain sudah memindahkan job
+        # (`done`/`cancelled`), tidak ada yang ditimpa.
+        if not pause_if_building(jid, kode_commit,
+                                 f"transisi `done` dibatalkan: {kode_commit}"):
+            kini = (jobs.get(jid) or {}).get("status", "?")
+            notify(f"[#{jid}] {job['title']}\nTransisi ganda diabaikan — status sudah "
+                   f"`{kini}` ({kode_commit}). Tidak ada yang ditimpa.")
+            return
+        notify(f"[#{jid}] {job['title']}\nBELUM TUNTAS — transisi `done` dibatalkan "
+               f"({kode_commit}).\n{alasan_commit}\nLokasi: {d}\nLanjutkan: /retry {jid}")
+        return
     bukti = hasil.get("evidence") or {}
-    add_event(jid, "completion", json.dumps(
-        {"schema": 1, "job_id": jid, "level": hasil["level"], "policy": hasil["policy"],
-         "dir_real": hasil["dir_real"], "tree_sha256": hasil["tree_sha256"],
-         "digest_complete": hasil["digest_complete"],
-         # C2-B1: tingkat bukti dicatat terpisah dari status. `done` tetap berarti
-         # pekerjaan berhenti, bukan berarti siap rilis.
-         "evidence": {"level": bukti.get("level", ""),
-                      "acceptance": bool(bukti.get("acceptance")),
-                      "release_eligible": False},
-         "ts": round(time.time(), 3)},
-        ensure_ascii=False))
     verify = hasil["verify"][:700]
     gaps = read_text(dir_real / "GAPS.md", 700)
     body = f"[#{jid}] {job['title']} — SELESAI ({hasil['level']})\n"

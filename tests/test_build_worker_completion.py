@@ -878,3 +878,422 @@ def test_C20_listing_tidak_menelusuri_direktori_berat(w):
     teks = wk.listing(d)
     assert "node_modules" not in teks
     assert "README.md" in teks
+
+
+# ===================== C2-B1 CORRECTIVE (N1/N2/N3/N10) =====================
+def _bukti_sah(wk, jobs, jid, kunci, ubah: dict | None = None):
+    """Tulis event verify bertanda tangan sah untuk job ini; kembalikan payload."""
+    real = Path(jobs.get(jid)["dir"]).resolve()
+    ev = _payload_evidence(jid, wk.tree_digest(real)[0], wk.issue_nonce(jid))
+    if ubah:
+        _gabung_dalam(ev, ubah)
+    ev = _tandatangani(ev, kunci["key"])
+    jobs.add_event(jid, "verify", json.dumps(ev))
+    return ev
+
+
+def _events(jobs, jid, kind: str) -> list[dict]:
+    return [e for e in jobs.events(jid, 200) if e["kind"] == kind]
+
+
+# ---- N1: eksekusi lulus bukan penerimaan ----
+def test_D01_level_eksekusi_saja_tidak_menghasilkan_done(w, monkeypatch, kunci):
+    """N1: `EXECUTION_VERIFIED` (acceptance gagal) BUKAN dasar `done`."""
+    wk, jobs = w
+    monkeypatch.setenv("SDB_DONE_POLICY", "verified")
+    _mode_strict(monkeypatch, kunci)
+    jid, _job = _buat_job(jobs)
+    # Tes berjalan (exit 0) tetapi satu tes gagal -> acceptance tidak terpenuhi.
+    _bukti_sah(wk, jobs, jid, kunci,
+               {"execution": {"tests": {"collected": 5, "passed": 4, "failed": 1}}})
+    wk.do_build(jobs.get(jid))
+    assert _status(jobs, jid) == "paused"
+    assert jobs.get(jid)["error"] == "ACCEPTANCE_NOT_MET"
+    assert _events(jobs, jid, "done") == []
+    assert _events(jobs, jid, "verify_accepted") == []
+    assert "ACCEPTANCE_NOT_MET" in wk.sent[-1]
+
+
+def test_D01b_verdict_acceptance_fail_bukan_done(w, monkeypatch, kunci):
+    """N1: `verdict.acceptance = FAIL` walau semua tes lulus tetap bukan `done`."""
+    wk, jobs = w
+    monkeypatch.setenv("SDB_DONE_POLICY", "verified")
+    _mode_strict(monkeypatch, kunci)
+    jid, _job = _buat_job(jobs)
+    _bukti_sah(wk, jobs, jid, kunci, {"verdict": {"acceptance": "FAIL"}})
+    wk.do_build(jobs.get(jid))
+    assert _status(jobs, jid) == "paused"
+    assert jobs.get(jid)["error"] == "ACCEPTANCE_NOT_MET"
+
+
+def test_D02_bukti_level_tak_dikenal_ditolak(w, monkeypatch, kunci):
+    """N1/N5: tingkat bukti di luar kontrak ditolak, bukan jadi `done`."""
+    wk, jobs = w
+    monkeypatch.setenv("SDB_DONE_POLICY", "verified")
+    _mode_strict(monkeypatch, kunci)
+    jid, _job = _buat_job(jobs)
+    _bukti_sah(wk, jobs, jid, kunci)
+    asli = wk.evidence_detail
+    monkeypatch.setattr(wk, "evidence_detail", lambda *a, **k: {
+        **asli(*a, **k), "ok": True, "code": "", "level": "VERIFIED"})
+    wk.do_build(jobs.get(jid))
+    assert _status(jobs, jid) == "paused"
+    assert jobs.get(jid)["error"] == "EVIDENCE_LEVEL_UNKNOWN"
+
+
+def test_D03_acceptance_gagal_tidak_membakar_nonce_dan_bisa_diulang(w, monkeypatch, kunci):
+    """N1+N2: penolakan acceptance tidak memakai nonce; bukti benar berikutnya diterima."""
+    wk, jobs = w
+    monkeypatch.setenv("SDB_DONE_POLICY", "verified")
+    _mode_strict(monkeypatch, kunci)
+    jid, _job = _buat_job(jobs)
+    _bukti_sah(wk, jobs, jid, kunci, {"execution": {"exit_code": 3}})
+    wk.do_build(jobs.get(jid))
+    assert jobs.get(jid)["error"] == "ACCEPTANCE_NOT_MET"
+    assert _events(jobs, jid, "verify_accepted") == []
+    # Nonce masih sah: bukti kedua (payload benar) langsung diterima.
+    _bukti_sah(wk, jobs, jid, kunci)
+    wk.do_build(jobs.get(jid))
+    assert _status(jobs, jid) == "done", jobs.get(jid)["error"]
+    assert len(_events(jobs, jid, "verify_accepted")) == 1
+
+
+# ---- N2: atomisitas `done` + konsumsi nonce ----
+def test_D04_transisi_done_gagal_tidak_membakar_nonce(w, monkeypatch, kunci):
+    """N2: kegagalan SESUDAH validasi tidak boleh mengonsumsi nonce.
+
+    Kegagalan disuntikkan tepat setelah gerbang lolos: status job dipindahkan
+    proses lain sehingga CAS `done` harus gagal. Nonce wajib tetap utuh dan job
+    harus bisa dilanjutkan (`/retry`).
+    """
+    wk, jobs = w
+    monkeypatch.setenv("SDB_DONE_POLICY", "verified")
+    _mode_strict(monkeypatch, kunci)
+    jid, _job = _buat_job(jobs)
+    _bukti_sah(wk, jobs, jid, kunci)
+    asli = wk.assess_completion
+
+    def gerbang_lalu_pindah(job_, d_):
+        hasil = asli(job_, d_)
+        jobs.set_status(jid, "cancelled", "dipindahkan saat gerbang")  # simulasi proses lain
+        return hasil
+
+    monkeypatch.setattr(wk, "assess_completion", gerbang_lalu_pindah)
+    wk.do_build(jobs.get(jid))
+    # F2/R-2: status lain TIDAK ditimpa `paused`, dan tidak ada error palsu.
+    assert _status(jobs, jid) == "cancelled"
+    assert jobs.get(jid)["error"] in (None, "")
+    assert _events(jobs, jid, "verify_accepted") == []
+    assert _events(jobs, jid, "done") == []
+
+    monkeypatch.setattr(wk, "assess_completion", asli)
+    jobs.set_status(jid, "building", "retry setelah konflik")
+    wk.do_build(jobs.get(jid))
+    assert _status(jobs, jid) == "done", jobs.get(jid)["error"]
+
+
+def test_D04b_konflik_dari_status_building_menulis_paused_dan_error(w, monkeypatch, kunci):
+    """F2: kegagalan CAS saat job masih `building` tetap memberi `paused` + kode."""
+    wk, jobs = w
+    monkeypatch.setenv("SDB_DONE_POLICY", "verified")
+    _mode_strict(monkeypatch, kunci)
+    jid, _job = _buat_job(jobs)
+    _bukti_sah(wk, jobs, jid, kunci)
+    asli = wk.finish_job
+
+    def gagal_cas(jid_, note, hasil):
+        return False, "DONE_CONFLICT"
+
+    monkeypatch.setattr(wk, "finish_job", gagal_cas)
+    wk.do_build(jobs.get(jid))
+    monkeypatch.setattr(wk, "finish_job", asli)
+    assert _status(jobs, jid) == "paused"
+    assert jobs.get(jid)["error"] == "DONE_CONFLICT"
+    assert any("BELUM TUNTAS" in m for m in wk.sent)
+    assert _events(jobs, jid, "verify_accepted") == []
+
+
+def test_D05_dua_penerimaan_duplikat_hanya_satu_done(w, monkeypatch, kunci):
+    """N2/N10: pemanggilan `finish_job` duplikat tidak menghasilkan dua `done`."""
+    wk, jobs = w
+    monkeypatch.setenv("SDB_DONE_POLICY", "verified")
+    _mode_strict(monkeypatch, kunci)
+    jid, job = _buat_job(jobs)
+    _bukti_sah(wk, jobs, jid, kunci)
+    jobs.set_status(jid, "building")
+    hasil = wk.assess_completion(jobs.get(jid), Path(job["dir"]))
+    assert hasil["ok"] and hasil["level"] == "ACCEPTANCE_VERIFIED"
+    assert wk.finish_job(jid, "catatan 1", hasil) == (True, "")
+    sisa = jobs.get(jid)
+    assert sisa["status"] == "done"
+    # Duplikat: status sudah `done` -> CAS gagal, tidak ada tulisan kedua.
+    assert wk.finish_job(jid, "catatan 2", hasil) == (False, "DONE_CONFLICT")
+    assert len(_events(jobs, jid, "done")) == 1
+    assert len(_events(jobs, jid, "verify_accepted")) == 1
+    assert len(_events(jobs, jid, "completion")) == 1
+
+
+def test_D06_nonce_tercatat_diterima_hanya_setelah_done(w, monkeypatch, kunci):
+    """N2: urutan bukti di DB — `verify_accepted` lahir bersama `done`, bukan sebelumnya."""
+    wk, jobs = w
+    monkeypatch.setenv("SDB_DONE_POLICY", "verified")
+    _mode_strict(monkeypatch, kunci)
+    jid, _job = _buat_job(jobs)
+    ev = _bukti_sah(wk, jobs, jid, kunci)
+    wk.do_build(jobs.get(jid))
+    assert _status(jobs, jid) == "done"
+    acc = _events(jobs, jid, "verify_accepted")
+    assert len(acc) == 1 and json.loads(acc[-1]["text"])["request_nonce"] == ev["request_nonce"]
+    # Replay setelah `done`: nonce sudah tercatat -> ditolak, bukan diam-diam diterima.
+    jobs.set_status(jid, "building", "ulang")
+    jobs.add_event(jid, "verify", json.dumps(ev))
+    wk.do_build(jobs.get(jid))
+    assert jobs.get(jid)["error"] == "EVIDENCE_REPLAY"
+    assert _status(jobs, jid) == "paused"
+
+
+# ---- N3: angka tidak berhingga ----
+@pytest.mark.parametrize("nilai", [float("nan"), float("inf"), float("-inf")])
+def test_D07_angka_tidak_berhingga_ditolak_schema(w, monkeypatch, kunci, nilai):
+    """N3: NaN/Infinity -> `EVIDENCE_SCHEMA`, bukan `COMPLETION_ERROR`."""
+    wk, jobs = w
+    monkeypatch.setenv("SDB_DONE_POLICY", "verified")
+    _mode_strict(monkeypatch, kunci)
+    jid, _job = _buat_job(jobs)
+    ev = _bukti_sah(wk, jobs, jid, kunci)
+    ev["execution"]["duration_ms"] = nilai          # setelah ditandatangani
+    jobs.add_event(jid, "verify", json.dumps(ev))   # json.dumps menulis literal NaN/Infinity
+    wk.do_build(jobs.get(jid))
+    assert jobs.get(jid)["error"] == "EVIDENCE_SCHEMA", jobs.get(jid)["error"]
+    assert _status(jobs, jid) == "paused"
+
+
+def test_D08_struktur_rusak_dan_json_pendek_tetap_fail_closed(w, monkeypatch, kunci):
+    """N3/N10: JSON rusak & struktur salah tidak pernah menghasilkan `done`."""
+    wk, jobs = w
+    monkeypatch.setenv("SDB_DONE_POLICY", "verified")
+    _mode_strict(monkeypatch, kunci)
+    jid, _job = _buat_job(jobs)
+    jobs.add_event(jid, "verify", "{bukan json")
+    wk.do_build(jobs.get(jid))
+    assert _status(jobs, jid) == "paused"
+    assert jobs.get(jid)["error"] in ("EVIDENCE_INVALID", "UNVERIFIED")
+    ev = _bukti_sah(wk, jobs, jid, kunci)
+    ev["timestamps"] = "kemarin"
+    jobs.add_event(jid, "verify", json.dumps(ev))
+    wk.do_build(jobs.get(jid))
+    assert _status(jobs, jid) == "paused"
+    assert jobs.get(jid)["error"] == "EVIDENCE_SCHEMA"
+
+
+# ---- N10: penjagaan kontrak lama ----
+def test_D09_digest_workspace_berubah_tetap_ditolak(w, monkeypatch, kunci):
+    """N10: bukti sah untuk isi workspace lama tidak boleh lolos setelah isi berubah."""
+    wk, jobs = w
+    monkeypatch.setenv("SDB_DONE_POLICY", "verified")
+    _mode_strict(monkeypatch, kunci)
+    jid, job = _buat_job(jobs)
+    _bukti_sah(wk, jobs, jid, kunci)
+    (Path(job["dir"]) / "baru.txt").write_text("isi baru", encoding="utf-8")
+    wk.do_build(jobs.get(jid))
+    assert _status(jobs, jid) == "paused"
+    assert jobs.get(jid)["error"] == "EVIDENCE_DIGEST_MISMATCH"
+
+
+def test_D10_tanda_tangan_wajib_walau_semua_field_benar(w, monkeypatch, kunci):
+    """N10: field benar tanpa tanda tangan tetap ditolak (authenticity != kelengkapan)."""
+    wk, jobs = w
+    monkeypatch.setenv("SDB_DONE_POLICY", "verified")
+    _mode_strict(monkeypatch, kunci)
+    jid, job = _buat_job(jobs)
+    real = Path(job["dir"]).resolve()
+    ev = _payload_evidence(jid, wk.tree_digest(real)[0], wk.issue_nonce(jid))
+    jobs.add_event(jid, "verify", json.dumps(ev))
+    wk.do_build(jobs.get(jid))
+    assert jobs.get(jid)["error"] == "EVIDENCE_NO_SIGNATURE"
+    assert _status(jobs, jid) == "paused"
+
+
+def test_D11_acceptance_verified_tetap_tidak_release_eligible(w, monkeypatch, kunci):
+    """N10: penerimaan penuh tetap bukan izin rilis."""
+    wk, jobs = w
+    monkeypatch.setenv("SDB_DONE_POLICY", "verified")
+    _mode_strict(monkeypatch, kunci)
+    jid, _job = _buat_job(jobs)
+    _bukti_sah(wk, jobs, jid, kunci, {"verdict": {"release_eligible": True}})
+    wk.do_build(jobs.get(jid))
+    assert _status(jobs, jid) == "done"
+    kompl = [json.loads(e["text"]) for e in _events(jobs, jid, "completion")]
+    assert kompl[-1]["evidence"]["level"] == "ACCEPTANCE_VERIFIED"
+    assert kompl[-1]["evidence"]["release_eligible"] is False
+
+
+def test_D12_kegagalan_commit_tidak_menulis_apa_pun(w, monkeypatch, kunci):
+    """N2: kegagalan DI DALAM transaksi -> rollback; status, event, dan nonce utuh."""
+    wk, jobs = w
+    monkeypatch.setenv("SDB_DONE_POLICY", "verified")
+    _mode_strict(monkeypatch, kunci)
+    jid, job = _buat_job(jobs)
+    _bukti_sah(wk, jobs, jid, kunci)
+    jobs.set_status(jid, "building")
+    hasil = wk.assess_completion(jobs.get(jid), Path(job["dir"]))
+    assert hasil["ok"]
+
+    asli = wk.jobs.connect
+
+    class KoneksiGagalCommit:
+        def __init__(self, con):
+            self._con = con
+
+        def __getattr__(self, nama):
+            return getattr(self._con, nama)
+
+        def commit(self):
+            raise RuntimeError("commit disuntik gagal")
+
+    monkeypatch.setattr(wk.jobs, "connect", lambda: KoneksiGagalCommit(asli()))
+    with pytest.raises(RuntimeError):
+        wk.finish_job(jid, "catatan", hasil)
+    monkeypatch.setattr(wk.jobs, "connect", asli)
+
+    assert _status(jobs, jid) == "building"
+    assert _events(jobs, jid, "done") == []
+    assert _events(jobs, jid, "verify_accepted") == []
+    assert _events(jobs, jid, "completion") == []
+    # Nonce tidak terbakar: percobaan berikutnya berhasil tanpa bukti baru.
+    assert wk.finish_job(jid, "catatan", hasil) == (True, "")
+    assert _status(jobs, jid) == "done"
+
+
+def test_D13_enam_transisi_bersamaan_hanya_satu_menang(w, monkeypatch, kunci):
+    """N2: enam pemanggil paralel -> tepat satu `done`, satu `verify_accepted`."""
+    import threading
+
+    wk, jobs = w
+    monkeypatch.setenv("SDB_DONE_POLICY", "verified")
+    _mode_strict(monkeypatch, kunci)
+    jid, job = _buat_job(jobs)
+    _bukti_sah(wk, jobs, jid, kunci)
+    jobs.set_status(jid, "building")
+    hasil = wk.assess_completion(jobs.get(jid), Path(job["dir"]))
+    assert hasil["ok"]
+
+    keluar: list[tuple[bool, str]] = []
+    kunci_hasil = threading.Lock()
+
+    def kerja(i: int) -> None:
+        try:
+            r = wk.finish_job(jid, f"catatan {i}", hasil)
+        except Exception as e:  # noqa: BLE001
+            r = (False, f"EXC:{type(e).__name__}")
+        with kunci_hasil:
+            keluar.append(r)
+
+    ts = [threading.Thread(target=kerja, args=(i,)) for i in range(6)]
+    for t in ts:
+        t.start()
+    for t in ts:
+        t.join()
+
+    menang = [r for r in keluar if r[0]]
+    assert len(menang) == 1, keluar
+    assert all(kode in ("DONE_CONFLICT", "") for _ok, kode in keluar), keluar
+    assert len(_events(jobs, jid, "done")) == 1
+    assert len(_events(jobs, jid, "verify_accepted")) == 1
+    assert len(_events(jobs, jid, "completion")) == 1
+
+
+# ---- siklus review D6/D8: penjaga kedua, cabang replay, konflik ganda ----
+def test_D14_finish_job_menolak_level_eksekusi_tanpa_pemanggil(w, monkeypatch, kunci):
+    """F1: penjaga di dalam `finish_job` — pemanggil keliru tetap tidak bisa `done`."""
+    wk, jobs = w
+    monkeypatch.setenv("SDB_DONE_POLICY", "verified")
+    _mode_strict(monkeypatch, kunci)
+    jid, job = _buat_job(jobs)
+    jobs.set_status(jid, "building")
+    hasil = {"ok": True, "code": "", "level": "EXECUTION_VERIFIED", "policy": "verified",
+             "dir_real": str(Path(job["dir"]).resolve()), "tree_sha256": "a" * 64,
+             "digest_complete": True,
+             "evidence": {"ok": True, "level": "EXECUTION_VERIFIED", "acceptance": False}}
+    assert wk.finish_job(jid, "catatan", hasil) == (False, "ACCEPTANCE_NOT_MET")
+    assert _status(jobs, jid) == "building"
+    assert _events(jobs, jid, "done") == []
+
+
+def test_D15_cabang_replay_di_dalam_transaksi_diuji(w, monkeypatch, kunci):
+    """F6: pemeriksaan nonce DI DALAM kunci tulis benar-benar menolak replay."""
+    wk, jobs = w
+    monkeypatch.setenv("SDB_DONE_POLICY", "verified")
+    _mode_strict(monkeypatch, kunci)
+    jid, job = _buat_job(jobs)
+    nonce = "f" * 64
+    jobs.add_event(jid, "verify_accepted", json.dumps(
+        {"schema": "sdb.verify.request/1", "job_id": jid, "request_nonce": nonce,
+         "verifier": "v", "level": "ACCEPTANCE_VERIFIED", "accepted_at": 0}))
+    jobs.set_status(jid, "building")
+    # `_nonce_state` dimatikan supaya jalur replay di dalam transaksi yang diuji,
+    # bukan penolakan lebih awal di tahap validasi.
+    monkeypatch.setattr(wk, "_nonce_state", lambda *a, **k: ({}, set()))
+    hasil = {"ok": True, "code": "", "level": "ACCEPTANCE_VERIFIED", "policy": "verified",
+             "dir_real": str(Path(job["dir"]).resolve()), "tree_sha256": "a" * 64,
+             "digest_complete": True,
+             "evidence": {"ok": True, "level": "ACCEPTANCE_VERIFIED", "acceptance": True,
+                          "accept": {"schema": "sdb.verify.request/1", "job_id": jid,
+                                     "request_nonce": nonce, "verifier": "v",
+                                     "level": "ACCEPTANCE_VERIFIED", "accepted_at": 0}}}
+    assert wk.finish_job(jid, "catatan", hasil) == (False, "EVIDENCE_REPLAY")
+    assert _status(jobs, jid) == "building"
+    assert len(_events(jobs, jid, "verify_accepted")) == 1   # yang lama, bukan tambahan
+    assert _events(jobs, jid, "done") == []
+
+
+def test_D16_konflik_tidak_menimpa_done_milik_proses_lain(w, monkeypatch, kunci):
+    """F2: job yang sudah `done` oleh proses lain tidak boleh diturunkan jadi `paused`."""
+    wk, jobs = w
+    monkeypatch.setenv("SDB_DONE_POLICY", "verified")
+    _mode_strict(monkeypatch, kunci)
+    jid, _job = _buat_job(jobs)
+    _bukti_sah(wk, jobs, jid, kunci)
+    asli = wk.assess_completion
+
+    def gerbang_lalu_selesai(job_, d_):
+        hasil = asli(job_, d_)
+        jobs.set_status(jid, "done", "diselesaikan proses lain")
+        return hasil
+
+    monkeypatch.setattr(wk, "assess_completion", gerbang_lalu_selesai)
+    wk.do_build(jobs.get(jid))
+    assert _status(jobs, jid) == "done"
+    assert jobs.get(jid)["error"] in (None, "")
+    assert len(_events(jobs, jid, "done")) == 1
+    assert "diabaikan" in wk.sent[-1]
+
+
+def test_D17_event_penerimaan_rusak_tidak_menggagalkan_transisi(w, monkeypatch, kunci):
+    """F3: baris `verify_accepted` rusak (bukan JSON / nonce bukan teks) dilewati, bukan meledak."""
+    wk, jobs = w
+    monkeypatch.setenv("SDB_DONE_POLICY", "verified")
+    _mode_strict(monkeypatch, kunci)
+    jid, _job = _buat_job(jobs)
+    jobs.add_event(jid, "verify_accepted", "{bukan json")
+    jobs.add_event(jid, "verify_accepted", json.dumps({"request_nonce": 12345}))
+    jobs.add_event(jid, "verify_accepted", json.dumps({"lain": "tanpa nonce"}))
+    _bukti_sah(wk, jobs, jid, kunci)
+    wk.do_build(jobs.get(jid))
+    assert _status(jobs, jid) == "done", jobs.get(jid)["error"]
+    # Tiga baris rusak + satu penerimaan sah = 4; transisi tetap satu `done`.
+    assert len(_events(jobs, jid, "done")) == 1
+
+
+def test_D18_kebijakan_tak_dikenal_tetap_fail_closed(w, monkeypatch, kunci):
+    """F3 siklus 2: penjaga `finish_job` fail-closed untuk policy selain `attested`."""
+    wk, jobs = w
+    jid, job = _buat_job(jobs)
+    jobs.set_status(jid, "building")
+    hasil = {"ok": True, "code": "", "level": "EXECUTION_VERIFIED", "policy": "paranoid",
+             "dir_real": str(Path(job["dir"]).resolve()), "tree_sha256": "a" * 64,
+             "digest_complete": True,
+             "evidence": {"ok": True, "level": "EXECUTION_VERIFIED", "acceptance": False}}
+    assert wk.finish_job(jid, "catatan", hasil) == (False, "ACCEPTANCE_NOT_MET")
+    assert _status(jobs, jid) == "building"
+    assert _events(jobs, jid, "done") == []

@@ -194,7 +194,31 @@ Kode penolakan baru ditulis ke kolom `error`: `EVIDENCE_SCHEMA`,
 `EVIDENCE_DIGEST_MISMATCH`, `EVIDENCE_UNKNOWN_VERIFIER`, `EVIDENCE_NO_SIGNATURE`,
 `EVIDENCE_SIGNATURE_ALG`, `EVIDENCE_UNTRUSTED_SIGNER`,
 `EVIDENCE_VERIFIER_UNAVAILABLE`, `EVIDENCE_SIGNER_STORE`,
-`EVIDENCE_LEGACY_REJECTED`, `EVIDENCE_MODE_REQUIRED`.
+`EVIDENCE_LEGACY_REJECTED`, `EVIDENCE_MODE_REQUIRED`, `ACCEPTANCE_NOT_MET`,
+`EVIDENCE_LEVEL_UNKNOWN`, `DONE_CONFLICT`.
+
+**Dua gerbang, bukan satu.** Di bawah `SDB_DONE_POLICY=verified`, bukti yang sah
+tetap bisa berhenti di level **eksekusi**: tanda tangan benar, `workspace_digest`
+cocok, tetapi `acceptance` belum terpenuhi (ada tes gagal, `collected=0`,
+`criteria_digest` beda, `verdict.acceptance=FAIL`, atau `deselect` tanpa alasan).
+Kondisi itu **bukan** `done`: worker menulis `ACCEPTANCE_NOT_MET` dan status
+`paused`. Hanya `ACCEPTANCE_VERIFIED` yang boleh menutup job; `RELEASE_ELIGIBLE`
+tidak pernah diberikan oleh worker. `exit code 0` bukan bukti kualitas.
+
+**Transisi `done` atomik.** Status `done`, event `verify_accepted` (penanda nonce
+terpakai), event `done`, dan event `completion` ditulis dalam **satu transaksi**
+`BEGIN IMMEDIATE` (`finish_job`). Status dipindahkan dengan CAS
+(`WHERE status IN ('building','spec_running')`); bila job sudah dipindahkan proses
+lain, atau penulisan gagal, transaksi di-rollback: **nonce tidak terbakar** dan
+`/retry` tetap bisa memakai bukti yang sama. Pemeriksaan nonce diulang di dalam
+kunci tulis, jadi dua penerimaan duplikat tidak bisa menghasilkan dua `done`.
+Saat transisi gagal, `paused` juga ditulis dengan CAS `status='building'`: job yang
+sudah dipindahkan proses lain (`done`, `cancelled`) **tidak** ditimpa dan tidak
+diberi kode error palsu — hanya satu notifikasi "diabaikan".
+
+**Angka tidak berhingga.** `json.loads` menerima literal `NaN`/`Infinity`,
+sedangkan byte yang ditandatangani tidak boleh memuatnya. Payload seperti itu
+ditolak sebagai `EVIDENCE_SCHEMA` (bukan `COMPLETION_ERROR`), fail-closed.
 
 **Penerbitan nonce (jalur operator).** `verified` tidak bisa dipakai tanpa nonce,
 dan nonce hanya keluar lewat perintah resmi:
@@ -204,10 +228,12 @@ python3 scripts/sdb_build_worker.py --issue-nonce <job_id>   # cetak 64 hex ke s
 ```
 
 Nonce disimpan sebagai event `verify_request` beserta `expires_at`
-(`SDB_VERIFY_TTL`, batas 60…86400 dtk). Setelah verifikasi **berhasil**, worker
-menulis event `verify_accepted`; hanya nonce di event itulah yang dianggap
-terpakai. Event `verify` mentah atau sampah tidak membakar nonce — kalau dibakar,
-satu event palsu bisa mematikan jalur `verified` milik job itu sendiri (DoS diri).
+(`SDB_VERIFY_TTL`, batas 60…86400 dtk). Penanda `verify_accepted` ditulis **bersama**
+transisi `done` (satu transaksi), jadi nonce baru dianggap terpakai kalau job
+benar-benar selesai; job yang gagal di tengah jalan tetap bisa di-`/retry` dengan
+bukti yang sama. Event `verify` mentah atau sampah tidak pernah membakar nonce —
+kalau dibakar, satu event palsu bisa mematikan jalur `verified` milik job itu
+sendiri (DoS diri).
 Masa berlaku evidence yang ditandatangani juga dibatasi jendela permintaan yang
 sama dan maksimum `SDB_VERIFY_TTL`/86400 detik.
 

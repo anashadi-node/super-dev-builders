@@ -416,7 +416,15 @@ def validate(evidence: object, *, job_id: int, workspace_digest: str,
         return _gagal("EVIDENCE_SIGNATURE_ALG", "algoritma tanda tangan tidak didukung")
     if sig.get("namespace") != NAMESPACE:
         return _gagal("EVIDENCE_SIGNATURE_ALG", "namespace tanda tangan salah")
-    sah, kode = verify_signature(signable_bytes(evidence), sig.get("sig"),
+    # N3: `json.loads` menerima literal NaN/Infinity, sedangkan `json.dumps`
+    # (dengan allow_nan=False) tidak. Tanpa penangkap ini, payload berisi angka
+    # tak berhingga meledak sebagai pengecualian tak tertangkap dan berujung
+    # `COMPLETION_ERROR` — kode yang salah untuk masalah bentuk payload.
+    try:
+        payload = signable_bytes(evidence)
+    except (ValueError, TypeError):
+        return _gagal("EVIDENCE_SCHEMA", "payload berisi angka tidak berhingga (NaN/Infinity)")
+    sah, kode = verify_signature(payload, sig.get("sig"),
                                  Path(allowed_signers) if allowed_signers else Path("/nonexistent"),
                                  vid)
     if not sah:

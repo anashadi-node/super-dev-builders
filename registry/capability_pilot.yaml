@@ -35,3 +35,18 @@ capabilities:
     notes: >-
       Implementasi pertama C1-01. Level CI_ATTESTED / INDEPENDENT_REVIEW tidak
       dapat diklaim oleh penulis bukti; hanya verifier/CI yang berwenang.
+  - id: BE-SP-03
+    name: "API Contract Engineering"
+    division: D3/D5
+    status: PILOT
+    scope: "Kontrak mesin control plane v1: POST /v1/jobs + GET /v1/jobs/:id, negative tests, mutation testing"
+    test_command_hint: ".venv/bin/python -m pytest tests/test_be_sp03_contract.py -q"
+    evidence_path: "runs/capability/BE-SP-03/<revision>.json"
+    evidence_schema: sdb.capability.evidence/1
+    evidence_level_allowed: [AGENT_REPORTED]
+    acceptance: INFORMATIONAL_ONLY
+    owner_approval: "2026-11-20 — dokumen C1-02 BE-SP-03 §1 (allowlist 5 file, app.py/Store READ-ONLY)"
+    notes: >-
+      Implementasi C1-02. Kontrak mencerminkan perilaku source yang dibuktikan
+      lewat tests/test_be_sp03_contract.py (T1-T10). File produksi app.py/Store
+      tidak diubah; mutasi T9 berjalan pada salinan scratch.

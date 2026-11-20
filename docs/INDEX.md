@@ -136,3 +136,4 @@ sumbernya `.md`). Jangan menautkan arsip sebagai rujukan utama.
 | `platform/packs/*.json` | manifest skill per divisi (hash + lisensi) |
 | `THIRD_PARTY_NOTICES.md` | lisensi pihak ketiga + aturan pemisahan CC-BY-SA |
 | `BE_SP12_EVIDENCE_CONTRACT.md` | implementation pack C1/BE-SP-12: kontrak evidence 9 field, aturan tolak, allowlist berkas |
+| `BE_SP03_API_CONTRACT.md` | kontrak API control plane v1 (C1-02 BE-SP-03): 2 keluarga endpoint, error envelope, job_object, aturan kompatibilitas |

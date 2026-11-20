@@ -72,7 +72,7 @@ memvalidasi bahwa laporan benar-benar ada, JSON valid, serta tidak memuat nilai 
 
 | # | Pemeriksaan | Hasil | Bukti |
 |---|---|---|---|
-| 1 | Scanner menerima riwayat yang dimaksud | **LULUS** | blok nyata dijalankan lokal: `187 commits scanned` |
+| 1 | Scanner menerima riwayat yang dimaksud | **LULUS** | blok nyata dijalankan lokal: `190 commits scanned` (187 pada eksekusi sebelum commit laporan) |
 | 2 | Riwayat hilang tidak boleh PASS | **LULUS** | `test_hazard_checkout_dangkal_melewatkan_kebocoran` (klon dangkal = exit 0 **hanya** di klon dangkal; asersi memaksa keduanya diuji) |
 | 3 | Scanner absen tidak boleh PASS | **LULUS** [H] | `command -v gitleaks \|\| exit 1`; diuji dengan `PATH` tanpa scanner (exit 1) |
 | 4 | Checksum artefak = rilis resmi | **LULUS** | unduh `gitleaks_8.28.0_linux_x64.tar.gz` hari ini → `a65b5253807a68ac0cafa4414031fd740aeb55f54fb7e55f386acb52e6a840eb` = `GITLEAKS_SHA256` di `ci.yml` |
@@ -87,7 +87,7 @@ memvalidasi bahwa laporan benar-benar ada, JSON valid, serta tidak memuat nilai 
 
 | Konteks | Riwayat yang tersedia | Cakupan nyata |
 |---|---|---|
-| Lokal (`gitleaks --all`) | seluruh ref lokal | 187 commit, 0 kebocoran |
+| Lokal (`gitleaks --all`) | seluruh ref lokal | 190 commit, 0 kebocoran |
 | CI `push`/`workflow_dispatch` dengan `fetch-depth: 0` | semua branch + tag yang di-fetch | seluruh riwayat yang dijangkau ref yang di-checkout |
 | CI `pull_request` | merge commit `refs/pull/N/merge` + riwayat penuh ref tersebut | kebocoran yang ADA di riwayat PR tertangkap; branch lain yang tidak di-fetch tidak dipindai |
 
@@ -106,7 +106,7 @@ yang bisa diaudit.
 | Pemeriksaan | Hasil |
 |---|---|
 | Pola kredensial pada rentang commit yang keluar | 0 kredensial nyata; `ghp_`/`AKIA` hanya muncul sebagai **literal pola regex** di tes (`tests/test_ci_workflow_policy.py`) |
-| Pemindaian gitleaks pada seluruh riwayat lokal | 187 commit, **0 kebocoran** |
+| Pemindaian gitleaks pada seluruh riwayat lokal | 190 commit, **0 kebocoran** |
 | Canary sintetis tertinggal di commit yang keluar | **tidak ada** (`git log -p origin/master..HEAD \| grep -c 'ghp_[A-Za-z0-9]{20,}'` = 0) |
 | Objek commit percobaan `9af4f37` | masih ada sebagai objek **tak terjangkau** (tidak ada ref yang memuatnya, `git for-each-ref --contains` kosong) → **tidak akan terkirim** oleh push biasa |
 | Berkas baru tak terlacak yang ikut terbawa | tidak ada (`git status --porcelain -uall` kosong) |
@@ -128,7 +128,7 @@ destruktif dan tidak diperlukan untuk push. (3) Username pada path lokal adalah 
 |---|---|---|
 | `pytest tests skills integrations --junitxml=…` | **0** | `tests=866 failures=0 errors=0 skipped=0 time=61.0s` |
 | `pytest tests/test_ci_workflow_policy.py` | **0** | **23 passed in 3.7s** |
-| Blok `Pindai rahasia` asli (diekstrak dari YAML, dijalankan `bash -c`) | **0** | `187 commits scanned`, `no leaks found`, `laporan_rahasia=OK entri=0` |
+| Blok `Pindai rahasia` asli (diekstrak dari YAML, dijalankan `bash -c`) | **0** | `190 commits scanned`, `no leaks found`, `laporan_rahasia=OK entri=0` (dijalankan ulang pada HEAD `6334bf8`) |
 | `bash -n docs/c2b2m/*.sh` | 0 | empat skrip lolos sintaks |
 | `docs/c2b2m/apply.sh` tanpa dua kunci | **2** | menolak (guard) |
 | `docs/c2b2m/rollback.sh` tanpa dua kunci | **2** | menolak (guard) |

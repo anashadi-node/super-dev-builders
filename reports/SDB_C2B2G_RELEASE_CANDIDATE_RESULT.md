@@ -31,18 +31,16 @@ Tidak ada reset/checkout paksa yang dilakukan.
 
 ## 2. Jumlah commit yang akan keluar bila di-push
 
-`git rev-list --count origin/master..HEAD` = **15** (14 commit sebelum commit laporan ini,
-+ 1 commit laporan). Rentang `71aa30b..HEAD` = 7 commit sesi ini; `origin/master..71aa30b` =
-8 commit lokal lama. Ringkasan diff terhadap `origin/master`:
+`git rev-list --count origin/master..HEAD` = **17** pada HEAD final laporan ini.
+Komposisi: 8 commit lokal lama (`23065a9` … `71aa30b`) + 5 commit kerja sesi ini
+(`e033702`, `0654937`, `e920c92`, `02322c3`, `89fbe62`) + 4 commit laporan
+(`7bca894`, `6334bf8`, `ea5753b`, dan commit terakhir yang memuat angka ini).
+Angka ini bertambah satu setiap laporan diperbarui — itulah sebabnya disebut sebagai
+rentang, bukan angka tetap. Ringkasan diff terhadap `origin/master` sebelum laporan ini:
 
 ```
-21 files changed, 4949 insertions(+), 48 deletions(-)     # sebelum laporan ini
+21 files changed, 4949 insertions(+), 48 deletions(-)
 ```
-
-Commit sesi ini: `e033702` (CODEOWNERS) · `0654937` (gitleaks fail-closed + baseline ratchet
-+ JUnit) · `e920c92` (pack builder + kontrak BE-SP-12) · `7bca894` (laporan fast-track) ·
-`02322c3` (fetch-depth 0 + integritas laporan + kredensial checkout) · `89fbe62`
-(builder READY_FOR_OWNER_APPROVAL).
 
 ---
 
@@ -288,7 +286,7 @@ menyentuh `workflows/stages.yaml`, `agents/*.yaml`, `registry/skills.yaml`,
 
 ## 13. Approval berikutnya yang dibutuhkan Owner
 
-1. **`PUSH_APPROVED`** untuk 15 commit pada `feat/c2b2g-ci-hardening` + Draft PR ke `master`
+1. **`PUSH_APPROVED`** untuk 17 commit pada `feat/c2b2g-ci-hardening` + Draft PR ke `master`
    (tanpa merge, tanpa force-push, tanpa ubah branch protection) — ini satu-satunya cara
    mendapatkan bukti runner nyata (R1).
 2. **Reviewer kedua / arrangement review** untuk menuntaskan R2 (CODEOWNERS).

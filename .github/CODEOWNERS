@@ -1,0 +1,38 @@
+# CODEOWNERS — Super Dev Builders
+#
+# Tujuan: jalur keamanan kritis tidak bisa diubah tanpa persetujuan pemilik yang
+# disebut di bawah. Berkas ini mengikat REVIEW, bukan menjalankan gerbang: aturan
+# "Require review from Code Owners" di branch protection BELUM diaktifkan karena
+# saat berkas ini dibuat repo hanya punya SATU akun dengan akses tulis
+# (`anashadi-node`, admin=true) — mengaktifkannya sekarang membuat setiap PR
+# termasuk PR pemilik tidak bisa mencapai status approved (penulis tidak boleh
+# menyetujui PR-nya sendiri). Lihat SDB_C2B2_FASTTRACK_EXECUTION_RESULT.md §4B.
+#
+# BOOTSTRAP: CODEOWNERS hanya berlaku pada base branch setelah berkas ini masuk ke
+# branch tersebut. Selama masih di branch fitur, ia belum menahan apa pun. Urutan
+# yang benar: merge ke master -> aktifkan "Require review from Code Owners" ->
+# verifikasi dengan PR negatif (lihat negative test di laporan).
+#
+# Sintaks: pola diawali "/" = relatif root repo. Urutan penting; pola terakhir
+# yang cocok menang. Jangan menambah pola global "*" tanpa reviewer kedua.
+
+# --- Gerbang CI dan kanal review itu sendiri -------------------------------
+/.github/                 @anashadi-node
+/.github/CODEOWNERS       @anashadi-node
+
+# --- Konfigurasi pemindaian rahasia --------------------------------------
+/.gitleaks.toml           @anashadi-node
+
+# --- Inti bukti dan gerbang penerimaan ------------------------------------
+/scripts/sdb_evidence.py       @anashadi-node
+/scripts/sdb_build_worker.py   @anashadi-node
+/scripts/sdb_jobs.py           @anashadi-node
+/scripts/sdb_common.py         @anashadi-node
+/scripts/release_check.py      @anashadi-node
+/scripts/did_validate.py       @anashadi-node
+/tests/test_ci_workflow_policy.py  @anashadi-node
+
+# --- Kontrak proses dan registry (jangan berubah tanpa persetujuan) -------
+/workflows/stages.yaml    @anashadi-node
+/registry/                @anashadi-node
+/platform/did_profiles.json  @anashadi-node

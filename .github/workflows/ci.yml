@@ -39,6 +39,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          # WAJIB 0: gerbang rahasia memindai `--log-opts=--all`. Dengan default
+          # fetch-depth=1 hanya satu commit terlihat, sehingga kebocoran di riwayat
+          # lolos dengan exit 0 (hijau palsu). Terbukti: klon depth=1 -> exit 0,
+          # klon penuh -> exit 1 pada repo uji dengan kebocoran di commit lama.
+          fetch-depth: 0
+          # Token checkout tidak disimpan di .git/config: langkah CI ini tidak push.
+          persist-credentials: false
 
       - name: Setup Python
         uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
@@ -79,6 +87,23 @@ jobs:
             --baseline-path .github/gitleaks-baseline.json \
             --log-opts="--all" \
             --report-format json --report-path reports/ci/gitleaks.json
+          # Laporan harus benar-benar ada dan terbaca: exit 0 tanpa laporan berarti
+          # hasil pemindaian hilang dan tidak boleh dianggap lulus.
+          test -s reports/ci/gitleaks.json || { echo "FAIL laporan rahasia tidak dihasilkan"; exit 1; }
+          # `python` polos tidak selalu ada (host lokal hanya punya python3);
+          # runner menyediakan keduanya, tetapi ambil yang tersedia agar blok ini
+          # bisa diuji lokal tanpa perubahan perilaku.
+          PY=$(command -v python3 || command -v python) || { echo "FAIL interpreter python tidak ada"; exit 1; }
+          "$PY" - <<'PY'
+          import json, sys
+          data = json.load(open("reports/ci/gitleaks.json", encoding="utf-8"))
+          if not isinstance(data, list):
+              print("FAIL laporan rahasia bukan array JSON"); sys.exit(1)
+          bocor = [d.get("Secret") for d in data if d.get("Secret") not in (None, "", "REDACTED")]
+          if bocor:
+              print("FAIL laporan memuat nilai rahasia tidak ter-redact"); sys.exit(1)
+          print(f"laporan_rahasia=OK entri={len(data)} semua_ter_redact=true")
+          PY
           echo "laporan_rahasia=reports/ci/gitleaks.json (nilai di-redact, baseline 10 temuan teraudit)"
 
       # PRASYARAT, bukan hiasan: sebagian uji keamanan menguji kanal media (OCR).

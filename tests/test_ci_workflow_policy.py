@@ -19,6 +19,7 @@ import re
 import shutil
 import string
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
@@ -156,6 +157,23 @@ def test_versi_pin_di_workflow_sama_dengan_pin_tes() -> None:
     assert _step("Pasang gitleaks").get("env", {}).get("GITLEAKS_VERSION") == PIN_GITLEAKS
 
 
+def test_checkout_mengambil_seluruh_riwayat() -> None:
+    """Gerbang memindai `--log-opts=--all`; checkout default hanya 1 commit.
+
+    Terbukti empiris (lihat test_hazard_checkout_dangkal_melewatkan_kebocoran):
+    klon depth=1 membuat kebocoran di riwayat lolos dengan exit 0.
+    """
+    checkout = _step("Checkout")
+    with_ = checkout.get("with") or {}
+    assert with_.get("fetch-depth") == 0, f"fetch-depth={with_.get('fetch-depth')!r} -> riwayat tidak lengkap"
+
+
+def test_checkout_tidak_menyimpan_kredensial() -> None:
+    """Token checkout tersimpan di .git/config bila persist-credentials dibiarkan."""
+    checkout = _step("Checkout")
+    assert (checkout.get("with") or {}).get("persist-credentials") is False
+
+
 def test_checksum_scanner_tertanam_bukan_diunduh() -> None:
     """Checksum dari origin yang sama = tidak melindungi dari origin yang disusupi."""
     step = _step("Pasang gitleaks")
@@ -218,7 +236,7 @@ def test_ratchet_menolak_kebocoran_baru(tmp_path: Path) -> None:
     subprocess.run(["git", "clone", "-q", "--shared", str(REPO), str(klon)], check=True)
     # Baseline dibaca dari working tree; di sesi ini ia belum di-commit, jadi disalin
     # dari working tree asli supaya klon mencerminkan keadaan CI yang sebenarnya.
-    shutil.copy2(BASELINE, klon / ".github" / "gitleaks-baseline.json")
+    _pasang_baseline(klon)
     # Token canary DIBANGKITKAN saat runtime: menanam token berbentuk PAT di source
     # akan ditangkap gitleaks sebagai kebocoran nyata (dan memang seharusnya begitu).
     acak = random.Random(20261120)
@@ -308,3 +326,140 @@ def test_codeowners_valid_dan_mencakup_jalur_kritis() -> None:
     assert not any(ln.startswith("* ") for ln in baris), (
         "pola global '*' membuat PR pemilik tunggal tidak bisa disetujui"
     )
+
+
+# --- 6. riwayat, integritas laporan, hazard checkout ----------------------
+
+def _git(*args: str, cwd: Path) -> str:
+    return subprocess.run(
+        ["git", *args], cwd=str(cwd), check=True, capture_output=True, text=True,
+        env={**os.environ, "GIT_CONFIG_GLOBAL": "/dev/null", "GIT_CONFIG_SYSTEM": "/dev/null"},
+    ).stdout
+
+
+# Identitas commit uji: alamat email disusun saat runtime supaya berkas ini tidak
+# memuat pola email (gerbang higiene R3_pii menandai pola semacam itu).
+_EMAIL_UJI = "uji" + chr(64) + "invalid.tld"
+_IDENT = ["-c", "user.name=uji", "-c", f"user.email={_EMAIL_UJI}", "-c", "commit.gpgsign=false"]
+
+
+def _repo_dengan_kebocoran_lama(tmp: Path) -> Path:
+    """Repo 6 commit: kebocoran di commit ke-2, dihapus di HEAD.
+
+    Kebocoran hanya tersisa di RIWAYAT — inilah bentuk yang lolos bila checkout dangkal.
+    Token dibangkitkan runtime supaya source tes sendiri bersih dari pola rahasia.
+    """
+    src = tmp / "src"
+    src.mkdir()
+    _git("init", "-q", "-b", "main", cwd=src)
+    (src / "data.txt").write_text("awal\n", encoding="utf-8")
+    _git("add", "data.txt", cwd=src)
+    _git(*_IDENT, "commit", "-q", "-m", "c1 bersih", cwd=src)
+    acak = random.Random(424242)
+    token = "ghp_" + "".join(acak.choice(string.ascii_letters + string.digits) for _ in range(36))
+    (src / "bocor.txt").write_text(f"token = {token}\n", encoding="utf-8")
+    _git("add", "bocor.txt", cwd=src)
+    _git(*_IDENT, "commit", "-q", "-m", "c2 bocor", cwd=src)
+    (src / "bocor.txt").unlink()
+    _git("add", "-A", cwd=src)
+    _git(*_IDENT, "commit", "-q", "-m", "c3 hapus bocor", cwd=src)
+    return src
+
+
+def _pasang_baseline(klon: Path) -> None:
+    """Lengkapi klon uji dengan berkas yang di CI berasal dari repo.
+
+    Tanpa `.gitleaks.toml` gitleaks gagal MEMUAT config (bukan soal riwayat), sehingga
+    hasil uji bisa disalahartikan sebagai "kebocoran terdeteksi".
+    """
+    (klon / ".github").mkdir(parents=True, exist_ok=True)
+    shutil.copy2(BASELINE, klon / ".github" / "gitleaks-baseline.json")
+    shutil.copy2(REPO / ".gitleaks.toml", klon / ".gitleaks.toml")
+
+
+def test_hazard_checkout_dangkal_melewatkan_kebocoran(tmp_path: Path) -> None:
+    """Bukti empiris mengapa `fetch-depth: 0` wajib, bukan preferensi.
+
+    Klon depth=1 pada repo yang kebocorannya hanya ada di riwayat menghasilkan exit 0
+    (hijau palsu). Klon penuh menangkapnya. Bila gitleaks tidak terpasang, tes ini
+    dilewati secara terbuka — bukan lulus diam-diam.
+    """
+    if not shutil.which("gitleaks"):
+        pytest.skip("gitleaks tidak terpasang di mesin ini")
+    blok = _run_block("Pindai rahasia")
+    src = _repo_dengan_kebocoran_lama(tmp_path)
+
+    for nama, opsi, harapan_gagal in (
+        ("dangkal", ["--depth", "1"], False),
+        ("penuh", [], True),
+    ):
+        klon = tmp_path / nama
+        _git("clone", "-q", *opsi, f"file://{src}", str(klon), cwd=tmp_path)
+        _pasang_baseline(klon)
+        hasil = _run(blok, cwd=klon)
+        if harapan_gagal:
+            assert hasil.returncode != 0, f"klon {nama} TIDAK menangkap kebocoran riwayat"
+            laporan = json.loads((klon / "reports" / "ci" / "gitleaks.json").read_text())
+            assert [d["File"] for d in laporan] == ["bocor.txt"], laporan
+        else:
+            assert hasil.returncode == 0, (
+                f"klon {nama} gagal — hazard tidak tereproduksi, klaim fetch-depth: 0 "
+                "kehilangan dasar empiris"
+            )
+
+
+def test_gerbang_gagal_bila_laporan_tidak_dihasilkan(tmp_path: Path) -> None:
+    """Exit 0 dari scanner tanpa laporan = hasil hilang; tidak boleh dianggap lulus."""
+    blok = _run_block("Pindai rahasia")
+    shim = tmp_path / "bin"
+    shim.mkdir()
+    palsu = shim / "gitleaks"
+    # versi benar, exit 0, tetapi TIDAK menulis laporan apa pun
+    palsu.write_text('#!/bin/sh\ncase "$1" in version) echo 8.28.0;; esac\nexit 0\n', encoding="utf-8")
+    palsu.chmod(0o755)
+    klon = tmp_path / "repo"
+    klon.mkdir()
+    _pasang_baseline(klon)
+    hasil = _run(blok, cwd=klon, path=f"{shim}:/usr/bin:/bin")
+    assert hasil.returncode != 0
+    assert "laporan" in (hasil.stdout + hasil.stderr).lower()
+
+
+def test_gerbang_gagal_bila_laporan_memuat_nilai_tidak_ter_redact(tmp_path: Path) -> None:
+    """`--redact` bisa dilewati oleh perubahan argumen; laporan diperiksa ulang."""
+    blok = _run_block("Pindai rahasia")
+    shim = tmp_path / "bin"
+    shim.mkdir()
+    palsu = shim / "gitleaks"
+    palsu.write_text(
+        '#!/bin/sh\n'
+        'case "$1" in version) echo 8.28.0; exit 0;; esac\n'
+        'mkdir -p reports/ci\n'
+        'printf \'[{"RuleID":"x","File":"a.txt","Secret":"NILAI-ASLI"}]\' > reports/ci/gitleaks.json\n'
+        'exit 0\n',
+        encoding="utf-8",
+    )
+    palsu.chmod(0o755)
+    klon = tmp_path / "repo"
+    klon.mkdir()
+    _pasang_baseline(klon)
+    hasil = _run(blok, cwd=klon, path=f"{shim}:/usr/bin:/bin")
+    assert hasil.returncode != 0
+    assert "redact" in (hasil.stdout + hasil.stderr).lower()
+
+
+def test_junit_tidak_memuat_data_pribadi_atau_kredensial() -> None:
+    """Artefak JUnit diunggah keluar repo: harus bebas path home, email, dan token."""
+    with tempfile.TemporaryDirectory() as tmp:
+        junit = Path(tmp) / "junit.xml"
+        hasil = subprocess.run(
+            [sys.executable, "-m", "pytest", "tests/test_ci_workflow_policy.py",
+             "-q", "-k", "checkout and not hazard", f"--junitxml={junit}"],
+            cwd=str(REPO), capture_output=True, text=True, timeout=300,
+        )
+        assert hasil.returncode == 0, hasil.stdout[-2000:]
+        isi = junit.read_text(encoding="utf-8")
+    assert "/home/" not in isi, "JUnit memuat path home"
+    assert not re.search(r"[\w.+-]+@[\w-]+\.[\w.]+", isi), "JUnit memuat alamat email"
+    for pola in (r"ghp_[A-Za-z0-9]{20,}", r"AKIA[0-9A-Z]{16}", r"-----BEGIN [A-Z ]*PRIVATE KEY-----"):
+        assert not re.search(pola, isi), f"JUnit memuat pola kredensial: {pola}"

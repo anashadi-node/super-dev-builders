@@ -45,6 +45,7 @@ tanggalnya menang — dan yang kalah **harus** dipindahkan ke `docs/archive/`, b
 | `THIRD_PARTY_SKILLS_DECISION_2026-10-05.md` | keputusan skill pihak ketiga |
 | `SECURITY_GATE_10.md` | gerbang keamanan lapis 10: apa yang diperiksa sebelum klaim "aman" |
 | `TECHNOLOGY_GOVERNANCE.md` | pemilihan teknologi |
+| `RESTRICTED_BUILDER_C2B2M.md` | execution pack akun builder least-privilege (A″): matriks uji, canary, rollback — belum dieksekusi |
 
 ## Pipeline & bukti
 
@@ -134,3 +135,4 @@ sumbernya `.md`). Jangan menautkan arsip sebagai rujukan utama.
 | `platform/schemas/*.schema.json` | kontrak tenant/job/artifact |
 | `platform/packs/*.json` | manifest skill per divisi (hash + lisensi) |
 | `THIRD_PARTY_NOTICES.md` | lisensi pihak ketiga + aturan pemisahan CC-BY-SA |
+| `BE_SP12_EVIDENCE_CONTRACT.md` | implementation pack C1/BE-SP-12: kontrak evidence 9 field, aturan tolak, allowlist berkas |

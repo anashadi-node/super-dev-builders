@@ -54,9 +54,15 @@ OPEN_STATES = ("spec_queued", "spec_running", "spec_ready", "build_queued", "bui
 def connect() -> sqlite3.Connection:
     DB.parent.mkdir(parents=True, exist_ok=True)
     con = sqlite3.connect(DB, timeout=15)
-    con.row_factory = sqlite3.Row
-    con.execute("PRAGMA journal_mode=WAL")
-    con.executescript(SCHEMA)
+    try:
+        con.row_factory = sqlite3.Row
+        con.execute("PRAGMA journal_mode=WAL")
+        con.executescript(SCHEMA)
+    except BaseException:
+        # Setup gagal (PRAGMA/schema): tutup di sini, karena `conn()` belum
+        # memegang koneksi sehingga tidak bisa menutupnya.
+        con.close()
+        raise
     return con
 
 

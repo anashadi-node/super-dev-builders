@@ -153,6 +153,17 @@ def test_claim_tetap_atomik_dan_menutup(jobs, monkeypatch):
     assert spy.ditutup == spy.dibuka
 
 
+def test_galat_setup_koneksi_tidak_bocor(jobs, monkeypatch):
+    """R1 review: kegagalan PRAGMA/executescript saat membuka koneksi tidak boleh
+    meninggalkan fd — `conn()` belum memegang koneksi pada titik itu."""
+    spy = _spy(monkeypatch, jobs)
+    monkeypatch.setattr(jobs, "SCHEMA", "BUKAN SQL YANG SAH;")
+    with pytest.raises(sqlite3.Error):
+        jobs.stats()
+    assert spy.dibuka == 1, spy.dibuka
+    assert spy.ditutup == spy.dibuka, (spy.dibuka, spy.ditutup)
+
+
 def test_galat_sqlite_tidak_meninggalkan_koneksi(jobs, monkeypatch):
     jid = jobs.create_job("galat sqlite\n")
     spy = _spy(monkeypatch, jobs)

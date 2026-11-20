@@ -1,0 +1,37 @@
+# Capability Registry — PILOT
+#
+# CATATAN RUANG LINGKUP (jangan salah baca):
+#   Berkas ini BUKAN katalog 26 capability dan tidak menggantikan katalog itu.
+#   Ia hanya mendaftarkan capability yang sudah punya izin pilot + bukti
+#   machine-readable. ID katalog lama tidak ditimpa, tidak dipindah, dan tidak
+#   diduplikasi di sini — penambahan entri baru wajib lewat keputusan Owner.
+#
+# Skema evidence: `sdb.capability.evidence/1` (registry/capability_evidence.schema.json)
+# Penulis bukti  : scripts/sdb_capability_evidence.py
+# Lokasi bukti   : runs/capability/<capability_id>/<revision-40hex>.json (TIDAK di-commit)
+#
+# Aturan keras:
+#   - `status` hanya PILOT atau ACTIVE; entri tanpa dua nilai itu ditolak pemuat.
+#   - `acceptance` tidak pernah berarti "lulus": PASS eksekusi bersifat informatif
+#     sampai ada reviewer independen (lihat docs/BE_SP12_EVIDENCE_CONTRACT.md §1).
+version: 1
+updated: 2026-11-20
+catalog:
+  canonical_count: 26
+  registered_here: pilot_only
+
+capabilities:
+  - id: BE-SP-12
+    name: "Backend QA / Test Engineer"
+    division: D6/D7
+    status: PILOT
+    scope: "QA backend clean-room: unit + integrasi, gerbang rahasia, bukti eksekusi terikat revisi"
+    test_command_hint: ".venv/bin/python -m pytest tests/test_capability_evidence.py -q"
+    evidence_path: "runs/capability/BE-SP-12/<revision>.json"
+    evidence_schema: sdb.capability.evidence/1
+    evidence_level_allowed: [AGENT_REPORTED]
+    acceptance: INFORMATIONAL_ONLY
+    owner_approval: "2026-11-20 — D-BE1=A, D-BE2=A, D-BE3=A (C1-01)"
+    notes: >-
+      Implementasi pertama C1-01. Level CI_ATTESTED / INDEPENDENT_REVIEW tidak
+      dapat diklaim oleh penulis bukti; hanya verifier/CI yang berwenang.

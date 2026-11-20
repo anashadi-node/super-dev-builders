@@ -51,6 +51,20 @@ headsha=$(head -1 <<<"$out"); subuid=$(tail -1 <<<"$out")
 [[ "$headsha" =~ ^[0-9a-f]{7,}$ ]] && ok "11 bisa kerja di workspace" "HEAD=$headsha" || no "11 bisa kerja di workspace" "${out:0:60}"
 [[ "$subuid" == "$uid" ]] && ok "12 subprocess identitas sama" "uid=$subuid" || no "12 subprocess identitas sama" "$subuid != $uid"
 
+# 13-16 penutup celah: skills Builder, workspace proyek lain, systemd, proses pekerja
+out=$(as_b "test -r $WS/../skills/README.md || ls -1 $WS/../skills | head -1")
+[[ -n "$out" ]] && ok "13 baca skills salinan sendiri" "${out:0:28}" || no "13 baca skills salinan sendiri"
+
+out=$(as_b "test -r $OWNER_HOME/vsb && echo BISA || echo TOLAK")
+[[ "$out" == *TOLAK ]] && ok "14 tidak baca workspace proyek lain" || no "14 tidak baca workspace proyek lain" "$out"
+
+out=$(as_b "test -w /etc/systemd/system && echo BISA || echo TOLAK")
+[[ "$out" == *TOLAK ]] && ok "15 tidak tulis unit systemd" || no "15 tidak tulis unit systemd" "$out"
+
+out=$(as_b "sleep 1 >/dev/null 2>&1 & echo \$!; sleep 0.2; ps -o uid= -p \$! 2>/dev/null")
+pid=$(head -1 <<<"$out"); procuid=$(tail -1 <<<"$out" | tr -d ' ')
+[[ "$procuid" == "$uid" ]] && ok "16 proses pekerja mewarisi uid" "pid=$pid uid=$procuid" || no "16 proses pekerja mewarisi uid" "uid=${procuid:-?} != $uid"
+
 echo
 echo "RINGKASAN: $pass PASS / $fail FAIL"
 [[ $fail -eq 0 ]] || exit 1

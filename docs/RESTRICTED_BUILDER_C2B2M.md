@@ -1,10 +1,13 @@
 # C2-B2M — Restricted Builder Execution Pack (A″)
 
-**Status:** `PROPOSED — BELUM DIEKSEKUSI`. Tidak ada user, group, ACL, `chown`, atau
-unit systemd yang dibuat/diubah oleh dokumen ini.
+**Status:** `READY_FOR_OWNER_APPROVAL — BELUM DIEKSEKUSI`. Tidak ada user, group, ACL,
+`chown`, atau unit systemd yang dibuat/diubah oleh dokumen ini. Kesiapan berarti pack
+dapat dieksekusi apa adanya setelah approval, bukan bahwa OS sudah diubah.
 **Keputusan Owner:** D1 — A″ disetujui sebagai *target design*; eksekusi OS ditahan.
-**Skrip pendamping:** `docs/c2b2m/preflight.sh`, `apply.sh`, `verify.sh`, `rollback.sh`
-(sudah lolos `bash -n`, belum pernah dijalankan).
+**Skrip pendamping:** `docs/c2b2m/preflight.sh`, `apply.sh`, `verify.sh`, `rollback.sh`.
+Bukti yang benar-benar dijalankan hari ini: `bash -n` keempat berkas = OK; `preflight.sh`
+= exit 0 (`HASIL: PASS`); `apply.sh` dan `rollback.sh` tanpa dua kunci = exit 2 (menolak).
+`apply.sh`/`verify.sh`/`rollback.sh` **belum pernah** dijalankan terhadap sistem.
 
 ## 1. Fakta host yang diukur (bukan asumsi)
 
@@ -55,9 +58,30 @@ Alasan `/bin/bash` (bukan `nologin`): builder harus menjalankan `pytest`, `git`,
 | 9 | Bisa kerja di workspace | `pytest -q` + `git status` di `/srv/sdb-workspace/repo` | jalan, UID sama di subprocess |
 | 10 | Identitas subprocess | `python -c "import os;print(os.getuid())"` | sama dengan UID sdbbuild |
 
+Tambahan uji 11–16 menutup empat celah yang sebelumnya hanya dinarasikan:
+11 bisa kerja di workspace, 12 identitas subprocess, 13 skills salinan sendiri
+(`/srv/sdb-workspace/skills`, bukan `~/.hermes`), 14 tidak baca workspace proyek lain,
+15 tidak tulis `/etc/systemd/system`, 16 proses pekerja mewarisi UID builder.
+
 Canary dibuat oleh `apply.sh` sebagai berkas **palsu** (`fake_key.pem` berisi string
 `CANARY-SINTETIS-JANGAN-DIPAKAI`, `fake_token.txt` serupa) dengan mode `0600`. Tidak
 ada berkas rahasia asli yang dibaca, disalin, atau di-hash oleh skrip mana pun.
+
+## 3b. Peta butir validasi direktif §7 → bukti di pack
+
+| Butir §7 | Bagaimana pack memenuhi | Status |
+|---|---|---|
+| Isolasi akun & grup | `apply.sh` membuat grup/user khusus; `verify.sh` 01–04 | siap (belum dieksekusi) |
+| Akses persis yang dibutuhkan builder | workspace `/srv/sdb-workspace/{repo,skills,out,venv}`; `verify.sh` 11 | siap |
+| Akses ke skills & tools bersama | **salinan** `$SRC_REPO/skills` (bukan symlink ke `~/.hermes`); `verify.sh` 13 | siap, menunggu keputusan (lihat §7) |
+| Menjalankan proses builder terbatas | seluruh proses via `sudo -u sdbbuild`; `verify.sh` 12 & 16 | siap |
+| Perlindungan kredensial Owner | home Owner `0750`, `~/.hermes` `0700`, canary `0600`; `verify.sh` 05–07 | siap |
+| Perlindungan workspace proyek lain | `verify.sh` 14 (probe `~/vsb`) | siap |
+| Perlindungan service systemd | `verify.sh` 15 + tidak ada unit builder | siap |
+| Pemulihan bila builder gagal | `rollback.sh` idempoten (aman pada apply separuh jalan) | siap |
+| Rollback tanpa menghapus data pengguna lain | `userdel --remove` hanya `sdbbuild`; `groupdel` bila grup kosong; tidak menyentuh home Owner | siap |
+| Definisi "nama profil terbatas ≠ eksekusi terbatas" | klaim dibuktikan lewat UID/GID nyata (12 & 16), bukan nama | siap |
+| Canary sintetis saja | `fake_key.pem`/`fake_token.txt` berisi string penanda, bukan kredensial | siap |
 
 ## 4. Prosedur (setelah approval)
 
@@ -91,7 +115,19 @@ konfigurasi Hermes, unit systemd, maupun hak akses Owner.
 
 | Risiko | Dampak | Mitigasi di pack |
 |---|---|---|
-| Builder butuh dependensi yang hanya ada di venv Owner | Build gagal, bukan bocor | venv sendiri di `/srv/sdb-workspace/repo/.venv`; tidak memakai `.venv` Owner |
+| Builder butuh dependensi yang hanya ada di venv Owner | Build gagal, bukan bocor | venv sendiri di `/srv/sdb-workspace/venv` (dibuat `apply.sh`); `.venv` Owner tidak terbaca dan tidak dipakai |
 | `git clone` menyalin riwayat berisi artefak profil Chromium | Data non-rahasia ikut tersalin | Terdokumentasi di laporan §7; tidak ada kredensial (audit: kunci publik + MAC) |
 | Builder menulis ke `runs/` produksi | Artefak bukti rusak | Clone terpisah; `runs/` hanya ada di repo Owner |
 | Escalation via kernel/`.so` lokal | Di luar cakupan akun | Dicatat sebagai batas: bukan sandbox, hanya pembatasan identitas |
+
+## 7. Dua keputusan Owner yang tersisa sebelum `apply.sh` dijalankan
+
+1. **Kebijakan skills builder** — pack memilih *salinan* `skills/` ke `/srv/sdb-workspace/skills`
+   (bukan akses ke `~/.hermes/skills`, yang akan membuka profil Owner). Konsekuensi: skills
+   builder tidak otomatis ikut terbarui saat repo Owner berubah; sinkronisasi ulang harus
+   dijalankan manual (`cp -a`). Alternatif: symlink baca-saja ke satu subdirektori skills —
+   ditolak default karena memperluas permukaan baca ke pohon profil Owner.
+2. **Cara kerja proses builder** — pack hanya menyediakan jalur eksekusi manual
+   (`sudo -u sdbbuild`). Bila `sdb_build_worker.py` akan dijalankan sebagai builder, dibutuhkan
+   keputusan: unit systemd `sdbbuild.service`, cron, atau supervisor Hermes. Belum dibuat;
+   `verify.sh` 16 hanya membuktikan proses anak mewarisi UID.

@@ -41,7 +41,24 @@ if [[ ! -d "$WS/repo/.git" ]]; then
   chown -R "$USER_B:$USER_B" "$WS/repo"
 fi
 chmod 0750 "$WS/repo"
-log "workspace siap: $WS/repo"
+log "workspace siap: $WS/repo (HEAD=$(git -C "$WS/repo" rev-parse --short HEAD))"
+
+# 2b. skills & tools yang boleh dipakai builder — SALINAN, bukan symlink ke ~/.hermes
+#     (symlink akan membuat builder membaca profil Owner; salinan menjaga batas).
+if [[ ! -d "$WS/skills" ]]; then
+  install -d -m 0750 -o "$USER_B" -g "$USER_B" "$WS/skills"
+  cp -a "$SRC_REPO/skills/." "$WS/skills/"
+  chown -R "$USER_B:$USER_B" "$WS/skills"
+fi
+
+# 2c. venv sendiri: builder tidak boleh memakai .venv Owner (tidak terbaca, dan
+#     memakainya berarti eksekusi kode dengan pustaka milik Owner).
+if [[ ! -x "$WS/venv/bin/python" ]]; then
+  python3 -m venv "$WS/venv"
+  chown -R "$USER_B:$USER_B" "$WS/venv"
+fi
+log "skills + venv builder siap: $WS/skills, $WS/venv"
+
 
 # 3. canary sintetis (BUKAN rahasia asli) untuk uji akses negatif
 install -d -m 0700 -o anashadi -g anashadi "$CANARY"

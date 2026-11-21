@@ -27,7 +27,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import os
-import shutil
 import subprocess
 import tempfile
 import zipfile
@@ -35,6 +34,16 @@ import zipfile
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EPOCH = 1_791_000_000  # 2026-10-06; dipakai agar zip tidak bergantung waktu build
 ZIP_TIME = (2026, 11, 6, 9, 0, 0)
+CC = "/usr/bin/gcc-13"
+LD = "/usr/bin/ld.bfd"
+CC_VERSION = "gcc-13 (Ubuntu 13.4.0-10ubuntu1) 13.4.0"
+LD_VERSION = "GNU ld (GNU Binutils for Ubuntu) 2.46"
+BUILD_ENV = {
+    "LANG": "C",
+    "LC_ALL": "C",
+    "PATH": "/usr/bin:/bin",
+    "SOURCE_DATE_EPOCH": str(EPOCH),
+}
 
 ANDROID_MANIFEST = """<?xml version="1.0" encoding="utf-8"?>
 <!-- Fixture: manifest TEKS, bukan AXML biner (tidak ada aapt di mesin ini). -->
@@ -123,15 +132,49 @@ DESKTOP_CHANNEL = """{
 """
 
 
+def _tolak_ancestor_symlink(path: str) -> None:
+    """Tolak symlink pada setiap komponen path yang sudah ada."""
+    absolut = os.path.abspath(path)
+    sekarang = os.path.sep
+    for bagian in absolut.split(os.path.sep)[1:]:
+        sekarang = os.path.join(sekarang, bagian)
+        if os.path.lexists(sekarang) and os.path.islink(sekarang):
+            raise RuntimeError(f"path output fixture melewati symlink: {sekarang}")
+
+
+def _tolak_symlink(root: str) -> None:
+    """Tolak symlink/hardlink yang dapat keluar dari direktori build."""
+    _tolak_ancestor_symlink(root)
+    if not os.path.exists(root):
+        return
+    if not os.path.isdir(root):
+        raise RuntimeError(f"output fixture bukan direktori: {root}")
+    for akar, direktori, berkas in os.walk(root, followlinks=False):
+        for nama in [*direktori, *berkas]:
+            path = os.path.join(akar, nama)
+            if os.path.islink(path):
+                raise RuntimeError(f"output fixture memuat symlink: {path}")
+            info = os.stat(path, follow_symlinks=False)
+            if os.path.isfile(path) and info.st_nlink != 1:
+                raise RuntimeError(f"output fixture memuat hardlink: {path}")
+
+
 def _tulis(path: str, isi: str, mode: int = 0o644) -> None:
+    _tolak_ancestor_symlink(os.path.dirname(path))
+    if os.path.lexists(path):
+        if os.path.islink(path):
+            raise RuntimeError(f"output fixture tidak boleh symlink: {path}")
+        if os.stat(path, follow_symlinks=False).st_nlink != 1:
+            raise RuntimeError(f"output fixture tidak boleh hardlink: {path}")
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as handle:
         handle.write(isi)
     os.chmod(path, mode)
 
 
-def _zip_tree(src_dir: str, out_path: str) -> None:
-    """Zip deterministik: urutan nama, timestamp tetap, tanpa metadata mesin."""
+def _zip_tree(src_dir: str, out_path: str, expected: set[str]) -> None:
+    """Zip hanya input yang dikenal; tolak symlink dan berkas sisa/tersembunyi."""
+    _tolak_symlink(src_dir)
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     if os.path.exists(out_path):
         os.remove(out_path)
@@ -140,6 +183,11 @@ def _zip_tree(src_dir: str, out_path: str) -> None:
         for b in berkas:
             penuh = os.path.join(akar, b)
             nama.append((os.path.relpath(penuh, src_dir).replace(os.sep, "/"), penuh))
+    aktual = {rel for rel, _ in nama}
+    if aktual != expected:
+        kurang = sorted(expected - aktual)
+        ekstra = sorted(aktual - expected)
+        raise RuntimeError(f"input APK tidak sesuai allowlist: kurang={kurang}, ekstra={ekstra}")
     with zipfile.ZipFile(out_path, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as zf:
         for rel, penuh in sorted(nama):
             info = zipfile.ZipInfo(rel, date_time=ZIP_TIME)
@@ -149,17 +197,56 @@ def _zip_tree(src_dir: str, out_path: str) -> None:
                 zf.writestr(info, fh.read())
 
 
+def _versi(path: str) -> str:
+    """Ambil baris versi pertama tanpa bergantung locale mesin."""
+    proc = subprocess.run(
+        [path, "--version"], check=True, capture_output=True, text=True, env=BUILD_ENV
+    )
+    return proc.stdout.splitlines()[0]
+
+
+def verify_toolchain() -> None:
+    """Tolak build bila compiler/linker bukan toolchain fixture yang dikunci."""
+    expected = ((CC, CC_VERSION), (LD, LD_VERSION))
+    for path, version in expected:
+        if not os.path.isfile(path) or not os.access(path, os.X_OK):
+            raise RuntimeError(f"toolchain fixture tidak tersedia: {path}")
+        actual = _versi(path)
+        if actual != version:
+            raise RuntimeError(
+                f"versi toolchain fixture bergeser: {path}: {actual!r} != {version!r}"
+            )
+
+
 def _gcc(src: str, out: str, args: list[str]) -> None:
-    env = {**os.environ, "SOURCE_DATE_EPOCH": str(EPOCH)}
-    cc = shutil.which("gcc") or "/usr/bin/gcc"  # jalur absolut: tak bergantung PATH pemanggil
-    # Path build ikut tercetak di debug info; samakan supaya hash stabil antar-direktori.
-    peta = [f"-ffile-prefix-map={os.path.dirname(src)}=/build",
-            f"-fdebug-prefix-map={os.path.dirname(src)}=/build"]
-    subprocess.run([cc, *peta, *args, src, "-o", out], check=True, env=env)
+    verify_toolchain()
+    src_dir = os.path.dirname(os.path.abspath(src))
+    # GCC merekam source path dan DW_AT_comp_dir. Compile dari source directory,
+    # lalu petakan keduanya ke path virtual tetap agar CWD/scratch path tidak bocor.
+    peta = [
+        f"-ffile-prefix-map={src_dir}=/build",
+        f"-fdebug-prefix-map={src_dir}=/build",
+    ]
+    subprocess.run(
+        [
+            CC,
+            "-B/usr/bin",
+            "-fuse-ld=bfd",
+            *peta,
+            *args,
+            os.path.basename(src),
+            "-o",
+            os.path.abspath(out),
+        ],
+        check=True,
+        cwd=src_dir,
+        env=BUILD_ENV,
+    )
     os.chmod(out, 0o700)
 
 
 def build_android(out_dir: str) -> str:
+    _tolak_symlink(out_dir)
     src = os.path.join(out_dir, "src")
     _tulis(os.path.join(src, "AndroidManifest.xml"), ANDROID_MANIFEST)
     _tulis(os.path.join(src, "assets", "config.json"), ANDROID_CONFIG)
@@ -172,11 +259,20 @@ def build_android(out_dir: str) -> str:
     _gcc(os.path.join(src, "jni", "libmini.c"), os.path.join(lib_dir, "libmini.so"),
          ["-O1", "-fPIC", "-shared", "-Wl,--build-id=none"])
     target = os.path.join(out_dir, "artifact", "android-mini.apk")
-    _zip_tree(src, target)
+    expected = {
+        "AndroidManifest.xml",
+        "assets/config.json",
+        "jni/libmini.c",
+        "lib/x86_64/libmini.so",
+        "res/layout/activity_main.xml",
+        "res/values/strings.xml",
+    }
+    _zip_tree(src, target, expected)
     return target
 
 
 def build_desktop(out_dir: str) -> str:
+    _tolak_symlink(out_dir)
     src = os.path.join(out_dir, "src")
     _tulis(os.path.join(src, "desktop-mini.c"), DESKTOP_C)
     _tulis(os.path.join(src, "installer.sh"), DESKTOP_INSTALLER, 0o755)

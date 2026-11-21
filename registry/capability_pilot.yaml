@@ -20,11 +20,27 @@ catalog:
   canonical_count: 26
   registered_here: pilot_only
 
+# Routing metadata is trusted configuration. Task payloads may select only a
+# capability ID and lane; they cannot replace the profile or executor below.
+routing:
+  executor: hermes
+  lanes:
+    frontend:
+      profile: cc-frontend
+      capability_ids: [FE-SP-01, FE-SP-02, FE-SP-03, FE-SP-04, FE-SP-05, FE-SP-06, FE-SP-07, FE-SP-08, FE-SP-09, FE-SP-10, FE-SP-11, FE-SP-12]
+    backend:
+      profile: cc-builder
+      capability_ids: [BE-SP-01, BE-SP-02, BE-SP-03, BE-SP-04, BE-SP-05, BE-SP-06, BE-SP-07, BE-SP-08, BE-SP-09, BE-SP-10, BE-SP-11, BE-SP-12, BE-SP-13, BE-SP-14]
+
 capabilities:
   - id: BE-SP-12
     name: "Backend QA / Test Engineer"
     division: D6/D7
     status: PILOT
+    lane: backend
+    profile: cc-builder
+    executor: hermes
+    implementation_status: PILOT_VERIFIED_SUBSCOPE
     scope: "QA backend clean-room: unit + integrasi, gerbang rahasia, bukti eksekusi terikat revisi"
     test_command_hint: ".venv/bin/python -m pytest tests/test_capability_evidence.py -q"
     evidence_path: "runs/capability/BE-SP-12/<revision>.json"
@@ -36,9 +52,13 @@ capabilities:
       Implementasi pertama C1-01. Level CI_ATTESTED / INDEPENDENT_REVIEW tidak
       dapat diklaim oleh penulis bukti; hanya verifier/CI yang berwenang.
   - id: BE-SP-03
-    name: "API Contract Engineering"
+    name: "API Architect / Engineer"
     division: D3/D5
     status: PILOT
+    lane: backend
+    profile: cc-builder
+    executor: hermes
+    implementation_status: PILOT_VERIFIED_SUBSCOPE
     scope: "Kontrak mesin control plane v1: POST /v1/jobs + GET /v1/jobs/:id, negative tests, mutation testing"
     test_command_hint: ".venv/bin/python -m pytest tests/test_be_sp03_contract.py -q"
     evidence_path: "runs/capability/BE-SP-03/<revision>.json"

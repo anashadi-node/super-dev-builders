@@ -1,0 +1,14 @@
+schema: sdb.capability.execution-approvals/1
+records:
+  # Session-approved deterministic nonproduction C1-03 smoke record.
+  # Canonical task fields are documented in docs/SDB_C1_CAPABILITY_ROUTING.md.
+  - approval_ref: C1-03-D6D8-NONPROD-20261121
+    task_digest: 33b8bce0bda2e20c4522c2dfc7402ff38d3faa668fcb5c3bf39a3266f6f359c6
+    capability_id: BE-SP-03
+    lane: backend
+    allowed_write_roots: []
+    nonproduction: true
+    issuer: SDB_OPERATOR_SESSION_APPROVAL
+    issued_at: "2026-11-21T00:00:00Z"
+    expires_at: "2026-12-21T00:00:00Z"
+    nonce: c1-03-d6d8-20261121-65d853a238c54005

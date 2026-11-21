@@ -6,7 +6,7 @@ Tanggal: 2026-11-21 · Mode: BROWNFIELD_RECOVERY → CHANGE_ONLY · Cabang: `fea
 
 | Acceptance | Hasil | Bukti ringkas |
 |---|---|---|
-| `GITLEAKS_HISTORY` | **PASS** | Gitleaks 8.28.0 memindai 197 commit melalui `--log-opts="--all"`; 0 temuan |
+| `GITLEAKS_HISTORY` | **PASS** | pre-report: Gitleaks 8.28.0 memindai 197 commit melalui `--log-opts="--all"`; 0 temuan; final delivery scan dicatat di respons penutupan |
 | `CI_POLICY_TESTS` | **PASS** | `make check` exit 0; seluruh pytest mencapai 100% |
 | `FIXTURE_REPRODUCIBILITY` | **PASS** | Android/Desktop dibangun 3× di scratch berbeda dengan hash identik; tes fixture 10/10 |
 | `OFFLINE_SANDBOX` | **PASS_PREFLIGHT** | startup isolated production-shaped exit 0; negative missing-environment exit 1 sesuai harapan |
@@ -126,7 +126,7 @@ Verdict dibatasi pada `PASS_PREFLIGHT`, bukan live integration.
 | `SDB_REQUIRE_FIXTURE_TOOLCHAIN=1 make fixtures-verify` | 0 | dua fixture `SAMA` |
 | `make check` dengan policy/evidence/toolchain env | 0 | seluruh sub-gate lulus; hygiene 0 FAIL/3 WARN |
 | `make did-suite` | 0 | 5/5 target PASS; halusinasi 0 |
-| exact Gitleaks 8.28.0 + baseline + `--log-opts="--all"` | 0 | 197 commit; 0 finding |
+| exact Gitleaks 8.28.0 + baseline + `--log-opts="--all"` | 0 | pre-report: 197 commit; 0 finding; final delivery scan ada di respons penutupan |
 | `git diff --check` | 0 | bersih |
 | D6 correction re-review | 0 | PASS, 0 blocker |
 | D8 final correction re-review | 0 | PASS, 0 blocker |

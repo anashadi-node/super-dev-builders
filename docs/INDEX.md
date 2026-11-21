@@ -138,4 +138,4 @@ sumbernya `.md`). Jangan menautkan arsip sebagai rujukan utama.
 | `BE_SP12_EVIDENCE_CONTRACT.md` | implementation pack C1/BE-SP-12: kontrak evidence 9 field, aturan tolak, allowlist berkas |
 | `BE_SP03_API_CONTRACT.md` | kontrak API control plane v1 (C1-02 BE-SP-03): 2 keluarga endpoint, error envelope, job_object, aturan kompatibilitas |
 | `SDB_C1_CAPABILITY_ROUTING.md` | C1-03 router capability: lane/profile, approval store, sandbox bwrap allowlist, kontrak hasil, batas yang diterima |
-| `SDB_C1_04_GATE_RECOVERY_RESULT.md` | C1-04 pemulihan gerbang: akar masalah gitleaks (riwayat), diagnosis fixture, smoke sandbox offline, keputusan Owner |
+| `../reports/SDB_C1_04_GATE_RECOVERY_RESULT.md` | C1-04 pemulihan gerbang: akar masalah gitleaks (riwayat), diagnosis fixture, smoke sandbox offline, keputusan Owner |

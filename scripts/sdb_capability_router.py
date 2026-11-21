@@ -36,6 +36,7 @@ from sdb_capability_trust import (
     capture_revision_binding,
     consume_approval,
     fail,
+    git,
     load_routing_registry,
     load_trusted_approval,
     open_directory_nofollow,
@@ -48,7 +49,6 @@ from sdb_capability_trust import load_registry_mapping as load_registry_mapping
 
 TASK_SCHEMA = "sdb.capability.task/1"
 RESULT_SCHEMA = "sdb.capability.result/1"
-APPROVAL_SCHEMA = "sdb.capability.execution-approvals/1"
 EVIDENCE_SCHEMA = "sdb.capability.evidence/1"
 HERMES_EXECUTABLE = Path("/home/anashadi/.local/bin/hermes")
 HERMES_SHA256 = "ce029ccc2679fb234364effdc67971c01ea4b8920866793282b53b61c9a57e2f"
@@ -373,6 +373,37 @@ def _validate_result(stdout: bytes, task: TaskPack, challenge: str) -> tuple[boo
         return False, None, None
 
 
+# SEC-02: paths whose *content* the verdict depends on. Untracked additions here can
+# change what the executor runs (e.g. a new tests/conftest.py), so they count as drift.
+CODE_ROOTS = frozenset({"scripts", "tests", "registry", "skills"})
+
+
+def _require_approved_revision(repo: Path, approval: ApprovalRecord, head: str) -> None:
+    """Refuse to execute anything but the approved revision — label *and* content.
+
+    ``git rev-parse HEAD`` is only a label: a dirty worktree, or a rewritten
+    ``.git/HEAD``, keeps the label while changing the code that produces the verdict.
+    Tracked modifications anywhere and untracked files under CODE_ROOTS are rejected.
+    """
+    if head != approval.source_revision:
+        raise fail("source_revision_changed",
+                   f"approved {approval.source_revision}, working copy {head}")
+    status = git(repo, "status", "--porcelain", "--untracked-files=all").stdout
+    offenders: list[str] = []
+    for line in status.splitlines():
+        if len(line) < 4:
+            continue
+        code, path = line[:2], line[3:].split(" -> ")[-1].strip().strip('"')
+        if code == "??":
+            if path.split("/")[0] in CODE_ROOTS:
+                offenders.append(f"untracked {path}")
+        elif code.strip():
+            offenders.append(f"modified {path}")
+    if offenders:
+        raise fail("source_revision_dirty",
+                   f"working copy differs from {head}: {', '.join(offenders[:3])}")
+
+
 def execute(
     task: TaskPack, approval: ApprovalRecord, registry: RoutingRegistry,
     repo: Path, adapter: ControlledHermesAdapter, *, state_dir: Path | None = None,
@@ -386,6 +417,9 @@ def execute(
     for root in approval.allowed_write_roots:
         if PurePosixPath(root).parts[0] in FORBIDDEN_ROOT_HEADS:
             raise fail("approval_roots_invalid", f"{root} overlaps protected paths")
+    # SEC-02: the approval authorizes one exact revision; refuse to run any other.
+    # This closes the missing check, not concurrent modification (see below).
+    _require_approved_revision(repo, approval, git(repo, "rev-parse", "HEAD").stdout.strip())
     profile = _profile(registry, task)
     _verify_bwrap()
     active_profile_dir = HERMES_PROFILE_ROOT / profile
@@ -436,6 +470,8 @@ def execute(
         # D8: a report left over from an earlier run must never become this run's evidence.
         _clear_stale_junit(repo, approval)
         before = capture_revision_binding(repo)
+        # Re-check immediately before launch: narrows the window opened above.
+        _require_approved_revision(repo, approval, before.head)
         started = _timestamp()
         exit_code, stdout, stderr, process_failure = _run_streaming(
             sandbox, prompt, pass_fds=[repo_fd, executor_fd, *(fd for _, fd in roots)],

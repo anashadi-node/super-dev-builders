@@ -1090,3 +1090,154 @@ def test_t10_no_junit_report_means_no_evidence(tmp_path: Path, pack: router.Task
     (repo / router.JUNIT_RELATIVE).unlink()
     with pytest.raises(router.RoutingError, match="evidence_no_tests"):
         router.record_execution_evidence(result, repo)
+
+
+def _shim_openssl(directory: Path, *, marker: Path | None = None) -> Path:
+    """A PATH shim that claims success for every signature (D8 attack #3)."""
+    directory.mkdir(parents=True, exist_ok=True)
+    shim = directory / "openssl"
+    body = "#!/bin/sh\n" + (f"touch {marker}\n" if marker else "") + "exit 0\n"
+    shim.write_text(body, encoding="utf-8")
+    shim.chmod(0o755)
+    return shim
+
+
+def test_sec01_path_shim_cannot_forge_an_approval_signature(
+    tmp_path: Path, pack: router.TaskPack, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A fake `openssl` earlier in PATH must never be consulted, let alone accept a forgery."""
+    repo = _trusted_repo(tmp_path, pack)
+    marker = tmp_path / "shim-ran"
+    _shim_openssl(tmp_path / "shim", marker=marker)
+    monkeypatch.setenv("PATH", f"{tmp_path / 'shim'}:{os.environ['PATH']}")
+    record = _approval_record(
+        pack,
+        source_revision=_git(repo, "rev-parse", "HEAD"),
+        execution_instance=trust.instance_id(trust.approval_state_dir()),
+    )
+    record["signature"] = base64.b64encode(b"\x00" * 64).decode("ascii")
+    with pytest.raises(router.RoutingError, match="approval_signature_invalid"):
+        trust.verify_approval_signature(record, state_dir=trust.approval_state_dir())
+    assert not marker.exists(), "the PATH shim was executed"
+
+
+def test_sec01_env_cannot_select_the_verifier(
+    tmp_path: Path, pack: router.TaskPack, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """D8 HIGH: pointing SDB_OPENSSL_BIN at another root-owned binary must not help."""
+    repo = _trusted_repo(tmp_path, pack)
+    monkeypatch.setenv("SDB_OPENSSL_BIN", "/bin/true")
+    record = _approval_record(
+        pack,
+        source_revision=_git(repo, "rev-parse", "HEAD"),
+        execution_instance=trust.instance_id(trust.approval_state_dir()),
+    )
+    record["signature"] = base64.b64encode(b"\x00" * 64).decode("ascii")
+    with pytest.raises(router.RoutingError, match="approval_signature_invalid"):
+        trust.verify_approval_signature(record, state_dir=trust.approval_state_dir())
+
+
+def test_sec01_pin_cannot_endorse_a_substituted_binary(
+    tmp_path: Path, pack: router.TaskPack, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A digest taken from the same env as the override cannot legitimise another binary."""
+    repo = _trusted_repo(tmp_path, pack)
+    substitute = Path("/bin/true")
+    monkeypatch.setenv("SDB_OPENSSL_BIN", str(substitute))
+    monkeypatch.setenv("SDB_OPENSSL_SHA256", hashlib.sha256(substitute.read_bytes()).hexdigest())
+    record = _approval_record(
+        pack,
+        source_revision=_git(repo, "rev-parse", "HEAD"),
+        execution_instance=trust.instance_id(trust.approval_state_dir()),
+    )
+    record["signature"] = base64.b64encode(b"\x00" * 64).decode("ascii")
+    with pytest.raises(router.RoutingError, match="trust_verifier_mismatch"):
+        trust.verify_approval_signature(record, state_dir=trust.approval_state_dir())
+
+
+def test_sec01_verifier_pin_mismatch_fails_closed(
+    tmp_path: Path, pack: router.TaskPack, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _trusted_repo(tmp_path, pack)
+    monkeypatch.setenv("SDB_OPENSSL_SHA256", "0" * 64)
+    with pytest.raises(router.RoutingError, match="trust_verifier_mismatch"):
+        trust.open_trusted_verifier()
+
+
+def test_sec01_system_verifier_is_accepted() -> None:
+    """The default candidate set resolves to a real root-owned binary on this host."""
+    fd, path, digest = trust.open_trusted_verifier()
+    try:
+        info = os.fstat(fd)
+        assert info.st_uid == 0 and not info.st_mode & 0o022
+        assert len(digest) == 64 and path.is_absolute()
+    finally:
+        os.close(fd)
+
+
+def test_sec02_execute_refuses_a_revision_that_changed_after_approval(
+    tmp_path: Path, pack: router.TaskPack, registry: router.RoutingRegistry
+) -> None:
+    """D8 attack #13: approving HEAD A must not authorize execution of HEAD B."""
+    repo = _trusted_repo(tmp_path, pack)
+    approval = _approval(repo, pack)
+    _git(repo, "commit", "-q", "--allow-empty", "-m", "unapproved drift")
+    assert _git(repo, "rev-parse", "HEAD") != approval.source_revision
+    with pytest.raises(router.RoutingError, match="source_revision_changed"):
+        router.execute(pack, approval, registry, repo, _adapter(tmp_path))
+
+
+def test_sec02_revision_mismatch_does_not_burn_the_approval(
+    tmp_path: Path, pack: router.TaskPack, registry: router.RoutingRegistry
+) -> None:
+    """The pre-flight refusal happens before the single-use marker is written."""
+    repo = _trusted_repo(tmp_path, pack)
+    approval = _approval(repo, pack)
+    _git(repo, "commit", "-q", "--allow-empty", "-m", "unapproved drift")
+    with pytest.raises(router.RoutingError, match="source_revision_changed"):
+        router.execute(pack, approval, registry, repo, _adapter(tmp_path))
+    assert not trust.replay_marker_path(approval, trust.approval_state_dir()).exists()
+
+
+def test_sec02_dirty_worktree_is_refused(
+    tmp_path: Path, pack: router.TaskPack, registry: router.RoutingRegistry
+) -> None:
+    """D8 HIGH: HEAD alone is a label — an uncommitted edit must not execute."""
+    repo = _trusted_repo(tmp_path, pack)
+    approval = _approval(repo, pack)
+    target = repo / "scripts" / "sdb_capability_router.py"
+    target.write_text(target.read_text(encoding="utf-8") + "\n# unapproved edit\n",
+                      encoding="utf-8")
+    with pytest.raises(router.RoutingError, match="source_revision_dirty"):
+        router.execute(pack, approval, registry, repo, _adapter(tmp_path))
+    assert not trust.replay_marker_path(approval, trust.approval_state_dir()).exists()
+
+
+def test_sec02_untracked_executor_input_is_refused(
+    tmp_path: Path, pack: router.TaskPack, registry: router.RoutingRegistry
+) -> None:
+    """An untracked tests/conftest.py can rewrite the verdict without touching HEAD."""
+    repo = _trusted_repo(tmp_path, pack)
+    approval = _approval(repo, pack)
+    (repo / "tests").mkdir()
+    (repo / "tests" / "conftest.py").write_text("import pytest\n", encoding="utf-8")
+    with pytest.raises(router.RoutingError, match="source_revision_dirty"):
+        router.execute(pack, approval, registry, repo, _adapter(tmp_path))
+
+
+def test_sec02_late_revision_change_is_refused_before_launch(
+    tmp_path: Path, pack: router.TaskPack, registry: router.RoutingRegistry,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The second check fires even when the pre-flight check saw the approved revision."""
+    repo = _trusted_repo(tmp_path, pack)
+    approval = _approval(repo, pack)
+    real = router.capture_revision_binding
+
+    def drifting(path: Path):
+        binding = real(path)
+        return trust.RevisionBinding("f" * 40, binding.files)
+
+    monkeypatch.setattr(router, "capture_revision_binding", drifting)
+    with pytest.raises(router.RoutingError, match="source_revision_changed"):
+        router.execute(pack, approval, registry, repo, _adapter(tmp_path))

@@ -8,7 +8,6 @@ import hashlib
 import json
 import os
 import re
-import shutil
 import stat
 import subprocess
 import tempfile
@@ -506,8 +505,63 @@ def approval_canonical(record: Mapping[str, Any]) -> bytes:
     })
 
 
+VERIFIER_SHA_ENV = "SDB_OPENSSL_SHA256"
+# Fixed absolute candidates only: PATH is never searched and no environment variable can
+# select the verifier. An env-selected path would let a caller point at any root-owned
+# executable (e.g. /bin/true) that "verifies" every signature (D8 HIGH, 2026-11-22).
+DEFAULT_VERIFIERS = (Path("/usr/bin/openssl"), Path("/bin/openssl"))
+
+
+def open_trusted_verifier() -> tuple[int, Path, str]:
+    """Open the Ed25519 verifier from a root-owned, non-writable absolute path (SEC-01).
+
+    Returns ``(fd, path, sha256)`` with the descriptor rewound to offset 0. Callers exec
+    ``/proc/self/fd/<fd>`` so the *verified inode* is what runs; a swap of the path name
+    after this call cannot substitute another binary. The trust anchor is filesystem
+    ownership (uid 0, not group/world writable), never configuration: ``SDB_OPENSSL_SHA256``
+    is an *assertion* on the already-opened inode, not the anchor itself.
+
+    Remaining limitations: a root-level actor who rewrites the inode in place is outside
+    this boundary, and an HSM or root verifier service is still required for
+    PRODUCTION_TRUST.
+    """
+    problems: list[str] = []
+    for candidate in DEFAULT_VERIFIERS:
+        try:
+            # O_NONBLOCK: a FIFO planted at the fixed path must fail fast, not hang.
+            fd = os.open(candidate,
+                         os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC | os.O_NONBLOCK)
+        except OSError as exc:
+            problems.append(f"{candidate}: {exc.strerror}")
+            continue
+        try:
+            info = os.fstat(fd)
+            if not stat.S_ISREG(info.st_mode):
+                raise fail("trust_verifier_untrusted", f"{candidate} is not a regular file")
+            if info.st_uid != 0:
+                raise fail("trust_verifier_untrusted", f"{candidate} is not owned by root")
+            if info.st_mode & 0o022:
+                raise fail("trust_verifier_untrusted", f"{candidate} is group/world writable")
+            if not info.st_mode & 0o111:
+                raise fail("trust_verifier_untrusted", f"{candidate} is not executable")
+            digest = hashlib.sha256()
+            while chunk := os.read(fd, 1 << 20):
+                digest.update(chunk)
+            os.lseek(fd, 0, os.SEEK_SET)
+            actual = digest.hexdigest()
+            expected = os.environ.get(VERIFIER_SHA_ENV, "").strip().lower()
+            if expected and actual != expected:
+                raise fail("trust_verifier_mismatch",
+                           f"{candidate} does not match {VERIFIER_SHA_ENV}")
+            return fd, candidate, actual
+        except BaseException:
+            os.close(fd)
+            raise
+    raise fail("trust_verifier_unavailable", "; ".join(problems) or "no trusted openssl")
+
+
 def verify_approval_signature(record: Mapping[str, Any], *, state_dir: Path) -> None:
-    """Ed25519 verification through the openssl CLI with a key that never enters the repo."""
+    """Ed25519 verification through a pinned verifier binary and a key outside the repo."""
     signature = record.get("signature")
     if not isinstance(signature, str) or not signature:
         raise fail("approval_unsigned", "approval has no signature")
@@ -517,21 +571,31 @@ def verify_approval_signature(record: Mapping[str, Any], *, state_dir: Path) -> 
         raise fail("approval_signature_invalid", "signature is not base64") from exc
     if len(blob) != 64:
         raise fail("approval_signature_invalid", "signature must be 64 bytes")
-    openssl = shutil.which("openssl")
-    if not openssl:
-        raise fail("trust_verifier_unavailable", "openssl is not installed")
     pubkey = approval_public_key(state_dir)
     message = approval_canonical(record)
-    with tempfile.TemporaryDirectory(dir=_require_state_dir(state_dir)) as tmp:
-        msg_path = Path(tmp) / "message.bin"
-        sig_path = Path(tmp) / "signature.bin"
-        msg_path.write_bytes(message)
-        sig_path.write_bytes(blob)
-        proc = subprocess.run(
-            [openssl, "pkeyutl", "-verify", "-pubin", "-inkey", str(pubkey),
-             "-rawin", "-in", str(msg_path), "-sigfile", str(sig_path)],
-            capture_output=True, text=True,
-        )
+    verifier_fd, verifier_path, _ = open_trusted_verifier()
+    try:
+        # Exec the already-verified descriptor when /proc is available; the path form is a
+        # fallback and re-introduces a narrow check-to-execute TOCTOU window (documented).
+        executable = (f"/proc/self/fd/{verifier_fd}" if os.path.isdir("/proc/self/fd")
+                      else str(verifier_path))
+        with tempfile.TemporaryDirectory(dir=_require_state_dir(state_dir)) as tmp:
+            msg_path = Path(tmp) / "message.bin"
+            sig_path = Path(tmp) / "signature.bin"
+            msg_path.write_bytes(message)
+            sig_path.write_bytes(blob)
+            env = {"PATH": "/usr/bin:/bin", "LC_ALL": "C", "HOME": tmp, "TMPDIR": tmp}
+            try:
+                proc = subprocess.run(
+                    [executable, "pkeyutl", "-verify", "-pubin", "-inkey", str(pubkey),
+                     "-rawin", "-in", str(msg_path), "-sigfile", str(sig_path)],
+                    capture_output=True, text=True, env=env, timeout=30,
+                    pass_fds=(verifier_fd,),
+                )
+            except subprocess.TimeoutExpired as exc:
+                raise fail("trust_verifier_unavailable", "verifier timed out") from exc
+    finally:
+        os.close(verifier_fd)
     if proc.returncode != 0:
         raise fail("approval_signature_invalid", "signature does not verify against the trusted key")
 

@@ -186,8 +186,11 @@ tepercaya — karena kapabilitas itu **tidak** diklaim siap; yang diklaim hanya 
 4. **Kunci privat approval berada di mesin yang sama** (state dir 0700) untuk scope test. Produksi butuh
    HSM/KMS atau approval service; kunci privat tidak boleh dapat dibaca builder.
 5. **Issuer adalah string allowlist** yang diikat ke fingerprint kunci, bukan identitas terautentikasi perangkat.
-6. **TOCTOU revisi.** HEAD diperiksa sebelum eksekusi; repo yang berubah di antara pemeriksaan dan
-   eksekusi tidak terdeteksi (jendela sempit, belum ada lock/worktree terpisah).
+6. **TOCTOU revisi.** Revisi diperiksa dua kali (sebelum approval dikonsumsi dan tepat sebelum launch)
+   dan tidak lagi hanya label: `git status` wajib bersih untuk berkas terlacak, dan berkas untracked di
+   `scripts/`, `tests/`, `registry/`, `skills/` ditolak (`source_revision_dirty`). Sisa jendela: commit
+   yang mendarat di antara pemeriksaan terakhir dan start child, serta berkas untracked di luar code roots.
+   Belum ada lock/worktree terpisah.
 7. **Schema BE-SP-12** belum dapat merepresentasikan eksekusi tanpa tes secara jujur (lihat §3).
 
 ---
@@ -208,3 +211,28 @@ tepercaya — karena kapabilitas itu **tidak** diklaim siap; yang diklaim hanya 
 
 Commit: satu commit lokal (test-only), **bukan** `INTEGRATED_VERIFIED`, **bukan** production-ready.
 Tidak ada push, merge, atau deploy.
+
+---
+
+## 9. DELTA — C1-06 FINAL SECURITY PATCH (2026-11-22)
+
+Baseline `cfda945`; satu commit lokal tambahan, test-only.
+
+| Temuan | Perbaikan | Bukti |
+|---|---|---|
+| SEC-01 verifier dari `PATH` (`shutil.which`) | `open_trusted_verifier()`: kandidat absolut tetap (`/usr/bin/openssl`, `/bin/openssl`), `O_NOFOLLOW\|O_NONBLOCK`, wajib `S_ISREG`, `uid==0`, bukan group/world-writable, executable; digest SHA-256 dihitung dari fd; eksekusi lewat `/proc/self/fd/<fd>` + `pass_fds`; env child minimal (`PATH`, `LC_ALL`, `HOME`, `TMPDIR`); fail closed. Tidak ada variabel environment yang dapat memilih binary. | `tests/test_capability_routing.py` — `test_sec01_*` (PATH shim tidak pernah dieksekusi, `/bin/true` tidak dapat dipakai, pin salah → `trust_verifier_mismatch`) |
+| SEC-02 revisi tidak diperiksa di jalur eksekusi | `_require_approved_revision()` dipanggil sebelum `consume_approval` dan lagi tepat sebelum launch: `HEAD` harus sama dengan `approval.source_revision`, worktree harus bersih (tracked) dan tanpa untracked di code roots. Kode error: `source_revision_changed`, `source_revision_dirty`. | `test_sec02_*` (drift commit, edit tanpa commit, `tests/conftest.py` untracked, drift setelah pre-flight) |
+| CODE-03 konstanta mati `APPROVAL_SCHEMA="…/1"` | Dihapus dari router; kontrak skema tetap di `sdb_capability_trust.APPROVAL_SCHEMA="…/2"`; tidak ada rename versi. | `grep -rn APPROVAL_SCHEMA` → hanya trust:22; record skema v1 ditolak `approval_fields_invalid` |
+
+Reproduksi sebelum/sesudah (tes yang sama dijalankan pada arsip `cfda945` dan pada working tree):
+7/7 tes SEC-01/SEC-02 **gagal** di baseline, **lulus** setelah patch. Di baseline, signature 64 byte nol
+**diterima** saat shim `openssl` ada di PATH, dan approval revisi A menjalankan revisi B.
+
+Ronde D8 kedua menemukan dua bypass pada patch awal dan keduanya sudah ditutup sebelum commit:
+(1) `SDB_OPENSSL_BIN` dapat menunjuk binary root-owned lain (mis. `/bin/true`) → override dihapus total;
+(2) revisi hanya diikat sebagai label, sehingga worktree kotor atau `.git/HEAD` yang ditulis ulang lolos →
+gate konten (`source_revision_dirty`) ditambahkan.
+
+Blocker produksi yang tersisa: anchor di luar UID owner (HSM/KMS/approval service), ledger replay
+append-only lintas host, attestation independen, isolasi snapshot/worktree, dan filter egress.
+`PRODUCTION_TRUST` tetap **BLOCKED**.

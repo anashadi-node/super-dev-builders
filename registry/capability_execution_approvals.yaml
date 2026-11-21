@@ -1,3 +1,7 @@
+# DEPRECATED (C1-06 security closeout, 2026-11-22): NOT READ BY ANY CODE PATH.
+# Approvals are now loaded only from the machine-local trust state directory and must
+# carry an Ed25519 signature verified against a pinned key. This file is retained solely
+# as the audit trail of the superseded committed-store model. Never treat it as authority.
 schema: sdb.capability.execution-approvals/1
 records:
   # Session-approved deterministic nonproduction C1-03 smoke record.

@@ -15,19 +15,23 @@ import stat
 import subprocess
 import sys
 import time
+import xml.etree.ElementTree as ET
 from contextlib import ExitStack
 from dataclasses import dataclass, field
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Mapping, Sequence
 
 import sdb_capability_evidence
 import sdb_common
 from sdb_capability_trust import (
+    FORBIDDEN_ROOT_HEADS,
+    TRUST_MODE,
     ApprovalRecord,
     RevisionBinding,
     RoutingError,
     RoutingRegistry,
     TaskPack,
+    approval_state_dir,
     canonical_bytes,
     capture_revision_binding,
     consume_approval,
@@ -37,6 +41,7 @@ from sdb_capability_trust import (
     open_directory_nofollow,
     secure_write,
     sha256,
+    sha256_file,
     strict_keys,
 )
 from sdb_capability_trust import load_registry_mapping as load_registry_mapping
@@ -61,6 +66,11 @@ SANDBOX_ETC_ENTRIES = (
     "passwd", "ssl",
 )
 RUNTIME_SECRET_FILES = (".env", ".envrc")
+# Test-only executors must not be able to read profile credentials (D8 F1): shadow them.
+PROFILE_SECRET_FILES = (".env", ".envrc", "auth.json", "auth.lock", ".netrc", ".git-credentials")
+# Test-only executors have no reason to read these either (D8 #5): blank them out.
+PROFILE_PRIVATE_FILES = ("config.yaml",)
+PROFILE_PRIVATE_DIRS = ("sessions", "logs", "memories", "cache", "state")
 MAX_PROMPT_BYTES = 48 * 1024  # below the 64 KiB pipe buffer: stdin write never blocks
 BWRAP_EXECUTABLE = Path("/usr/bin/bwrap")
 HERMES_PROFILE_ROOT = Path("/home/anashadi/.hermes/profiles")
@@ -130,6 +140,9 @@ class ExecutionResult:
     finished_at: str
     revision_binding_before: RevisionBinding
     revision_binding_after: RevisionBinding
+    # Recorded at construction from the adapter's declared mode (never re-derived from argv).
+    executor_kind: str = "test_only"
+    network_policy: str = "isolated"
 
 
 def _verify_bwrap() -> None:
@@ -179,11 +192,19 @@ def _verify_executor(path: Path, *, production: bool, expected_sha256: str = HER
 def _sandbox_base(*, production: bool, profile_dir: Path) -> list[str]:
     """Allowlist root: start from an empty tmpfs and mount only what the child needs.
 
-    No `/run`, `/var/run`, `/home`, `/root`, other profiles or `~/.ssh`: host unix sockets
-    (docker, dbus, systemd-user) and credentials are simply not present in the mount namespace.
+    No `/run`, `/var/run`, `/root`, other profiles or `~/.ssh`: host unix sockets
+    (docker, dbus, systemd-user) are not present in the mount namespace.
+
+    Credentials are not made absent by construction: the profile overlay still exposes
+    whatever the profile holds, so named credential files are shadowed with `/dev/null`
+    (production and test-only) and the remaining private files/dirs are blanked for
+    test-only runs. This is a denylist, not a proof of absence (D8 F1).
     """
     argv = [
-        str(BWRAP_EXECUTABLE), "--unshare-all", "--share-net", "--die-with-parent", "--new-session",
+        str(BWRAP_EXECUTABLE), "--unshare-all",
+        # Production needs Hermes LLM transport; a test-only executor must be offline (D8 F2).
+        "--share-net" if production else "--unshare-net",
+        "--die-with-parent", "--new-session",
     ]
     for name in SANDBOX_SYSTEM_DIRS:
         host = Path(name)
@@ -213,6 +234,14 @@ def _sandbox_base(*, production: bool, profile_dir: Path) -> list[str]:
         "--setenv", "LC_ALL", "C.UTF-8",
         "--overlay-src", str(profile_dir), "--tmp-overlay", str(profile_dir),
     ]
+    if not production:
+        # Overlay still exposes profile contents; shadow credential files after the overlay.
+        for secret_name in (*PROFILE_SECRET_FILES, *PROFILE_PRIVATE_FILES):
+            if (profile_dir / secret_name).is_file():
+                argv += ["--ro-bind", "/dev/null", str(profile_dir / secret_name)]
+        for dir_name in PROFILE_PRIVATE_DIRS:
+            if (profile_dir / dir_name).is_dir():
+                argv += ["--tmpfs", str(profile_dir / dir_name)]
     return argv
 
 
@@ -346,13 +375,17 @@ def _validate_result(stdout: bytes, task: TaskPack, challenge: str) -> tuple[boo
 
 def execute(
     task: TaskPack, approval: ApprovalRecord, registry: RoutingRegistry,
-    repo: Path, adapter: ControlledHermesAdapter,
+    repo: Path, adapter: ControlledHermesAdapter, *, state_dir: Path | None = None,
 ) -> ExecutionResult:
     """Consume authorization, execute inside bwrap, then verify result and revision."""
     repo = repo.resolve(strict=True)
     if (approval.task_digest != task.digest() or approval.capability_id != task.capability_id
             or approval.lane != task.lane or not approval.nonproduction):
         raise fail("approval_task_mismatch", "approval no longer matches the task")
+    # Defence in depth: re-check write roots here, not only in load_trusted_approval.
+    for root in approval.allowed_write_roots:
+        if PurePosixPath(root).parts[0] in FORBIDDEN_ROOT_HEADS:
+            raise fail("approval_roots_invalid", f"{root} overlaps protected paths")
     profile = _profile(registry, task)
     _verify_bwrap()
     active_profile_dir = HERMES_PROFILE_ROOT / profile
@@ -386,6 +419,9 @@ def execute(
         for _, fd in roots:
             stack.callback(os.close, fd)
         sandbox = _sandbox_base(production=not adapter._test_only, profile_dir=active_profile_dir)
+        executor_kind = "production" if not adapter._test_only else "test_only"
+        network_policy = "hermes_llm_transport" if not adapter._test_only else "isolated"
+        _check_network_policy(sandbox, network_policy)
         sandbox += [
             "--ro-bind-fd", str(repo_fd), str(repo),
             "--tmpfs", str(repo / ".git"), "--remount-ro", str(repo / ".git"),
@@ -396,7 +432,9 @@ def execute(
             "--chdir", str(repo), "--", f"/proc/self/fd/{executor_fd}", *hermes_args,
         ]
         # Validation is complete: only now burn the single-use approval (L-1).
-        consume_approval(approval, repo / ".git" / "sdb-capability-approval-replay")
+        consume_approval(approval, approval_state_dir(state_dir))
+        # D8: a report left over from an earlier run must never become this run's evidence.
+        _clear_stale_junit(repo, approval)
         before = capture_revision_binding(repo)
         started = _timestamp()
         exit_code, stdout, stderr, process_failure = _run_streaming(
@@ -420,7 +458,15 @@ def execute(
         task, approval, status, failure_code, exit_code, verified and failure_code is None,
         result_schema, hermes_args, tuple(sandbox), sha256(stdout), sha256(stderr),
         _excerpt(stdout), _excerpt(stderr), len(stdout) + len(stderr), started, finished, before, after,
+        executor_kind, network_policy,
     )
+
+
+def _check_network_policy(sandbox: list[str], expected: str) -> None:
+    """Fail closed if the sandbox argv disagrees with the adapter's declared mode (D8 #7)."""
+    isolated = "--unshare-net" in sandbox
+    if isolated != (expected == "isolated") or ("--share-net" in sandbox) == isolated:
+        raise fail("routing_inconsistent", f"sandbox network flags do not match {expected}")
 
 
 def _evidence_exit_code(code: int) -> int:
@@ -432,10 +478,32 @@ def _json_bytes(value: Mapping[str, Any]) -> bytes:
     return (json.dumps(value, sort_keys=True, ensure_ascii=False, indent=2) + "\n").encode()
 
 
+def _routing_metadata(result: ExecutionResult) -> dict[str, Any]:
+    """Non-secret routing metadata: enough to diagnose which route ran, nothing reusable."""
+    args = list(result.argv)
+    profile = args[args.index("-p") + 1] if "-p" in args else None
+    return {
+        "profile": profile,
+        "executor_kind": result.executor_kind,
+        "network_policy": result.network_policy,
+        # Digest of the single-use nonce: auditable, not replayable.
+        "approval_nonce_sha256": sha256(result.approval.nonce.encode()),
+    }
+
+
 def _artifact_payload(result: ExecutionResult) -> dict[str, Any]:
     return {
         "schema": "sdb.capability.invocation/1", "capability_id": result.task.capability_id,
         "task_digest": result.task.digest(), "approval_ref": result.approval.approval_ref,
+        "routing": _routing_metadata(result),
+        "trust": {
+            "mode": TRUST_MODE,
+            "attestation": "self_reported_no_independent_anchor",
+            "replay_state": "machine_local",
+            "approval_source_revision": result.approval.source_revision,
+            "execution_instance": result.approval.execution_instance,
+            "issuer_key_id": result.approval.issuer_key_id,
+        },
         "status": result.status, "failure_code": result.failure_code, "exit_code": result.exit_code,
         "verified_result": result.verified_result, "result_schema": result.result_schema,
         "stdout_sha256": result.stdout_sha256, "stderr_sha256": result.stderr_sha256,
@@ -455,12 +523,72 @@ def write_invocation_artifact(result: ExecutionResult, repo: Path) -> tuple[str,
     return relative, sha256(data)
 
 
+JUNIT_RELATIVE = "artifacts/capability/junit.xml"
+
+
+def _clear_stale_junit(repo: Path, approval: ApprovalRecord) -> None:
+    """Delete any pre-existing report so evidence can only come from this execution."""
+    relative = JUNIT_RELATIVE
+    if not any(relative == root or relative.startswith(root + "/") for root in approval.allowed_write_roots):
+        return
+    path = repo / relative
+    try:
+        info = path.lstat()
+    except OSError:
+        return
+    if stat.S_ISDIR(info.st_mode):
+        raise fail("evidence_no_tests", "junit path is a directory, not a report")
+    path.unlink()
+
+
+def _read_junit(repo: Path, approval: ApprovalRecord) -> tuple[str, dict[str, int], str]:
+    """Actual executed test counts from the JUnit report the run produced.
+
+    No synthesis: if the run produced no report, evidence is refused (fail-closed).
+    """
+    relative = JUNIT_RELATIVE
+    if not any(relative == root or relative.startswith(root + "/") for root in approval.allowed_write_roots):
+        raise fail("evidence_no_tests", "junit report path is outside the authorized write scope")
+    path = repo / relative
+    try:
+        info = path.lstat()
+    except OSError as exc:
+        raise fail("evidence_no_tests", "execution produced no JUnit report") from exc
+    if stat.S_ISLNK(info.st_mode) or not stat.S_ISREG(info.st_mode):
+        raise fail("evidence_no_tests", "junit report must be a regular file")
+    try:
+        root = ET.fromstring(path.read_text(encoding="utf-8"))
+    except (OSError, ET.ParseError) as exc:
+        raise fail("evidence_no_tests", f"junit report unreadable: {exc}") from exc
+    suite = root if root.tag == "testsuite" else root.find("testsuite")
+    if suite is None:
+        raise fail("evidence_no_tests", "junit report has no testsuite element")
+
+    def count(name: str) -> int:
+        raw = suite.get(name) or "0"
+        if not raw.isdigit():
+            raise fail("evidence_no_tests", f"junit {name} is not an integer")
+        return int(raw)
+
+    total = count("tests")
+    failed, errors, skipped = count("failures"), count("errors"), count("skipped")
+    if total <= 0 or failed + errors + skipped > total:
+        raise fail("evidence_no_tests", "junit report carries no consistent executed tests")
+    return relative, {
+        "passed": total - failed - errors - skipped,
+        "failed": failed, "errors": errors, "skipped": skipped, "total": total,
+    }, sha256_file(path)
+
+
 def _write_evidence(
     result: ExecutionResult, repo: Path, *, positive_only: bool,
 ) -> dict[str, Any]:
     positive = result.verified_result and result.status == "PASS_VERIFIED_SUBSCOPE"
     if positive_only and not positive:
         raise fail("evidence_result_unverified", "positive evidence requires independently verified PASS")
+    junit_relative, test_results, junit_digest = _read_junit(repo, result.approval)
+    if positive and (test_results["failed"] or test_results["errors"]):
+        raise fail("evidence_result_unverified", "PASS contradicts the executed test report")
     artifact_path, artifact_digest = write_invocation_artifact(result, repo)
     evidence_verdict = "INTEGRATION_TESTED_NONPRODUCTION" if positive else (
         "BLOCKED" if result.status == "BLOCKED" else "FAIL"
@@ -469,16 +597,18 @@ def _write_evidence(
         "schema": EVIDENCE_SCHEMA,
         "capability_id": result.task.capability_id,
         "revision": result.revision_binding_before.head,
-        "test_command": "C1 controlled Hermes nonproduction challenge",
-        "exit_code": _evidence_exit_code(result.exit_code),
-        "test_results": {
-            "passed": 1 if positive else 0,
-            "failed": 0 if positive else 1,
-            "skipped": 0,
-            "errors": 0,
-            "total": 1,
-        },
-        "artifact_refs": [{"path": artifact_path, "sha256": artifact_digest}],
+        # Real executed command, real counts: no handshake is passed off as a test result.
+        "test_command": f"junit:{junit_relative}",
+        # A non-positive execution never records exit_code 0: that would let a FAIL
+        # verdict read as a PASS to any exit-code-based consumer.
+        "exit_code": _evidence_exit_code(result.exit_code) if positive else max(
+            1, _evidence_exit_code(result.exit_code)
+        ),
+        "test_results": test_results,
+        "artifact_refs": [
+            {"path": artifact_path, "sha256": artifact_digest},
+            {"path": junit_relative, "sha256": junit_digest},
+        ],
         "evidence_level": "AGENT_REPORTED",
         "verification_timestamp": result.finished_at,
         "review_status": "NOT_REVIEWED",
@@ -489,7 +619,6 @@ def _write_evidence(
         sdb_capability_evidence.validate_payload(
             payload,
             repo=repo,
-            head=result.revision_binding_before.head,
             now=dt.datetime.now(dt.timezone.utc),
         )
     except sdb_capability_evidence.EvidenceError as exc:
@@ -541,8 +670,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         repo = Path(sdb_common.REPO_ROOT).resolve(strict=True)
         task = TaskPack.from_mapping(_load_json(args.task))
         registry = load_routing_registry(repo)
-        approval = load_trusted_approval(repo, args.approval_ref, task)
-        result = execute(task, approval, registry, repo, ControlledHermesAdapter.production())
+        state_dir = approval_state_dir()
+        approval = load_trusted_approval(repo, args.approval_ref, task, state_dir=state_dir)
+        result = execute(
+            task, approval, registry, repo, ControlledHermesAdapter.production(), state_dir=state_dir,
+        )
         output = finish_public_execution(result, repo)
         print(json.dumps(output, indent=2))
         return 0 if output["verdict"] == "INTEGRATION_TESTED_NONPRODUCTION" else 1

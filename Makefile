@@ -25,7 +25,7 @@ PY_DOC ?= $(shell \
 # TARGET lewat lingkungan (bukan interpolasi make ke shell): nilai ber-kutip/`;`/`$(...)` tetap data.
 export TARGET
 
-.PHONY: help check lint drift doctor inventory test gate-init lint-registry release-check skills-list install-main workflow install-dry-run clean-pyc docs-tutorial docs-lint mutation did did-providers did-bench pr-merge
+.PHONY: help check lint drift doctor inventory test test-count gate-init lint-registry release-check skills-list install-main workflow install-dry-run clean-pyc docs-tutorial docs-lint mutation did did-providers did-bench pr-merge
 
 help:
 	@grep -E "^[a-z-]+:" Makefile | sed "s/:.*//" | column -c 80
@@ -40,6 +40,15 @@ inventory:
 # kalau seseorang ingat menjalankannya manual (audit 2026-11-05, temuan VF2).
 test:
 	$(PY_SYS) -m pytest tests skills integrations -q
+
+# Ringkas metrik artefak JUnit existing; metadata dibaca dari environment agar tidak
+# pernah dievaluasi shell sebagai command. Target ini tidak menjalankan pytest lagi.
+# Hasilnya CALLER_ATTESTED/INFORMATIONAL_ONLY: bukan bukti independen bahwa command
+# menghasilkan artefak atau bahwa suatu suite lengkap sudah dijalankan.
+test-count:
+	$(PY_SYS) scripts/sdb_junit_reporter.py --from-env \
+		--expected-revision "$$(git rev-parse HEAD)" --require-clean-repo . \
+		--max-age-seconds "$${TEST_MAX_AGE_SECONDS:-3600}"
 
 lint:
 	ruff check sdb_platform scripts tests skills dashboard

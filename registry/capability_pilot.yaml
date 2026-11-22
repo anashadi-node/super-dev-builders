@@ -15,7 +15,7 @@
 #   - `acceptance` tidak pernah berarti "lulus": PASS eksekusi bersifat informatif
 #     sampai ada reviewer independen (lihat docs/BE_SP12_EVIDENCE_CONTRACT.md §1).
 version: 1
-updated: 2026-11-20
+updated: 2026-11-22
 catalog:
   canonical_count: 26
   registered_here: pilot_only
@@ -70,3 +70,27 @@ capabilities:
       Implementasi C1-02. Kontrak mencerminkan perilaku source yang dibuktikan
       lewat tests/test_be_sp03_contract.py (T1-T10). File produksi app.py/Store
       tidak diubah; mutasi T9 berjalan pada salinan scratch.
+  - id: BE-SP-10
+    name: "Backend Security Engineer"
+    division: D8/D9
+    status: PILOT
+    lane: backend
+    profile: cc-builder
+    executor: hermes
+    implementation_status: PILOT_VERIFIED_SUBSCOPE
+    scope: "Gate Gitleaks fail-closed pada scope repository yang disetujui, dengan findings terstruktur dan evidence terikat revisi"
+    test_command_hint: ".venv/bin/python -m pytest tests/test_be_sp10_security_gate.py -q"
+    evidence_path: "runs/capability/BE-SP-10/<revision>.json"
+    evidence_schema: sdb.capability.evidence/1
+    evidence_level_allowed: [AGENT_REPORTED]
+    acceptance: INFORMATIONAL_ONLY
+    security_gate:
+      scanner: gitleaks
+      scanner_version: "8.28.0"
+      scanner_sha256: 5fd1b3b0073269484d40078662e921d07427340ab9e6ed526ccd215a565b3298
+      config: .gitleaks.toml
+      allowed_scopes: ["."]
+    owner_approval: "2026-11-22 — C1-08 CHANGE_ONLY, capability BE-SP-10"
+    notes: >-
+      Gate memisahkan findings dari execution errors, meredaksi material rahasia,
+      dan tidak dapat menaikkan evidence menjadi independent acceptance.

@@ -144,7 +144,7 @@ penulisan ulang history, baseline CI tidak diubah.
 | Pemindaian raw (pembanding audit) | `make secrets-raw` | **38 temuan** di luar filter: 37 `sourcegraph-access-token` (SHA-1 commit di `reports/upgrade-evidence/thirdparty-scan-github-mcp-server.json`, sudah ber-allowlist terdokumentasi) + 1 `generic-api-key` fixture `tests/test_scripts.py` (allowlist fixture terdokumentasi) |
 | Hygiene | `make hygiene` | **PASS** (0 FAIL, 3 WARN pre-existing: 3 berkas >512 KB) |
 | D6/D8 delta review | review manual diff (2 berkas baru + 1 laporan) | lihat §7 |
-| `make check` | `make check` (log: `/tmp/c107_make_check_final.log`) | **PASS, rc=0** — ruff `All checks passed!` · skill drift `136/136 OK` · `registry_lint: PASS` · `hygiene: PASS` (608 berkas, 0 FAIL, 3 WARN pre-existing) · `pack: PASS` (9/9) · `docs_lint: PASS` (62 md, 43 custom skill) · pytest **944 tes** lulus |
+| `make check` | `make check` (log: `/tmp/c107_make_check_final.log`) | **PASS, rc=0** — ruff `All checks passed!` · skill drift `136/136 OK` · `registry_lint: PASS` · `hygiene: PASS` (608 berkas, 0 FAIL, 3 WARN pre-existing) · `pack: PASS` (9/9) · `docs_lint: PASS` (62 md, 43 custom skill) · pytest **1040 testcase, 0 gagal/error/skip** (attr junit 1043; rekonsiliasi hitungan: 1031 testcase di C1-06 `9266f08` + 9 tes baru = 1040) |
 
 Tidak ada gate wajib yang merah. `PRODUCTION_TRUST` tetap **BLOCKED** (tidak ada klaim produksi).
 

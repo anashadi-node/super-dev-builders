@@ -128,12 +128,29 @@ def main(argv=None) -> int:
 
     drift = skill_drift()
     deps = dep_check()
-    bad = [r for r in drift if r["status"] != "OK"] +           [{"skill": d["dep"], "status": d["status"]} for d in deps if d["status"] != "OK"]
+    bad_skills = [r for r in drift if r["status"] != "OK"]
+    bad_deps = [d for d in deps if d["status"] != "OK"]
     if args.drift_only:
-        for r in bad:
-            print(f"  {r['status']:<9} {r['skill']:<32} @ {r['where']} {r.get('other', '')}")
-        print(f"skill drift: {len(drift) - len(bad)}/{len(drift)} OK, {len(bad)} bermasalah")
-        return 1 if bad else 0
+        for row in bad_skills:
+            print(
+                f"  {row['status']:<9} {row['skill']:<32}"
+                f" @ {row['where']} {row.get('other', '')}"
+            )
+        for row in bad_deps:
+            print(
+                f"  {row['status']:<16} {row['dep']:<32}"
+                f" @ dependency want={row.get('want', '-')}"
+                f" installed={row.get('installed') or 'MISSING'}"
+            )
+        print(
+            f"skill drift: {len(drift) - len(bad_skills)}/{len(drift)} OK,"
+            f" {len(bad_skills)} bermasalah"
+        )
+        print(
+            f"dependency: {len(deps) - len(bad_deps)}/{len(deps)} OK,"
+            f" {len(bad_deps)} bermasalah"
+        )
+        return 1 if bad_skills or bad_deps else 0
 
     report = {"checked_at": now_iso(), "yaml_backend": yaml_backend(), "host": {}, "profiles": {}, "registry": {},
               "skill_drift": drift}
@@ -212,10 +229,16 @@ def main(argv=None) -> int:
     for name, info in report["profiles"].items():
         print(f"    {'OK ' if info['present'] else 'MISS'} {name} (soul={info.get('soul_md')})")
     dep_ok = sum(1 for d in deps if d["status"] == "OK")
-    dep_bad = [d["dep"] for d in deps if d["status"] != "OK"]
-    print(f"  deps pinned: {dep_ok}/{len(deps)} OK" + ("" if not dep_bad else f" -> {dep_bad}"))
-    print(f"  skill drift: {len(drift) - len(bad)}/{len(drift)} OK, {len(bad)} bermasalah"
-          + (" -> jalankan `make drift`" if bad else ""))
+    dep_bad_names = [d["dep"] for d in bad_deps]
+    print(
+        f"  deps pinned: {dep_ok}/{len(deps)} OK"
+        + ("" if not dep_bad_names else f" -> {dep_bad_names}")
+    )
+    print(
+        f"  skill drift: {len(drift) - len(bad_skills)}/{len(drift)} OK,"
+        f" {len(bad_skills)} bermasalah"
+        + (" -> jalankan `make drift`" if bad_skills else "")
+    )
     if missing_required:
         print(f"  KURANG (wajib): {missing_required}")
         return 3

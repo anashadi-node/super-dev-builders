@@ -53,6 +53,30 @@ Semua gate punya exit criteria; tidak ada gate "kira-kira lulus".
   -> `make check` hijau -> baru commit/push. Jangan pernah push sebelum gerbang lokal
   hijau walau CI lolos: CI tidak boleh jadi penemu cacat yang bisa dicegah lokal.
 
+## Rahasia: fixture, exception, dan pemindaian riwayat
+- **Berkas uji dan laporan ikut dipindai.** Gitleaks memindai riwayat penuh termasuk `tests/` dan
+  `reports/`; kredensial sintetis ber-entropy tinggi yang menyerupai asli di fixture/contoh
+  dokumen menjadi temuan nyata di repo sendiri.
+- **Nilai sintetis dibuat saat runtime, bukan literal.** `base64.b64encode(hashlib.sha256(b"tag").digest()).decode()`
+  membuat deteksi tetap teruji tanpa meninggalkan literal ber-entropy tinggi di berkas.
+- **Jangan menaruh hash 40-hex utuh di laporan naratif.** Rule `sourcegraph-access-token` menandainya
+  sebagai token; tulis 8 karakter pertama + cara membaca penuh (`git rev-parse <short>`).
+- **Bedakan tiga mode scan dan sebutkan mana yang dijalankan:** terkonfigurasi
+  (`--config .gitleaks.toml`), disesuaikan baseline (`--baseline-path`), dan mentah
+  (`useDefault=true` tanpa filter). Selisih "0 vs 10 temuan" hampir selalu soal flag, bukan
+  sensitivitas scanner — buktikan dulu sebelum menyimpulkan "bersih".
+- **Temuan historis wajib diklasifikasi berbasis bukti** sebelum dikecualikan: jalur field, tipe
+  nilai, panjang, kelas karakter, relasi antar-field. Jangan pernah melabeli "semua false positive"
+  tanpa bukti per temuan.
+- **Exception harus fingerprint persis** (`commit:file:rule:line`), bukan path/direktori/rule;
+  mematikan rule (`generic-api-key`) atau menambah `--exit-code 0` sama dengan melemahkan gate.
+- **Scanner absen atau gagal di gate otoritatif = GAGAL-TERTUTUP.** Gate CI wajib memeriksa
+  keberadaan binary dan memvalidasi laporan JSON; jangan pernah `|| true` atau menganggap
+  "tidak ada output" sebagai lulus. Gate workstation boleh SKIP, gate CI tidak.
+- **Tinjau diff ter-stage sebelum commit** — termasuk laporan, fixture, dan dokumentasi. Berkas
+  baru adalah permukaan pindai: commit yang menambah fixture/laporan bisa menyalakan gate yang
+  tadinya hijau.
+
 ## Verifikasi SEBELUM push (jangan menyerahkan ke CI untuk menemukan cacat mendasar)
 1. Reproduksi lingkungan runner secara lokal: salinan bersih (`git archive HEAD | tar -x -C /tmp/sim`),
    venv terpisah berisi hanya dependensi pyproject, `HOME` kosong, `PATH` hanya venv:

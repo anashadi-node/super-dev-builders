@@ -1,0 +1,227 @@
+{
+  "contract_id": "sdb.control_plane.api",
+  "contract_version": "1",
+  "api_version": "v1",
+  "capability": "BE-SP-03",
+  "generated": "2026-11-20",
+  "producer": {
+    "component": "sdb_platform/control_plane/app.py",
+    "class": "Api (binding HTTP: make_handler/serve, ThreadingHTTPServer)",
+    "server_banner": "sdb-control-plane/0.5",
+    "store": "sdb_platform/control_plane/store.py (Store, sqlite3, :memory: atau file)"
+  },
+  "consumers": [
+    "tenant clients via header X-API-Key (scope kontrak ini)",
+    "admin clients via X-Admin-Key (di luar dua keluarga endpoint ini)",
+    "workers via X-Worker-Key (di luar scope; bila tidak diaktifkan endpoint worker -> 503 worker_disabled)"
+  ],
+  "source_provenance": {
+    "files": [
+      "sdb_platform/control_plane/app.py",
+      "sdb_platform/control_plane/store.py",
+      "sdb_platform/control_plane/metrics.py",
+      "sdb_platform/control_plane/billing.py"
+    ],
+    "binding": "Perilaku dibuktikan oleh tests/test_be_sp03_contract.py terhadap server loopback (Store :memory:). Anchor teks boleh bergeser karena refactor; yang mengikat adalah perilaku yang diuji, bukan teks ini."
+  },
+  "authentication": {
+    "scheme": "header X-API-Key, satu key = satu tenant",
+    "storage": "SHA-256(key) disimpan di tabel api_keys; pembandingan konstan (compare_digest)",
+    "failure": { "status": 401, "code": "unauthorized" },
+    "key_min_length": 24,
+    "note": "Key yang tidak dikirim, salah, atau jenisnya keliru (admin/worker) semuanya 401 unauthorized."
+  },
+  "authorization": {
+    "model": "role-by-header: /v1/jobs* hanya menerima X-API-Key tenant aktif; X-Admin-Key tidak berlaku di rute ini",
+    "inactive_tenant": { "status": 403, "code": "tenant_inactive", "when": "tenant suspended/deleted" }
+  },
+  "tenancy": {
+    "model": "tenant_id wajib pada SETIAP query (lihat docstring store.py); isolasi tidak bergantung disiplin programmer",
+    "cross_tenant_read": {
+      "status": 404,
+      "code": "job_not_found",
+      "note": "404 (bukan 403) supaya keberadaan job milik tenant lain tidak bocor."
+    },
+    "idempotency_scope": "UNIQUE (tenant_id, idempotency_key): key yang sama di tenant berbeda = dua job berbeda."
+  },
+  "transport": {
+    "content_type_all_responses": "application/json; charset=utf-8",
+    "max_body_bytes": 262144,
+    "response_headers_always": {
+      "Cache-Control": "no-store",
+      "X-Content-Type-Options": "nosniff"
+    }
+  },
+  "error_envelope": {
+    "shape": { "error": { "code": "<string>", "message": "<string>" } },
+    "note": "Semua error ControlPlaneError dibungkus bentuk ini di lapisan HTTP; 500 internal_error hanya memuat nama tipe exception."
+  },
+  "endpoints": [
+    {
+      "method": "POST",
+      "route": "/v1/jobs",
+      "auth": "tenant (X-API-Key)",
+      "request": {
+        "content_type": "application/json (objek JSON)",
+        "required": [
+          {
+            "name": "type",
+            "type": "string",
+            "enum": ["recon", "build", "review", "qa", "security", "docs", "release"],
+            "error": { "status": 400, "code": "invalid_type" }
+          },
+          {
+            "name": "pack",
+            "type": "object",
+            "fields": {
+              "id": "string, regex [a-z][a-z0-9-]{1,40}",
+              "version": "string, semver \\d+.\\d+.\\d+"
+            },
+            "error": { "status": 400, "code": "invalid_pack" }
+          },
+          {
+            "name": "target_ref",
+            "type": "string",
+            "pattern": "^(artifact|git|upload)://\\S+$",
+            "max_len": 2048,
+            "error": { "status": 400, "code": "invalid_target" }
+          },
+          {
+            "name": "budget",
+            "type": "object",
+            "fields": {
+              "tokens": "integer 1000..2000000",
+              "seconds": "integer 60..14400"
+            },
+            "error": { "status": 400, "code": "invalid_budget" }
+          },
+          {
+            "name": "idempotency_key",
+            "type": "string",
+            "min_len": 8,
+            "max_len": 128,
+            "error": { "status": 400, "code": "invalid_idempotency_key" }
+          }
+        ]
+      },
+      "success": [
+        {
+          "status": 201,
+          "when": "job baru dibuat",
+          "body": { "job": "<job_object>", "replayed": false }
+        },
+        {
+          "status": 200,
+          "when": "replay idempotent: (tenant_id, idempotency_key) sama dan isi sama",
+          "body": { "job": "<job_object>", "replayed": true }
+        }
+      ],
+      "errors": [
+        { "status": 400, "code": "invalid_json", "when": "body bukan JSON sah, atau bukan objek JSON" },
+        { "status": 400, "code": "invalid_content_length", "when": "header Content-Length tidak sah" },
+        { "status": 413, "code": "body_too_large", "when": "ukuran body > 256 KB" },
+        { "status": 401, "code": "unauthorized", "when": "X-API-Key absen / tidak cocok / jenis key keliru" },
+        { "status": 403, "code": "tenant_inactive", "when": "tenant suspended atau deleted" },
+        { "status": 402, "code": "quota_jobs_exceeded", "when": "jobs_per_month bulan berjalan habis" },
+        { "status": 402, "code": "quota_tokens_exceeded", "when": "sisa token bulan berjalan < budget.tokens" },
+        { "status": 409, "code": "idempotency_conflict", "when": "idempotency_key sudah dipakai untuk isi berbeda" },
+        {
+          "status": 429,
+          "code": "rate_limited",
+          "when": "token bucket per-tenant habis (kapasitas = max(5, 2x rate/detik), refill monotonic)",
+          "retry_after_header": "Retry-After: integer detik >= 1"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "route": "/v1/jobs/:id",
+      "route_pattern": "^/v1/jobs/([A-Za-z0-9_]+)$",
+      "auth": "tenant (X-API-Key)",
+      "request": {
+        "path_params": { "id": "job_id, format j_<ULID26>" }
+      },
+      "success": [
+        {
+          "status": 200,
+          "when": "job ada dan dimiliki tenant pemanggil",
+          "body": { "job": "<job_object>" }
+        }
+      ],
+      "errors": [
+        { "status": 401, "code": "unauthorized", "when": "X-API-Key absen / tidak cocok" },
+        {
+          "status": 404,
+          "code": "job_not_found",
+          "when": "job tidak ada ATAU dimiliki tenant lain (tidak dibedakan)"
+        }
+      ]
+    }
+  ],
+  "removed_endpoints": [
+    {
+      "method": "POST",
+      "route": "/v1/jobs/:id/finish",
+      "status": 410,
+      "code": "endpoint_removed",
+      "note": "Dicabut v0.5.1; dilempar TANPA pemeriksaan auth. Penutupan job lewat worker /complete atau tenant /cancel."
+    }
+  ],
+  "job_object": {
+    "job_id": "string",
+    "tenant_id": "string",
+    "type": "string",
+    "pack": "object {id: string, version: string}",
+    "target_ref": "string",
+    "budget": "object {tokens: integer, seconds: integer}",
+    "idempotency_key": "string",
+    "status": "string enum [queued, running, succeeded, failed, blocked, budget_exceeded, cancelled]",
+    "tokens_used": "integer",
+    "gate_verdict": "string|null",
+    "created_at": "string ISO-8601 UTC",
+    "finished_at": "string|null",
+    "attempts": "integer",
+    "lease_owner": "string|null",
+    "cancel_requested": "boolean"
+  },
+  "compatibility": {
+    "breaking_forbidden": [
+      "menghapus atau merelaksasi field wajib request (required[].name)",
+      "mengubah status sukses (201/200 POST, 200 GET)",
+      "mengubah bentuk error_envelope",
+      "mengubah masking 404 job_not_found untuk akses lintas tenant",
+      "menghapus field job_object yang dijanjikan"
+    ],
+    "additive_allowed": [
+      "field response baru (consumer harus abaikan field tak dikenal)",
+      "error code baru"
+    ]
+  },
+  "sensitive_info_policy": [
+    "Tidak ada stack trace, path file, atau nama module di body error (500 hanya nama tipe exception).",
+    "API key tidak pernah di-echo di response; basis data hanya menyimpan SHA-256(key).",
+    "Pesan 404 job_not_found generik ('job tidak ditemukan') tanpa membocorkan tenant pemilik.",
+    "Header keamanan wajib pada semua response: X-Content-Type-Options: nosniff, Cache-Control: no-store."
+  ],
+  "invariants": [
+    "Isolasi tenant: setiap query menyertakan tenant_id; idempotency unik per tenant.",
+    "Semua error memakai satu bentuk envelope.",
+    "Rate limiting per tenant terjadi SETELAH auth sukses (tenant banjir tidak mengganggu tenant lain).",
+    "Kontrak ini hanya mencakup 2 keluarga endpoint; endpoint lain (admin/billing/worker) di luar scope BE-SP-03."
+  ],
+  "examples": {
+    "valid_request": {
+      "type": "recon",
+      "pack": { "id": "be-sp03-pack", "version": "1.0.0" },
+      "target_ref": "artifact://demo/fixture/1",
+      "budget": { "tokens": 1000, "seconds": 60 },
+      "idempotency_key": "be-sp03-example-0001"
+    },
+    "error_body": {
+      "error": {
+        "code": "unauthorized",
+        "message": "X-API-Key wajib"
+      }
+    }
+  }
+}

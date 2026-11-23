@@ -1,0 +1,23 @@
+# .gitleaksignore — exception per-fingerprint untuk temuan historis yang SUDAH diaudit.
+#
+# Format: <commit>:<file>:<rule-id>:<start-line>
+# Setiap baris terikat pada SATU commit + SATU baris. Konsekuensinya:
+#   - secret baru di commit lain  -> fingerprint beda -> tetap dilaporkan;
+#   - secret baru di baris lain   -> fingerprint beda -> tetap dilaporkan;
+#   - rule `generic-api-key` tetap aktif (tidak ada allowlist rule/path/regex).
+#
+# Audit lengkap + bukti klasifikasi: reports/SDB_C1_07_GITLEAKS_RESOLUTION.md
+# Penjaga drift (fingerprint == baseline CI, rule tetap hidup): tests/test_c1_07_secret_exceptions.py
+
+# [9 temuan] Dump profil Chromium (JSON satu baris -> semua match di line 1).
+# Isi match bukan kredensial:
+#   extensions.settings.<id>.manifest.key         -> public key manifest extension (bukan secret)
+#   media_router.receiver_id_hash_token           -> token hash
+#   protection.macs.enterprise_signin.*           -> MAC preferensi Chrome (digest HMAC)
+#   safebrowsing.hash_real_time_ohttp_key         -> hash kunci OHTTP
+72eec21bcf39edc42a7155b9ed97e88114c55d71:$HOME/.local/share/sdb-deck/profile/Default/Preferences:generic-api-key:1
+
+# [1 temuan] Baseline digest file: nilainya SHA-256 dari
+# integrations/replica-skill/replica-design/tokens.json (sudah diverifikasi sama),
+# kena rule karena nama kuncinya mengandung "tokens".
+223dc4c4d18f49d94ad686c40bfb28afd17bc933:integrations/replica-skill-baseline.json:generic-api-key:19

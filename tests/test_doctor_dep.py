@@ -5,6 +5,7 @@ import sys
 import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
+import doctor
 from doctor import dep_check, skill_drift
 
 
@@ -37,6 +38,39 @@ def test_dep_check_flags_unpinned():
                 got = parser.parse(open(meta, "rb")).get("Version")
         assert got is None or got == ""
         assert r["status"] == "UNPINNED"
+
+
+def test_skill_drift_dependency_missing_tidak_crash_dan_hitungan_terpisah(
+    monkeypatch, capsys
+):
+    monkeypatch.setattr(
+        doctor,
+        "skill_drift",
+        lambda: [
+            {"skill": "alpha", "where": "/skills/alpha", "status": "OK"},
+            {"skill": "beta", "where": "/skills/beta", "status": "OK"},
+        ],
+    )
+    monkeypatch.setattr(
+        doctor,
+        "dep_check",
+        lambda: [
+            {
+                "dep": "missing-package",
+                "want": "1.2.3",
+                "installed": None,
+                "status": "MISSING_OR_DRIFT",
+            }
+        ],
+    )
+
+    exit_code = doctor.main(["--drift-only"])
+    output = capsys.readouterr().out
+
+    assert exit_code == 1
+    assert "missing-package" in output
+    assert "skill drift: 2/2 OK, 0 bermasalah" in output
+    assert "dependency: 0/1 OK, 1 bermasalah" in output
 
 
 def test_skill_drift_all_ok():

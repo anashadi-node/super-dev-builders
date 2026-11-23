@@ -39,6 +39,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          # WAJIB 0: gerbang rahasia memindai `--log-opts=--all`. Dengan default
+          # fetch-depth=1 hanya satu commit terlihat, sehingga kebocoran di riwayat
+          # lolos dengan exit 0 (hijau palsu). Terbukti: klon depth=1 -> exit 0,
+          # klon penuh -> exit 1 pada repo uji dengan kebocoran di commit lama.
+          fetch-depth: 0
+          # Token checkout tidak disimpan di .git/config: langkah CI ini tidak push.
+          persist-credentials: false
 
       - name: Setup Python
         uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
@@ -50,6 +58,53 @@ jobs:
 
       - name: Narasi lingkungan (bukti yang bisa dibaca)
         run: python -V && python -m pytest --version
+
+      # GERBANG RAHASIA, fail-closed. `make secrets` TIDAK dipakai di sini: target itu
+      # sengaja `exit 0` saat gitleaks tidak terpasang (untuk workstation), sehingga di
+      # runner ia akan hijau palsu. Langkah di bawah memasang versi yang dipin, memeriksa
+      # checksum rilis resmi, dan GAGAL bila pemasangan atau pemindaian tidak terjadi.
+      - name: Pasang gitleaks (pin 8.28.0, sha256 tertanam)
+        env:
+          GITLEAKS_VERSION: "8.28.0"
+          GITLEAKS_SHA256: "a65b5253807a68ac0cafa4414031fd740aeb55f54fb7e55f386acb52e6a840eb"
+        run: |
+          set -euo pipefail
+          base="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}"
+          curl -sSfL "${base}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" -o "${RUNNER_TEMP}/gitleaks.tgz"
+          echo "${GITLEAKS_SHA256}  ${RUNNER_TEMP}/gitleaks.tgz" | sha256sum -c -
+          tar -xzf "${RUNNER_TEMP}/gitleaks.tgz" -C "${RUNNER_TEMP}" gitleaks
+          install -m 0755 "${RUNNER_TEMP}/gitleaks" "${HOME}/.local/bin/gitleaks"
+          echo "${HOME}/.local/bin" >> "${GITHUB_PATH}"
+          "${HOME}/.local/bin/gitleaks" version
+
+      - name: Pindai rahasia seluruh riwayat (gagal bila scanner tidak tersedia)
+        run: |
+          set -euo pipefail
+          command -v gitleaks >/dev/null 2>&1 || { echo "FAIL gitleaks tidak tersedia di runner"; exit 1; }
+          test "$(gitleaks version)" = "8.28.0" || { echo "FAIL versi gitleaks tidak sesuai pin"; exit 1; }
+          mkdir -p reports/ci
+          gitleaks detect --config .gitleaks.toml --no-banner --redact \
+            --baseline-path .github/gitleaks-baseline.json \
+            --log-opts="--all" \
+            --report-format json --report-path reports/ci/gitleaks.json
+          # Laporan harus benar-benar ada dan terbaca: exit 0 tanpa laporan berarti
+          # hasil pemindaian hilang dan tidak boleh dianggap lulus.
+          test -s reports/ci/gitleaks.json || { echo "FAIL laporan rahasia tidak dihasilkan"; exit 1; }
+          # `python` polos tidak selalu ada (host lokal hanya punya python3);
+          # runner menyediakan keduanya, tetapi ambil yang tersedia agar blok ini
+          # bisa diuji lokal tanpa perubahan perilaku.
+          PY=$(command -v python3 || command -v python) || { echo "FAIL interpreter python tidak ada"; exit 1; }
+          "$PY" - <<'PY'
+          import json, sys
+          data = json.load(open("reports/ci/gitleaks.json", encoding="utf-8"))
+          if not isinstance(data, list):
+              print("FAIL laporan rahasia bukan array JSON"); sys.exit(1)
+          bocor = [d.get("Secret") for d in data if d.get("Secret") not in (None, "", "REDACTED")]
+          if bocor:
+              print("FAIL laporan memuat nilai rahasia tidak ter-redact"); sys.exit(1)
+          print(f"laporan_rahasia=OK entri={len(data)} semua_ter_redact=true")
+          PY
+          echo "laporan_rahasia=reports/ci/gitleaks.json (nilai di-redact, baseline 10 temuan teraudit)"
 
       # PRASYARAT, bukan hiasan: sebagian uji keamanan menguji kanal media (OCR).
       # Tanpa tesseract, alat menolak lebih awal (fail-closed) dan uji yang mengharapkan
@@ -68,8 +123,12 @@ jobs:
       - name: Lint registry pihak ketiga
         run: make lint-registry
 
+      # JUnit ditulis lewat PYTEST_ADDOPTS supaya Makefile (sumber tunggal perintah uji)
+      # tidak perlu diubah dan tidak ada eksekusi suite kedua yang membuang waktu runner.
       - name: Test suite
-        run: make test
+        env:
+          PYTEST_ADDOPTS: "--junitxml=reports/ci/junit.xml"
+        run: mkdir -p reports/ci && make test
 
       - name: Drift skill (repo vs terpasang)
         run: if [ -d "$HOME/.hermes/skills" ]; then make drift; else echo SKIP_drift_tanpa_direktori_skill; fi
@@ -98,3 +157,55 @@ jobs:
 
       - name: Manifest paket per divisi (hash + lisensi)
         run: make packs
+
+      # Artefak uji harus bisa diaudit per commit SHA. Isinya HANYA keluaran mesin
+      # (JUnit + laporan rahasia yang sudah di-redact + metadata) — tidak ada source
+      # privat, token, kredensial, atau data pelanggan.
+      - name: Metadata eksekusi (tanpa rahasia)
+        if: always()
+        env:
+          GH_SHA: ${{ github.sha }}
+          GH_REF: ${{ github.ref }}
+          GH_RUN_ID: ${{ github.run_id }}
+          GH_RUN_ATTEMPT: ${{ github.run_attempt }}
+          GH_WORKFLOW: ${{ github.workflow }}
+        run: |
+          set -euo pipefail
+          mkdir -p reports/ci
+          python - <<'PY'
+          import json, os, platform, sys, subprocess, datetime
+          meta = {
+              "schema": "sdb-ci-evidence/1",
+              "repo": os.environ.get("GITHUB_REPOSITORY", "lokal"),
+              "git_sha": os.environ.get("GH_SHA") or subprocess.run(["git","rev-parse","HEAD"],capture_output=True,text=True).stdout.strip(),
+              "git_ref": os.environ.get("GH_REF", ""),
+              "workflow": os.environ.get("GH_WORKFLOW", "lokal"),
+              "run_id": os.environ.get("GH_RUN_ID", ""),
+              "run_attempt": os.environ.get("GH_RUN_ATTEMPT", ""),
+              "runner_os": platform.platform(),
+              "python": sys.version.split()[0],
+              "pytest": subprocess.run([sys.executable,"-m","pytest","--version"],capture_output=True,text=True).stdout.strip(),
+              "sdb_done_policy": os.environ.get("SDB_DONE_POLICY", "attested"),
+              "sdb_evidence_mode": os.environ.get("SDB_EVIDENCE_MODE", "legacy"),
+              "evidence_level": "CI_ATTESTED",
+              "independent_review": False,
+              "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
+          }
+          with open("reports/ci/meta.json","w",encoding="utf-8") as fh:
+              json.dump(meta, fh, indent=2, sort_keys=True)
+              fh.write("\n")
+          print(json.dumps(meta, sort_keys=True))
+          PY
+
+      - name: Simpan artefak uji per commit
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ci-evidence-${{ github.sha }}
+          path: |
+            reports/ci/junit.xml
+            reports/ci/gitleaks.json
+            reports/ci/meta.json
+          if-no-files-found: warn
+          retention-days: 14
+          compression-level: 6

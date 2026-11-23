@@ -12,6 +12,7 @@ membedakan "premium" dengan "AI menebak lalu menghasilkan sampah".
 """
 from __future__ import annotations
 
+import contextlib
 import os
 import re
 import sqlite3
@@ -53,10 +54,43 @@ OPEN_STATES = ("spec_queued", "spec_running", "spec_ready", "build_queued", "bui
 def connect() -> sqlite3.Connection:
     DB.parent.mkdir(parents=True, exist_ok=True)
     con = sqlite3.connect(DB, timeout=15)
-    con.row_factory = sqlite3.Row
-    con.execute("PRAGMA journal_mode=WAL")
-    con.executescript(SCHEMA)
+    try:
+        con.row_factory = sqlite3.Row
+        con.execute("PRAGMA journal_mode=WAL")
+        con.executescript(SCHEMA)
+    except BaseException:
+        # Setup gagal (PRAGMA/schema): tutup di sini, karena `conn()` belum
+        # memegang koneksi sehingga tidak bisa menutupnya.
+        con.close()
+        raise
     return con
+
+
+@contextlib.contextmanager
+def conn():
+    """Koneksi dengan transaksi DAN penutupan deterministik.
+
+    `with connect() as con` hanya mengurus transaksi (commit/rollback) — CPython
+    tidak menutup koneksi. Akibatnya fd dan handle WAL bergantung pada refcount/GC:
+    probe 200x `get()` menahan 403 fd sampai `gc.collect()`. Di sini penutupan
+    selalu terjadi, termasuk saat blok melempar galat.
+
+    Semantik transaksi tetap: sukses -> commit, galat -> rollback lalu re-raise.
+    `claim()` yang memakai `BEGIN IMMEDIATE`/`COMMIT` sendiri tetap sah; commit
+    tambahan pada koneksi tanpa transaksi adalah no-op.
+    """
+    con = connect()
+    try:
+        yield con
+        con.commit()
+    except BaseException:
+        try:
+            con.rollback()
+        except sqlite3.Error:
+            pass
+        raise
+    finally:
+        con.close()
 
 
 def slugify(text: str, limit: int = 32) -> str:
@@ -68,7 +102,7 @@ def create_job(brief: str, title: str = "", model: str = "") -> int:
     now = time.time()
     brief = brief.strip()
     title = (title or brief.splitlines()[0])[:80]
-    with connect() as con:
+    with conn() as con:
         cur = con.execute(
             "INSERT INTO jobs(slug,title,brief,status,dir,model,created,updated)"
             " VALUES(?,?,?,?,?,?,?,?)",
@@ -85,7 +119,7 @@ def create_job(brief: str, title: str = "", model: str = "") -> int:
 
 
 def get(job_id: int) -> dict | None:
-    with connect() as con:
+    with conn() as con:
         row = con.execute("SELECT * FROM jobs WHERE id=?", (job_id,)).fetchone()
     return dict(row) if row else None
 
@@ -97,12 +131,12 @@ def list_jobs(limit: int = 10, only_open: bool = False) -> list[dict]:
         sql += " WHERE status IN (%s)" % ",".join("?" * len(OPEN_STATES))
         args = OPEN_STATES
     sql += " ORDER BY id DESC LIMIT ?"
-    with connect() as con:
+    with conn() as con:
         return [dict(r) for r in con.execute(sql, (*args, limit))]
 
 
 def set_status(job_id: int, status: str, note: str = "") -> None:
-    with connect() as con:
+    with conn() as con:
         con.execute("UPDATE jobs SET status=?, updated=? WHERE id=?",
                     (status, time.time(), job_id))
         if note:
@@ -127,19 +161,19 @@ def set_field(job_id: int, **fields) -> None:
     cols = {k: v for k, v in fields.items() if k in _SET_FIELD_SQL}
     if not cols:
         return
-    with connect() as con:
+    with conn() as con:
         for nama, nilai in cols.items():
             con.execute(_SET_FIELD_SQL[nama], (nilai, time.time(), job_id))
 
 
 def add_event(job_id: int, kind: str, text: str) -> None:
-    with connect() as con:
+    with conn() as con:
         con.execute("INSERT INTO events(job_id,ts,kind,text) VALUES(?,?,?,?)",
                     (job_id, time.time(), kind, text[:8000]))
 
 
 def events(job_id: int, limit: int = 8) -> list[dict]:
-    with connect() as con:
+    with conn() as con:
         rows = con.execute(
             "SELECT ts,kind,text FROM events WHERE job_id=? ORDER BY id DESC LIMIT ?",
             (job_id, limit)).fetchall()
@@ -148,7 +182,7 @@ def events(job_id: int, limit: int = 8) -> list[dict]:
 
 def claim(status: str, running: str) -> dict | None:
     """Ambil satu job berstatus `status` dan kunci sebagai `running` (atomik)."""
-    with connect() as con:
+    with conn() as con:
         con.execute("BEGIN IMMEDIATE")
         row = con.execute(
             "SELECT * FROM jobs WHERE status=? ORDER BY id LIMIT 1", (status,)).fetchone()
@@ -162,7 +196,7 @@ def claim(status: str, running: str) -> dict | None:
 
 
 def stats() -> dict:
-    with connect() as con:
+    with conn() as con:
         rows = con.execute("SELECT status, COUNT(*) FROM jobs GROUP BY status").fetchall()
     return {s: n for s, n in rows}
 

@@ -2,7 +2,7 @@
 # Aturan: pin versi, verifikasi checksum untuk binary, install user-local (tanpa sudo) bila memungkinkan.
 # Pemasangan nyata: `bash scripts/bootstrap_tools.sh --install <tool> --yes` (butuh approval manusia dulu).
 version: 2.2.0
-updated: 2026-10-26
+updated: 2026-11-23
 host_checked: 2026-10-26
 tools_installed: "ruff 0.16.10, semgrep 1.179.0, trivy 0.75.0 (approval #4), syft 1.54.0, codeql 2.27.1, playwright 1.63.0 (approval #2, 2026-10-04), rea-agents 6.8.0 (approval #19, 2026-10-26)"
 
@@ -122,11 +122,21 @@ present:
     integrity: "sha512-9QDeRnGqEDzABZyr04eLnBXBv/c6I9/TWu/6M0MD4pEfkySI/BIgwTODIbAReX3C1x6hjw9+Jlx4A2yUSPZ9ww== (registry dist.integrity, dihitung ulang COCOK)"
     provenance: "SLSA v1 attestation, publisher GitHub Actions OIDC"
     evidence: "reports/REA_AUDIT_20261026.md (scan IOC 0 temuan, 29 temuan scanner = 100% FP, uji fixture 1,83 s)"
-    policy: "Gate #0 PASS wajib; tier T0 statis default, T1 capture, T2 debug/frida, T3 perangkat = approval per aksi; MCP (229 tool / 3,79 MB) TIDAK didaftarkan"
+    policy: "REA engine dipakai untuk M2 formal: Gate #0 PASS wajib; tier statis/runtime/debug/perangkat mengikuti approval; MCP (229 tool / 3,79 MB) TIDAK didaftarkan"
     note: "VERIFIED 2026-11-06: ghidra 12.1.4 + JDK 21 terpasang di ~/.local/opt dan provider ghidra REA available=true (bukti: `bash scripts/rea doctor` + evidence/elf-demo/rea-inspect.json). ida/hopper/jadx tetap belum ada. node host kini 26.13.0 (>=26.12.1) memenuhi `engines`; wrapper memilih node secara otomatis"
     license: MIT
     approved_by: mas anas
     approved_at: 2026-10-26
+  # --- internal WS-2 bounded implementation; no external package/provider ---
+  - id: recon_forge_observe
+    version_pin: "CR-SDB-REA-001 / DEC-SDB-012"
+    path: /home/anashadi/super-dev-builders/tools/recon-forge.py
+    role: public_passive_provisional_observation
+    install_method: "in-repo Python stdlib; no installation"
+    policy: "M0 GET-only public HTML/fixture; SSRF/DNS/redirect/peer checks; default transient; save only runs/provisional-observations/. M1 fail-closed; M2 delegated to existing recon; M3 blocked; no automatic downgrade"
+    evidence: "tests/test_recon_forge.py::test_sdb_rea_001_m0_fixture_tanpa_permission_atau_hash through test_sdb_rea_010_transient_dan_save_tetap_noncanonical"
+    approved_by: "Owner — APPROVE BOUNDED IMPLEMENTATION WS-2 / CR-SDB-REA-001 ONLY"
+    approved_at: 2026-11-23
 
 # Sumber model (provenance) — catat karena HuggingFace langsung DIBLOKIR dari host ini.
 model_sources:

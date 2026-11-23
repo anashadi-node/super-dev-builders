@@ -10,7 +10,10 @@ import json
 import os
 import sys
 
+import pytest
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
+import build_fixtures
 import did_validate
 
 ROOT = os.path.join(os.path.dirname(__file__), "..")
@@ -62,3 +65,87 @@ def test_evidence_yang_dirujuk_handoff_ada_di_disk():
             path = os.path.join(ROOT, item["path"])
             assert os.path.isfile(path), f"{target}: evidence hilang {item['path']}"
             assert _sha256(path) == item["sha256"], f"{target}: hash evidence bergeser {item['path']}"
+
+
+def test_toolchain_fixture_dikunci_dan_fail_closed(monkeypatch):
+    assert build_fixtures.CC == "/usr/bin/gcc-13"
+    assert build_fixtures.LD == "/usr/bin/ld.bfd"
+    monkeypatch.setattr(build_fixtures.os.path, "isfile", lambda _path: True)
+    monkeypatch.setattr(build_fixtures.os, "access", lambda _path, _mode: True)
+    monkeypatch.setattr(build_fixtures, "_versi", lambda _path: "versi-salah")
+    with pytest.raises(RuntimeError, match="versi toolchain fixture bergeser"):
+        build_fixtures.verify_toolchain()
+
+
+def _wajibkan_toolchain_tersedia():
+    try:
+        build_fixtures.verify_toolchain()
+    except RuntimeError as exc:
+        if os.environ.get("SDB_REQUIRE_FIXTURE_TOOLCHAIN") == "1":
+            pytest.fail(str(exc))
+        pytest.skip(f"toolchain fixture ter-pin tidak tersedia: {exc}")
+
+
+def test_build_fixture_tidak_bergantung_cwd(tmp_path, monkeypatch):
+    _wajibkan_toolchain_tersedia()
+    hashes = []
+    for index in range(3):
+        cwd = tmp_path / f"cwd-{index}"
+        out = tmp_path / f"out-{index}"
+        cwd.mkdir()
+        monkeypatch.chdir(cwd)
+        hashes.append(
+            {
+                target: build_fixtures.sha256(builder(str(out / target)))
+                for target, builder in build_fixtures.BUILDERS.items()
+            }
+        )
+    assert hashes[0] == hashes[1] == hashes[2]
+
+
+def test_android_menolak_symlink_sebelum_menulis(tmp_path):
+    out = tmp_path / "android"
+    assets = out / "src" / "assets"
+    assets.mkdir(parents=True)
+    korban = tmp_path / "korban-sintetis.txt"
+    korban.write_text("JANGAN_DIUBAH", encoding="utf-8")
+    (assets / "config.json").symlink_to(korban)
+
+    with pytest.raises(RuntimeError, match="symlink"):
+        build_fixtures.build_android(str(out))
+    assert korban.read_text(encoding="utf-8") == "JANGAN_DIUBAH"
+
+
+def test_android_menolak_berkas_tambahan_dari_apk(tmp_path):
+    _wajibkan_toolchain_tersedia()
+    out = tmp_path / "android"
+    ekstra = out / "src" / "lib" / "x86_64" / "extra.secret"
+    ekstra.parent.mkdir(parents=True)
+    ekstra.write_text("NILAI_SINTETIS", encoding="utf-8")
+
+    with pytest.raises(RuntimeError, match=r"ekstra=.*extra\.secret"):
+        build_fixtures.build_android(str(out))
+
+
+def test_android_menolak_symlink_pada_ancestor(tmp_path):
+    luar = tmp_path / "luar"
+    luar.mkdir()
+    alias = tmp_path / "alias"
+    alias.symlink_to(luar, target_is_directory=True)
+
+    with pytest.raises(RuntimeError, match="melewati symlink"):
+        build_fixtures.build_android(str(alias / "android"))
+    assert not (luar / "android").exists()
+
+
+def test_android_menolak_hardlink_sebelum_menulis(tmp_path):
+    out = tmp_path / "android"
+    assets = out / "src" / "assets"
+    assets.mkdir(parents=True)
+    korban = tmp_path / "korban-hardlink-sintetis.txt"
+    korban.write_text("JANGAN_DIUBAH", encoding="utf-8")
+    os.link(korban, assets / "config.json")
+
+    with pytest.raises(RuntimeError, match="hardlink"):
+        build_fixtures.build_android(str(out))
+    assert korban.read_text(encoding="utf-8") == "JANGAN_DIUBAH"

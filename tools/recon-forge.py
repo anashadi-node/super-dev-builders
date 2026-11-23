@@ -39,6 +39,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import hashlib
+import ipaddress
 import json
 import os
 import re
@@ -49,7 +50,10 @@ import sys
 import time
 import urllib.error
 import urllib.request
+from collections import Counter
+from html.parser import HTMLParser
 from pathlib import Path
+from urllib.parse import urljoin, urlparse
 
 REPO = Path(__file__).resolve().parents[1]
 REA_WRAPPER = REPO / "scripts" / "rea"
@@ -427,7 +431,7 @@ def craft_candidates() -> list[Path]:
 
 
 def craft_bin() -> str | None:
-    for name in CRAFT_NAMES + ("craft",):
+    for name in (*CRAFT_NAMES, "craft"):
         found = shutil.which(name)
         if found:
             return found
@@ -502,6 +506,356 @@ def free_port() -> int:
     with socket.socket() as sock:
         sock.bind(("127.0.0.1", 0))
         return int(sock.getsockname()[1])
+
+
+# ---------------------------------------------------------- flexible observation
+OBSERVATION_CONTRACT = {
+    "M0": {"pipeline_mode": "A", "tool_risk_tier": "T0"},
+    "M1": {"pipeline_mode": "A", "tool_risk_tier": "T1"},
+    "M2": {"pipeline_mode": "B", "tool_risk_tier": "T2"},
+    "M3": {"pipeline_mode": "B", "tool_risk_tier": "T3"},
+}
+PROVISIONAL_FIELDS = {
+    "artifact_class": "PROVISIONAL_OBSERVATION",
+    "planning_reference_eligible": True,
+    "formal_evidence_eligible": False,
+    "stage_01B_satisfied": False,
+    "canonical_did_handoff_eligible": False,
+    "reconstruction_authorized": False,
+    "validation_status": "PROVISIONAL_UNVALIDATED",
+}
+READ_ONLY_TOOLS = ("http_get_public", "html_parser", "dom_inventory")
+MAX_OBSERVATION_BYTES = 2 * 1024 * 1024
+BLOCKED_HOSTS = {
+    "localhost",
+    "localhost.localdomain",
+    "metadata.google.internal",
+    "metadata.google",
+    "instance-data",
+}
+PROMPT_INJECTION_MARKERS = (
+    "ignore previous instructions",
+    "ignore all previous",
+    "system prompt",
+    "developer message",
+    "tool call",
+    "execute command",
+    "run this command",
+)
+
+
+def classify_observation_mode(raw: str | None) -> tuple[str, str, str]:
+    """Klasifikasikan tiga namespace tanpa fallback tersirat."""
+    mode = (raw or "").strip().upper()
+    if mode not in OBSERVATION_CONTRACT:
+        raise ForgeError(
+            "BLOCKED_INVALID_OBSERVATION_MODE: expected explicit M0, M1, M2, or M3",
+            2,
+        )
+    contract = OBSERVATION_CONTRACT[mode]
+    return mode, contract["pipeline_mode"], contract["tool_risk_tier"]
+
+
+def _is_public_ip(raw: str) -> bool:
+    try:
+        return ipaddress.ip_address(raw.split("%", 1)[0]).is_global
+    except ValueError:
+        return False
+
+
+def validate_public_url(url: str) -> dict:
+    """Validasi URL M0 dan semua alamat DNS sebelum provider dijalankan."""
+    try:
+        parsed = urlparse(url)
+        port = parsed.port
+    except ValueError as exc:
+        raise ForgeError(f"BLOCKED_NETWORK_BOUNDARY: malformed URL ({exc})", 2) from exc
+    if parsed.scheme not in {"http", "https"}:
+        raise ForgeError("BLOCKED_NETWORK_BOUNDARY: only http/https are allowed", 2)
+    if not parsed.hostname or parsed.username or parsed.password:
+        raise ForgeError("BLOCKED_NETWORK_BOUNDARY: public hostname required; userinfo forbidden", 2)
+    if port is not None and port not in {80, 443}:
+        raise ForgeError(
+            "BLOCKED_NETWORK_BOUNDARY: only ports 80/443 are allowed",
+            2,
+        )
+
+    host = parsed.hostname.rstrip(".").lower()
+    if host in BLOCKED_HOSTS or host.endswith(".local") or host.endswith(".internal"):
+        raise ForgeError(f"BLOCKED_NETWORK_BOUNDARY: forbidden destination {host}", 2)
+
+    addresses: set[str] = set()
+    try:
+        literal = ipaddress.ip_address(host.split("%", 1)[0])
+    except ValueError:
+        try:
+            infos = socket.getaddrinfo(host, port or (443 if parsed.scheme == "https" else 80),
+                                       type=socket.SOCK_STREAM)
+        except socket.gaierror as exc:
+            raise ForgeError(f"BLOCKED_NETWORK_BOUNDARY: DNS resolution failed for {host}", 2) from exc
+        addresses.update(str(info[4][0]).split("%", 1)[0] for info in infos)
+    else:
+        addresses.add(str(literal))
+
+    if not addresses or any(not _is_public_ip(address) for address in addresses):
+        raise ForgeError(
+            f"BLOCKED_NETWORK_BOUNDARY: non-public DNS/IP destination for {host}",
+            2,
+        )
+    return {"url": url, "hostname": host, "resolved_addresses": sorted(addresses)}
+
+
+class PublicRedirectHandler(urllib.request.HTTPRedirectHandler):
+    """Tolak redirect ke private/metadata destination sebelum request kedua."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        validate_public_url(newurl)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+def _response_peer_ip(response) -> str:
+    """Ambil peer socket untuk memutus DNS-rebinding; gagal baca berarti fail-closed."""
+    candidates = [
+        getattr(getattr(getattr(response, "fp", None), "raw", None), "_sock", None),
+        getattr(getattr(response, "fp", None), "_sock", None),
+    ]
+    for sock in candidates:
+        if sock is None:
+            continue
+        try:
+            return str(sock.getpeername()[0]).split("%", 1)[0]
+        except (AttributeError, OSError, TypeError):
+            continue
+    raise ForgeError("BLOCKED_NETWORK_BOUNDARY: peer address unavailable", 2)
+
+
+def fetch_public_html(url: str, timeout: float = 10.0) -> dict:
+    """GET publik terbatas ukuran; tanpa cookies, auth, JS, atau state-changing action."""
+    boundary = validate_public_url(url)
+    request = urllib.request.Request(
+        url,
+        method="GET",
+        headers={
+            "User-Agent": "SDB-Public-Observer/1.0",
+            "Accept": "text/html,application/xhtml+xml;q=0.9",
+        },
+    )
+    opener = urllib.request.build_opener(PublicRedirectHandler())
+    try:
+        with opener.open(request, timeout=timeout) as response:
+            final_url = response.geturl()
+            final_boundary = validate_public_url(final_url)
+            peer_ip = _response_peer_ip(response)
+            if not _is_public_ip(peer_ip):
+                raise ForgeError("BLOCKED_NETWORK_BOUNDARY: non-public connected peer", 2)
+            allowed_final_ips = set(final_boundary["resolved_addresses"])
+            if peer_ip not in allowed_final_ips:
+                raise ForgeError("BLOCKED_NETWORK_BOUNDARY: DNS-rebinding peer mismatch", 2)
+            content_type = response.headers.get_content_type()
+            if content_type not in {"text/html", "application/xhtml+xml"}:
+                raise ForgeError(
+                    f"BLOCKED_CONTENT_TYPE: expected HTML, got {content_type}",
+                    2,
+                )
+            raw = response.read(MAX_OBSERVATION_BYTES + 1)
+            if len(raw) > MAX_OBSERVATION_BYTES:
+                raise ForgeError("BLOCKED_RESPONSE_TOO_LARGE", 2)
+            charset = response.headers.get_content_charset() or "utf-8"
+    except ForgeError:
+        raise
+    except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        raise ForgeError(f"OBSERVATION_FETCH_FAILED: {type(exc).__name__}", 3) from exc
+    return {
+        "html": raw.decode(charset, errors="replace"),
+        "requested_url": url,
+        "final_url": final_url,
+        "network_boundary": {
+            "requested": boundary,
+            "final": final_boundary,
+            "redirects_revalidated": True,
+        },
+    }
+
+
+class PassiveHTMLAnalyzer(HTMLParser):
+    """Parser data-only; tidak mengeksekusi script, event handler, atau instruksi DOM."""
+
+    def __init__(self, base_url: str):
+        super().__init__(convert_charrefs=True)
+        self.base_url = base_url
+        self.title_parts: list[str] = []
+        self.in_title = False
+        self.tags: Counter[str] = Counter()
+        self.headings: Counter[str] = Counter()
+        self.input_types: Counter[str] = Counter()
+        self.links: list[dict] = []
+        self.forms: list[dict] = []
+        self.metadata: list[dict] = []
+        self.prompt_injection_signals = 0
+
+    @staticmethod
+    def _clean(value: str | None, limit: int = 300) -> str:
+        return " ".join((value or "").split())[:limit]
+
+    def _inspect_untrusted(self, value: str | None) -> None:
+        lowered = (value or "").lower()
+        self.prompt_injection_signals += sum(marker in lowered for marker in PROMPT_INJECTION_MARKERS)
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        tag = tag.lower()
+        data = {str(key).lower(): value for key, value in attrs}
+        self.tags[tag] += 1
+        for key, value in attrs:
+            if key.lower().startswith("on"):
+                continue
+            self._inspect_untrusted(value)
+        if tag == "title":
+            self.in_title = True
+        if tag in {"h1", "h2", "h3", "h4", "h5", "h6"}:
+            self.headings[tag] += 1
+        if tag == "input":
+            self.input_types[(data.get("type") or "text").lower()] += 1
+        if tag == "a" and len(self.links) < 200:
+            href = self._clean(data.get("href"), 500)
+            absolute = urljoin(self.base_url, href) if href else ""
+            if absolute and urlparse(absolute).scheme not in {"http", "https"}:
+                absolute = ""
+            self.links.append({"href": absolute})
+        if tag == "form" and len(self.forms) < 50:
+            self.forms.append({
+                "method": (data.get("method") or "get").lower(),
+                "action": self._clean(data.get("action"), 500),
+            })
+        if tag == "meta" and len(self.metadata) < 50:
+            key = data.get("name") or data.get("property") or data.get("http-equiv")
+            if key:
+                self.metadata.append({
+                    "key": self._clean(key, 100),
+                    "content": self._clean(data.get("content")),
+                })
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag.lower() == "title":
+            self.in_title = False
+
+    def handle_data(self, data: str) -> None:
+        self._inspect_untrusted(data)
+        if self.in_title:
+            self.title_parts.append(data)
+
+    def inventory(self) -> dict:
+        landmarks = {tag: self.tags[tag] for tag in ("header", "nav", "main", "aside", "footer")
+                     if self.tags[tag]}
+        interactive = {tag: self.tags[tag] for tag in ("a", "button", "select", "textarea")
+                       if self.tags[tag]}
+        if self.tags["input"]:
+            interactive["input"] = self.tags["input"]
+        return {
+            "title": self._clean(" ".join(self.title_parts), 300),
+            "tag_counts": dict(sorted(self.tags.items())),
+            "headings": dict(sorted(self.headings.items())),
+            "landmarks": landmarks,
+            "interactive_elements": interactive,
+            "input_types": dict(sorted(self.input_types.items())),
+            "links": self.links,
+            "forms": self.forms,
+            "metadata": self.metadata,
+            "content_safety": {
+                "untrusted_content": True,
+                "prompt_injection_signals": self.prompt_injection_signals,
+                "policy_effect": "NONE_CONTENT_TREATED_AS_DATA",
+            },
+        }
+
+
+def provisional_payload(observation_class: str) -> dict:
+    mode, pipeline_mode, tool_risk_tier = classify_observation_mode(observation_class)
+    return {
+        "schema_version": "sdb.provisional-observation.v1",
+        "observation_class": mode,
+        "pipeline_mode": pipeline_mode,
+        "tool_risk_tier": tool_risk_tier,
+        **PROVISIONAL_FIELDS,
+    }
+
+
+def _fixture_source(path_text: str) -> dict:
+    path = Path(path_text).expanduser().resolve()
+    if not path.is_file():
+        raise ForgeError(f"OBSERVATION_FIXTURE_NOT_FOUND: {path}", 2)
+    if path.stat().st_size > MAX_OBSERVATION_BYTES:
+        raise ForgeError("BLOCKED_RESPONSE_TOO_LARGE", 2)
+    return {
+        "html": path.read_text(encoding="utf-8", errors="replace"),
+        "requested_url": path.as_uri(),
+        "final_url": path.as_uri(),
+        "network_boundary": {"fixture": True, "network_used": False},
+    }
+
+
+def save_provisional(payload: dict, label: str) -> Path:
+    if not re.fullmatch(r"[a-z0-9][a-z0-9._-]{0,63}", label or ""):
+        raise ForgeError("INVALID_SAVE_LABEL: use lowercase slug (max 64 chars)", 2)
+    base = (REPO / "runs" / "provisional-observations").resolve()
+    destination = base / label / "observation.json"
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    if base not in destination.resolve().parents:
+        raise ForgeError("BLOCKED_OUTPUT_BOUNDARY", 2)
+    payload["output_lifecycle"] = "PERSISTENT_NONCANONICAL_SANITIZED"
+    payload["saved_to"] = repo_rel(destination)
+    write_json(destination, payload)
+    return destination
+
+
+def cmd_observe(args) -> int:
+    """Architecture A: M0 runs passively; M1/M2/M3 remain explicit fail-closed."""
+    mode, _, _ = classify_observation_mode(args.mode)
+    payload = provisional_payload(mode)
+    payload["output_lifecycle"] = "TRANSIENT"
+    payload["execution_policy"] = {
+        "read_only": True,
+        "active_provider_execution": False,
+        "allowed_tools": list(READ_ONLY_TOOLS),
+        "page_content_is_authority": False,
+    }
+
+    if mode == "M1":
+        payload["status"] = "BLOCKED_TRUST_CONTEXT_UNAVAILABLE"
+        payload["reason"] = "trusted operator/session ingress is not implemented"
+        print(json.dumps(payload, indent=2, ensure_ascii=False))
+        return 3
+    if mode == "M2":
+        payload["status"] = "BLOCKED_FORMAL_PIPELINE_REQUIRED"
+        payload["reason"] = "use existing recon + Gate #0; no automatic downgrade"
+        print(json.dumps(payload, indent=2, ensure_ascii=False))
+        return 2
+    if mode == "M3":
+        payload["status"] = "BLOCKED_RESTRICTED_HIGH_RISK"
+        payload["reason"] = "restricted/intrusive activity requires a separate approval process"
+        print(json.dumps(payload, indent=2, ensure_ascii=False))
+        return 2
+
+    if bool(args.url) == bool(args.fixture):
+        raise ForgeError("M0_REQUIRES_EXACTLY_ONE_SOURCE: --url or --fixture", 2)
+    source = _fixture_source(args.fixture) if args.fixture else fetch_public_html(
+        args.url, timeout=args.timeout
+    )
+    parser = PassiveHTMLAnalyzer(source["final_url"])
+    parser.feed(source["html"])
+    parser.close()
+    payload.update({
+        "status": "PROVISIONAL_OBSERVATION",
+        "source": {
+            "requested": source["requested_url"],
+            "final": source["final_url"],
+            "network_boundary": source["network_boundary"],
+        },
+        "observation": parser.inventory(),
+    })
+    if args.save:
+        save_provisional(payload, args.label)
+    print(json.dumps(payload, indent=2, ensure_ascii=False))
+    return 0
 
 
 # --------------------------------------------------------------------------- doctor
@@ -1049,6 +1403,19 @@ def main(argv=None) -> int:
     p.add_argument("--kind", choices=sorted(PLANS), default="web")
     p.add_argument("--json", action="store_true")
     p.set_defaults(func=cmd_plan)
+
+    o = sub.add_parser(
+        "observe",
+        help="observasi publik pasif provisional (Architecture A)",
+    )
+    o.add_argument("--mode", required=True, help="explicit M0, M1, M2, or M3")
+    source = o.add_mutually_exclusive_group()
+    source.add_argument("--url", default="", help="public http/https URL (M0 only)")
+    source.add_argument("--fixture", default="", help="local deterministic HTML fixture")
+    o.add_argument("--timeout", type=float, default=10.0)
+    o.add_argument("--save", action="store_true", help="save sanitized noncanonical output")
+    o.add_argument("--label", default="observation", help="lowercase save label")
+    o.set_defaults(func=cmd_observe)
 
     r = sub.add_parser("recon", help="panen bukti dengan REA (browser CDP milik sendiri)")
     r.add_argument("--target", required=True)

@@ -207,7 +207,13 @@ def _parse_block(lines, i, indent):
             if _indent_of(raw) < indent or not raw.lstrip().startswith("- "):
                 break
             content = raw.lstrip()[2:]
-            head, _, tail = content.partition(":")
+            head, sep, tail = content.partition(":")
+            # YAML: titik dua hanya pemisah kunci bila diikuti spasi/akhir baris
+            # (`key: value`). `- /tmp:size=64m` dan `- a:b` adalah SCALAR utuh;
+            # tanpanya parser membuat dict {"/tmp": "size=64m"} (artefak compose
+            # rt-rw-portal, CR-SDB-YAML-01).
+            if sep and tail and not tail[0].isspace():
+                sep, head, tail = "", content, ""
             if tail and not content.startswith(("[", "{")) and not re.match(r'^["\']', content):
                 while not _balanced(tail) and i + 1 < len(lines):
                     i += 1

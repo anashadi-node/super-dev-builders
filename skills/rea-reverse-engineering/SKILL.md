@@ -18,9 +18,10 @@ metadata:
 
 # REA — Reverse Engineer Anything (integrasi SDB)
 
-REA menjawab satu jenis pertanyaan yang tidak bisa dijawab source repo: **apa yang sebenarnya dilakukan
-artefak yang dikirim ke pengguna** — bundle Electron, ASAR, APK, biner native, halaman web. Setiap temuan
-dibawa sebagai Evidence ber-hash dengan label CONFIRMED / INFERRED / UNKNOWN.
+REA menjawab pertanyaan tentang **apa yang tampak atau dilakukan artefak yang dikirim ke pengguna** — bundle
+Electron, ASAR, APK, biner native, atau halaman web. Jalur M0 hanya menghasilkan observasi provisional;
+jalur investigasi formal M2 membawa temuan sebagai Evidence ber-hash dengan label
+CONFIRMED / INFERRED / UNKNOWN.
 
 Integrasi ini **CLI-first**. MCP server REA (229 tool, 3,79 MB skema) **tidak** didaftarkan ke profil Hermes
 mana pun secara default — alasannya biaya konteks, bukan ketidakpercayaan. Lihat `reports/REA_AUDIT_20261026.md` §5.
@@ -34,11 +35,24 @@ Pakai bila klaim bergantung pada **artefak terkirim**, bukan source:
 
 **Jangan** pakai bila:
 - source repo lengkap tersedia dan bisa dibaca langsung → pakai `codebase-map` / tools repo biasa;
-- target tidak punya izin tertulis → **STOP**, Gate #0 dulu (§2);
-- pertanyaannya sekadar "aplikasi ini pakai framework apa" → fingerprint visual/capture biasa lebih murah;
+- target investigasi M2 tidak punya izin tertulis → **STOP**, Gate #0 dulu (§2);
+- pertanyaannya sekadar "aplikasi ini pakai framework apa" → M0 atau fingerprint visual biasa lebih murah;
 - target memuat data pribadi/kredensial yang tidak boleh masuk konteks (§7).
 
-## 2. Prasyarat wajib — Gate #0 (tidak bisa dilewati)
+### 1.1 Empat mode yang tidak boleh dicampur
+
+| Mode | Jalur | Tier | Perilaku |
+|---|---|---|---|
+| M0 public passive observation | A | T0 | `tools/recon-forge.py observe --mode M0`; GET publik/fixture, read-only, output `PROVISIONAL_OBSERVATION` |
+| M1 owner-authenticated observation | A | T1 | kontrak tersedia tetapi **fail-closed**: `BLOCKED_TRUST_CONTEXT_UNAVAILABLE` sampai trusted ingress nyata ada |
+| M2 formal investigation | B | T2 | command `recon` existing; Gate #0, Stage 01B/01C, DID, hash, dan evidence tetap wajib |
+| M3 restricted/high-risk | B | T3 | diblokir dan tidak pernah otomatis turun ke M0/M1 |
+
+Mode kosong, unknown, atau ambigu = blocked sebelum provider berjalan. `observation_class`, `pipeline_mode`,
+dan `tool_risk_tier` adalah tiga namespace terpisah. M0 tidak mengklaim evidence formal, otorisasi
+rekonstruksi, atau handoff DID. Save eksplisit masuk `runs/provisional-observations/`, bukan `evidence/`.
+
+## 2. Prasyarat wajib — Gate #0 untuk M2 formal
 
 ```bash
 cd ~/super-dev-builders
@@ -123,7 +137,7 @@ Redaksi dulu, simpan kemudian: jalankan `scripts/redact_network.py` untuk captur
 
 ## 7. Larangan keras
 
-1. Tidak ada analisis tanpa Gate #0 PASS.
+1. M2 formal tidak boleh berjalan tanpa Gate #0 PASS; pengecualian ini hanya untuk M0 publik pasif.
 2. Tidak ada `debug`/frida/adb (T2–T3) tanpa approval tertulis per aksi.
 3. Tidak ada credential, cookie, token, PII, atau isi dompet/kunci privat yang masuk Evidence atau konteks.
    Bila artefak memuatnya: catat sebagai temuan "berisi data sensitif", **jangan** salin nilainya.

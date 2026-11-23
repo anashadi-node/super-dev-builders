@@ -33,6 +33,7 @@ tanggalnya menang — dan yang kalah **harus** dipindahkan ke `docs/archive/`, b
 | `adr/0006-worker-lease-dan-idempotensi.md` | klaim atomik, lease, penyelesaian tepat sekali |
 | `adr/0007-pengetatan-pasca-audit.md` | siapa boleh menutup job, batal ditagih pemakaian, invoice admin, hash v2 |
 | `adr/0008-html-dokumen-dilacak-dan-gerbang-docs-lint.md` | HTML dokumen berdaftar boleh dilacak; `make docs-lint` menegakkan indeks, PDF, dan klaim angka |
+| `adr/0009-owner-directed-flexible-rea.md` | M0 public passive provisional; M1 fail-closed; M2 tetap formal; M3 blocked |
 
 ## Kebijakan & keamanan
 
@@ -45,6 +46,7 @@ tanggalnya menang — dan yang kalah **harus** dipindahkan ke `docs/archive/`, b
 | `THIRD_PARTY_SKILLS_DECISION_2026-10-05.md` | keputusan skill pihak ketiga |
 | `SECURITY_GATE_10.md` | gerbang keamanan lapis 10: apa yang diperiksa sebelum klaim "aman" |
 | `TECHNOLOGY_GOVERNANCE.md` | pemilihan teknologi |
+| `RESTRICTED_BUILDER_C2B2M.md` | execution pack akun builder least-privilege (A″): matriks uji, canary, rollback — belum dieksekusi |
 
 ## Pipeline & bukti
 
@@ -81,7 +83,7 @@ tanggalnya menang — dan yang kalah **harus** dipindahkan ke `docs/archive/`, b
 
 | Dokumen | Isi |
 |---|---|
-| `INTEGRASI_REA.md` | REA CLI terpin (audit + prosedur upgrade) |
+| `INTEGRASI_REA.md` | REA CLI terpin + kontrak Flexible REA M0–M3 dan batas WS-2 |
 | `INTEGRASI_REPLICA.md` | integrasi `replica-skill` (Zona B) + kebijakan clone |
 | `RECON_FORGE.md` | orkestrator recon/paritas (`tools/recon-forge.py`): jalur web + native, akar izin, invarian bukti |
 | `INTEGRASI_GITHUB_VERCEL_SUPABASE.md` | integrasi repo/deploy/DB |
@@ -134,3 +136,8 @@ sumbernya `.md`). Jangan menautkan arsip sebagai rujukan utama.
 | `platform/schemas/*.schema.json` | kontrak tenant/job/artifact |
 | `platform/packs/*.json` | manifest skill per divisi (hash + lisensi) |
 | `THIRD_PARTY_NOTICES.md` | lisensi pihak ketiga + aturan pemisahan CC-BY-SA |
+| `BE_SP12_EVIDENCE_CONTRACT.md` | implementation pack C1/BE-SP-12: kontrak evidence 9 field, aturan tolak, allowlist berkas |
+| `BE_SP03_API_CONTRACT.md` | kontrak API control plane v1 (C1-02 BE-SP-03): 2 keluarga endpoint, error envelope, job_object, aturan kompatibilitas |
+| `SDB_C1_CAPABILITY_ROUTING.md` | C1-03 router capability: lane/profile, approval store, sandbox bwrap allowlist, kontrak hasil, batas yang diterima |
+| `../reports/SDB_C1_04_GATE_RECOVERY_RESULT.md` | C1-04 pemulihan gerbang: akar masalah gitleaks (riwayat), diagnosis fixture, smoke sandbox offline, keputusan Owner |
+| `../reports/SDB_C1_05_UNBLOCK_RESULT.md` | C1-05: rewrite riwayat lokal, fixture reproducible dan hardened, Hermes offline preflight, gerbang final |

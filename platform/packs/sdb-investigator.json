@@ -63,7 +63,7 @@
   {
    "id": "rea-reverse-engineering",
    "path": "skills/rea-reverse-engineering",
-   "sha256": "5b852dc8e860a23279d5e6400cfa1e5eeabc26dd8bc66f9c4122df57a4b29ae2",
+   "sha256": "49d4c8b1a9cf65b1b95cc3ea19e9c1afb7b3cd06c11b912d97565cdf9c74b7bc",
    "license": "BUSL-1.1"
   },
   {
@@ -75,7 +75,7 @@
   {
    "id": "reconstruction-scope-gate",
    "path": "skills/reconstruction-scope-gate",
-   "sha256": "733cc49220f40da7401f9a1b2a6b80daeb1e505b5d5c7149a9de46e38e45233c",
+   "sha256": "3133e08e657827f86d8d3f80c2a5ad4502a6b767210387e16d2eaaff01f5ca36",
    "license": "BUSL-1.1"
   },
   {

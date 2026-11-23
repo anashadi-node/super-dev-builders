@@ -75,6 +75,58 @@ def test_custom_skill_registered_and_count_matches():
         "approved_custom_count tidak cocok dengan jumlah entri (registry_lint akan WARN)"
 
 
+def test_flexible_rea_ws2_registry_and_agent_contract():
+    tools = load_yaml(repo_path("registry", "tools.yaml")) or {}
+    observe = next(
+        (t for t in (tools.get("present") or []) if t.get("id") == "recon_forge_observe"),
+        None,
+    )
+    assert observe is not None, "recon_forge_observe tidak terdaftar"
+    assert "M0" in str(observe.get("policy"))
+    assert "M1 fail-closed" in str(observe.get("policy"))
+    assert "M3 blocked" in str(observe.get("policy"))
+    assert "no automatic downgrade" in str(observe.get("policy"))
+
+    skills = load_yaml(repo_path("registry", "skills.yaml")) or {}
+    rea = next((s for s in (skills.get("custom") or []) if s.get("id") == "rea-reverse-engineering"), None)
+    assert rea is not None
+    assert "tools/recon-forge.py" in (rea.get("scripts") or [])
+    assert "M2 formal tetap Gate #0 PASS" in str(rea.get("gate"))
+
+    agent = load_yaml(repo_path("agents", "sdb-recon.yaml")) or {}
+    modes = agent.get("mode_contract") or {}
+    assert modes["M0"]["tool_risk_tier"] == "T0"
+    assert modes["M0"]["gate0_required"] is False
+    assert modes["M1"]["status"] == "BLOCKED_TRUST_CONTEXT_UNAVAILABLE"
+    assert modes["M2"]["gate0_required"] is True
+    assert modes["M2"]["contract_changed"] is False
+    assert modes["M3"]["status"] == "BLOCKED_RESTRICTED_HIGH_RISK"
+    assert modes["invalid_mode"]["automatic_downgrade"] is False
+    provisional = agent.get("provisional_contract") or {}
+    assert provisional["artifact_class"] == "PROVISIONAL_OBSERVATION"
+    assert provisional["formal_evidence_eligible"] is False
+    assert provisional["canonical_did_handoff_eligible"] is False
+
+
+def test_flexible_rea_docs_and_scope_gate_are_consistent():
+    paths = (
+        repo_path("docs", "INTEGRASI_REA.md"),
+        repo_path("docs", "adr", "0009-owner-directed-flexible-rea.md"),
+        repo_path("skills", "rea-reverse-engineering", "SKILL.md"),
+        repo_path("skills", "reconstruction-scope-gate", "SKILL.md"),
+    )
+    for path in paths:
+        assert os.path.isfile(path), path
+        body = open(path, encoding="utf-8").read()
+        for needle in (
+            "PROVISIONAL_OBSERVATION",
+            "BLOCKED_TRUST_CONTEXT_UNAVAILABLE",
+            "M2",
+            "M3",
+        ):
+            assert needle in body, f"{path} kehilangan kontrak {needle}"
+
+
 def test_wrapper_runs_pinned_binary_when_installed():
     """Lewati (bukan gagal) bila tool belum terpasang di host ini."""
     prefix = os.path.expanduser(f"~/.hermes/tools/rea-{REA_VERSION}")

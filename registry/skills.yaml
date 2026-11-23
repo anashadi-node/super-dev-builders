@@ -259,10 +259,10 @@ custom:
     divisions: [D1, D3, D7, D8]
     profiles: [sdb-orchestrator, sdb-recon, sdb-architect, sdb-reviewer, sdb-security, sdb-investigator]
     path: skills/rea-reverse-engineering
-    scripts: [scripts/rea]
+    scripts: [scripts/rea, tools/recon-forge.py]
     tool: rea_agents
     upstream: "morluto/rea — rea-agents@6.8.0 (MIT), audit reports/REA_AUDIT_20261026.md"
-    gate: "Gate #0 PASS wajib untuk setiap target; tier T0-T3, T2/T3 butuh approval per aksi; MCP 229 tool TIDAK didaftarkan (3,79 MB skema)"
+    gate: "M0 public passive via recon-forge observe tidak butuh Gate #0 dan selalu provisional; M1 fail-closed; M2 formal tetap Gate #0 PASS + Stage 01B/01C + DID/hash; M3 blocked; tanpa automatic downgrade"
     evidence: reports/REA_AUDIT_20261026.md
   - id: replica-skill-pipeline
     status: ADD

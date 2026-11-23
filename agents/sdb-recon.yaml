@@ -1,19 +1,43 @@
 id: sdb-recon
 hermes_profile: cc-capture-forensics      # direktori profil Hermes aktual (nama lama dipertahankan agar sesi & state.db tidak rusak)
 divisions: [D1]
-mission: "Observasi sah target, bangun evidence package, normalisasi, dan spesifikasi ulang tanpa menembus proteksi."
+mission: "Observasi publik provisional M0 atau recon formal M2 tanpa menembus proteksi."
 permissions:
   read: [target_public_surface, authorized_artifacts]
-  write: [evidence/<target>/, normalized/<target>/]
-  execute: [playwright, crawlee(rate_limited), evidence_lint, redact_network,
+  write: [runs/provisional-observations/ (M0_explicit_save_only), evidence/<target>/ (M2_only),
+          normalized/<target>/ (M2_only)]
+  execute: [recon-forge_observe_M0, playwright (M2_only), crawlee(rate_limited,M2_only),
+            evidence_lint (M2_only), redact_network (M2_only),
             mobsf|jadx|apktool|ghidra (mode_B_isolated_only)]
   network: restricted_egress
   forbidden: [auth_bypass, captcha_bypass, paywall_bypass, rate_limit_bypass, drm_bypass,
               pinning_bypass, brute_force_endpoints, credential_capture, secret_storage,
               third_party_tls_interception]
-inputs: [authorization_manifest_PASS, target_manifest]
-outputs: [normalized/*.json, inventory.json, screens.json, components.json, network.json, technology.json,
-          FEATURE_MATRIX.md, SPEC.md]
+inputs:
+  M0: [owner_operational_instruction, public_url_or_local_fixture]
+  M1: [trusted_operator_session_ingress]
+  M2: [authorization_manifest_PASS, target_manifest]
+outputs:
+  M0: [PROVISIONAL_OBSERVATION]
+  M1: [BLOCKED_TRUST_CONTEXT_UNAVAILABLE]
+  M2: [normalized/*.json, inventory.json, screens.json, components.json, network.json,
+       technology.json, FEATURE_MATRIX.md, SPEC.md]
+mode_contract:
+  M0: {pipeline_mode: A, tool_risk_tier: T0, gate0_required: false, active: true}
+  M1: {pipeline_mode: A, tool_risk_tier: T1, status: BLOCKED_TRUST_CONTEXT_UNAVAILABLE}
+  M2: {pipeline_mode: B, tool_risk_tier: T2, gate0_required: true, contract_changed: false}
+  M3: {pipeline_mode: B, tool_risk_tier: T3, status: BLOCKED_RESTRICTED_HIGH_RISK}
+  invalid_mode: {status: BLOCKED_INVALID_OBSERVATION_MODE, automatic_downgrade: false}
+provisional_contract:
+  artifact_class: PROVISIONAL_OBSERVATION
+  planning_reference_eligible: true
+  formal_evidence_eligible: false
+  stage_01B_satisfied: false
+  canonical_did_handoff_eligible: false
+  reconstruction_authorized: false
+  validation_status: PROVISIONAL_UNVALIDATED
+  default_output: transient
+  persistent_output: runs/provisional-observations/
 evidence_rules:
   require_status: [FACT, INFERRED, UNKNOWN, OUT_OF_SCOPE]
   require_confidence_when_inferred: true

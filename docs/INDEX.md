@@ -33,6 +33,7 @@ tanggalnya menang — dan yang kalah **harus** dipindahkan ke `docs/archive/`, b
 | `adr/0006-worker-lease-dan-idempotensi.md` | klaim atomik, lease, penyelesaian tepat sekali |
 | `adr/0007-pengetatan-pasca-audit.md` | siapa boleh menutup job, batal ditagih pemakaian, invoice admin, hash v2 |
 | `adr/0008-html-dokumen-dilacak-dan-gerbang-docs-lint.md` | HTML dokumen berdaftar boleh dilacak; `make docs-lint` menegakkan indeks, PDF, dan klaim angka |
+| `adr/0009-owner-directed-flexible-rea.md` | M0 public passive provisional; M1 fail-closed; M2 tetap formal; M3 blocked |
 
 ## Kebijakan & keamanan
 
@@ -82,7 +83,7 @@ tanggalnya menang — dan yang kalah **harus** dipindahkan ke `docs/archive/`, b
 
 | Dokumen | Isi |
 |---|---|
-| `INTEGRASI_REA.md` | REA CLI terpin (audit + prosedur upgrade) |
+| `INTEGRASI_REA.md` | REA CLI terpin + kontrak Flexible REA M0–M3 dan batas WS-2 |
 | `INTEGRASI_REPLICA.md` | integrasi `replica-skill` (Zona B) + kebijakan clone |
 | `RECON_FORGE.md` | orkestrator recon/paritas (`tools/recon-forge.py`): jalur web + native, akar izin, invarian bukti |
 | `INTEGRASI_GITHUB_VERCEL_SUPABASE.md` | integrasi repo/deploy/DB |

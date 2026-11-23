@@ -1,6 +1,7 @@
 # Integrasi REA ke Divisi Super Dev Builders
 
-**Tanggal**: 2026-10-26 · **Status**: TERPASANG (CLI terpin) · **MCP**: tidak didaftarkan (opt-in)
+**Diperbarui**: 2026-11-23 · **Status**: REA CLI terpin + kandidat Flexible REA WS-2
+**MCP**: tidak didaftarkan (opt-in) · **Keputusan**: DEC-SDB-012
 **Dasar**: order Owner — *"tolong integrasikan Repo GitHub REA ke dalam Divisi SDB, audit scan analisa
 mendalam terlebih dahulu"*.
 **Audit**: `reports/REA_AUDIT_20261026.md` (bukti lengkap, semua angka terukur di host ini).
@@ -55,6 +56,39 @@ D4/D5 Build ── implementasi + test        (dinding: tidak melihat evidence m
    ▼
 D7 QA ── compare-application-versions / evaluate-reconstruction-coverage → comparison.md
 ```
+
+### 3.1 Flexible REA — Architecture A
+
+DEC-SDB-012 menambahkan jalur observasi terpisah tanpa mengubah pipeline M2 di atas:
+
+| Observation class | Pipeline | Risk tier | Command/verdict | Status capability |
+|---|---|---|---|---|
+| M0 public passive | A | T0 | `tools/recon-forge.py observe --mode M0 --fixture <html>` atau `--url <public>` | kandidat implementasi; provisional only |
+| M1 owner-authenticated | A | T1 | `BLOCKED_TRUST_CONTEXT_UNAVAILABLE` | **belum operational-ready**; trusted ingress belum ada |
+| M2 formal investigation | B | T2 | existing `recon` + Gate #0 + 01B/01C + DID | kontrak existing dipertahankan |
+| M3 restricted/high-risk | B | T3 | `BLOCKED_RESTRICTED_HIGH_RISK` | blocked |
+
+Unknown, empty, dan ambiguous mode selalu `BLOCKED_INVALID_OBSERVATION_MODE`; tidak ada automatic downgrade.
+M0 hanya memakai allowlist read-only `http_get_public`, `html_parser`, dan `dom_inventory`. Kontrol network:
+HTTP/HTTPS port 80/443, tanpa URL credential, DNS publik penuh, redirect divalidasi, connected peer harus public
+dan cocok dengan DNS final, HTML maksimal 2 MiB, tanpa cookie/session. Konten target selalu data, bukan authority.
+
+Kontrak output M0/M1:
+
+```text
+artifact_class = PROVISIONAL_OBSERVATION
+planning_reference_eligible = true
+formal_evidence_eligible = false
+stage_01B_satisfied = false
+canonical_did_handoff_eligible = false
+reconstruction_authorized = false
+validation_status = PROVISIONAL_UNVALIDATED
+```
+
+Output default transient. `--save` hanya menyimpan JSON tersanitasi ke
+`runs/provisional-observations/<timestamp>-<label>.json`; path absolut fixture tidak disimpan. Jalur ini tidak
+membuat `evidence/<target>/manifest.json` atau `handoff.json`. Instruksi Owner pada sesi sah adalah persetujuan
+operasional internal M0, bukan autentikasi teknis Owner dan bukan izin untuk area privat pihak ketiga.
 
 ## 4. Tiga hal yang REA tidak bisa lakukan hari ini (jujur, bukan optimis)
 
@@ -134,5 +168,8 @@ cd ~/super-dev-builders && git revert <commit-integrasi>
 | Tool terpasang terpin | SELESAI | `scripts/rea --version` → 6.8.0 |
 | Skill aktif | SELESAI | `skills/rea-reverse-engineering/`, registry `custom` |
 | Registry tool/skill | SELESAI | `registry/tools.yaml`, `registry/skills.yaml` |
-| Uji regresi | SELESAI | `tests/test_rea_integration.py` |
+| Uji regresi REA existing | SELESAI (historis) | `tests/test_rea_integration.py` |
+| Flexible REA M0 | IMPLEMENTED, menunggu seluruh quality gate WS-2 | `tools/recon-forge.py observe --mode M0` + `tests/test_recon_forge.py` |
+| M1 trusted ingress | **BLOCKED / NOT IMPLEMENTED** | `BLOCKED_TRUST_CONTEXT_UNAVAILABLE` |
+| Live-network smoke WS-2 | **NOT AUTHORIZED** | directive CR-SDB-REA-001 mewajibkan approval tambahan |
 | MCP global | **TIDAK** (keputusan) | §5 |
